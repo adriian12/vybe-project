@@ -1,24 +1,19 @@
-import { useLocation } from "react-router-dom";
-import { useEffect } from "react";
+
+import { Link } from "react-router-dom";
+import { PartyButton } from "@/components/ui-custom/party-button";
 
 const NotFound = () => {
-  const location = useLocation();
-
-  useEffect(() => {
-    console.error(
-      "404 Error: User attempted to access non-existent route:",
-      location.pathname
-    );
-  }, [location.pathname]);
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <div className="min-h-screen flex items-center justify-center p-4">
       <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">404</h1>
-        <p className="text-xl text-gray-600 mb-4">Oops! Page not found</p>
-        <a href="/" className="text-blue-500 hover:text-blue-700 underline">
-          Return to Home
-        </a>
+        <div className="text-7xl mb-4">🎭</div>
+        <h1 className="text-3xl font-bold mb-2">Página no encontrada</h1>
+        <p className="text-party-gray mb-6">
+          Parece que la fiesta que buscas no está aquí
+        </p>
+        <PartyButton asChild variant="gradient">
+          <Link to="/">Volver a la fiesta</Link>
+        </PartyButton>
       </div>
     </div>
   );
