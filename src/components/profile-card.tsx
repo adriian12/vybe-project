@@ -1,21 +1,25 @@
 
 import React, { useState } from "react";
 import { User } from "@/types/user";
-import { X, Check, MapPin } from "lucide-react";
+import { X, Check, MapPin, Star, Crown } from "lucide-react";
 import { PartyButton } from "./ui-custom/party-button";
 
 interface ProfileCardProps {
   user: User;
   onSwipeLeft: (userId: string) => void;
   onSwipeRight: (userId: string) => void;
+  onSuperLike?: (userId: string) => void;
+  isPremium?: boolean;
 }
 
 const ProfileCard: React.FC<ProfileCardProps> = ({
   user,
   onSwipeLeft,
   onSwipeRight,
+  onSuperLike,
+  isPremium = false,
 }) => {
-  const [swipeDirection, setSwipeDirection] = useState<'left' | 'right' | null>(null);
+  const [swipeDirection, setSwipeDirection] = useState<'left' | 'right' | 'up' | null>(null);
 
   const handleSwipeLeft = () => {
     setSwipeDirection('left');
@@ -33,10 +37,22 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
     }, 300);
   };
 
+  const handleSuperLike = () => {
+    if (!onSuperLike) return;
+    
+    setSwipeDirection('up');
+    setTimeout(() => {
+      onSuperLike(user.id);
+      setSwipeDirection(null);
+    }, 300);
+  };
+
   const cardClass = swipeDirection === 'left' 
     ? 'swiping-left' 
     : swipeDirection === 'right' 
     ? 'swiping-right' 
+    : swipeDirection === 'up'
+    ? 'swiping-up'
     : '';
 
   return (
@@ -63,6 +79,17 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
               >
                 <X size={24} />
               </PartyButton>
+
+              {isPremium && onSuperLike && (
+                <PartyButton 
+                  variant="accent" 
+                  size="round" 
+                  className="shadow-lg"
+                  onClick={handleSuperLike}
+                >
+                  <Star size={24} />
+                </PartyButton>
+              )}
               
               <PartyButton 
                 variant="accent" 
@@ -73,6 +100,15 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
                 <Check size={24} />
               </PartyButton>
             </div>
+
+            {!isPremium && (
+              <div className="mt-4">
+                <button className="w-full py-1 px-2 bg-party-accent/30 backdrop-blur-sm rounded-lg text-white text-xs flex items-center justify-center">
+                  <Crown size={12} className="mr-1" />
+                  Desbloquea Super Likes con Vybe Premium
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
