@@ -28,7 +28,7 @@ const HomePage = () => {
       handleSwipeLeft(userId);
     } else {
       const result = await handleSwipeRight(userId);
-      // Corregido: comprobamos si result es true (boolean), no si es truthy
+      // Check if the result is specifically true (boolean)
       if (result === true && currentProfile) {
         setMatchedUser(currentProfile);
         setShowMatchDialog(true);

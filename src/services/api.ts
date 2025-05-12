@@ -1,5 +1,6 @@
 
 import { User } from "@/types/user";
+import { Venue } from "@/types/venue";
 
 // Usuarios de ejemplo
 const MOCK_USERS: User[] = [
@@ -55,12 +56,47 @@ const MOCK_USERS: User[] = [
   },
 ];
 
+// Locales de ejemplo
+const MOCK_VENUES: Venue[] = [
+  {
+    id: "v1",
+    name: "Pachá Mallorca",
+    email: "info@pachamallorca.com",
+    type: "discoteca",
+    isVerified: true,
+    location: {
+      latitude: 39.5696,
+      longitude: 2.6502,
+      address: "Paseo Marítimo, 42, Palma"
+    },
+    eventRadius: 50
+  },
+  {
+    id: "v2",
+    name: "Festival Mallorca Live",
+    email: "contacto@mallorcalive.com",
+    type: "festival",
+    isVerified: true,
+    location: {
+      latitude: 39.5307,
+      longitude: 2.7338,
+      address: "Calvià, Mallorca"
+    },
+    eventRadius: 500
+  }
+];
+
 export const api = {
   // Simula verificar un código de evento
-  verifyEventCode: async (code: string): Promise<boolean> => {
+  verifyEventCode: async (code: string): Promise<{isValid: boolean, eventType: string}> => {
     return new Promise(resolve => {
       setTimeout(() => {
-        resolve(code.length > 5);
+        // Simula que ciertos códigos corresponden a festivales
+        const eventType = code.toLowerCase().includes('fest') ? 'festival' : 'discoteca';
+        resolve({
+          isValid: code.length > 5,
+          eventType
+        });
       }, 1000);
     });
   },
@@ -114,4 +150,14 @@ export const api = {
       }, 1500);
     });
   },
+
+  // Simula generar un código QR para un local
+  generateQRCode: async (venueId: string): Promise<string> => {
+    return new Promise(resolve => {
+      setTimeout(() => {
+        // En un caso real, se generaría un código QR único
+        resolve(`VYBE-${venueId}-${new Date().toISOString().split('T')[0]}`);
+      }, 1000);
+    });
+  }
 };

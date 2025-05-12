@@ -1,6 +1,7 @@
 
 import { createContext, useState, useContext, ReactNode, useEffect } from "react";
 import { User } from "@/types/user";
+import { Venue } from "@/types/venue";
 import { api } from "@/services/api";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -8,7 +9,9 @@ interface AppContextType {
   isLoggedIn: boolean;
   isLocationVerified: boolean;
   isEventVerified: boolean;
+  userType: 'user' | 'venue' | null;
   currentUser: User | null;
+  currentVenue: Venue | null;
   nearbyProfiles: User[];
   matches: User[];
   currentProfile: User | null;
@@ -16,9 +19,10 @@ interface AppContextType {
   verifyLocation: () => Promise<boolean>;
   verifyEventCode: (code: string) => Promise<boolean>;
   handleSwipeLeft: (userId: string) => void;
-  handleSwipeRight: (userId: string) => void;
+  handleSwipeRight: (userId: string) => Promise<boolean>;
   loadNextProfile: () => void;
   login: (phone: string) => Promise<boolean>;
+  loginVenue: (email: string, name: string, type: string) => Promise<boolean>;
   logout: () => void;
 }
 
@@ -37,18 +41,21 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLocationVerified, setIsLocationVerified] = useState(false);
   const [isEventVerified, setIsEventVerified] = useState(false);
+  const [userType, setUserType] = useState<'user' | 'venue' | null>(null);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [currentVenue, setCurrentVenue] = useState<Venue | null>(null);
   const [nearbyProfiles, setNearbyProfiles] = useState<User[]>([]);
   const [matches, setMatches] = useState<User[]>([]);
   const [currentProfile, setCurrentProfile] = useState<User | null>(null);
+  const [eventRadius, setEventRadius] = useState(50); // Radio en metros (default 50m)
   
   // Efectos para cargar datos iniciales
   useEffect(() => {
-    if (isLoggedIn && isLocationVerified && isEventVerified) {
+    if (isLoggedIn && userType === 'user' && isLocationVerified && isEventVerified) {
       loadProfiles();
       loadMatches();
     }
-  }, [isLoggedIn, isLocationVerified, isEventVerified]);
+  }, [isLoggedIn, userType, isLocationVerified, isEventVerified]);
   
   // Simula cargar el perfil actual si hay perfiles cercanos
   useEffect(() => {
@@ -101,9 +108,20 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
   const verifyEventCode = async (code: string) => {
     try {
-      const isValid = await api.verifyEventCode(code);
-      setIsEventVerified(isValid);
-      return isValid;
+      // Aquí verificaríamos si el código corresponde a un festival para ajustar el radio
+      const eventData = await api.verifyEventCode(code);
+      
+      if (eventData.isValid) {
+        setIsEventVerified(true);
+        // Ajusta el radio dependiendo del tipo de evento
+        if (eventData.eventType === 'festival') {
+          setEventRadius(500); // 500m para festivales
+        } else {
+          setEventRadius(50); // 50m para el resto de eventos
+        }
+        return true;
+      }
+      return false;
     } catch (error) {
       toast({
         title: "Error de código",
@@ -120,7 +138,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     loadNextProfile();
   };
 
-  const handleSwipeRight = async (userId: string) => {
+  const handleSwipeRight = async (userId: string): Promise<boolean> => {
     try {
       const isMatch = await api.likeProfile(userId);
       
@@ -164,6 +182,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       const result = await api.login(phone);
       if (result.success) {
         setIsLoggedIn(true);
+        setUserType('user');
         // Aquí simularíamos cargar los datos del usuario
         setCurrentUser({
           id: result.userId || "user123",
@@ -186,11 +205,43 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const loginVenue = async (email: string, name: string, type: string) => {
+    try {
+      // Simulamos el registro/login de un local
+      setIsLoggedIn(true);
+      setUserType('venue');
+      setCurrentVenue({
+        id: "venue123",
+        name: name,
+        email: email,
+        type: type,
+        isVerified: false, // Inicialmente no verificado
+        eventRadius: type === 'festival' ? 500 : 50
+      });
+      
+      toast({
+        title: "¡Bienvenido!",
+        description: "Tu local está en proceso de verificación.",
+      });
+      
+      return true;
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "No se pudo completar el registro. Intenta más tarde.",
+        variant: "destructive",
+      });
+      return false;
+    }
+  };
+
   const logout = () => {
     setIsLoggedIn(false);
     setIsLocationVerified(false);
     setIsEventVerified(false);
+    setUserType(null);
     setCurrentUser(null);
+    setCurrentVenue(null);
     setNearbyProfiles([]);
     setMatches([]);
     setCurrentProfile(null);
@@ -200,7 +251,9 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     isLoggedIn,
     isLocationVerified,
     isEventVerified,
+    userType,
     currentUser,
+    currentVenue,
     nearbyProfiles,
     matches,
     currentProfile,
@@ -211,6 +264,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     handleSwipeRight,
     loadNextProfile,
     login,
+    loginVenue,
     logout
   };
 
