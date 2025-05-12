@@ -8,9 +8,15 @@ interface MatchDialogProps {
   isOpen: boolean;
   onClose: () => void;
   matchedUser: User | null;
+  matchName?: string;
 }
 
-const MatchDialog: React.FC<MatchDialogProps> = ({ isOpen, onClose, matchedUser }) => {
+const MatchDialog: React.FC<MatchDialogProps> = ({ 
+  isOpen, 
+  onClose, 
+  matchedUser,
+  matchName = "Vibe Check" 
+}) => {
   if (!matchedUser) return null;
 
   return (
@@ -18,7 +24,7 @@ const MatchDialog: React.FC<MatchDialogProps> = ({ isOpen, onClose, matchedUser 
       <DialogContent className="sm:max-w-md bg-party-dark border-party-primary">
         <div className="text-center py-6">
           <div className="match-gradient text-transparent bg-clip-text text-4xl font-bold mb-8 animate-pulse-soft">
-            ¡Conexión Única!
+            ¡{matchName}!
           </div>
           
           <div className="flex justify-center space-x-4 mb-8">
@@ -39,16 +45,20 @@ const MatchDialog: React.FC<MatchDialogProps> = ({ isOpen, onClose, matchedUser 
           </div>
           
           <p className="text-lg mb-6">
-            Tú y <span className="font-bold text-party-primary">{matchedUser.name}</span> tienen una conexión. ¡Inicien una conversación ahora!
+            Tú y <span className="font-bold text-party-primary">{matchedUser.name}</span> tienen buenas vibras. ¡Inicien una conversación ahora!
           </p>
           
-          <div className="flex justify-center space-x-4">
+          <div className="flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-4">
             <PartyButton variant="outline" onClick={onClose}>
               Seguir descubriendo
             </PartyButton>
             <PartyButton variant="gradient">
               Enviar mensaje
             </PartyButton>
+          </div>
+          
+          <div className="mt-6 text-sm text-party-gray">
+            <p>Recuerda: Solo puedes conectar con personas en un radio de 50m</p>
           </div>
         </div>
       </DialogContent>

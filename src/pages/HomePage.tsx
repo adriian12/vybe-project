@@ -28,7 +28,8 @@ const HomePage = () => {
       handleSwipeLeft(userId);
     } else {
       const isMatch = await handleSwipeRight(userId);
-      if (isMatch && currentProfile) {
+      // We check isMatch explicitly as a boolean, not as a truthiness check
+      if (isMatch === true && currentProfile) {
         setMatchedUser(currentProfile);
         setShowMatchDialog(true);
       }
@@ -64,6 +65,7 @@ const HomePage = () => {
         isOpen={showMatchDialog} 
         onClose={() => setShowMatchDialog(false)} 
         matchedUser={matchedUser}
+        matchName="Vibe Check"
       />
       
       <Footer />

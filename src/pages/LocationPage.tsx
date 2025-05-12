@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppContext } from "@/context/app-context";
 import { PartyButton } from "@/components/ui-custom/party-button";
-import { MapPin } from "lucide-react";
+import { MapPin, QrCode } from "lucide-react";
 import QRScanner from "@/components/qr-scanner";
 
 const LocationPage = () => {
@@ -15,7 +15,7 @@ const LocationPage = () => {
   // Si ya tenemos verificada la ubicación y el evento, ir a la página principal
   useEffect(() => {
     if (isLocationVerified && isEventVerified) {
-      navigate("/");
+      navigate("/home");
     }
   }, [isLocationVerified, isEventVerified, navigate]);
 
@@ -34,7 +34,7 @@ const LocationPage = () => {
   const handleQrScanSuccess = async (code: string) => {
     const success = await verifyEventCode(code);
     if (success) {
-      navigate("/");
+      navigate("/home");
     }
   };
 
@@ -51,8 +51,12 @@ const LocationPage = () => {
               Verifica tu ubicación
             </h1>
             
+            <p className="text-center text-party-gray mb-4 max-w-xs">
+              Vybe solo funciona dentro de eventos, discotecas o fiestas verificadas
+            </p>
+            
             <p className="text-center text-party-gray mb-8 max-w-xs">
-              Para usar PartyMatch, debes estar en un evento o local que participe en nuestra red
+              Solo podrás ver perfiles en un radio de 50m de tu ubicación actual
             </p>
             
             <PartyButton 
@@ -72,7 +76,25 @@ const LocationPage = () => {
             </PartyButton>
           </>
         ) : (
-          <QRScanner onScanSuccess={handleQrScanSuccess} />
+          <>
+            <div className="w-24 h-24 rounded-full bg-party-dark flex items-center justify-center mb-8">
+              <QrCode size={48} className="text-party-primary" />
+            </div>
+            
+            <h1 className="text-2xl font-bold text-center mb-4">
+              Escanea el código del evento
+            </h1>
+            
+            <p className="text-center text-party-gray mb-4 max-w-xs">
+              Para garantizar exclusividad, cada evento tiene su propio código QR diario
+            </p>
+            
+            <p className="text-center text-party-gray mb-8 max-w-xs">
+              Solicita el código al organizador del evento o establecimiento
+            </p>
+            
+            <QRScanner onScanSuccess={handleQrScanSuccess} />
+          </>
         )}
       </div>
     </div>
