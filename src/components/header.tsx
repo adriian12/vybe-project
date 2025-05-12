@@ -9,7 +9,7 @@ const Header = () => {
         <User size={24} className="text-party-primary" />
       </Link>
       <Link to="/" className="text-xl font-bold bg-clip-text text-transparent party-gradient">
-        PartyMatch
+        Vybe
       </Link>
       <Link to="/matches">
         <MessageCircle size={24} className="text-party-primary" />

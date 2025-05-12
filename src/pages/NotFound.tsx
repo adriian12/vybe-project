@@ -11,9 +11,9 @@ const NotFound = () => {
         <p className="text-party-gray mb-6">
           Parece que la fiesta que buscas no está aquí
         </p>
-        <PartyButton asChild variant="gradient">
-          <Link to="/">Volver a la fiesta</Link>
-        </PartyButton>
+        <Link to="/">
+          <PartyButton variant="gradient">Volver a la fiesta</PartyButton>
+        </Link>
       </div>
     </div>
   );

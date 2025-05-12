@@ -21,7 +21,7 @@ const Index = () => {
     <div className="min-h-screen flex items-center justify-center">
       <div className="animate-pulse-soft">
         <div className="text-3xl font-bold text-transparent bg-clip-text party-gradient">
-          PartyMatch
+          Vybe
         </div>
       </div>
     </div>
