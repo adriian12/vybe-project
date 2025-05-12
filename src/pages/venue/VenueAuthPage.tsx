@@ -214,7 +214,7 @@ const VenueAuthPage = () => {
                     <p className="text-sm text-party-gray mb-2">
                       Sube un documento que acredite tu negocio
                     </p>
-                    <PartyButton variant="outline" size="sm" asChild>
+                    <PartyButton variant="outline" size="sm">
                       <label htmlFor="file-upload" className="cursor-pointer">
                         Seleccionar archivo
                       </label>
