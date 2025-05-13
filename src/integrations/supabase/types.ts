@@ -9,41 +9,133 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      events: {
+      connections: {
         Row: {
+          connection_type: string
           created_at: string
-          description: string | null
-          end_date: string
           id: string
-          location: unknown | null
-          max_capacity: number | null
-          name: string
-          qr_code: string | null
-          start_date: string
+          user_id_1: string
+          user_id_2: string
+        }
+        Insert: {
+          connection_type?: string
+          created_at?: string
+          id?: string
+          user_id_1: string
+          user_id_2: string
+        }
+        Update: {
+          connection_type?: string
+          created_at?: string
+          id?: string
+          user_id_1?: string
+          user_id_2?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "connections_user_id_1_fkey"
+            columns: ["user_id_1"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "connections_user_id_2_fkey"
+            columns: ["user_id_2"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_codes: {
+        Row: {
+          active: boolean
+          code: string
+          created_at: string
+          expires_at: string
+          id: string
           venue_id: string
         }
         Insert: {
+          active?: boolean
+          code: string
           created_at?: string
-          description?: string | null
-          end_date: string
+          expires_at?: string
           id?: string
-          location?: unknown | null
-          max_capacity?: number | null
-          name: string
-          qr_code?: string | null
-          start_date: string
           venue_id: string
         }
         Update: {
+          active?: boolean
+          code?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          venue_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_codes_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      events: {
+        Row: {
+          booking_url: string | null
+          created_at: string
+          description: string | null
+          dress_code: string | null
+          end_date: string
+          id: string
+          location: unknown | null
+          max_age: number | null
+          max_capacity: number | null
+          min_age: number | null
+          name: string
+          price: number | null
+          qr_code: string | null
+          start_date: string
+          theme: string | null
+          venue_id: string
+        }
+        Insert: {
+          booking_url?: string | null
           created_at?: string
           description?: string | null
+          dress_code?: string | null
+          end_date: string
+          id?: string
+          location?: unknown | null
+          max_age?: number | null
+          max_capacity?: number | null
+          min_age?: number | null
+          name: string
+          price?: number | null
+          qr_code?: string | null
+          start_date: string
+          theme?: string | null
+          venue_id: string
+        }
+        Update: {
+          booking_url?: string | null
+          created_at?: string
+          description?: string | null
+          dress_code?: string | null
           end_date?: string
           id?: string
           location?: unknown | null
+          max_age?: number | null
           max_capacity?: number | null
+          min_age?: number | null
           name?: string
+          price?: number | null
           qr_code?: string | null
           start_date?: string
+          theme?: string | null
           venue_id?: string
         }
         Relationships: [
@@ -56,15 +148,61 @@ export type Database = {
           },
         ]
       }
+      messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          read: boolean
+          receiver_id: string
+          sender_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          read?: boolean
+          receiver_id: string
+          sender_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          read?: boolean
+          receiver_id?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_receiver_id_fkey"
+            columns: ["receiver_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           age: number
           avatar: string | null
           bio: string | null
           created_at: string
+          face_verified: boolean | null
           id: string
           is_verified: boolean
+          last_location: unknown | null
           name: string
+          phone: string | null
+          phone_verified: boolean | null
           photos: string[]
           user_id: string
         }
@@ -73,9 +211,13 @@ export type Database = {
           avatar?: string | null
           bio?: string | null
           created_at?: string
+          face_verified?: boolean | null
           id?: string
           is_verified?: boolean
+          last_location?: unknown | null
           name: string
+          phone?: string | null
+          phone_verified?: boolean | null
           photos?: string[]
           user_id: string
         }
@@ -84,9 +226,13 @@ export type Database = {
           avatar?: string | null
           bio?: string | null
           created_at?: string
+          face_verified?: boolean | null
           id?: string
           is_verified?: boolean
+          last_location?: unknown | null
           name?: string
+          phone?: string | null
+          phone_verified?: boolean | null
           photos?: string[]
           user_id?: string
         }
@@ -128,6 +274,36 @@ export type Database = {
           name?: string
           type?: string
           venue_id?: string
+        }
+        Relationships: []
+      }
+      verification_codes: {
+        Row: {
+          code: string
+          created_at: string
+          expires_at: string
+          id: string
+          user_id: string
+          user_type: string
+          verified: boolean
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          expires_at: string
+          id?: string
+          user_id: string
+          user_type: string
+          verified?: boolean
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          user_id?: string
+          user_type?: string
+          verified?: boolean
         }
         Relationships: []
       }

@@ -1,6 +1,7 @@
 
-import { User } from "@/types/user";
-import { Venue } from "@/types/venue";
+import { User, Message, Connection } from "@/types/user";
+import { Venue, Event, EventCode } from "@/types/venue";
+import { supabase } from "@/integrations/supabase/client";
 
 // Usuarios de ejemplo
 const MOCK_USERS: User[] = [
@@ -69,7 +70,7 @@ const MOCK_VENUES: Venue[] = [
       longitude: 2.6502,
       address: "Paseo Marítimo, 42, Palma"
     },
-    eventRadius: 50
+    eventRadius: 100
   },
   {
     id: "v2",
@@ -86,6 +87,58 @@ const MOCK_VENUES: Venue[] = [
   }
 ];
 
+// Eventos de ejemplo
+const MOCK_EVENTS: Event[] = [
+  {
+    id: "e1",
+    name: "Noche Electrónica",
+    venueId: "v1",
+    startDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+    endDate: new Date(Date.now() + 30 * 60 * 60 * 1000).toISOString(),
+    minAge: 18,
+    maxAge: null,
+    theme: "Electrónica",
+    dressCode: "Casual elegante",
+    price: 15.00,
+    bookingUrl: "https://example.com/booking/e1"
+  },
+  {
+    id: "e2",
+    name: "Festival de Verano",
+    venueId: "v2",
+    startDate: new Date(Date.now() + 72 * 60 * 60 * 1000).toISOString(),
+    endDate: new Date(Date.now() + 96 * 60 * 60 * 1000).toISOString(),
+    minAge: 16,
+    maxAge: null,
+    theme: "Música variada",
+    dressCode: "Ropa cómoda",
+    price: 45.00,
+    bookingUrl: "https://example.com/booking/e2"
+  }
+];
+
+// Mensajes de ejemplo
+const MOCK_MESSAGES: Record<string, Message[]> = {
+  "1": [
+    {
+      id: "m1",
+      senderId: "2",
+      receiverId: "1",
+      content: "¡Hola! Nos vemos en el evento de esta noche?",
+      read: true,
+      createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString()
+    },
+    {
+      id: "m2",
+      senderId: "1",
+      receiverId: "2",
+      content: "¡Claro! Estaré allí a las 10pm",
+      read: false,
+      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString()
+    }
+  ]
+};
+
 export const api = {
   // Simula verificar un código de evento
   verifyEventCode: async (code: string): Promise<{isValid: boolean, eventType: string}> => {
@@ -94,7 +147,7 @@ export const api = {
         // Simula que ciertos códigos corresponden a festivales
         const eventType = code.toLowerCase().includes('fest') ? 'festival' : 'discoteca';
         resolve({
-          isValid: code.length > 5,
+          isValid: code.length >= 6,
           eventType
         });
       }, 1000);
@@ -142,6 +195,39 @@ export const api = {
     });
   },
 
+  // Simula obtener mensajes
+  getMessages: async (userId: string): Promise<Record<string, Message[]>> => {
+    return new Promise(resolve => {
+      setTimeout(() => {
+        resolve(MOCK_MESSAGES);
+      }, 800);
+    });
+  },
+  
+  // Simula enviar un mensaje
+  sendMessage: async (senderId: string, receiverId: string, content: string): Promise<Message> => {
+    return new Promise(resolve => {
+      setTimeout(() => {
+        const newMessage = {
+          id: `m${Math.random().toString(36).slice(2, 11)}`,
+          senderId,
+          receiverId,
+          content,
+          read: false,
+          createdAt: new Date().toISOString()
+        };
+        
+        if (!MOCK_MESSAGES[senderId]) {
+          MOCK_MESSAGES[senderId] = [];
+        }
+        
+        MOCK_MESSAGES[senderId].push(newMessage);
+        
+        resolve(newMessage);
+      }, 500);
+    });
+  },
+
   // Simula iniciar sesión
   login: async (phone: string): Promise<{success: boolean, userId?: string}> => {
     return new Promise(resolve => {
@@ -150,14 +236,62 @@ export const api = {
       }, 1500);
     });
   },
+  
+  // Simula verificar un código SMS/email
+  verifyCode: async (code: string, type: 'phone' | 'email'): Promise<boolean> => {
+    return new Promise(resolve => {
+      setTimeout(() => {
+        resolve(code.length === 6);
+      }, 1000);
+    });
+  },
+
+  // Simula verificar una imagen facial
+  verifyFace: async (imageData: string): Promise<boolean> => {
+    return new Promise(resolve => {
+      setTimeout(() => {
+        resolve(imageData.length > 100);
+      }, 2000);
+    });
+  },
 
   // Simula generar un código QR para un local
-  generateQRCode: async (venueId: string): Promise<string> => {
+  generateQRCode: async (venueId: string): Promise<{qrCode: string, manualCode: string}> => {
     return new Promise(resolve => {
       setTimeout(() => {
         // En un caso real, se generaría un código QR único
-        resolve(`VYBE-${venueId}-${new Date().toISOString().split('T')[0]}`);
+        const manualCode = Math.floor(100000 + Math.random() * 900000).toString();
+        const qrCode = `VYBE-${venueId}-${manualCode}`;
+        resolve({ 
+          qrCode, 
+          manualCode 
+        });
       }, 1000);
+    });
+  },
+  
+  // Simula obtener eventos
+  getEvents: async (): Promise<Event[]> => {
+    return new Promise(resolve => {
+      setTimeout(() => {
+        resolve(MOCK_EVENTS);
+      }, 1000);
+    });
+  },
+  
+  // Simula crear un evento
+  createEvent: async (eventData: Omit<Event, 'id'>): Promise<Event> => {
+    return new Promise(resolve => {
+      setTimeout(() => {
+        const newEvent = {
+          id: `e${Math.random().toString(36).slice(2, 11)}`,
+          ...eventData
+        };
+        
+        MOCK_EVENTS.push(newEvent);
+        
+        resolve(newEvent);
+      }, 1500);
     });
   }
 };

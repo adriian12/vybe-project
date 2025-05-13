@@ -12,6 +12,7 @@ import AuthPage from "./pages/AuthPage";
 import LocationPage from "./pages/LocationPage";
 import HomePage from "./pages/HomePage";
 import MatchesPage from "./pages/MatchesPage";
+import ChatPage from "./pages/ChatPage";
 import ProfilePage from "./pages/ProfilePage";
 import VenueAuthPage from "./pages/venue/VenueAuthPage";
 import VenueDashboardPage from "./pages/venue/VenueDashboardPage";
@@ -32,6 +33,7 @@ const App = () => (
               <Route path="/location" element={<LocationPage />} />
               <Route path="/home" element={<HomePage />} />
               <Route path="/matches" element={<MatchesPage />} />
+              <Route path="/chat/:userId" element={<ChatPage />} />
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/venue/auth" element={<VenueAuthPage />} />
               <Route path="/venue/dashboard" element={<VenueDashboardPage />} />

@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppContext } from "@/context/app-context";
 import { 
@@ -12,16 +12,34 @@ import {
   Building
 } from "lucide-react";
 import { PartyButton } from "@/components/ui-custom/party-button";
+import VenueQRCode from "@/components/venue/venue-qr-code";
+import CreateEventForm from "@/components/venue/create-event-form";
 
 const VenueDashboardPage = () => {
-  const { currentVenue, logout } = useAppContext();
+  const { currentVenue, logout, events } = useAppContext();
   const [activeTab, setActiveTab] = useState<"qr" | "stats" | "events">("qr");
+  const [statsData, setStatsData] = useState({
+    scans: 24,
+    activeUsers: 18
+  });
   const navigate = useNavigate();
 
   const handleLogout = () => {
     logout();
     navigate("/");
   };
+
+  const refreshStats = () => {
+    // En un caso real, obtendríamos las estadísticas actualizadas
+    setStatsData({
+      scans: Math.floor(Math.random() * 50) + 10,
+      activeUsers: Math.floor(Math.random() * 30) + 5
+    });
+  };
+
+  useEffect(() => {
+    refreshStats();
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
@@ -45,37 +63,18 @@ const VenueDashboardPage = () => {
       <main className="pt-20 pb-20 px-4">
         {activeTab === "qr" && (
           <div className="space-y-6">
-            <div className="text-center">
-              <h1 className="text-2xl font-bold mb-2">Código QR del Día</h1>
-              <p className="text-party-gray text-sm mb-6">
-                Este código es válido solo para hoy. Los usuarios deben escanearlo para acceder a la app.
-              </p>
-              
-              <div className="w-64 h-64 mx-auto border-2 border-party-primary rounded-lg flex items-center justify-center mb-4">
-                <QrCode size={180} className="text-party-primary" />
-              </div>
-              
-              <div className="flex justify-center space-x-2 mb-8">
-                <PartyButton variant="outline" size="sm">
-                  <Share2 size={16} className="mr-2" />
-                  Compartir
-                </PartyButton>
-                <PartyButton variant="outline" size="sm">
-                  Descargar
-                </PartyButton>
-              </div>
-              
-              <div className="bg-party-dark/10 p-4 rounded-lg max-w-sm mx-auto">
-                <h3 className="font-semibold mb-1">Estadísticas de hoy:</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="text-center">
-                    <p className="text-2xl font-bold text-party-primary">24</p>
-                    <p className="text-xs text-party-gray">Escaneos</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-2xl font-bold text-party-primary">18</p>
-                    <p className="text-xs text-party-gray">Usuarios activos</p>
-                  </div>
+            <VenueQRCode refreshStats={refreshStats} />
+            
+            <div className="bg-party-dark/10 p-4 rounded-lg max-w-sm mx-auto">
+              <h3 className="font-semibold mb-1">Estadísticas de hoy:</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-party-primary">{statsData.scans}</p>
+                  <p className="text-xs text-party-gray">Escaneos</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-party-primary">{statsData.activeUsers}</p>
+                  <p className="text-xs text-party-gray">Usuarios activos</p>
                 </div>
               </div>
             </div>
@@ -87,7 +86,7 @@ const VenueDashboardPage = () => {
                 <div className="flex justify-between items-center">
                   <div>
                     <p className="font-medium">Tipo de evento</p>
-                    <p className="text-xs text-party-gray">Discoteca</p>
+                    <p className="text-xs text-party-gray">{currentVenue?.type || "Discoteca"}</p>
                   </div>
                   <PartyButton variant="outline" size="sm">Cambiar</PartyButton>
                 </div>
@@ -95,7 +94,7 @@ const VenueDashboardPage = () => {
                 <div className="flex justify-between items-center">
                   <div>
                     <p className="font-medium">Radio de alcance</p>
-                    <p className="text-xs text-party-gray">50 metros</p>
+                    <p className="text-xs text-party-gray">{currentVenue?.eventRadius || 50} metros</p>
                   </div>
                   <PartyButton variant="outline" size="sm">Editar</PartyButton>
                 </div>
@@ -115,28 +114,97 @@ const VenueDashboardPage = () => {
         )}
 
         {activeTab === "stats" && (
-          <div className="text-center p-8">
-            <BarChart2 size={48} className="mx-auto text-party-primary mb-4" />
-            <h2 className="text-xl font-bold mb-2">Estadísticas</h2>
-            <p className="text-party-gray mb-4">
-              Analiza la actividad en tu local y obtén información valiosa sobre tus asistentes
-            </p>
-            <p className="text-party-gray">
-              (Esta sección será implementada próximamente)
-            </p>
+          <div className="space-y-6">
+            <div className="text-center mb-8">
+              <BarChart2 size={48} className="mx-auto text-party-primary mb-4" />
+              <h2 className="text-xl font-bold mb-2">Estadísticas</h2>
+              <p className="text-party-gray mb-4">
+                Analiza la actividad en tu local y obtén información valiosa sobre tus asistentes
+              </p>
+            </div>
+            
+            <div className="bg-party-dark/10 p-4 rounded-lg max-w-sm mx-auto">
+              <div className="grid grid-cols-4 gap-2 mb-6 text-center">
+                <button className="py-1 px-2 bg-party-primary text-white text-xs rounded-full">Total</button>
+                <button className="py-1 px-2 bg-party-dark/20 text-xs rounded-full">Año</button>
+                <button className="py-1 px-2 bg-party-dark/20 text-xs rounded-full">Mes</button>
+                <button className="py-1 px-2 bg-party-dark/20 text-xs rounded-full">Semana</button>
+              </div>
+              
+              <div className="space-y-4">
+                <div className="bg-party-dark/5 p-3 rounded-lg">
+                  <p className="text-xs text-party-gray mb-1">Total de escaneos</p>
+                  <p className="text-2xl font-bold">1,248</p>
+                </div>
+                
+                <div className="bg-party-dark/5 p-3 rounded-lg">
+                  <p className="text-xs text-party-gray mb-1">Usuarios activos</p>
+                  <p className="text-2xl font-bold">847</p>
+                </div>
+                
+                <div className="bg-party-dark/5 p-3 rounded-lg">
+                  <p className="text-xs text-party-gray mb-1">Eventos creados</p>
+                  <p className="text-2xl font-bold">{events.length || 0}</p>
+                </div>
+                
+                <div className="bg-party-dark/5 p-3 rounded-lg">
+                  <p className="text-xs text-party-gray mb-1">Promedio de asistencia</p>
+                  <p className="text-2xl font-bold">32</p>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
         {activeTab === "events" && (
-          <div className="text-center p-8">
-            <CalendarPlus size={48} className="mx-auto text-party-primary mb-4" />
-            <h2 className="text-xl font-bold mb-2">Gestión de Eventos</h2>
-            <p className="text-party-gray mb-4">
-              Crea y gestiona eventos especiales en tu establecimiento
-            </p>
-            <p className="text-party-gray">
-              (Esta sección será implementada próximamente)
-            </p>
+          <div className="space-y-6">
+            <div className="mb-6">
+              <h2 className="text-xl font-bold mb-2 text-center">Gestión de Eventos</h2>
+              <p className="text-party-gray text-center mb-6">
+                Crea y gestiona eventos especiales en tu establecimiento
+              </p>
+            </div>
+            
+            {events.length > 0 ? (
+              <div className="space-y-4 mb-8">
+                <h3 className="font-semibold">Eventos próximos</h3>
+                
+                {events.map((event) => (
+                  <div key={event.id} className="bg-party-dark/10 p-4 rounded-lg">
+                    <h4 className="font-bold">{event.name}</h4>
+                    <p className="text-xs text-party-gray mb-2">
+                      {new Date(event.startDate).toLocaleDateString()} - {new Date(event.startDate).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                    </p>
+                    
+                    <div className="grid grid-cols-2 gap-2 text-xs mb-2">
+                      {event.theme && (
+                        <p><span className="text-party-gray">Temática:</span> {event.theme}</p>
+                      )}
+                      {event.dressCode && (
+                        <p><span className="text-party-gray">Dress code:</span> {event.dressCode}</p>
+                      )}
+                      {event.minAge && (
+                        <p><span className="text-party-gray">Edad:</span> {event.minAge}+</p>
+                      )}
+                      {event.price && (
+                        <p><span className="text-party-gray">Precio:</span> {event.price}€</p>
+                      )}
+                    </div>
+                    
+                    <div className="flex space-x-2">
+                      <PartyButton variant="outline" size="sm">Editar</PartyButton>
+                      {event.bookingUrl && (
+                        <PartyButton variant="outline" size="sm" onClick={() => window.open(event.bookingUrl, '_blank')}>
+                          Reservas
+                        </PartyButton>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+            
+            <CreateEventForm />
           </div>
         )}
       </main>

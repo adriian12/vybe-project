@@ -1,9 +1,10 @@
 
 import { createContext, useState, useContext, ReactNode, useEffect } from "react";
-import { User } from "@/types/user";
-import { Venue } from "@/types/venue";
+import { User, Message, Connection } from "@/types/user";
+import { Venue, Event, EventCode } from "@/types/venue";
 import { api } from "@/services/api";
 import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface AppContextType {
   isLoggedIn: boolean;
@@ -13,8 +14,10 @@ interface AppContextType {
   currentUser: User | null;
   currentVenue: Venue | null;
   nearbyProfiles: User[];
-  matches: User[];
+  connections: User[];
   currentProfile: User | null;
+  messages: Record<string, Message[]>;
+  events: Event[];
   setIsLoggedIn: (value: boolean) => void;
   verifyLocation: () => Promise<boolean>;
   verifyEventCode: (code: string) => Promise<boolean>;
@@ -22,7 +25,12 @@ interface AppContextType {
   handleSwipeRight: (userId: string) => Promise<boolean>;
   loadNextProfile: () => void;
   login: (phone: string) => Promise<boolean>;
+  verifyPhoneCode: (code: string) => Promise<boolean>;
+  verifyFace: (imageData: string) => Promise<boolean>;
   loginVenue: (email: string, name: string, type: string) => Promise<boolean>;
+  createEvent: (eventData: Omit<Event, 'id'>) => Promise<Event | null>;
+  sendMessage: (receiverId: string, content: string) => Promise<boolean>;
+  generateQRCode: () => Promise<{qrCode: string, manualCode: string} | null>;
   logout: () => void;
 }
 
@@ -45,15 +53,17 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [currentVenue, setCurrentVenue] = useState<Venue | null>(null);
   const [nearbyProfiles, setNearbyProfiles] = useState<User[]>([]);
-  const [matches, setMatches] = useState<User[]>([]);
+  const [connections, setConnections] = useState<User[]>([]);
   const [currentProfile, setCurrentProfile] = useState<User | null>(null);
+  const [messages, setMessages] = useState<Record<string, Message[]>>({});
+  const [events, setEvents] = useState<Event[]>([]);
   const [eventRadius, setEventRadius] = useState(50); // Radio en metros (default 50m)
   
   // Efectos para cargar datos iniciales
   useEffect(() => {
     if (isLoggedIn && userType === 'user' && isLocationVerified && isEventVerified) {
       loadProfiles();
-      loadMatches();
+      loadConnections();
     }
   }, [isLoggedIn, userType, isLocationVerified, isEventVerified]);
   
@@ -63,6 +73,20 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       setCurrentProfile(nearbyProfiles[0]);
     }
   }, [nearbyProfiles, currentProfile]);
+
+  // Carga eventos para usuarios y locales
+  useEffect(() => {
+    if (isLoggedIn) {
+      loadEvents();
+    }
+  }, [isLoggedIn]);
+
+  // Carga mensajes para usuarios
+  useEffect(() => {
+    if (isLoggedIn && userType === 'user' && currentUser) {
+      loadMessages();
+    }
+  }, [isLoggedIn, userType, currentUser]);
 
   const loadProfiles = async () => {
     try {
@@ -77,14 +101,42 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const loadMatches = async () => {
+  const loadConnections = async () => {
     try {
-      const matchesData = await api.getMatches();
-      setMatches(matchesData);
+      const connectionsData = await api.getMatches();
+      setConnections(connectionsData);
     } catch (error) {
       toast({
         title: "Error",
         description: "No se pudieron cargar tus conexiones",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const loadMessages = async () => {
+    if (!currentUser) return;
+    
+    try {
+      const messagesData = await api.getMessages(currentUser.id);
+      setMessages(messagesData);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "No se pudieron cargar tus mensajes",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const loadEvents = async () => {
+    try {
+      const eventsData = await api.getEvents();
+      setEvents(eventsData);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "No se pudieron cargar los eventos",
         variant: "destructive",
       });
     }
@@ -142,11 +194,11 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     try {
       const isMatch = await api.likeProfile(userId);
       
-      // Si hay match, añadirlo a la lista de matches
+      // Si hay match, añadirlo a la lista de connections
       if (isMatch) {
         const matchedUser = nearbyProfiles.find(p => p.id === userId);
         if (matchedUser) {
-          setMatches(prev => [...prev, matchedUser]);
+          setConnections(prev => [...prev, matchedUser]);
           toast({
             title: "¡Nueva conexión!",
             description: `Has conectado con ${matchedUser.name}`,
@@ -190,7 +242,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
           age: 28,
           bio: "Tu perfil",
           photos: ["https://i.pravatar.cc/300?img=32"],
-          isVerified: true
+          isVerified: true,
+          phone: phone
         });
         return true;
       }
@@ -205,8 +258,78 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const verifyPhoneCode = async (code: string): Promise<boolean> => {
+    try {
+      const isValid = await api.verifyCode(code, 'phone');
+      
+      if (isValid && currentUser) {
+        setCurrentUser({
+          ...currentUser,
+          phoneVerified: true
+        });
+        
+        toast({
+          title: "Teléfono verificado",
+          description: "Tu número de teléfono ha sido verificado correctamente",
+        });
+      }
+      
+      return isValid;
+    } catch (error) {
+      toast({
+        title: "Error de verificación",
+        description: "No se pudo verificar el código. Intenta de nuevo.",
+        variant: "destructive",
+      });
+      return false;
+    }
+  };
+
+  const verifyFace = async (imageData: string): Promise<boolean> => {
+    try {
+      const isValid = await api.verifyFace(imageData);
+      
+      if (isValid && currentUser) {
+        setCurrentUser({
+          ...currentUser,
+          faceVerified: true
+        });
+        
+        toast({
+          title: "Identidad verificada",
+          description: "Tu identidad ha sido verificada correctamente",
+        });
+      }
+      
+      return isValid;
+    } catch (error) {
+      toast({
+        title: "Error de verificación",
+        description: "No se pudo verificar tu identidad. Intenta de nuevo.",
+        variant: "destructive",
+      });
+      return false;
+    }
+  };
+
   const loginVenue = async (email: string, name: string, type: string) => {
     try {
+      // Determinamos el radio basado en el tipo
+      let radius = 50;
+      switch (type) {
+        case 'discoteca':
+          radius = 100;
+          break;
+        case 'festival':
+          radius = 500;
+          break;
+        case 'evento_empresarial':
+          radius = 250;
+          break;
+        default:
+          radius = 50;
+      }
+      
       // Simulamos el registro/login de un local
       setIsLoggedIn(true);
       setUserType('venue');
@@ -214,9 +337,9 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         id: "venue123",
         name: name,
         email: email,
-        type: type,
+        type: type as VenueType,
         isVerified: false, // Inicialmente no verificado
-        eventRadius: type === 'festival' ? 500 : 50
+        eventRadius: radius
       });
       
       toast({
@@ -235,6 +358,79 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const createEvent = async (eventData: Omit<Event, 'id'>): Promise<Event | null> => {
+    if (!currentVenue) return null;
+    
+    try {
+      const newEvent = await api.createEvent(eventData);
+      
+      setEvents(prev => [...prev, newEvent]);
+      
+      toast({
+        title: "Evento creado",
+        description: "Tu evento ha sido creado correctamente",
+      });
+      
+      return newEvent;
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "No se pudo crear el evento. Intenta más tarde.",
+        variant: "destructive",
+      });
+      return null;
+    }
+  };
+
+  const sendMessage = async (receiverId: string, content: string): Promise<boolean> => {
+    if (!currentUser) return false;
+    
+    try {
+      const message = await api.sendMessage(currentUser.id, receiverId, content);
+      
+      // Actualizamos los mensajes localmente
+      setMessages(prev => {
+        const receiverMessages = prev[receiverId] || [];
+        return {
+          ...prev,
+          [receiverId]: [...receiverMessages, message]
+        };
+      });
+      
+      return true;
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "No se pudo enviar el mensaje. Intenta más tarde.",
+        variant: "destructive",
+      });
+      return false;
+    }
+  };
+
+  const generateQRCode = async (): Promise<{qrCode: string, manualCode: string} | null> => {
+    if (!currentVenue) return null;
+    
+    try {
+      const { qrCode, manualCode } = await api.generateQRCode(currentVenue.id);
+      
+      // Actualizamos el local con el código QR
+      setCurrentVenue({
+        ...currentVenue,
+        qrCode
+      });
+      
+      return { qrCode, manualCode };
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "No se pudo generar el código QR. Intenta más tarde.",
+        variant: "destructive",
+      });
+      return null;
+    }
+  };
+
   const logout = () => {
     setIsLoggedIn(false);
     setIsLocationVerified(false);
@@ -243,8 +439,10 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     setCurrentUser(null);
     setCurrentVenue(null);
     setNearbyProfiles([]);
-    setMatches([]);
+    setConnections([]);
     setCurrentProfile(null);
+    setMessages({});
+    setEvents([]);
   };
 
   const value = {
@@ -255,8 +453,10 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     currentUser,
     currentVenue,
     nearbyProfiles,
-    matches,
+    connections,
     currentProfile,
+    messages,
+    events,
     setIsLoggedIn,
     verifyLocation,
     verifyEventCode,
@@ -264,7 +464,12 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     handleSwipeRight,
     loadNextProfile,
     login,
+    verifyPhoneCode,
+    verifyFace,
     loginVenue,
+    createEvent,
+    sendMessage,
+    generateQRCode,
     logout
   };
 
