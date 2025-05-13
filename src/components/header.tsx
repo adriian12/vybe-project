@@ -1,6 +1,7 @@
+
 import { Link } from "react-router-dom";
 import { MessageCircle, User } from "lucide-react";
-import logo from "../../../../logo_vybe_trans.png";
+import logo from "../assets/vybe_logo.png";
 
 const Header = () => {
   return (
@@ -8,8 +9,8 @@ const Header = () => {
       <Link to="/profile">
         <User size={24} className="text-party-primary" />
       </Link>
-      <Link to="/" className="text-xl font-bold bg-clip-text text-transparent party-gradient">
-        <img src={logo} alt="Vybe" className="h-8 w-8" />
+      <Link to="/" className="text-xl font-bold">
+        <img src={logo} alt="Vybe" className="h-8" />
       </Link>
       <Link to="/matches">
         <MessageCircle size={24} className="text-party-primary" />

@@ -9,7 +9,128 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      events: {
+        Row: {
+          created_at: string
+          description: string | null
+          end_date: string
+          id: string
+          location: unknown | null
+          max_capacity: number | null
+          name: string
+          qr_code: string | null
+          start_date: string
+          venue_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          end_date: string
+          id?: string
+          location?: unknown | null
+          max_capacity?: number | null
+          name: string
+          qr_code?: string | null
+          start_date: string
+          venue_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          end_date?: string
+          id?: string
+          location?: unknown | null
+          max_capacity?: number | null
+          name?: string
+          qr_code?: string | null
+          start_date?: string
+          venue_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "events_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          age: number
+          avatar: string | null
+          bio: string | null
+          created_at: string
+          id: string
+          is_verified: boolean
+          name: string
+          photos: string[]
+          user_id: string
+        }
+        Insert: {
+          age: number
+          avatar?: string | null
+          bio?: string | null
+          created_at?: string
+          id?: string
+          is_verified?: boolean
+          name: string
+          photos?: string[]
+          user_id: string
+        }
+        Update: {
+          age?: number
+          avatar?: string | null
+          bio?: string | null
+          created_at?: string
+          id?: string
+          is_verified?: boolean
+          name?: string
+          photos?: string[]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      venues: {
+        Row: {
+          created_at: string
+          documents: string[]
+          email: string
+          event_radius: number
+          id: string
+          is_verified: boolean
+          location: unknown | null
+          name: string
+          type: string
+          venue_id: string
+        }
+        Insert: {
+          created_at?: string
+          documents?: string[]
+          email: string
+          event_radius?: number
+          id?: string
+          is_verified?: boolean
+          location?: unknown | null
+          name: string
+          type: string
+          venue_id: string
+        }
+        Update: {
+          created_at?: string
+          documents?: string[]
+          email?: string
+          event_radius?: number
+          id?: string
+          is_verified?: boolean
+          location?: unknown | null
+          name?: string
+          type?: string
+          venue_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
