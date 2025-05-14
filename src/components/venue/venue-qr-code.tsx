@@ -10,19 +10,40 @@ interface VenueQRCodeProps {
 }
 
 const VenueQRCode: React.FC<VenueQRCodeProps> = ({ refreshStats }) => {
-  const { currentVenue, generateQRCode } = useAppContext();
+  const { currentVenue, generateQRCode, events } = useAppContext();
   const [qrValue, setQrValue] = useState<string | null>(null);
   const [manualCode, setManualCode] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [timeLeft, setTimeLeft] = useState<string | null>(null);
   const [expirationTime, setExpirationTime] = useState<Date | null>(null);
+  const [activeEvents, setActiveEvents] = useState<Event[]>([]);
 
-  // Generar código QR al cargar el componente
+  // Verificar si hay eventos activos
   useEffect(() => {
-    if (!qrValue) {
-      generateNewQRCode();
+    if (events && events.length > 0) {
+      const now = new Date();
+      const active = events.filter(event => {
+        const startDate = new Date(event.startDate);
+        const endDate = new Date(event.endDate);
+        
+        // Considerar un evento como activo si:
+        // 1. Ya ha empezado y no ha terminado, o
+        // 2. Está a punto de empezar (menos de 10 minutos)
+        const isActive = 
+          (now >= startDate && now <= endDate) || 
+          (startDate.getTime() - now.getTime() <= 10 * 60 * 1000);
+        
+        return isActive;
+      });
+      
+      setActiveEvents(active);
+      
+      // Si hay eventos activos pero no hay QR, generarlo
+      if (active.length > 0 && !qrValue) {
+        generateNewQRCode();
+      }
     }
-  }, []);
+  }, [events]);
 
   // Actualizar tiempo restante
   useEffect(() => {
@@ -60,10 +81,20 @@ const VenueQRCode: React.FC<VenueQRCodeProps> = ({ refreshStats }) => {
         setQrValue(result.qrCode);
         setManualCode(result.manualCode);
         
-        // Establecer tiempo de expiración (24 horas)
-        const expTime = new Date();
-        expTime.setHours(expTime.getHours() + 24);
-        setExpirationTime(expTime);
+        // Si hay eventos activos, establecer el tiempo de expiración al final del último evento
+        if (activeEvents.length > 0) {
+          const latestEndTime = activeEvents.reduce((latest, event) => {
+            const endDate = new Date(event.endDate);
+            return endDate > latest ? endDate : latest;
+          }, new Date(activeEvents[0].endDate));
+          
+          setExpirationTime(latestEndTime);
+        } else {
+          // Si no hay eventos activos, usar el tiempo por defecto (24 horas)
+          const expTime = new Date();
+          expTime.setHours(expTime.getHours() + 24);
+          setExpirationTime(expTime);
+        }
         
         // Refrescar estadísticas
         refreshStats();
@@ -107,7 +138,9 @@ const VenueQRCode: React.FC<VenueQRCodeProps> = ({ refreshStats }) => {
       <div className="text-center">
         <h1 className="text-2xl font-bold mb-2">Código QR del Día</h1>
         <p className="text-party-gray text-sm mb-6">
-          Este código es válido durante 24 horas. Los usuarios deben escanearlo para acceder a la app.
+          {activeEvents.length > 0 
+            ? "Este código es válido durante el evento. Los usuarios deben escanearlo para acceder a la app."
+            : "Este código es válido durante 24 horas. Los usuarios deben escanearlo para acceder a la app."}
         </p>
         
         <div className="w-64 h-64 mx-auto border-2 border-party-primary rounded-lg flex items-center justify-center mb-4 bg-white">
@@ -121,7 +154,28 @@ const VenueQRCode: React.FC<VenueQRCodeProps> = ({ refreshStats }) => {
               renderAs="canvas"
             />
           ) : (
-            <QrCode size={180} className="text-party-primary" />
+            activeEvents.length > 0 ? (
+              <div className="text-center">
+                <QrCode size={80} className="mx-auto mb-4 text-party-primary" />
+                <p className="text-sm text-party-gray">Eventos activos detectados</p>
+                <PartyButton 
+                  variant="outline" 
+                  size="sm" 
+                  className="mt-4"
+                  onClick={generateNewQRCode}
+                  disabled={loading}
+                >
+                  {loading ? "Generando..." : "Generar QR"}
+                </PartyButton>
+              </div>
+            ) : (
+              <div className="text-center">
+                <QrCode size={80} className="mx-auto mb-4 text-party-gray" />
+                <p className="text-sm text-party-gray">
+                  El QR se generará automáticamente cuando tengas eventos activos
+                </p>
+              </div>
+            )
           )}
         </div>
         
@@ -144,11 +198,21 @@ const VenueQRCode: React.FC<VenueQRCodeProps> = ({ refreshStats }) => {
         )}
         
         <div className="flex justify-center space-x-2 mb-8">
-          <PartyButton variant="outline" size="sm" onClick={handleShare}>
+          <PartyButton 
+            variant="outline" 
+            size="sm" 
+            onClick={handleShare} 
+            disabled={!qrValue}
+          >
             <Share2 size={16} className="mr-2" />
             Compartir
           </PartyButton>
-          <PartyButton variant="outline" size="sm" onClick={downloadQRCode}>
+          <PartyButton 
+            variant="outline" 
+            size="sm" 
+            onClick={downloadQRCode} 
+            disabled={!qrValue}
+          >
             Descargar
           </PartyButton>
         </div>

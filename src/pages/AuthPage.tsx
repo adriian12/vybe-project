@@ -4,37 +4,82 @@ import { useNavigate } from "react-router-dom";
 import { useAppContext } from "@/context/app-context";
 import { PartyButton } from "@/components/ui-custom/party-button";
 import { Camera } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 const AuthPage = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [step, setStep] = useState<"phone" | "code" | "selfie">("phone");
   const [verificationCode, setVerificationCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [phoneError, setPhoneError] = useState<string | null>(null);
+  const [codeError, setCodeError] = useState<string | null>(null);
+  const { toast } = useToast();
   const {
     login
   } = useAppContext();
   const navigate = useNavigate();
 
+  const validatePhoneNumber = (phone: string): boolean => {
+    // Regex simple para validar un número de teléfono
+    const phoneRegex = /^\+?[0-9]{9,15}$/;
+    return phoneRegex.test(phone);
+  };
+
   const handlePhoneSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (phoneNumber.trim().length >= 9) {
-      // En una implementación real, aquí enviaríamos un código de verificación
-      setStep("code");
+    setPhoneError(null);
+    
+    if (!validatePhoneNumber(phoneNumber)) {
+      setPhoneError("Número de teléfono no válido. Debe tener entre 9 y 15 dígitos.");
+      return;
     }
+
+    // Simulación de verificación de existencia del número
+    // En una aplicación real, esto sería una llamada a una API
+    setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+      
+      // Simulación de número no existente (1 de cada 10 veces)
+      if (Math.random() < 0.1) {
+        setPhoneError("El número de teléfono no existe en nuestro sistema.");
+        return;
+      }
+      
+      // Mostrar toast de éxito
+      toast({
+        title: "Código enviado",
+        description: `Se ha enviado un código de verificación al número ${phoneNumber}`,
+      });
+      
+      setStep("code");
+    }, 1500);
   };
 
   const handleCodeSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (verificationCode.length === 6) {
-      setIsLoading(true);
-      try {
-        const success = await login(phoneNumber);
-        if (success) {
-          setStep("selfie");
-        }
-      } finally {
+    setCodeError(null);
+    
+    if (verificationCode.length !== 6) {
+      setCodeError("El código debe tener 6 dígitos");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      // Simulación de verificación de código inválido (1 de cada 10 veces)
+      if (Math.random() < 0.1) {
+        setCodeError("Código de verificación incorrecto o expirado.");
         setIsLoading(false);
+        return;
       }
+      
+      const success = await login(phoneNumber);
+      if (success) {
+        setStep("selfie");
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
   
@@ -61,14 +106,22 @@ const AuthPage = () => {
                 id="phoneNumber" 
                 type="tel" 
                 placeholder="+34 600000000" 
-                className="w-full p-3 rounded-lg bg-muted border border-border focus:border-party-primary focus:outline-none" 
+                className={`w-full p-3 rounded-lg bg-muted border ${phoneError ? 'border-red-500' : 'border-border'} focus:border-party-primary focus:outline-none`}
                 value={phoneNumber} 
                 onChange={e => setPhoneNumber(e.target.value)} 
                 required 
               />
+              {phoneError && (
+                <p className="text-red-500 text-xs">{phoneError}</p>
+              )}
             </div>
-            <PartyButton variant="gradient" className="w-full" type="submit">
-              Continuar
+            <PartyButton variant="gradient" className="w-full" type="submit" disabled={isLoading}>
+              {isLoading ? (
+                <span className="flex items-center justify-center">
+                  <span className="mr-2 w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></span>
+                  Verificando...
+                </span>
+              ) : "Continuar"}
             </PartyButton>
             <p className="text-xs text-center text-party-gray">
               Te enviaremos un código de verificación a este número
@@ -84,16 +137,24 @@ const AuthPage = () => {
                 id="verificationCode" 
                 type="text" 
                 placeholder="123456" 
-                className="w-full p-3 rounded-lg bg-muted border border-border focus:border-party-primary focus:outline-none" 
+                className={`w-full p-3 rounded-lg bg-muted border ${codeError ? 'border-red-500' : 'border-border'} focus:border-party-primary focus:outline-none`}
                 value={verificationCode} 
-                onChange={e => setVerificationCode(e.target.value)} 
+                onChange={e => setVerificationCode(e.target.value.replace(/[^0-9]/g, '').slice(0, 6))} 
                 maxLength={6} 
                 pattern="[0-9]{6}" 
                 required 
               />
+              {codeError && (
+                <p className="text-red-500 text-xs">{codeError}</p>
+              )}
             </div>
             <PartyButton variant="gradient" className="w-full" type="submit" disabled={isLoading}>
-              {isLoading ? "Verificando..." : "Verificar"}
+              {isLoading ? (
+                <span className="flex items-center justify-center">
+                  <span className="mr-2 w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></span>
+                  Verificando...
+                </span>
+              ) : "Verificar"}
             </PartyButton>
             <button 
               type="button" 

@@ -1,7 +1,6 @@
-
 import { createContext, useState, useContext, ReactNode, useEffect } from "react";
 import { User, Message, Connection } from "@/types/user";
-import { Venue, Event, EventCode } from "@/types/venue";
+import { Venue, Event, EventCode, VenueType } from "@/types/venue";
 import { api } from "@/services/api";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -27,7 +26,7 @@ interface AppContextType {
   login: (phone: string) => Promise<boolean>;
   verifyPhoneCode: (code: string) => Promise<boolean>;
   verifyFace: (imageData: string) => Promise<boolean>;
-  loginVenue: (email: string, name: string, type: string) => Promise<boolean>;
+  loginVenue: (email: string, name: string, type: VenueType) => Promise<boolean>;
   createEvent: (eventData: Omit<Event, 'id'>) => Promise<Event | null>;
   sendMessage: (receiverId: string, content: string) => Promise<boolean>;
   generateQRCode: () => Promise<{qrCode: string, manualCode: string} | null>;
@@ -312,7 +311,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const loginVenue = async (email: string, name: string, type: string) => {
+  const loginVenue = async (email: string, name: string, type: VenueType) => {
     try {
       // Determinamos el radio basado en el tipo
       let radius = 50;
@@ -337,7 +336,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         id: "venue123",
         name: name,
         email: email,
-        type: type as VenueType,
+        type: type,
         isVerified: false, // Inicialmente no verificado
         eventRadius: radius
       });

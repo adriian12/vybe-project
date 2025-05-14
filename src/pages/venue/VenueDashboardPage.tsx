@@ -22,6 +22,7 @@ const VenueDashboardPage = () => {
     scans: 24,
     activeUsers: 18
   });
+  const [statsPeriod, setStatsPeriod] = useState<"total" | "year" | "month" | "week">("total");
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -39,7 +40,50 @@ const VenueDashboardPage = () => {
 
   useEffect(() => {
     refreshStats();
-  }, []);
+  }, [statsPeriod]);
+
+  const getPeriodStats = () => {
+    // En un caso real, estos datos vendrían de una API
+    switch (statsPeriod) {
+      case "total":
+        return {
+          scans: 1248,
+          activeUsers: 847,
+          eventCount: events.length || 12,
+          avgAttendance: 32
+        };
+      case "year":
+        return {
+          scans: 876,
+          activeUsers: 542,
+          eventCount: 8,
+          avgAttendance: 28
+        };
+      case "month":
+        return {
+          scans: 346,
+          activeUsers: 218,
+          eventCount: 4,
+          avgAttendance: 24
+        };
+      case "week":
+        return {
+          scans: 124,
+          activeUsers: 76,
+          eventCount: 2,
+          avgAttendance: 18
+        };
+      default:
+        return {
+          scans: 1248,
+          activeUsers: 847,
+          eventCount: events.length || 12,
+          avgAttendance: 32
+        };
+    }
+  };
+
+  const periodStats = getPeriodStats();
 
   return (
     <div className="min-h-screen bg-background">
@@ -88,7 +132,7 @@ const VenueDashboardPage = () => {
                     <p className="font-medium">Tipo de evento</p>
                     <p className="text-xs text-party-gray">{currentVenue?.type || "Discoteca"}</p>
                   </div>
-                  <PartyButton variant="outline" size="sm">Cambiar</PartyButton>
+                  <p className="text-xs text-party-gray italic">Contacta con administración para cambiar</p>
                 </div>
                 
                 <div className="flex justify-between items-center">
@@ -96,7 +140,7 @@ const VenueDashboardPage = () => {
                     <p className="font-medium">Radio de alcance</p>
                     <p className="text-xs text-party-gray">{currentVenue?.eventRadius || 50} metros</p>
                   </div>
-                  <PartyButton variant="outline" size="sm">Editar</PartyButton>
+                  <p className="text-xs text-party-gray italic">Contacta con administración para cambiar</p>
                 </div>
                 
                 <div className="flex justify-between items-center">
@@ -125,31 +169,51 @@ const VenueDashboardPage = () => {
             
             <div className="bg-party-dark/10 p-4 rounded-lg max-w-sm mx-auto">
               <div className="grid grid-cols-4 gap-2 mb-6 text-center">
-                <button className="py-1 px-2 bg-party-primary text-white text-xs rounded-full">Total</button>
-                <button className="py-1 px-2 bg-party-dark/20 text-xs rounded-full">Año</button>
-                <button className="py-1 px-2 bg-party-dark/20 text-xs rounded-full">Mes</button>
-                <button className="py-1 px-2 bg-party-dark/20 text-xs rounded-full">Semana</button>
+                <button 
+                  className={`py-1 px-2 ${statsPeriod === "total" ? "bg-party-primary text-white" : "bg-party-dark/20"} text-xs rounded-full`}
+                  onClick={() => setStatsPeriod("total")}
+                >
+                  Total
+                </button>
+                <button 
+                  className={`py-1 px-2 ${statsPeriod === "year" ? "bg-party-primary text-white" : "bg-party-dark/20"} text-xs rounded-full`}
+                  onClick={() => setStatsPeriod("year")}
+                >
+                  Año
+                </button>
+                <button 
+                  className={`py-1 px-2 ${statsPeriod === "month" ? "bg-party-primary text-white" : "bg-party-dark/20"} text-xs rounded-full`}
+                  onClick={() => setStatsPeriod("month")}
+                >
+                  Mes
+                </button>
+                <button 
+                  className={`py-1 px-2 ${statsPeriod === "week" ? "bg-party-primary text-white" : "bg-party-dark/20"} text-xs rounded-full`}
+                  onClick={() => setStatsPeriod("week")}
+                >
+                  Semana
+                </button>
               </div>
               
               <div className="space-y-4">
                 <div className="bg-party-dark/5 p-3 rounded-lg">
                   <p className="text-xs text-party-gray mb-1">Total de escaneos</p>
-                  <p className="text-2xl font-bold">1,248</p>
+                  <p className="text-2xl font-bold">{periodStats.scans}</p>
                 </div>
                 
                 <div className="bg-party-dark/5 p-3 rounded-lg">
                   <p className="text-xs text-party-gray mb-1">Usuarios activos</p>
-                  <p className="text-2xl font-bold">847</p>
+                  <p className="text-2xl font-bold">{periodStats.activeUsers}</p>
                 </div>
                 
                 <div className="bg-party-dark/5 p-3 rounded-lg">
                   <p className="text-xs text-party-gray mb-1">Eventos creados</p>
-                  <p className="text-2xl font-bold">{events.length || 0}</p>
+                  <p className="text-2xl font-bold">{periodStats.eventCount}</p>
                 </div>
                 
                 <div className="bg-party-dark/5 p-3 rounded-lg">
                   <p className="text-xs text-party-gray mb-1">Promedio de asistencia</p>
-                  <p className="text-2xl font-bold">32</p>
+                  <p className="text-2xl font-bold">{periodStats.avgAttendance}</p>
                 </div>
               </div>
             </div>

@@ -7,15 +7,19 @@ import { Calendar } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { Event } from '@/types/venue';
 
+interface PriceItem {
+  description: string;
+  amount: number;
+}
+
 interface EventFormData {
   name: string;
   startDate: string;
   endDate: string;
   minAge?: number;
-  maxAge?: number;
   theme?: string;
   dressCode?: string;
-  price?: number;
+  prices?: PriceItem[];
   bookingUrl?: string;
 }
 
@@ -23,6 +27,7 @@ const CreateEventForm = () => {
   const { currentVenue, createEvent } = useAppContext();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [prices, setPrices] = useState<PriceItem[]>([{ description: '', amount: 0 }]);
   
   const { register, handleSubmit, formState: { errors }, reset } = useForm<EventFormData>();
   
@@ -30,16 +35,31 @@ const CreateEventForm = () => {
     return <div>No tienes permiso para crear eventos</div>;
   }
   
+  const addPriceField = () => {
+    setPrices([...prices, { description: '', amount: 0 }]);
+  };
+
+  const removePriceField = (index: number) => {
+    const newPrices = [...prices];
+    newPrices.splice(index, 1);
+    setPrices(newPrices);
+  };
+
+  const updatePriceField = (index: number, field: 'description' | 'amount', value: string | number) => {
+    const newPrices = [...prices];
+    newPrices[index][field] = value;
+    setPrices(newPrices);
+  };
+  
   const onSubmit = async (data: EventFormData) => {
     setIsLoading(true);
     
     try {
-      // Convert price from string to number
-      const price = data.price ? parseFloat(data.price.toString()) : undefined;
+      // Use the first price from the array as the main price
+      const price = prices.length > 0 ? prices[0].amount : undefined;
       
-      // Convert minAge and maxAge from string to number
-      const minAge = data.minAge ? parseInt(data.minAge.toString()) : undefined;
-      const maxAge = data.maxAge ? parseInt(data.maxAge.toString()) : undefined;
+      // Convert minAge from string to number
+      const minAge = data.minAge ? parseInt(data.minAge.toString()) : 18; // Default to 18
       
       const eventData: Omit<Event, 'id'> = {
         name: data.name,
@@ -47,20 +67,24 @@ const CreateEventForm = () => {
         startDate: new Date(data.startDate).toISOString(),
         endDate: new Date(data.endDate).toISOString(),
         minAge,
-        maxAge,
         theme: data.theme,
         dressCode: data.dressCode,
-        price,
-        bookingUrl: data.bookingUrl
+        price: price as number,
+        bookingUrl: data.bookingUrl,
+        // Additional metadata could include all price information
+        description: prices.length > 1 ? 
+          prices.map(p => `${p.description}: ${p.amount}€`).join(', ') : 
+          undefined
       };
       
       const newEvent = await createEvent(eventData);
       
       if (newEvent) {
         reset();
+        setPrices([{ description: '', amount: 0 }]);
         toast({
           title: 'Evento creado',
-          description: 'Tu evento ha sido creado correctamente',
+          description: 'Tu evento ha sido creado correctamente. El QR se generará automáticamente 10 minutos antes del inicio.',
         });
       }
     } catch (error) {
@@ -121,30 +145,18 @@ const CreateEventForm = () => {
           </div>
         </div>
         
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="minAge" className="block text-sm font-medium mb-1">Edad mínima</label>
-            <input
-              id="minAge"
-              type="number"
-              min="0"
-              {...register('minAge')}
-              className="w-full bg-party-dark/20 border border-party-dark/30 rounded-lg px-4 py-2"
-              placeholder="18"
-            />
-          </div>
-          
-          <div>
-            <label htmlFor="maxAge" className="block text-sm font-medium mb-1">Edad máxima</label>
-            <input
-              id="maxAge"
-              type="number"
-              min="0"
-              {...register('maxAge')}
-              className="w-full bg-party-dark/20 border border-party-dark/30 rounded-lg px-4 py-2"
-              placeholder="99"
-            />
-          </div>
+        <div>
+          <label htmlFor="minAge" className="block text-sm font-medium mb-1">Edad mínima</label>
+          <input
+            id="minAge"
+            type="number"
+            min="0"
+            defaultValue={18}
+            {...register('minAge')}
+            className="w-full bg-party-dark/20 border border-party-dark/30 rounded-lg px-4 py-2"
+            placeholder="18"
+          />
+          <p className="text-xs text-party-gray mt-1">Por defecto +18</p>
         </div>
         
         <div>
@@ -169,30 +181,57 @@ const CreateEventForm = () => {
           />
         </div>
         
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="price" className="block text-sm font-medium mb-1">Precio (€)</label>
-            <input
-              id="price"
-              type="number"
-              step="0.01"
-              min="0"
-              {...register('price')}
-              className="w-full bg-party-dark/20 border border-party-dark/30 rounded-lg px-4 py-2"
-              placeholder="15.00"
-            />
-          </div>
+        <div>
+          <label className="block text-sm font-medium mb-1">Precios (€)</label>
           
-          <div>
-            <label htmlFor="bookingUrl" className="block text-sm font-medium mb-1">URL de reserva</label>
-            <input
-              id="bookingUrl"
-              type="url"
-              {...register('bookingUrl')}
-              className="w-full bg-party-dark/20 border border-party-dark/30 rounded-lg px-4 py-2"
-              placeholder="https://..."
-            />
-          </div>
+          {prices.map((price, index) => (
+            <div key={index} className="flex space-x-2 mb-2">
+              <input
+                type="text"
+                value={price.description}
+                onChange={(e) => updatePriceField(index, 'description', e.target.value)}
+                className="flex-1 bg-party-dark/20 border border-party-dark/30 rounded-lg px-4 py-2"
+                placeholder="Descripción (ej: Entrada General)"
+              />
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                value={price.amount}
+                onChange={(e) => updatePriceField(index, 'amount', parseFloat(e.target.value))}
+                className="w-24 bg-party-dark/20 border border-party-dark/30 rounded-lg px-4 py-2"
+                placeholder="€"
+              />
+              {prices.length > 1 && (
+                <button 
+                  type="button" 
+                  onClick={() => removePriceField(index)}
+                  className="px-2 py-1 bg-red-500 text-white rounded-lg"
+                >
+                  -
+                </button>
+              )}
+            </div>
+          ))}
+          
+          <button 
+            type="button" 
+            onClick={addPriceField}
+            className="mt-1 text-sm text-party-primary"
+          >
+            + Añadir otro precio
+          </button>
+        </div>
+        
+        <div>
+          <label htmlFor="bookingUrl" className="block text-sm font-medium mb-1">URL de reserva</label>
+          <input
+            id="bookingUrl"
+            type="url"
+            {...register('bookingUrl')}
+            className="w-full bg-party-dark/20 border border-party-dark/30 rounded-lg px-4 py-2"
+            placeholder="https://..."
+          />
         </div>
         
         <div className="pt-4">
