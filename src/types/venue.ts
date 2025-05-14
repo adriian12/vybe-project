@@ -37,6 +37,7 @@ export interface Event {
   price?: number;
   bookingUrl?: string;
   qrCode?: string;
+  description?: string;
 }
 
 export interface EventCode {

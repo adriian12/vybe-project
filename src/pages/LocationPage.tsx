@@ -56,25 +56,36 @@ const LocationPage = () => {
   };
 
   const handleQrScanSuccess = async (code: string) => {
-    // Simular obtención de detalles del evento
-    const mockEventDetails = {
-      id: "event123",
-      name: "Fiesta Electrónica",
-      venue: "Club Vybe",
-      date: new Date().toLocaleDateString(),
-      time: "22:00 - 05:00",
-      theme: "Techno",
-      activePeople: 45
-    };
-    
-    setEventDetails(mockEventDetails);
-    setShowEventDetails(true);
+    try {
+      // Simular obtención de detalles del evento
+      const mockEventDetails = {
+        id: "event123",
+        name: "Fiesta Electrónica",
+        venue: "Club Vybe",
+        date: new Date().toLocaleDateString(),
+        time: "22:00 - 05:00",
+        theme: "Techno",
+        activePeople: 45,
+        validUntil: new Date(new Date().setHours(new Date().getHours() + 10)).toLocaleString()
+      };
+      
+      setEventDetails(mockEventDetails);
+      setShowEventDetails(true);
+    } catch (error) {
+      console.error("Error scanning QR code:", error);
+    }
   };
 
   const handleAccessEvent = async () => {
-    const success = await verifyEventCode(eventDetails.id);
-    if (success) {
-      navigate("/home");
+    if (!eventDetails) return;
+    
+    try {
+      const success = await verifyEventCode(eventDetails.id);
+      if (success) {
+        navigate("/home");
+      }
+    } catch (error) {
+      console.error("Error accessing event:", error);
     }
   };
 
@@ -134,6 +145,7 @@ const LocationPage = () => {
                 <p><span className="text-party-gray">Hora:</span> {eventDetails.time}</p>
                 <p><span className="text-party-gray">Tema:</span> {eventDetails.theme}</p>
                 <p><span className="text-party-gray">Asistentes actuales:</span> {eventDetails.activePeople}</p>
+                <p><span className="text-party-gray">Válido hasta:</span> {eventDetails.validUntil}</p>
               </div>
               
               <PartyButton 

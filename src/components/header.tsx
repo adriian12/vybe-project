@@ -1,7 +1,7 @@
 
 import { Link } from "react-router-dom";
 import { MessageCircle, User } from "lucide-react";
-import logo from "../assets/vybe_logo.png";
+import logo from "/lovable-uploads/4d4819ce-4617-44e3-ab63-2a72565c3bbc.png";
 
 const Header = () => {
   return (

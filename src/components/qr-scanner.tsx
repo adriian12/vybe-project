@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { PartyButton } from './ui-custom/party-button';
 import { Camera } from 'lucide-react';
+import { useToast } from '@/components/ui/use-toast';
 
 interface QRScannerProps {
   onScanSuccess: (code: string) => void;
@@ -10,6 +11,8 @@ interface QRScannerProps {
 const QRScanner: React.FC<QRScannerProps> = ({ onScanSuccess }) => {
   const [scanning, setScanning] = useState(false);
   const [manualCode, setManualCode] = useState('');
+  const [error, setError] = useState('');
+  const { toast } = useToast();
 
   // Simulación de escaneo
   const handleScan = () => {
@@ -20,11 +23,30 @@ const QRScanner: React.FC<QRScannerProps> = ({ onScanSuccess }) => {
     }, 2000);
   };
 
+  const validateCode = (code: string) => {
+    return code.length >= 6;
+  };
+
   const handleManualSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (manualCode.trim()) {
-      onScanSuccess(manualCode);
+    setError('');
+    
+    if (!manualCode.trim()) {
+      setError('Por favor ingresa un código');
+      return;
     }
+    
+    if (!validateCode(manualCode)) {
+      setError('Código inválido. Debe tener al menos 6 caracteres');
+      toast({
+        title: "Código inválido",
+        description: "El código ingresado no es válido",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    onScanSuccess(manualCode);
   };
 
   return (
@@ -77,6 +99,7 @@ const QRScanner: React.FC<QRScannerProps> = ({ onScanSuccess }) => {
             value={manualCode}
             onChange={(e) => setManualCode(e.target.value)}
           />
+          {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
         </div>
         <PartyButton 
           variant="outline"

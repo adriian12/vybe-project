@@ -3,261 +3,285 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppContext } from "@/context/app-context";
 import { PartyButton } from "@/components/ui-custom/party-button";
-import { Building, Mail, Phone, FileText, CheckCircle } from "lucide-react";
+import { Building, Mail, Check } from "lucide-react";
+import { VenueType } from "@/types/venue";
 
 const VenueAuthPage = () => {
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [step, setStep] = useState<"credentials" | "verification" | "details">("credentials");
-  const [verificationCode, setVerificationCode] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  
-  const [venueName, setVenueName] = useState("");
-  const [venueType, setVenueType] = useState("discoteca");
-  const [document, setDocument] = useState<File | null>(null);
-  
   const { loginVenue } = useAppContext();
   const navigate = useNavigate();
-
-  const handleCredentialsSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (email.trim().length > 0 && phone.trim().length >= 9) {
-      // En una implementación real, aquí enviaríamos un código de verificación
-      setStep("verification");
-    }
-  };
-
-  const handleVerificationSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (verificationCode.length === 6) {
-      setStep("details");
+  
+  const [step, setStep] = useState(1);
+  const [email, setEmail] = useState("");
+  const [venueName, setVenueName] = useState("");
+  const [venueType, setVenueType] = useState<VenueType>("discoteca");
+  const [phone, setPhone] = useState("");
+  const [documents, setDocuments] = useState<FileList | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  
+  const handleNext = () => {
+    if (step === 1) {
+      // Validar correo electrónico
+      if (!email || !email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+        setError("Por favor, introduce un correo electrónico válido");
+        return;
+      }
+      setError("");
+      setStep(2);
+    } else if (step === 2) {
+      // Validar nombre del local
+      if (!venueName) {
+        setError("Por favor, introduce el nombre de tu local");
+        return;
+      }
+      setError("");
+      setStep(3);
     }
   };
   
-  const handleDetailsSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
+  const handleBack = () => {
+    if (step > 1) {
+      setStep(step - 1);
+      setError("");
+    }
+  };
+  
+  const handleSubmit = async () => {
+    setLoading(true);
+    setError("");
     
     try {
-      // En una implementación real, aquí subiríamos el documento y crearíamos el local
       const success = await loginVenue(email, venueName, venueType);
+      
       if (success) {
         navigate("/venue/dashboard");
+      } else {
+        setError("Hubo un error al registrar tu local. Inténtalo de nuevo más tarde.");
       }
+    } catch (error) {
+      setError("Ha ocurrido un error. Por favor, inténtalo de nuevo.");
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
-
+  
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setDocument(e.target.files[0]);
-    }
+    setDocuments(e.target.files);
   };
-
+  
   return (
     <div className="min-h-screen flex flex-col">
-      <div className="flex-1 flex flex-col justify-center p-6">
-        <div className="text-center mb-12">
-          <h1 className="text-3xl font-bold mb-2 text-transparent bg-clip-text party-gradient">Vybe</h1>
-          <p className="text-party-gray">Gestión de Locales y Eventos</p>
-        </div>
-
-        {step === "credentials" ? (
-          <form onSubmit={handleCredentialsSubmit} className="space-y-6 max-w-sm mx-auto">
-            <div className="w-20 h-20 rounded-full bg-party-dark flex items-center justify-center mx-auto mb-6">
+      {/* Header */}
+      <header className="h-16 flex items-center justify-center border-b border-border">
+        <h1 className="text-xl font-bold text-transparent bg-clip-text party-gradient">Vybe</h1>
+      </header>
+      
+      {/* Main Content */}
+      <main className="flex-1 p-6 flex flex-col items-center justify-center">
+        <div className="w-full max-w-md space-y-6">
+          <div className="text-center mb-8">
+            <div className="w-20 h-20 mx-auto rounded-full bg-party-dark flex items-center justify-center mb-4">
               <Building size={36} className="text-party-primary" />
             </div>
             
-            <h2 className="text-xl font-bold text-center mb-4">Registro de Local/Empresa</h2>
+            <h1 className="text-2xl font-bold mb-2">
+              {step === 1 ? "Verificación de correo electrónico" :
+               step === 2 ? "Datos de tu negocio" :
+               "Verificación adicional"}
+            </h1>
             
-            <div className="space-y-2">
-              <label htmlFor="email" className="block text-sm font-medium">
-                Correo electrónico
-              </label>
-              <div className="flex">
-                <div className="bg-muted p-3 rounded-l-lg border border-r-0 border-border">
-                  <Mail size={20} className="text-party-gray" />
-                </div>
-                <input 
-                  id="email" 
-                  type="email" 
-                  placeholder="tu@empresa.com" 
-                  className="w-full p-3 rounded-r-lg bg-muted border border-border focus:border-party-primary focus:outline-none" 
-                  value={email} 
-                  onChange={e => setEmail(e.target.value)} 
-                  required 
-                />
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <label htmlFor="phone" className="block text-sm font-medium">
-                Número de teléfono
-              </label>
-              <div className="flex">
-                <div className="bg-muted p-3 rounded-l-lg border border-r-0 border-border">
-                  <Phone size={20} className="text-party-gray" />
-                </div>
-                <input 
-                  id="phone" 
-                  type="tel" 
-                  placeholder="+34 971000000" 
-                  className="w-full p-3 rounded-r-lg bg-muted border border-border focus:border-party-primary focus:outline-none" 
-                  value={phone} 
-                  onChange={e => setPhone(e.target.value)} 
-                  required 
-                />
-              </div>
-            </div>
-            
-            <PartyButton variant="gradient" className="w-full" type="submit">
-              Continuar
-            </PartyButton>
-            
-            <p className="text-xs text-center text-party-gray">
-              Enviaremos un código de verificación a tu correo y teléfono
+            <p className="text-party-gray">
+              {step === 1 ? "Introduce tu correo electrónico para comenzar" :
+               step === 2 ? "Completa la información de tu establecimiento" :
+               "Estos datos nos ayudarán a verificar tu negocio"}
             </p>
-          </form>
-        ) : step === "verification" ? (
-          <form onSubmit={handleVerificationSubmit} className="space-y-6 max-w-sm mx-auto">
-            <div className="space-y-2">
-              <label htmlFor="verificationCode" className="block text-sm font-medium">
-                Código de verificación
-              </label>
-              <input 
-                id="verificationCode" 
-                type="text" 
-                placeholder="123456" 
-                className="w-full p-3 rounded-lg bg-muted border border-border focus:border-party-primary focus:outline-none" 
-                value={verificationCode} 
-                onChange={e => setVerificationCode(e.target.value)} 
-                maxLength={6} 
-                pattern="[0-9]{6}" 
-                required 
-              />
+          </div>
+          
+          {/* Stepper */}
+          <div className="flex items-center justify-center mb-8">
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step >= 1 ? 'bg-party-primary text-white' : 'bg-party-dark/20 text-party-gray'}`}>
+              1
             </div>
-            <PartyButton variant="gradient" className="w-full" type="submit">
-              Verificar
-            </PartyButton>
-            <button 
-              type="button" 
-              className="text-sm text-party-primary block mx-auto" 
-              onClick={() => setStep("credentials")}
-            >
-              Cambiar correo o teléfono
-            </button>
-          </form>
-        ) : (
-          <form onSubmit={handleDetailsSubmit} className="space-y-6 max-w-sm mx-auto">
-            <div className="text-center mb-4">
-              <h2 className="text-xl font-bold mb-2">Detalles del local</h2>
-              <p className="text-party-gray text-sm">
-                Para verificar tu negocio, necesitamos algunos datos adicionales
-              </p>
+            <div className={`h-1 w-12 ${step >= 2 ? 'bg-party-primary' : 'bg-party-dark/20'}`}></div>
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step >= 2 ? 'bg-party-primary text-white' : 'bg-party-dark/20 text-party-gray'}`}>
+              2
             </div>
-            
-            <div className="space-y-2">
-              <label htmlFor="venueName" className="block text-sm font-medium">
-                Nombre del local
-              </label>
-              <input 
-                id="venueName" 
-                type="text"
-                placeholder="Nombre de tu local o empresa" 
-                className="w-full p-3 rounded-lg bg-muted border border-border focus:border-party-primary focus:outline-none" 
-                value={venueName} 
-                onChange={e => setVenueName(e.target.value)} 
-                required 
-              />
+            <div className={`h-1 w-12 ${step >= 3 ? 'bg-party-primary' : 'bg-party-dark/20'}`}></div>
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step >= 3 ? 'bg-party-primary text-white' : 'bg-party-dark/20 text-party-gray'}`}>
+              3
             </div>
-            
-            <div className="space-y-2">
-              <label htmlFor="venueType" className="block text-sm font-medium">
-                Tipo de establecimiento
-              </label>
-              <select
-                id="venueType"
-                className="w-full p-3 rounded-lg bg-muted border border-border focus:border-party-primary focus:outline-none"
-                value={venueType}
-                onChange={e => setVenueType(e.target.value)}
-                required
-              >
-                <option value="discoteca">Discoteca</option>
-                <option value="bar">Bar</option>
-                <option value="festival">Festival</option>
-                <option value="fiesta_privada">Fiesta Privada</option>
-                <option value="evento">Evento Empresarial</option>
-              </select>
-            </div>
-            
-            <div className="space-y-2">
-              <label htmlFor="document" className="block text-sm font-medium">
-                Documento de registro (opcional)
-              </label>
-              <div className="border-2 border-dashed border-border rounded-lg p-4 text-center">
-                {document ? (
-                  <div className="flex items-center justify-center space-x-2">
-                    <FileText size={24} className="text-green-500" />
-                    <span className="text-sm truncate max-w-[200px]">{document.name}</span>
-                    <button
-                      type="button"
-                      className="text-xs text-red-500"
-                      onClick={() => setDocument(null)}
-                    >
-                      Eliminar
-                    </button>
-                  </div>
-                ) : (
-                  <>
-                    <FileText size={32} className="mx-auto mb-2 text-party-gray" />
-                    <p className="text-sm text-party-gray mb-2">
-                      Sube un documento que acredite tu negocio
-                    </p>
-                    <PartyButton variant="outline" size="sm">
-                      <label htmlFor="file-upload" className="cursor-pointer">
-                        Seleccionar archivo
-                      </label>
-                    </PartyButton>
+          </div>
+          
+          {/* Form Steps */}
+          <div className="space-y-4">
+            {/* Step 1: Email verification */}
+            {step === 1 && (
+              <>
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium mb-1">Correo electrónico *</label>
+                  <div className="relative">
                     <input
-                      id="file-upload"
-                      type="file"
-                      className="hidden"
-                      accept=".pdf,.jpg,.jpeg,.png"
-                      onChange={handleFileChange}
+                      id="email"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full bg-party-dark/20 border border-party-dark/30 rounded-lg px-4 py-3 pl-10"
+                      placeholder="nombre@empresa.com"
                     />
-                  </>
-                )}
-              </div>
-              <p className="text-xs text-party-gray">
-                Formatos aceptados: PDF, JPG, PNG (max 5MB)
-              </p>
-            </div>
+                    <Mail size={16} className="absolute top-3.5 left-3 text-party-gray" />
+                  </div>
+                  {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+                  <p className="text-xs text-party-gray mt-1">Recibirás un código de verificación en este correo</p>
+                </div>
+                
+                <div className="pt-4">
+                  <PartyButton 
+                    variant="gradient"
+                    className="w-full"
+                    onClick={handleNext}
+                  >
+                    Continuar
+                  </PartyButton>
+                </div>
+              </>
+            )}
             
-            <div className="flex items-start space-x-2 my-4">
-              <CheckCircle size={20} className="text-party-primary mt-0.5 flex-shrink-0" />
-              <p className="text-sm text-party-gray">
-                Una vez verificado, podrás generar códigos QR diarios, crear eventos y acceder al panel de administración.
-              </p>
-            </div>
+            {/* Step 2: Business details */}
+            {step === 2 && (
+              <>
+                <div>
+                  <label htmlFor="venue-name" className="block text-sm font-medium mb-1">Nombre del establecimiento *</label>
+                  <input
+                    id="venue-name"
+                    type="text"
+                    value={venueName}
+                    onChange={(e) => setVenueName(e.target.value)}
+                    className="w-full bg-party-dark/20 border border-party-dark/30 rounded-lg px-4 py-3"
+                    placeholder="Nombre de tu local"
+                  />
+                </div>
+                
+                <div>
+                  <label htmlFor="venue-type" className="block text-sm font-medium mb-1">Tipo de establecimiento *</label>
+                  <select
+                    id="venue-type"
+                    value={venueType}
+                    onChange={(e) => setVenueType(e.target.value as VenueType)}
+                    className="w-full bg-party-dark/20 border border-party-dark/30 rounded-lg px-4 py-3"
+                  >
+                    <option value="discoteca">Discoteca (100m)</option>
+                    <option value="bar">Bar (50m)</option>
+                    <option value="local">Local (50m)</option>
+                    <option value="fiesta_privada">Fiesta privada (50m)</option>
+                    <option value="evento_empresarial">Evento empresarial (250m)</option>
+                    <option value="festival">Festival (500m)</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label htmlFor="phone" className="block text-sm font-medium mb-1">Teléfono de contacto *</label>
+                  <input
+                    id="phone"
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    className="w-full bg-party-dark/20 border border-party-dark/30 rounded-lg px-4 py-3"
+                    placeholder="+34 600 000 000"
+                  />
+                  <p className="text-xs text-party-gray mt-1">Recibirás un SMS de verificación en este número</p>
+                </div>
+                
+                {error && <p className="text-red-500 text-xs">{error}</p>}
+                
+                <div className="flex space-x-2 pt-4">
+                  <PartyButton 
+                    variant="outline"
+                    className="w-1/2"
+                    onClick={handleBack}
+                  >
+                    Atrás
+                  </PartyButton>
+                  <PartyButton 
+                    variant="gradient"
+                    className="w-1/2"
+                    onClick={handleNext}
+                  >
+                    Continuar
+                  </PartyButton>
+                </div>
+              </>
+            )}
             
-            <PartyButton 
-              variant="gradient" 
-              className="w-full" 
-              type="submit"
-              disabled={isLoading || !venueName}
-            >
-              {isLoading ? "Procesando..." : "Completar registro"}
-            </PartyButton>
-          </form>
-        )}
-      </div>
-
-      <div className="p-6">
-        <p className="text-xs text-center text-party-gray">
-          Al continuar, aceptas nuestros Términos de servicio y Política de privacidad para negocios
-        </p>
-      </div>
+            {/* Step 3: Additional verification */}
+            {step === 3 && (
+              <>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Verificación completada</label>
+                  <div className="bg-party-dark/10 rounded-lg p-4 flex items-center">
+                    <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center mr-3">
+                      <Check size={16} className="text-white" />
+                    </div>
+                    <div>
+                      <p className="font-medium">{email}</p>
+                      <p className="text-xs text-party-gray">Correo verificado correctamente</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium mb-1">Documentación (opcional)</label>
+                  <div className="border-2 border-dashed border-party-dark/30 rounded-lg p-6 text-center">
+                    <p className="text-sm text-party-gray mb-3">Sube documentos que demuestren ser dueño del local</p>
+                    <input
+                      type="file"
+                      multiple
+                      onChange={handleFileChange}
+                      className="hidden"
+                      id="file-upload"
+                    />
+                    <label htmlFor="file-upload" className="cursor-pointer bg-party-dark/20 text-party-primary py-2 px-4 rounded inline-block">
+                      Seleccionar archivos
+                    </label>
+                    {documents && documents.length > 0 && (
+                      <p className="mt-2 text-xs text-party-gray">
+                        {documents.length} archivo(s) seleccionado(s)
+                      </p>
+                    )}
+                    <p className="text-xs text-party-gray mt-2">Máximo 2MB por archivo</p>
+                  </div>
+                </div>
+                
+                {error && <p className="text-red-500 text-xs">{error}</p>}
+                
+                <div className="flex space-x-2 pt-4">
+                  <PartyButton 
+                    variant="outline"
+                    className="w-1/2"
+                    onClick={handleBack}
+                  >
+                    Atrás
+                  </PartyButton>
+                  <PartyButton 
+                    variant="gradient"
+                    className="w-1/2"
+                    onClick={handleSubmit}
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <span className="flex items-center justify-center">
+                        <span className="mr-2 w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></span>
+                        Registrando...
+                      </span>
+                    ) : (
+                      "Completar registro"
+                    )}
+                  </PartyButton>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      </main>
     </div>
   );
 };

@@ -4,6 +4,7 @@ import { useAppContext } from "@/context/app-context";
 import { QrCode, Share2 } from "lucide-react";
 import { PartyButton } from "@/components/ui-custom/party-button";
 import QRCode from "qrcode.react";
+import { Event } from "@/types/venue";
 
 interface VenueQRCodeProps {
   refreshStats: () => void;
@@ -17,6 +18,7 @@ const VenueQRCode: React.FC<VenueQRCodeProps> = ({ refreshStats }) => {
   const [timeLeft, setTimeLeft] = useState<string | null>(null);
   const [expirationTime, setExpirationTime] = useState<Date | null>(null);
   const [activeEvents, setActiveEvents] = useState<Event[]>([]);
+  const [currentEvent, setCurrentEvent] = useState<Event | null>(null);
 
   // Verificar si hay eventos activos
   useEffect(() => {
@@ -40,6 +42,7 @@ const VenueQRCode: React.FC<VenueQRCodeProps> = ({ refreshStats }) => {
       
       // Si hay eventos activos pero no hay QR, generarlo
       if (active.length > 0 && !qrValue) {
+        setCurrentEvent(active[0]);
         generateNewQRCode();
       }
     }
@@ -178,6 +181,16 @@ const VenueQRCode: React.FC<VenueQRCodeProps> = ({ refreshStats }) => {
             )
           )}
         </div>
+        
+        {currentEvent && (
+          <div className="mb-4 text-center bg-party-dark/10 p-3 rounded-lg">
+            <p className="font-bold">{currentEvent.name}</p>
+            <p className="text-xs text-party-gray">
+              {new Date(currentEvent.startDate).toLocaleDateString()} {new Date(currentEvent.startDate).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - 
+              {new Date(currentEvent.endDate).toLocaleDateString()} {new Date(currentEvent.endDate).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+            </p>
+          </div>
+        )}
         
         {manualCode && (
           <div className="mb-4 text-center">

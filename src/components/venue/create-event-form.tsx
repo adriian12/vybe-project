@@ -5,7 +5,7 @@ import { useAppContext } from '@/context/app-context';
 import { PartyButton } from '../ui-custom/party-button';
 import { Calendar } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
-import { Event } from '@/types/venue';
+import { Event, VenueType } from '@/types/venue';
 
 interface PriceItem {
   description: string;
@@ -47,7 +47,11 @@ const CreateEventForm = () => {
 
   const updatePriceField = (index: number, field: 'description' | 'amount', value: string | number) => {
     const newPrices = [...prices];
-    newPrices[index][field] = value;
+    if (field === 'description') {
+      newPrices[index].description = value as string;
+    } else {
+      newPrices[index].amount = value as number;
+    }
     setPrices(newPrices);
   };
   
@@ -61,6 +65,11 @@ const CreateEventForm = () => {
       // Convert minAge from string to number
       const minAge = data.minAge ? parseInt(data.minAge.toString()) : 18; // Default to 18
       
+      // Prepare description from all prices
+      const priceDescription = prices.length > 1 ? 
+        prices.map(p => `${p.description}: ${p.amount}€`).join(', ') : 
+        undefined;
+      
       const eventData: Omit<Event, 'id'> = {
         name: data.name,
         venueId: currentVenue.id,
@@ -69,12 +78,9 @@ const CreateEventForm = () => {
         minAge,
         theme: data.theme,
         dressCode: data.dressCode,
-        price: price as number,
+        price: price,
         bookingUrl: data.bookingUrl,
-        // Additional metadata could include all price information
-        description: prices.length > 1 ? 
-          prices.map(p => `${p.description}: ${p.amount}€`).join(', ') : 
-          undefined
+        description: priceDescription
       };
       
       const newEvent = await createEvent(eventData);
