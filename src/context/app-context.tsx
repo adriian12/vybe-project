@@ -45,18 +45,75 @@ export const useAppContext = () => {
 
 export const AppProvider = ({ children }: { children: ReactNode }) => {
   const { toast } = useToast();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isLocationVerified, setIsLocationVerified] = useState(false);
-  const [isEventVerified, setIsEventVerified] = useState(false);
-  const [userType, setUserType] = useState<'user' | 'venue' | null>(null);
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [currentVenue, setCurrentVenue] = useState<Venue | null>(null);
+  
+  // Initialize state from localStorage
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    const saved = localStorage.getItem('vybe_isLoggedIn');
+    return saved === 'true';
+  });
+  const [isLocationVerified, setIsLocationVerified] = useState(() => {
+    const saved = localStorage.getItem('vybe_isLocationVerified');
+    return saved === 'true';
+  });
+  const [isEventVerified, setIsEventVerified] = useState(() => {
+    const saved = localStorage.getItem('vybe_isEventVerified');
+    return saved === 'true';
+  });
+  const [userType, setUserType] = useState<'user' | 'venue' | null>(() => {
+    const saved = localStorage.getItem('vybe_userType');
+    return saved as 'user' | 'venue' | null;
+  });
+  const [currentUser, setCurrentUser] = useState<User | null>(() => {
+    const saved = localStorage.getItem('vybe_currentUser');
+    return saved ? JSON.parse(saved) : null;
+  });
+  const [currentVenue, setCurrentVenue] = useState<Venue | null>(() => {
+    const saved = localStorage.getItem('vybe_currentVenue');
+    return saved ? JSON.parse(saved) : null;
+  });
   const [nearbyProfiles, setNearbyProfiles] = useState<User[]>([]);
   const [connections, setConnections] = useState<User[]>([]);
   const [currentProfile, setCurrentProfile] = useState<User | null>(null);
   const [messages, setMessages] = useState<Record<string, Message[]>>({});
   const [events, setEvents] = useState<Event[]>([]);
-  const [eventRadius, setEventRadius] = useState(50); // Radio en metros (default 50m)
+  const [eventRadius, setEventRadius] = useState(50);
+
+  // Persist state changes to localStorage
+  useEffect(() => {
+    localStorage.setItem('vybe_isLoggedIn', String(isLoggedIn));
+  }, [isLoggedIn]);
+
+  useEffect(() => {
+    localStorage.setItem('vybe_isLocationVerified', String(isLocationVerified));
+  }, [isLocationVerified]);
+
+  useEffect(() => {
+    localStorage.setItem('vybe_isEventVerified', String(isEventVerified));
+  }, [isEventVerified]);
+
+  useEffect(() => {
+    if (userType) {
+      localStorage.setItem('vybe_userType', userType);
+    } else {
+      localStorage.removeItem('vybe_userType');
+    }
+  }, [userType]);
+
+  useEffect(() => {
+    if (currentUser) {
+      localStorage.setItem('vybe_currentUser', JSON.stringify(currentUser));
+    } else {
+      localStorage.removeItem('vybe_currentUser');
+    }
+  }, [currentUser]);
+
+  useEffect(() => {
+    if (currentVenue) {
+      localStorage.setItem('vybe_currentVenue', JSON.stringify(currentVenue));
+    } else {
+      localStorage.removeItem('vybe_currentVenue');
+    }
+  }, [currentVenue]);
   
   // Efectos para cargar datos iniciales
   useEffect(() => {
@@ -431,6 +488,14 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const logout = () => {
+    // Clear localStorage
+    localStorage.removeItem('vybe_isLoggedIn');
+    localStorage.removeItem('vybe_isLocationVerified');
+    localStorage.removeItem('vybe_isEventVerified');
+    localStorage.removeItem('vybe_userType');
+    localStorage.removeItem('vybe_currentUser');
+    localStorage.removeItem('vybe_currentVenue');
+    
     setIsLoggedIn(false);
     setIsLocationVerified(false);
     setIsEventVerified(false);
