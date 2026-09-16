@@ -1,250 +1,457 @@
-
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import { Check, ImagePlus, MapPin, X } from 'lucide-react';
 import { useAppContext } from '@/context/app-context';
-import { PartyButton } from '../ui-custom/party-button';
-import { Calendar } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
-import { Event, VenueType } from '@/types/venue';
+import { api } from '@/services/api';
+import { venueService } from '@/services/venue-service';
+import { getCurrentPosition, GeolocationError } from '@/services/geo';
+import { track } from '@/lib/observability';
+import { cn } from '@/lib/utils';
+import { Event } from '@/types/venue';
 
-interface PriceItem {
-  description: string;
-  amount: number;
-}
+/** El mismo límite que el resto de imágenes de la aplicación. */
+const MAX_POSTER_BYTES = 10 * 1024 * 1024;
+
+/** Géneros sugeridos. Se puede escribir cualquier otro. */
+const GENEROS = ['Techno', 'House', 'Tech House', 'Reggaeton', 'Latin', 'Pop', 'Hip Hop', 'Live', 'Open format'];
 
 interface EventFormData {
   name: string;
-  startDate: string;
-  endDate: string;
-  minAge?: number;
+  description?: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  capacity?: string;
+  price?: string;
+  minAge?: string;
   theme?: string;
   dressCode?: string;
-  prices?: PriceItem[];
   bookingUrl?: string;
 }
 
-const CreateEventForm = () => {
-  const { currentVenue, createEvent } = useAppContext();
+interface CreateEventFormProps {
+  /** Se llama al publicar, para cerrar el panel que lo contiene. */
+  onCreated?: () => void;
+  onClose?: () => void;
+}
+
+/** Combina la fecha y la hora del formulario; si el fin es antes que el inicio, es de madrugada. */
+const combinar = (date: string, start: string, end: string) => {
+  const inicio = new Date(`${date}T${start}`);
+  const fin = new Date(`${date}T${end}`);
+  if (fin <= inicio) fin.setDate(fin.getDate() + 1);
+  return { inicio, fin };
+};
+
+/**
+ * Crear un evento, según «Nuevo evento» de Stitch: un panel amarillo plano con
+ * los campos en blanco sólido y la tinta oscura.
+ *
+ * Sobre este amarillo nada puede ir en blanco como texto: da 1,4:1. Por eso el
+ * botón de publicar es el único elemento invertido (blanco con tinta oscura).
+ *
+ * La hora de fin se interpreta como del día siguiente cuando es anterior a la
+ * de inicio: una fiesta de 23:30 a 06:00 es lo normal, y pedir dos fechas
+ * completas hacía que media lista de eventos acabara antes de empezar.
+ */
+const CreateEventForm: React.FC<CreateEventFormProps> = ({ onCreated, onClose }) => {
+  const { t } = useTranslation();
+  const { currentVenue, createEvent, refreshEvents } = useAppContext();
   const { toast } = useToast();
+
   const [isLoading, setIsLoading] = useState(false);
-  const [prices, setPrices] = useState<PriceItem[]>([{ description: '', amount: 0 }]);
-  
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<EventFormData>();
-  
-  if (!currentVenue) {
-    return <div>No tienes permiso para crear eventos</div>;
-  }
-  
-  const addPriceField = () => {
-    setPrices([...prices, { description: '', amount: 0 }]);
-  };
+  const [isLocating, setIsLocating] = useState(false);
+  const [recurrence, setRecurrence] = useState<'none' | 'weekly' | 'biweekly'>('none');
 
-  const removePriceField = (index: number) => {
-    const newPrices = [...prices];
-    newPrices.splice(index, 1);
-    setPrices(newPrices);
-  };
+  // El cartel se guarda aparte del formulario: el fichero no viaja por
+  // react-hook-form, sólo la vista previa para enseñarlo antes de crear.
+  const [posterFile, setPosterFile] = useState<File | null>(null);
+  const [posterPreview, setPosterPreview] = useState<string | null>(null);
 
-  const updatePriceField = (index: number, field: 'description' | 'amount', value: string | number) => {
-    const newPrices = [...prices];
-    if (field === 'description') {
-      newPrices[index].description = value as string;
-    } else {
-      newPrices[index].amount = value as number;
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<EventFormData>({ defaultValues: { minAge: '18', startTime: '23:30', endTime: '06:00' } });
+
+  if (!currentVenue) return null;
+
+  const hasLocation = Boolean(currentVenue.location);
+
+  const campo =
+    'w-full rounded-xl border-0 bg-white px-3.5 py-2.5 text-body-md text-ink shadow-sm ' +
+    'placeholder:text-ink/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink ' +
+    'disabled:opacity-50';
+  const etiqueta = 'mb-1 block text-caption font-extrabold uppercase tracking-wide text-ink';
+
+  /**
+   * Enseña el cartel elegido sin subirlo todavía: subirlo aquí dejaría ficheros
+   * huérfanos cada vez que alguien abre el formulario y no llega a crear nada.
+   */
+  const pickPoster = (file: File) => {
+    if (file.size > MAX_POSTER_BYTES) {
+      toast({ title: t('auth.errors.fileTooBig'), variant: 'destructive' });
+      return;
     }
-    setPrices(newPrices);
+    setPosterFile(file);
+    setPosterPreview(URL.createObjectURL(file));
   };
-  
-  const onSubmit = async (data: EventFormData) => {
-    setIsLoading(true);
-    
+
+  /**
+   * Guarda las coordenadas del local. Sin ellas la geocerca no puede validar
+   * nada, así que el evento sería accesible desde cualquier sitio.
+   */
+  const captureVenueLocation = async () => {
+    setIsLocating(true);
     try {
-      // Use the first price from the array as the main price
-      const price = prices.length > 0 ? prices[0].amount : undefined;
-      
-      // Convert minAge from string to number
-      const minAge = data.minAge ? parseInt(data.minAge.toString()) : 18; // Default to 18
-      
-      // Prepare description from all prices
-      const priceDescription = prices.length > 1 ? 
-        prices.map(p => `${p.description}: ${p.amount}€`).join(', ') : 
-        undefined;
-      
-      const eventData: Omit<Event, 'id'> = {
-        name: data.name,
-        venueId: currentVenue.id,
-        startDate: new Date(data.startDate).toISOString(),
-        endDate: new Date(data.endDate).toISOString(),
-        minAge,
-        theme: data.theme,
-        dressCode: data.dressCode,
-        price: price,
-        bookingUrl: data.bookingUrl,
-        description: priceDescription
-      };
-      
-      const newEvent = await createEvent(eventData);
-      
-      if (newEvent) {
-        reset();
-        setPrices([{ description: '', amount: 0 }]);
-        toast({
-          title: 'Evento creado',
-          description: 'Tu evento ha sido creado correctamente. El QR se generará automáticamente 10 minutos antes del inicio.',
-        });
-      }
+      const coords = await getCurrentPosition();
+      const saved = await api.updateVenueLocation(coords.latitude, coords.longitude);
+      toast(
+        saved
+          ? { title: t('venue.events.locationSaved'), description: t('venue.events.locationSavedBody') }
+          : { title: t('common.error'), variant: 'destructive' },
+      );
     } catch (error) {
       toast({
-        title: 'Error',
-        description: 'No se pudo crear el evento',
+        title: t('common.error'),
+        description: error instanceof GeolocationError ? error.message : t('errors.generic'),
         variant: 'destructive',
       });
+    } finally {
+      setIsLocating(false);
+    }
+  };
+
+  const onSubmit = async (data: EventFormData) => {
+    const { inicio, fin } = combinar(data.date, data.startTime, data.endTime);
+
+    if (Number.isNaN(inicio.getTime()) || Number.isNaN(fin.getTime())) {
+      toast({ title: t('venue.events.badDates'), description: t('venue.events.badDatesBody'), variant: 'destructive' });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const minAge = Math.max(Number(data.minAge) || 18, 18);
+      const capacity = data.capacity ? Number(data.capacity) : undefined;
+
+      // El cartel se sube ahora, cuando ya se sabe que el evento va a existir.
+      // Si falla, el evento se crea igual y el cartel se puede añadir después.
+      let posterUrl: string | undefined;
+      if (posterFile) {
+        try {
+          posterUrl = (await api.uploadFile('event-photos', posterFile, posterFile.name)).url;
+        } catch (error) {
+          console.error('Error uploading poster:', error);
+          toast({ title: t('venue.events.posterFailed'), variant: 'destructive' });
+        }
+      }
+
+      const eventData: Omit<Event, 'id'> = {
+        name: data.name.trim(),
+        venueId: currentVenue.id,
+        startDate: inicio.toISOString(),
+        endDate: fin.toISOString(),
+        minAge,
+        theme: data.theme?.trim() || undefined,
+        dressCode: data.dressCode?.trim() || undefined,
+        price: data.price ? Number(data.price) : undefined,
+        bookingUrl: data.bookingUrl?.trim() || undefined,
+        description: data.description?.trim() || undefined,
+        maxCapacity: capacity && capacity > 0 ? capacity : undefined,
+        recurrence,
+        posterUrl,
+        location: currentVenue.location,
+      };
+
+      const newEvent = await createEvent(eventData);
+
+      if (newEvent) {
+        // El aviso de aforo arranca al 90 %, que es el mismo umbral por defecto
+        // que usa la pestaña de puerta.
+        if (eventData.maxCapacity) {
+          await venueService.setCapacity(newEvent.id, eventData.maxCapacity, 0.9).catch(() => undefined);
+        }
+        track('venue_event_created', { eventId: newEvent.id, recurrence });
+        reset();
+        setRecurrence('none');
+        setPosterFile(null);
+        setPosterPreview(null);
+        await refreshEvents();
+        onCreated?.();
+      }
     } finally {
       setIsLoading(false);
     }
   };
-  
+
   return (
-    <div className="p-4">
-      <h2 className="text-xl font-bold mb-6">Crear nuevo evento</h2>
-      
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <div>
-          <label htmlFor="name" className="block text-sm font-medium mb-1">Nombre del evento *</label>
-          <input
-            id="name"
-            type="text"
-            {...register('name', { required: 'Este campo es obligatorio' })}
-            className="w-full bg-party-dark/20 border border-party-dark/30 rounded-lg px-4 py-2"
-            placeholder="Fiesta de verano"
-          />
-          {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>}
-        </div>
-        
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="startDate" className="block text-sm font-medium mb-1">Fecha de inicio *</label>
-            <div className="relative">
-              <input
-                id="startDate"
-                type="datetime-local"
-                {...register('startDate', { required: 'Este campo es obligatorio' })}
-                className="w-full bg-party-dark/20 border border-party-dark/30 rounded-lg px-4 py-2"
-              />
-              <Calendar size={16} className="absolute top-3 right-3 text-party-gray" />
-            </div>
-            {errors.startDate && <p className="text-red-500 text-xs mt-1">{errors.startDate.message}</p>}
-          </div>
-          
-          <div>
-            <label htmlFor="endDate" className="block text-sm font-medium mb-1">Fecha de fin *</label>
-            <div className="relative">
-              <input
-                id="endDate"
-                type="datetime-local"
-                {...register('endDate', { required: 'Este campo es obligatorio' })}
-                className="w-full bg-party-dark/20 border border-party-dark/30 rounded-lg px-4 py-2"
-              />
-              <Calendar size={16} className="absolute top-3 right-3 text-party-gray" />
-            </div>
-            {errors.endDate && <p className="text-red-500 text-xs mt-1">{errors.endDate.message}</p>}
-          </div>
-        </div>
-        
-        <div>
-          <label htmlFor="minAge" className="block text-sm font-medium mb-1">Edad mínima</label>
-          <input
-            id="minAge"
-            type="number"
-            min="0"
-            defaultValue={18}
-            {...register('minAge')}
-            className="w-full bg-party-dark/20 border border-party-dark/30 rounded-lg px-4 py-2"
-            placeholder="18"
-          />
-          <p className="text-xs text-party-gray mt-1">Por defecto +18</p>
-        </div>
-        
-        <div>
-          <label htmlFor="theme" className="block text-sm font-medium mb-1">Temática</label>
-          <input
-            id="theme"
-            type="text"
-            {...register('theme')}
-            className="w-full bg-party-dark/20 border border-party-dark/30 rounded-lg px-4 py-2"
-            placeholder="Electrónica, Reggaeton, Pop..."
-          />
-        </div>
-        
-        <div>
-          <label htmlFor="dressCode" className="block text-sm font-medium mb-1">Código de vestimenta</label>
-          <input
-            id="dressCode"
-            type="text"
-            {...register('dressCode')}
-            className="w-full bg-party-dark/20 border border-party-dark/30 rounded-lg px-4 py-2"
-            placeholder="Casual elegante, Todo blanco..."
-          />
-        </div>
-        
-        <div>
-          <label className="block text-sm font-medium mb-1">Precios (€)</label>
-          
-          {prices.map((price, index) => (
-            <div key={index} className="flex space-x-2 mb-2">
-              <input
-                type="text"
-                value={price.description}
-                onChange={(e) => updatePriceField(index, 'description', e.target.value)}
-                className="flex-1 bg-party-dark/20 border border-party-dark/30 rounded-lg px-4 py-2"
-                placeholder="Descripción (ej: Entrada General)"
-              />
-              <input
-                type="number"
-                step="0.01"
-                min="0"
-                value={price.amount}
-                onChange={(e) => updatePriceField(index, 'amount', parseFloat(e.target.value))}
-                className="w-24 bg-party-dark/20 border border-party-dark/30 rounded-lg px-4 py-2"
-                placeholder="€"
-              />
-              {prices.length > 1 && (
-                <button 
-                  type="button" 
-                  onClick={() => removePriceField(index)}
-                  className="px-2 py-1 bg-red-500 text-white rounded-lg"
-                >
-                  -
-                </button>
-              )}
-            </div>
-          ))}
-          
-          <button 
-            type="button" 
-            onClick={addPriceField}
-            className="mt-1 text-sm text-party-primary"
+    <div className="rounded-[20px] bg-party-primary p-5 text-ink">
+      <div className="mb-5 flex items-center justify-between gap-3">
+        <h2 className="font-display text-headline-lg">{t('venue.events.newEvent')}</h2>
+        {onClose && (
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label={t('common.close')}
+            className="press flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-ink text-white"
           >
-            + Añadir otro precio
+            <X size={18} />
+          </button>
+        )}
+      </div>
+
+      {hasLocation ? (
+        <p className="mb-4 flex items-center gap-2 text-caption font-semibold">
+          <Check size={14} />
+          {t('venue.events.locationOk', { radius: currentVenue.eventRadius })}
+        </p>
+      ) : (
+        <div className="mb-5 rounded-xl bg-ink/10 p-4">
+          <p className="mb-3 text-body-sm">{t('venue.events.noLocation')}</p>
+          <button
+            type="button"
+            onClick={() => void captureVenueLocation()}
+            disabled={isLocating}
+            className="press inline-flex h-9 items-center gap-2 rounded-xl bg-ink px-3 text-sm font-bold text-white disabled:opacity-50"
+          >
+            <MapPin size={14} />
+            {isLocating ? t('venue.events.locating') : t('venue.events.useMyLocation')}
           </button>
         </div>
-        
+      )}
+
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
-          <label htmlFor="bookingUrl" className="block text-sm font-medium mb-1">URL de reserva</label>
+          <label htmlFor="ev-name" className={etiqueta}>
+            {t('venue.events.name')} *
+          </label>
           <input
-            id="bookingUrl"
-            type="url"
-            {...register('bookingUrl')}
-            className="w-full bg-party-dark/20 border border-party-dark/30 rounded-lg px-4 py-2"
-            placeholder="https://..."
+            id="ev-name"
+            {...register('name', { required: t('auth.errors.checkForm') })}
+            className={campo}
+            placeholder={t('venue.events.namePlaceholder')}
+            maxLength={80}
+          />
+          {errors.name && <p className="mt-1 text-caption font-bold text-ink">{errors.name.message}</p>}
+        </div>
+
+        <div>
+          <label htmlFor="ev-description" className={etiqueta}>
+            {t('venue.events.description')}
+          </label>
+          <textarea
+            id="ev-description"
+            rows={3}
+            {...register('description')}
+            className={cn(campo, 'resize-none')}
+            placeholder={t('venue.events.descriptionPlaceholder')}
+            maxLength={1000}
           />
         </div>
-        
-        <div className="pt-4">
-          <PartyButton type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? 'Creando evento...' : 'Crear evento'}
-          </PartyButton>
+
+        <div>
+          <label htmlFor="ev-date" className={etiqueta}>
+            {t('venue.events.date')} *
+          </label>
+          <input
+            id="ev-date"
+            type="date"
+            {...register('date', { required: t('auth.errors.checkForm') })}
+            className={campo}
+          />
+          {errors.date && <p className="mt-1 text-caption font-bold text-ink">{errors.date.message}</p>}
         </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label htmlFor="ev-start" className={etiqueta}>
+              {t('venue.events.startTime')}
+            </label>
+            <input id="ev-start" type="time" {...register('startTime', { required: true })} className={campo} />
+          </div>
+          <div>
+            <label htmlFor="ev-end" className={etiqueta}>
+              {t('venue.events.endTime')}
+            </label>
+            <input id="ev-end" type="time" {...register('endTime', { required: true })} className={campo} />
+          </div>
+        </div>
+        <p className="-mt-2 text-caption text-ink/70">{t('venue.events.overnightHelp')}</p>
+
+        <div className="grid grid-cols-3 gap-3">
+          <div>
+            <label htmlFor="ev-capacity" className={etiqueta}>
+              {t('venue.events.capacity')}
+            </label>
+            <input id="ev-capacity" type="number" min={1} inputMode="numeric" {...register('capacity')} className={campo} />
+          </div>
+          <div>
+            <label htmlFor="ev-price" className={etiqueta}>
+              {t('venue.events.price')}
+            </label>
+            <input
+              id="ev-price"
+              type="number"
+              min={0}
+              step="0.5"
+              inputMode="decimal"
+              {...register('price')}
+              className={campo}
+              placeholder="0"
+            />
+          </div>
+          <div>
+            <label htmlFor="ev-age" className={etiqueta}>
+              {t('venue.events.minAgeShort')}
+            </label>
+            <input id="ev-age" type="number" min={18} max={100} {...register('minAge')} className={campo} />
+          </div>
+        </div>
+
+        <div>
+          <label htmlFor="ev-theme" className={etiqueta}>
+            {t('venue.events.genre')}
+          </label>
+          <input
+            id="ev-theme"
+            list="ev-genres"
+            {...register('theme')}
+            className={campo}
+            placeholder={t('venue.events.themePlaceholder')}
+          />
+          <datalist id="ev-genres">
+            {GENEROS.map((g) => (
+              <option key={g} value={g} />
+            ))}
+          </datalist>
+        </div>
+
+        <div>
+          <label htmlFor="ev-dress" className={etiqueta}>
+            {t('venue.events.dressCode')}
+          </label>
+          <input
+            id="ev-dress"
+            {...register('dressCode')}
+            className={campo}
+            placeholder={t('venue.events.dressCodePlaceholder')}
+          />
+        </div>
+
+        {/* El cartel. La columna `poster_url` existía desde el principio y no
+            había forma de rellenarla. */}
+        <div>
+          <span className={etiqueta}>{t('venue.events.poster')}</span>
+          <input
+            id="event-poster"
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            className="sr-only"
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              event.target.value = '';
+              if (file) pickPoster(file);
+            }}
+          />
+
+          {posterPreview ? (
+            <div className="relative overflow-hidden rounded-xl">
+              <img src={posterPreview} alt="" className="aspect-[16/10] w-full object-cover" />
+              <button
+                type="button"
+                onClick={() => {
+                  setPosterPreview(null);
+                  setPosterFile(null);
+                }}
+                aria-label={t('common.delete')}
+                className="press absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-ink/80 text-white"
+              >
+                <X size={15} />
+              </button>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center gap-2 rounded-xl border-2 border-dashed border-ink/30 bg-white px-4 py-5 text-center">
+              <ImagePlus size={24} />
+              <p className="text-body-sm">{t('venue.events.posterDrop')}</p>
+              {/* El disparador es un `label`: dentro de un formulario un botón
+                  lo enviaría. Tiene forma de botón de verdad a propósito. */}
+              <label
+                htmlFor="event-poster"
+                className="press inline-flex h-9 cursor-pointer items-center rounded-xl bg-ink px-4 text-sm font-bold text-white"
+              >
+                {t('venue.events.selectFile')}
+              </label>
+              <p className="text-caption text-ink/60">{t('venue.events.posterHelp')}</p>
+            </div>
+          )}
+        </div>
+
+        <div className="space-y-3 rounded-xl bg-white p-3.5">
+          <div className="flex items-center justify-between gap-3">
+            <label htmlFor="ev-recurrent" className="font-display text-title-card">
+              {t('venue.events.recurrent')}
+            </label>
+            {/* Interruptor propio: el de la aplicación es amarillo encendido y
+                sobre este panel desaparecería. */}
+            <button
+              id="ev-recurrent"
+              type="button"
+              role="switch"
+              aria-checked={recurrence !== 'none'}
+              onClick={() => setRecurrence((r) => (r === 'none' ? 'weekly' : 'none'))}
+              className={cn(
+                'press relative h-6 w-11 shrink-0 rounded-full transition-colors',
+                recurrence !== 'none' ? 'bg-ink' : 'bg-ink/20',
+              )}
+            >
+              <span
+                className={cn(
+                  'absolute top-0.5 h-5 w-5 rounded-full transition-transform duration-200 [transition-timing-function:var(--ease-out)]',
+                  recurrence !== 'none' ? 'translate-x-[22px] bg-party-primary' : 'translate-x-0.5 bg-white',
+                )}
+              />
+            </button>
+          </div>
+          {recurrence !== 'none' && (
+            <div className="grid grid-cols-2 gap-1 rounded-lg bg-ink/5 p-1">
+              {(['weekly', 'biweekly'] as const).map((opcion) => (
+                <button
+                  key={opcion}
+                  type="button"
+                  onClick={() => setRecurrence(opcion)}
+                  aria-pressed={recurrence === opcion}
+                  className={cn(
+                    'press h-9 rounded-md text-caption font-bold',
+                    recurrence === opcion ? 'bg-ink text-party-primary' : 'text-ink/60',
+                  )}
+                >
+                  {t(`venue.events.recurrence.${opcion}`)}
+                </button>
+              ))}
+            </div>
+          )}
+          <p className="text-caption text-ink/60">{t('venue.events.recurrentHelp')}</p>
+        </div>
+
+        <div>
+          <label htmlFor="ev-booking" className={etiqueta}>
+            {t('venue.events.bookingUrl')}
+          </label>
+          <input id="ev-booking" type="url" {...register('bookingUrl')} className={campo} placeholder="https://…" />
+        </div>
+
+        {/* Invertido: sobre el amarillo, un botón amarillo no se vería. */}
+        <button
+          type="submit"
+          disabled={isLoading}
+          className="press flex h-12 w-full items-center justify-center rounded-xl bg-white font-display text-title-card font-extrabold text-ink shadow-md disabled:opacity-60"
+        >
+          {isLoading ? t('venue.events.creating') : t('venue.events.publish')}
+        </button>
       </form>
     </div>
   );

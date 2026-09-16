@@ -1,0 +1,99 @@
+import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import QRCode from 'qrcode.react';
+import { X, Monitor, Users } from 'lucide-react';
+import { PartyButton } from '@/components/ui-custom/party-button';
+import { venueService, EventOccupancy } from '@/services/venue-service';
+
+interface VenueTvViewProps {
+  code: string;
+  eventId: string;
+  eventName?: string;
+  venueName?: string;
+}
+
+/**
+ * Vista a pantalla completa para el monitor de la entrada.
+ *
+ * El QR del panel sirve en la barra, de móvil a móvil, pero para captar a quien
+ * está en la cola hace falta algo que se lea a tres metros. Se muestra también
+ * el contador de gente dentro, porque una sala que se ve llena atrae, y ese es
+ * justo el problema que tiene la app el primer día en un local nuevo.
+ */
+const VenueTvView = ({ code, eventId, eventName, venueName }: VenueTvViewProps) => {
+  const { t } = useTranslation();
+
+  const [open, setOpen] = useState(false);
+  const [occupancy, setOccupancy] = useState<EventOccupancy | null>(null);
+
+  const load = useCallback(async () => {
+    setOccupancy(await venueService.getOccupancy(eventId));
+  }, [eventId]);
+
+  useEffect(() => {
+    if (!open) return;
+
+    void load();
+    const interval = setInterval(() => void load(), 20_000);
+    return () => clearInterval(interval);
+  }, [open, load]);
+
+  // Salir con Escape: en un monitor sin teclado cómodo, el botón es pequeño.
+  useEffect(() => {
+    if (!open) return;
+
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [open]);
+
+  if (!open) {
+    return (
+      <PartyButton variant="outline" size="sm" className="w-full gap-2" onClick={() => setOpen(true)}>
+        <Monitor size={16} />
+        {t('venue.tv.open')}
+      </PartyButton>
+    );
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-party-primary text-party-dark p-8">
+      <button
+        type="button"
+        onClick={() => setOpen(false)}
+        className="absolute top-4 right-4 rounded-full bg-white/15 p-2"
+        aria-label={t('common.close')}
+      >
+        <X size={20} />
+      </button>
+
+      <p className="text-5xl font-extrabold tracking-tight mb-4">Vybe</p>
+
+      <p className="max-w-3xl text-center text-2xl md:text-3xl font-semibold leading-snug mb-8">
+        {t('venue.qr.posterSlogan')}
+      </p>
+
+      <div className="rounded-3xl bg-white p-6 leading-none">
+        <QRCode value={code} size={320} level="H" includeMargin renderAs="svg" />
+      </div>
+
+      <p className="mt-6 text-4xl font-bold tracking-[0.3em] tabular-nums">{code}</p>
+
+      {eventName && <p className="mt-6 text-2xl font-semibold">{eventName}</p>}
+      {venueName && <p className="text-lg opacity-80">{venueName}</p>}
+
+      {occupancy && occupancy.inside > 0 && (
+        <p className="mt-6 flex items-center gap-2 rounded-full bg-white/15 px-5 py-2 text-xl font-medium">
+          <Users size={20} />
+          {t('venue.tv.insideNow', { count: occupancy.inside })}
+        </p>
+      )}
+
+      <p className="mt-auto text-sm opacity-70">{t('venue.qr.posterFooter')}</p>
+    </div>
+  );
+};
+
+export default VenueTvView;

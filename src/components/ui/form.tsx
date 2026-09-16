@@ -93,7 +93,9 @@ const FormLabel = React.forwardRef<
   return (
     <Label
       ref={ref}
-      className={cn(error && "text-destructive", className)}
+      // Etiqueta pequeña y gris encima del campo, como en los formularios de
+      // Stitch: el campo relleno ya dice dónde se escribe.
+      className={cn("text-body-sm font-semibold text-[#C8C6C5]", error && "text-destructive", className)}
       htmlFor={formItemId}
       {...props}
     />
@@ -133,7 +135,7 @@ const FormDescription = React.forwardRef<
     <p
       ref={ref}
       id={formDescriptionId}
-      className={cn("text-sm text-muted-foreground", className)}
+      className={cn("text-caption font-normal text-party-gray", className)}
       {...props}
     />
   )

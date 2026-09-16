@@ -22,3 +22,37 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Variables de entorno (contienen claves del proyecto Supabase)
+.env
+.env.*
+!.env.example
+
+# Credenciales de prueba
+info.txt
+
+# Secretos generados para las Edge Functions
+supabase/.env.functions
+
+# Capacitor: los proyectos nativos sí van al repositorio —llevan permisos,
+# iconos y configuración propios— pero no lo que genera la compilación.
+android/app/build/
+android/build/
+android/.gradle/
+android/local.properties
+
+# Configuración de Firebase: no es secreta —viaja dentro del APK— pero es
+# de cada proyecto, y tenerla versionada invita a compilar contra la de otro.
+android/app/google-services.json
+ios/App/App/GoogleService-Info.plist
+android/app/src/main/assets/public/
+ios/App/build/
+ios/App/Pods/
+ios/App/App/public/
+
+# Estado local del CLI de Supabase y ajustes personales de Claude Code
+supabase/.temp/
+.claude/settings.local.json
+
+# SQL generado por scripts/generate-seed.py: lleva la contraseña de las cuentas de prueba
+supabase/seeds/mallorca_test_data.sql

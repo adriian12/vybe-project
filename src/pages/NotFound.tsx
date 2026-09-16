@@ -1,20 +1,19 @@
-
-import { Link } from "react-router-dom";
-import { PartyButton } from "@/components/ui-custom/party-button";
+import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { PartyButton } from '@/components/ui-custom/party-button';
+import { VybeMark } from '@/components/brand/vybe-logo';
 
 const NotFound = () => {
+  const { t } = useTranslation();
+
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="text-center">
-        <div className="text-7xl mb-4">🎭</div>
-        <h1 className="text-3xl font-bold mb-2">Página no encontrada</h1>
-        <p className="text-party-gray mb-6">
-          Parece que la fiesta que buscas no está aquí
-        </p>
-        <Link to="/">
-          <PartyButton variant="gradient">Volver a la fiesta</PartyButton>
-        </Link>
-      </div>
+    <div className="flex min-h-screen flex-col items-center justify-center gap-4 p-6 text-center">
+      <VybeMark size={56} />
+      <h1 className="font-display text-[64px] font-extrabold leading-none text-party-primary">404</h1>
+      <p className="max-w-xs text-body-md text-party-gray">{t('eventAccess.notFoundBody')}</p>
+      <PartyButton asChild size="lg">
+        <Link to="/">{t('common.goHome')}</Link>
+      </PartyButton>
     </div>
   );
 };

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!--
+		Enlaces universales: un enlace de vybe.app abre la aplicación instalada
+		en vez de Safari.
+
+		Para que funcione hay que publicar en el dominio el fichero
+		https://vybe.app/.well-known/apple-app-site-association con el
+		identificador del equipo y el bundle id, y activar «Associated Domains»
+		en la capacidad del target en Xcode. Mientras no exista ese fichero,
+		iOS abre Safari sin dar ningún error.
+	-->
+	<key>com.apple.developer.associated-domains</key>
+	<array>
+		<string>applinks:vybe.app</string>
+		<string>applinks:www.vybe.app</string>
+	</array>
+
+	<!-- Notificaciones push: en producción, no en el entorno de desarrollo. -->
+	<key>aps-environment</key>
+	<string>production</string>
+</dict>
+</plist>

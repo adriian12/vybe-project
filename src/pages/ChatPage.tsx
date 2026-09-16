@@ -1,40 +1,35 @@
-
-import { useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { useAppContext } from "@/context/app-context";
-import ChatWindow from "@/components/chat-window";
+import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import ChatWindow from '@/components/chat-window';
+import Header from '@/components/header';
+import Footer from '@/components/footer';
+import { PartyButton } from '@/components/ui-custom/party-button';
 
 const ChatPage = () => {
   const { userId } = useParams();
-  const { isLoggedIn, userType } = useAppContext();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
-  // Verificar si el usuario está autenticado
-  useEffect(() => {
-    if (!isLoggedIn) {
-      navigate("/auth");
-    } else if (userType !== 'user') {
-      navigate("/home");
-    }
-  }, [isLoggedIn, userType, navigate]);
-
+  // La autenticación la garantiza ProtectedRoute; aquí sólo falta comprobar
+  // que la URL trae una conversación.
   if (!userId) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen p-4">
-        <h1 className="text-2xl font-bold mb-4">No se encontró la conversación</h1>
-        <button
-          onClick={() => navigate("/matches")}
-          className="px-4 py-2 bg-party-primary text-white rounded-lg"
-        >
-          Volver a Mis Vybes
-        </button>
+      <div className="flex h-screen flex-col items-center justify-center gap-4 p-4">
+        <h1 className="font-display text-headline-lg">{t('chat.noConversation')}</h1>
+        <PartyButton onClick={() => navigate('/matches')}>{t('chat.backToMatches')}</PartyButton>
       </div>
     );
   }
 
+  // El chat ocupa exactamente el hueco entre la cabecera y la barra de abajo:
+  // así el campo de escribir queda siempre a la vista, también con el teclado.
   return (
-    <div className="h-screen overflow-hidden">
-      <ChatWindow matchId={userId} />
+    <div className="flex h-[100dvh] flex-col overflow-hidden pb-16 pt-16">
+      <Header />
+      <div className="mx-auto w-full max-w-2xl flex-1 overflow-hidden">
+        <ChatWindow matchId={userId} />
+      </div>
+      <Footer />
     </div>
   );
 };

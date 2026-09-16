@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>CFBundleDisplayName</key>
+        <string>Vybe</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>$(PRODUCT_NAME)</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(MARKETING_VERSION)</string>
+	<key>CFBundleVersion</key>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>UILaunchStoryboardName</key>
+	<string>LaunchScreen</string>
+	<key>UIMainStoryboardFile</key>
+	<string>Main</string>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>armv7</string>
+	</array>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<true/>
+
+	<!--
+		Apple rechaza la aplicación si un permiso no explica para qué se pide, y
+		el texto se le enseña tal cual a la persona en el diálogo del sistema.
+		Por eso dicen qué se hace con cada cosa, no que "la app lo necesita".
+	-->
+	<key>NSCameraUsageDescription</key>
+	<string>Para hacerte la foto con la que te verán en el evento. La foto es de esa noche y no se puede subir desde la galería.</string>
+
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Para elegir las fotos de tu perfil desde el carrete. La foto del evento se sigue haciendo con la cámara.</string>
+
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Para guardar en tu carrete el código QR de tu evento.</string>
+
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Para comprobar que estás en el local y dejarte entrar al evento. Solo se consulta mientras usas la aplicación.</string>
+
+	<!-- La localización también viaja en la alerta de ayuda a tus contactos. -->
+	<key>NSUserTrackingUsageDescription</key>
+	<string>No se te sigue entre aplicaciones ni se comparten tus datos con terceros.</string>
+</dict>
+</plist>

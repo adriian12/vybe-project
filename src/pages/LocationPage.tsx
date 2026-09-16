@@ -1,191 +1,135 @@
+import { useCallback, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { BadgeCheck, Loader2, RotateCw } from 'lucide-react';
+import { useAppContext } from '@/context/app-context';
+import Header from '@/components/header';
+import Footer from '@/components/footer';
+import QRScanner from '@/components/qr-scanner';
+import { ApiError } from '@/services/api';
+import { getCurrentPosition, Coordinates, GeolocationError } from '@/services/geo';
+import { track } from '@/lib/observability';
+import { cn } from '@/lib/utils';
 
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAppContext } from "@/context/app-context";
-import { PartyButton } from "@/components/ui-custom/party-button";
-import { MapPin, QrCode } from "lucide-react";
-import QRScanner from "@/components/qr-scanner";
-
+/**
+ * Acceso directo por código, sin elegir antes el evento en la lista.
+ *
+ * Es el camino corto para quien ya tiene el QR delante: la ubicación se pide
+ * sola al entrar y el servidor decide a qué evento corresponde el código. Usa
+ * el mismo lector que la puerta de un evento concreto.
+ */
 const LocationPage = () => {
-  const [isCheckingLocation, setIsCheckingLocation] = useState(false);
-  const [showQrScanner, setShowQrScanner] = useState(false);
-  const [eventDetails, setEventDetails] = useState<any>(null);
-  const [showEventDetails, setShowEventDetails] = useState(false);
-  const { verifyLocation, verifyEventCode, isLocationVerified, isEventVerified } = useAppContext();
   const navigate = useNavigate();
+  const { t } = useTranslation();
+  const { redeemEventCode } = useAppContext();
 
-  // Si ya tenemos verificada la ubicación y el evento, ir a la página principal
+  const [coords, setCoords] = useState<Coordinates | null>(null);
+  const [checking, setChecking] = useState(true);
+  const [locationError, setLocationError] = useState<string | null>(null);
+  const [isValidating, setIsValidating] = useState(false);
+  const [scanError, setScanError] = useState<string | null>(null);
+
+  const comprobar = useCallback(async () => {
+    setChecking(true);
+    setLocationError(null);
+
+    try {
+      setCoords(await getCurrentPosition());
+      track('location_verified', { from: 'location_page' });
+    } catch (error) {
+      setLocationError(error instanceof GeolocationError ? error.message : t('errors.generic'));
+    } finally {
+      setChecking(false);
+    }
+  }, [t]);
+
   useEffect(() => {
-    if (isLocationVerified && isEventVerified) {
-      navigate("/home");
-    }
-  }, [isLocationVerified, isEventVerified, navigate]);
+    void comprobar();
+  }, [comprobar]);
 
-  const handleCheckLocation = async () => {
-    setIsCheckingLocation(true);
-    try {
-      // Solicitar permisos de geolocalización
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          async (position) => {
-            // Posición obtenida correctamente
-            console.log("Ubicación obtenida:", position.coords.latitude, position.coords.longitude);
-            
-            const success = await verifyLocation();
-            if (success) {
-              setShowQrScanner(true);
-            }
-            setIsCheckingLocation(false);
-          },
-          (error) => {
-            // Error al obtener la posición
-            console.error("Error obteniendo ubicación:", error);
-            setIsCheckingLocation(false);
-          },
-          { enableHighAccuracy: true }
-        );
-      } else {
-        // Navegador no soporta geolocalización
-        console.error("La geolocalización no es soportada por este navegador");
-        setIsCheckingLocation(false);
+  const handleCode = useCallback(
+    async (code: string) => {
+      setIsValidating(true);
+      setScanError(null);
+
+      try {
+        const result = await redeemEventCode(code, coords ?? undefined);
+        track('code_redeemed', { eventId: result.eventId, from: 'location_page' });
+        navigate(`/event/${result.eventId}/live`, { replace: true });
+      } catch (error) {
+        track('code_rejected', { from: 'location_page' });
+        setScanError(error instanceof ApiError ? error.message : t('errors.generic'));
+      } finally {
+        setIsValidating(false);
       }
-    } catch (error) {
-      console.error("Error verificando ubicación:", error);
-      setIsCheckingLocation(false);
-    }
-  };
+    },
+    [coords, redeemEventCode, navigate, t],
+  );
 
-  const handleQrScanSuccess = async (code: string) => {
-    try {
-      // Simular obtención de detalles del evento
-      const mockEventDetails = {
-        id: "event123",
-        name: "Fiesta Electrónica",
-        venue: "Club Vybe",
-        date: new Date().toLocaleDateString(),
-        time: "22:00 - 05:00",
-        theme: "Techno",
-        activePeople: 45,
-        validUntil: new Date(new Date().setHours(new Date().getHours() + 10)).toLocaleString()
-      };
-      
-      setEventDetails(mockEventDetails);
-      setShowEventDetails(true);
-    } catch (error) {
-      console.error("Error scanning QR code:", error);
-    }
-  };
-
-  const handleAccessEvent = async () => {
-    if (!eventDetails) return;
-    
-    try {
-      const success = await verifyEventCode(eventDetails.id);
-      if (success) {
-        navigate("/home");
-      }
-    } catch (error) {
-      console.error("Error accessing event:", error);
-    }
-  };
+  const tarjeta = (
+    <div className="flex items-center gap-3 rounded-2xl bg-white p-4 text-ink">
+      <span
+        aria-hidden
+        className={cn(
+          'h-3 w-3 shrink-0 rounded-full',
+          checking ? 'animate-pulse bg-party-gray' : coords ? 'bg-emerald-500' : 'bg-party-accent',
+        )}
+      />
+      <div className="min-w-0 flex-1">
+        <p className="font-display text-title-card">
+          {checking
+            ? t('eventAccess.checkingTitle')
+            : coords
+              ? t('eventAccess.locationReady')
+              : t('eventAccess.noLocationTitle')}
+        </p>
+        <p className="text-body-sm text-ink/60">
+          {locationError ?? t('location.bodyTwo')}
+        </p>
+      </div>
+      {checking ? (
+        <Loader2 size={22} className="shrink-0 animate-spin text-ink/50" />
+      ) : coords ? (
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-ink text-party-primary">
+          <BadgeCheck size={20} />
+        </span>
+      ) : (
+        <button
+          type="button"
+          onClick={() => void comprobar()}
+          aria-label={t('eventAccess.tryAgain')}
+          className="press flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-ink text-party-primary"
+        >
+          <RotateCw size={18} />
+        </button>
+      )}
+    </div>
+  );
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <div className="flex-1 flex flex-col items-center justify-center p-6">
-        {!showQrScanner && !showEventDetails ? (
-          <>
-            <div className="w-24 h-24 rounded-full bg-party-dark flex items-center justify-center mb-8">
-              <MapPin size={48} className="text-party-primary" />
-            </div>
-            
-            <h1 className="text-2xl font-bold text-center mb-4">
-              Verifica tu ubicación
-            </h1>
-            
-            <p className="text-center text-party-gray mb-4 max-w-xs">
-              Vybe solo funciona dentro de eventos, discotecas o fiestas verificadas
-            </p>
-            
-            <p className="text-center text-party-gray mb-8 max-w-xs">
-              Solo podrás ver perfiles en un radio de 50m de tu ubicación actual
-            </p>
-            
-            <PartyButton 
-              variant="gradient" 
-              onClick={handleCheckLocation}
-              disabled={isCheckingLocation}
-              className="w-full max-w-xs"
-            >
-              {isCheckingLocation ? (
-                <span className="flex items-center justify-center">
-                  <span className="mr-2 w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></span>
-                  Verificando...
-                </span>
-              ) : (
-                "Verificar mi ubicación"
-              )}
-            </PartyButton>
-          </>
-        ) : showEventDetails ? (
-          <>
-            <div className="w-24 h-24 rounded-full bg-party-dark flex items-center justify-center mb-8">
-              <QrCode size={48} className="text-party-primary" />
-            </div>
-            
-            <h1 className="text-2xl font-bold text-center mb-4">
-              Evento detectado
-            </h1>
-            
-            <div className="w-full max-w-sm bg-party-dark/10 p-6 rounded-lg mb-8">
-              <h2 className="text-xl font-bold mb-2">{eventDetails.name}</h2>
-              <p className="text-party-gray mb-4">{eventDetails.venue}</p>
-              
-              <div className="space-y-2 mb-6">
-                <p><span className="text-party-gray">Fecha:</span> {eventDetails.date}</p>
-                <p><span className="text-party-gray">Hora:</span> {eventDetails.time}</p>
-                <p><span className="text-party-gray">Tema:</span> {eventDetails.theme}</p>
-                <p><span className="text-party-gray">Asistentes actuales:</span> {eventDetails.activePeople}</p>
-                <p><span className="text-party-gray">Válido hasta:</span> {eventDetails.validUntil}</p>
-              </div>
-              
-              <PartyButton 
-                variant="gradient" 
-                onClick={handleAccessEvent}
-                className="w-full"
-              >
-                Acceder al evento
-              </PartyButton>
-            </div>
-            
-            <button 
-              className="text-party-gray text-sm"
-              onClick={() => setShowEventDetails(false)}
-            >
-              Escanear otro código
-            </button>
-          </>
-        ) : (
-          <>
-            <div className="w-24 h-24 rounded-full bg-party-dark flex items-center justify-center mb-8">
-              <QrCode size={48} className="text-party-primary" />
-            </div>
-            
-            <h1 className="text-2xl font-bold text-center mb-4">
-              Escanea el código del evento
-            </h1>
-            
-            <p className="text-center text-party-gray mb-4 max-w-xs">
-              Para garantizar exclusividad, cada evento tiene su propio código QR diario
-            </p>
-            
-            <p className="text-center text-party-gray mb-8 max-w-xs">
-              Solicita el código al organizador del evento o establecimiento
-            </p>
-            
-            <QRScanner onScanSuccess={handleQrScanSuccess} />
-          </>
-        )}
-      </div>
+    <div className="min-h-screen pb-24 pt-16">
+      <Header />
+
+      <main className="mx-auto max-w-md space-y-5 px-margin pt-5">
+        <div>
+          <p className="flex items-center gap-2 text-label-pill uppercase tracking-wider text-party-primary">
+            <span className="h-2 w-2 rounded-full bg-party-primary" />
+            {t('eventAccess.atTheDoor')}
+          </p>
+          <h1 className="mt-1 font-display text-headline-xl">{t('eventAccess.title')}</h1>
+          <p className="mt-1 text-body-md text-party-gray">{t('location.body')}</p>
+        </div>
+
+        <QRScanner
+          onScanSuccess={(code) => void handleCode(code)}
+          isValidating={isValidating}
+          error={scanError}
+          disabled={!coords}
+          status={tarjeta}
+        />
+      </main>
+
+      <Footer />
     </div>
   );
 };

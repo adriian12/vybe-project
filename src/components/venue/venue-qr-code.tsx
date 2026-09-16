@@ -1,235 +1,316 @@
-
-import { useState, useEffect } from "react";
-import { useAppContext } from "@/context/app-context";
-import { QrCode, Share2 } from "lucide-react";
-import { PartyButton } from "@/components/ui-custom/party-button";
-import QRCode from "qrcode.react";
-import { Event } from "@/types/venue";
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { AlertTriangle, Copy, Download, QrCode, RefreshCw, Timer } from 'lucide-react';
+import QRCode from 'qrcode.react';
+import { useAppContext } from '@/context/app-context';
+import { PartyButton } from '@/components/ui-custom/party-button';
+import { VybeMark } from '@/components/brand/vybe-logo';
+import { Switch } from '@/components/ui/switch';
+import { useToast } from '@/components/ui/use-toast';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { api, ApiError } from '@/services/api';
+import { venueService } from '@/services/venue-service';
+import { track } from '@/lib/observability';
+import { Event } from '@/types/venue';
+import VenueQRPoster from '@/components/venue/venue-qr-poster';
+import VenueTvView from '@/components/venue/venue-tv-view';
 
 interface VenueQRCodeProps {
-  refreshStats: () => void;
+  onCodeGenerated?: () => void;
 }
 
-const VenueQRCode: React.FC<VenueQRCodeProps> = ({ refreshStats }) => {
-  const { currentVenue, generateQRCode, events } = useAppContext();
-  const [qrValue, setQrValue] = useState<string | null>(null);
+const QR_CANVAS_ID = 'vybe-venue-qr';
+const ROTATION_OPTIONS = [0, 15, 30, 60, 120];
+
+const VenueQRCode: React.FC<VenueQRCodeProps> = ({ onCodeGenerated }) => {
+  const { t } = useTranslation();
+  const { currentVenue, events } = useAppContext();
+  const { toast } = useToast();
+
   const [manualCode, setManualCode] = useState<string | null>(null);
+  const [expiresAt, setExpiresAt] = useState<Date | null>(null);
+  const [codeEventId, setCodeEventId] = useState<string | null>(null);
+  const [rotation, setRotation] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [timeLeft, setTimeLeft] = useState<string | null>(null);
-  const [expirationTime, setExpirationTime] = useState<Date | null>(null);
-  const [activeEvents, setActiveEvents] = useState<Event[]>([]);
-  const [currentEvent, setCurrentEvent] = useState<Event | null>(null);
+  const [now, setNow] = useState(() => Date.now());
 
-  // Verificar si hay eventos activos
+  // Eventos del local en curso o que empiezan en menos de una hora.
+  const activeEvents = useMemo(() => {
+    if (!currentVenue) return [];
+    const current = Date.now();
+
+    return events.filter((event) => {
+      if (event.venueId !== currentVenue.id) return false;
+      const start = new Date(event.startDate).getTime();
+      const end = new Date(event.endDate).getTime();
+      return (current >= start && current <= end) || start - current <= 60 * 60 * 1000;
+    });
+  }, [events, currentVenue]);
+
+  const currentEvent: Event | undefined = activeEvents[0];
+
+  // Recupera el código vigente en vez de generar uno nuevo en cada visita.
   useEffect(() => {
-    if (events && events.length > 0) {
-      const now = new Date();
-      const active = events.filter(event => {
-        const startDate = new Date(event.startDate);
-        const endDate = new Date(event.endDate);
-        
-        // Considerar un evento como activo si:
-        // 1. Ya ha empezado y no ha terminado, o
-        // 2. Está a punto de empezar (menos de 10 minutos)
-        const isActive = 
-          (now >= startDate && now <= endDate) || 
-          (startDate.getTime() - now.getTime() <= 10 * 60 * 1000);
-        
-        return isActive;
-      });
-      
-      setActiveEvents(active);
-      
-      // Si hay eventos activos pero no hay QR, generarlo
-      if (active.length > 0 && !qrValue) {
-        setCurrentEvent(active[0]);
-        generateNewQRCode();
-      }
-    }
-  }, [events]);
-
-  // Actualizar tiempo restante
-  useEffect(() => {
-    if (!expirationTime) return;
-
-    const interval = setInterval(() => {
-      const now = new Date();
-      const diff = expirationTime.getTime() - now.getTime();
-      
-      if (diff <= 0) {
-        setTimeLeft("Expirado");
-        clearInterval(interval);
-        return;
-      }
-      
-      const hours = Math.floor(diff / (1000 * 60 * 60));
-      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-      
-      setTimeLeft(`${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`);
-    }, 1000);
-    
-    return () => clearInterval(interval);
-  }, [expirationTime]);
-
-  const generateNewQRCode = async () => {
     if (!currentVenue) return;
-    
+    let cancelled = false;
+
+    void api.getActiveEventCode(currentVenue.id).then((existing) => {
+      if (cancelled || !existing) return;
+      setManualCode(existing.manualCode);
+      setExpiresAt(new Date(existing.expiresAt));
+      setCodeEventId(existing.eventId);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [currentVenue]);
+
+  useEffect(() => {
+    const interval = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Rotación automática: un código filtrado por WhatsApp deja de servir pronto.
+  useEffect(() => {
+    if (!currentVenue || rotation === 0) return;
+
+    const check = async () => {
+      const result = await venueService.rotateIfNeeded(currentVenue.id);
+      if (!result) return;
+
+      setManualCode(result.code);
+      setExpiresAt(new Date(result.expiresAt));
+      if (result.rotated) toast({ title: t('venue.qr.rotated') });
+    };
+
+    void check();
+    const interval = setInterval(() => void check(), 60_000);
+    return () => clearInterval(interval);
+  }, [currentVenue, rotation, toast, t]);
+
+  const isExpired = expiresAt !== null && expiresAt.getTime() <= now;
+
+  const generateNewCode = useCallback(async () => {
+    if (!currentVenue) return;
+
     setLoading(true);
-    
     try {
-      const result = await generateQRCode();
-      
-      if (result) {
-        setQrValue(result.qrCode);
-        setManualCode(result.manualCode);
-        
-        // Si hay eventos activos, establecer el tiempo de expiración al final del último evento
-        if (activeEvents.length > 0) {
-          const latestEndTime = activeEvents.reduce((latest, event) => {
-            const endDate = new Date(event.endDate);
-            return endDate > latest ? endDate : latest;
-          }, new Date(activeEvents[0].endDate));
-          
-          setExpirationTime(latestEndTime);
-        } else {
-          // Si no hay eventos activos, usar el tiempo por defecto (24 horas)
-          const expTime = new Date();
-          expTime.setHours(expTime.getHours() + 24);
-          setExpirationTime(expTime);
-        }
-        
-        // Refrescar estadísticas
-        refreshStats();
-      }
+      // El código caduca con el evento; si no hay evento, en 12 horas.
+      const expiry = currentEvent
+        ? new Date(currentEvent.endDate)
+        : new Date(Date.now() + 12 * 60 * 60 * 1000);
+
+      const result = await api.generateEventCode(currentVenue.id, currentEvent?.id ?? null, expiry);
+
+      if (rotation > 0) await venueService.setRotation(currentVenue.id, rotation);
+
+      setManualCode(result.manualCode);
+      setExpiresAt(new Date(result.expiresAt));
+      setCodeEventId(currentEvent?.id ?? null);
+      track('venue_code_generated', { eventId: currentEvent?.id });
+      onCodeGenerated?.();
     } catch (error) {
-      console.error('Error generating QR code:', error);
+      toast({
+        title: t('common.error'),
+        description: error instanceof ApiError ? error.message : t('errors.generic'),
+        variant: 'destructive',
+      });
     } finally {
       setLoading(false);
+    }
+  }, [currentVenue, currentEvent, rotation, onCodeGenerated, toast, t]);
+
+  const changeRotation = async (minutes: number) => {
+    setRotation(minutes);
+    if (!currentVenue || !manualCode) return;
+
+    try {
+      await venueService.setRotation(currentVenue.id, minutes || null);
+    } catch {
+      toast({ title: t('common.error'), variant: 'destructive' });
     }
   };
 
   const handleShare = async () => {
-    if (!qrValue) return;
-    
-    try {
-      await navigator.share({
-        title: 'Código de acceso Vybe',
-        text: `Usa este código para acceder a Vybe: ${manualCode}`,
-        url: window.location.href
-      });
-    } catch (error) {
-      console.error('Error sharing:', error);
+    if (!manualCode) return;
+    const text = t('venue.qr.shareText', { code: manualCode });
+
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: t('venue.qr.title'), text });
+        return;
+      } catch {
+        return; // El usuario ha cancelado el diálogo de compartir.
+      }
     }
+
+    await navigator.clipboard.writeText(text);
+    toast({ title: t('venue.qr.copied'), description: t('venue.qr.copiedBody') });
   };
 
   const downloadQRCode = () => {
-    const canvas = document.getElementById('qr-code') as HTMLCanvasElement;
+    const canvas = document.getElementById(QR_CANVAS_ID) as HTMLCanvasElement | null;
     if (!canvas) return;
-    
-    const url = canvas.toDataURL('image/png');
+
     const link = document.createElement('a');
-    link.href = url;
-    link.download = `vybe-qrcode-${new Date().toISOString().split('T')[0]}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.download = `vybe-qr-${new Date().toISOString().split('T')[0]}.png`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
 
+  if (!currentVenue) return null;
+
+  if (!currentVenue.isVerified) {
+    return (
+      <div className="surface-light mx-auto max-w-md rounded-2xl p-6 text-center">
+        <AlertTriangle size={40} className="mx-auto mb-4 text-destructive" />
+        <h2 className="mb-2 font-display text-headline-md">{t('venue.pendingTitle')}</h2>
+        <p className="text-body-sm text-party-gray">{t('venue.qr.notVerified')}</p>
+      </div>
+    );
+  }
+
+  const vigente = Boolean(manualCode) && !isExpired;
+  const restanteMs = expiresAt ? expiresAt.getTime() - now : 0;
+  const horas = Math.floor(restanteMs / 3_600_000);
+  const minutos = Math.floor((restanteMs % 3_600_000) / 60_000);
+
   return (
-    <div className="space-y-6">
-      <div className="text-center">
-        <h1 className="text-2xl font-bold mb-2">Código QR del Día</h1>
-        <p className="text-party-gray text-sm mb-6">
-          {activeEvents.length > 0 
-            ? "Este código es válido durante el evento. Los usuarios deben escanearlo para acceder a la app."
-            : "Este código es válido durante 24 horas. Los usuarios deben escanearlo para acceder a la app."}
-        </p>
-        
-        <div className="w-64 h-64 mx-auto border-2 border-party-primary rounded-lg flex items-center justify-center mb-4 bg-white">
-          {qrValue ? (
-            <QRCode
-              id="qr-code"
-              value={qrValue}
-              size={200}
-              level="H"
-              includeMargin={true}
-              renderAs="canvas"
-            />
+    <div className="space-y-4">
+      {/* ------------------------------------------------ tarjeta del código */}
+      <div className="surface-light rounded-2xl p-5 text-center">
+        {currentEvent && (
+          <p className="mb-3 truncate text-caption font-bold uppercase tracking-wide text-party-gray">
+            {currentEvent.name} ·{' '}
+            {new Date(currentEvent.startDate).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
+            {' – '}
+            {new Date(currentEvent.endDate).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
+          </p>
+        )}
+
+        <div className="relative mx-auto flex h-56 w-56 items-center justify-center rounded-2xl border border-black/[0.08] bg-white shadow-sm">
+          {vigente ? (
+            <>
+              <QRCode
+                id={QR_CANVAS_ID}
+                value={manualCode as string}
+                size={200}
+                level="H"
+                includeMargin
+                renderAs="canvas"
+              />
+              <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-lg bg-party-primary p-1 shadow">
+                <VybeMark size={26} />
+              </span>
+            </>
           ) : (
-            activeEvents.length > 0 ? (
-              <div className="text-center">
-                <QrCode size={80} className="mx-auto mb-4 text-party-primary" />
-                <p className="text-sm text-party-gray">Eventos activos detectados</p>
-                <PartyButton 
-                  variant="outline" 
-                  size="sm" 
-                  className="mt-4"
-                  onClick={generateNewQRCode}
-                  disabled={loading}
-                >
-                  {loading ? "Generando..." : "Generar QR"}
-                </PartyButton>
-              </div>
-            ) : (
-              <div className="text-center">
-                <QrCode size={80} className="mx-auto mb-4 text-party-gray" />
-                <p className="text-sm text-party-gray">
-                  El QR se generará automáticamente cuando tengas eventos activos
-                </p>
-              </div>
-            )
+            <div className="p-6 text-center">
+              <QrCode size={64} className="mx-auto mb-3 text-ink/25" />
+              <p className="text-body-sm text-party-gray">
+                {isExpired ? t('venue.qr.expired') : t('venue.qr.notGenerated')}
+              </p>
+            </div>
           )}
         </div>
-        
-        {currentEvent && (
-          <div className="mb-4 text-center bg-party-dark/10 p-3 rounded-lg">
-            <p className="font-bold">{currentEvent.name}</p>
-            <p className="text-xs text-party-gray">
-              {new Date(currentEvent.startDate).toLocaleDateString()} {new Date(currentEvent.startDate).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - 
-              {new Date(currentEvent.endDate).toLocaleDateString()} {new Date(currentEvent.endDate).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-            </p>
-          </div>
-        )}
-        
-        {manualCode && (
-          <div className="mb-4 text-center">
-            <p className="text-sm mb-1">Código manual:</p>
-            <p className="text-2xl font-bold text-party-primary tracking-widest">
+
+        {vigente && (
+          <>
+            <p className="mt-4 text-caption uppercase tracking-widest text-party-gray">{t('venue.qr.manualCodeLabel')}</p>
+            <button
+              type="button"
+              onClick={() => void handleShare()}
+              className="press mx-auto mt-1 flex items-center gap-2 font-mono text-[34px] font-bold tracking-[0.18em] text-ink"
+              aria-label={t('venue.qr.share')}
+            >
               {manualCode}
-            </p>
-          </div>
+              <Copy size={16} className="text-ink/40" />
+            </button>
+            {expiresAt && (
+              <span className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-party-primary px-3 py-1 text-caption font-bold text-ink">
+                <Timer size={14} />
+                {t('venue.qr.expiresInShort', { hours: horas, minutes: minutos })}
+              </span>
+            )}
+          </>
         )}
-        
-        {timeLeft && (
-          <div className="mb-4 text-center">
-            <p className="text-sm mb-1">Válido durante:</p>
-            <p className={`font-mono ${timeLeft === "Expirado" ? "text-red-500" : "text-party-primary"}`}>
-              {timeLeft}
-            </p>
-          </div>
+
+        {currentEvent && manualCode && codeEventId !== currentEvent.id && (
+          <p className="mt-3 text-caption text-destructive">{t('venue.qr.notLinked')}</p>
         )}
-        
-        <div className="flex justify-center space-x-2 mb-8">
-          <PartyButton 
-            variant="outline" 
-            size="sm" 
-            onClick={handleShare} 
-            disabled={!qrValue}
-          >
-            <Share2 size={16} className="mr-2" />
-            Compartir
-          </PartyButton>
-          <PartyButton 
-            variant="outline" 
-            size="sm" 
-            onClick={downloadQRCode} 
-            disabled={!qrValue}
-          >
-            Descargar
-          </PartyButton>
-        </div>
       </div>
+
+      <p className="px-2 text-center text-body-sm text-party-gray">
+        {currentEvent ? t('venue.qr.withEvent') : t('venue.qr.withoutEvent')}
+      </p>
+
+      {vigente && (
+        // Los dos sacan el código de esta pantalla, así que van a la par y en
+        // pequeño: uno encima de otro pesaban más que el propio QR.
+        <div className="grid grid-cols-2 gap-2">
+          <VenueQRPoster code={manualCode as string} eventName={currentEvent?.name} venueName={currentVenue?.name} />
+          {currentEvent ? (
+            <VenueTvView
+              code={manualCode as string}
+              eventId={currentEvent.id}
+              eventName={currentEvent.name}
+              venueName={currentVenue?.name}
+            />
+          ) : (
+            <PartyButton variant="outline" size="sm" onClick={downloadQRCode}>
+              <Download size={14} />
+              {t('venue.qr.download')}
+            </PartyButton>
+          )}
+        </div>
+      )}
+
+      {/* ------------------------------------------------ rotación automática */}
+      <div className="surface-light mt-2 rounded-2xl p-4">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <p className="font-display text-title-card">{t('venue.qr.rotation')}</p>
+            <p className="text-caption text-party-gray">{t('venue.qr.rotationHelp')}</p>
+          </div>
+          <Switch
+            checked={rotation > 0}
+            onCheckedChange={(v) => void changeRotation(v ? 30 : 0)}
+            aria-label={t('venue.qr.rotation')}
+          />
+        </div>
+        {rotation > 0 && (
+          <div className="mt-3 flex items-center justify-between gap-3 border-t border-black/[0.06] pt-3">
+            <label htmlFor="rotation-select" className="text-body-sm text-party-gray">
+              {t('venue.qr.rotationInterval')}
+            </label>
+            <Select value={String(rotation)} onValueChange={(value) => void changeRotation(Number(value))}>
+              <SelectTrigger id="rotation-select" className="h-9 w-auto min-w-[9rem]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {ROTATION_OPTIONS.filter((m) => m > 0).map((minutes) => (
+                  <SelectItem key={minutes} value={String(minutes)}>
+                    {t('venue.qr.rotationMinutes', { count: minutes })}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+      </div>
+
+      <PartyButton size="lg" className="w-full" onClick={() => void generateNewCode()} disabled={loading}>
+        <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
+        {loading ? t('venue.qr.generating') : manualCode ? t('venue.qr.regenerate') : t('venue.qr.generate')}
+      </PartyButton>
     </div>
   );
 };

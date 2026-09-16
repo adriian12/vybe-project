@@ -5,35 +5,67 @@
 
 @layer base {
   :root {
-    --background: 231 47% 13%;
-    --foreground: 0 0% 95%;
+    /* Negro y amarillo, tomados del diseño `diseños/home_usuario.png`: el
+       amarillo medido en la imagen es #F8D000 y la superficie oscura #1C1C1C.
 
-    --card: 231 47% 17%;
-    --card-foreground: 0 0% 95%;
+       Lo que obliga este cambio: sobre amarillo el texto **tiene que ser
+       oscuro**. Blanco sobre #F8D000 da 1,4:1 de contraste, ilegible. Por eso
+       `--primary-foreground` es casi negro y no blanco, al revés que antes. */
+    --background: 240 8% 7%;
+    --foreground: 0 0% 96%;
 
-    --popover: 231 47% 17%;
-    --popover-foreground: 0 0% 95%;
+    /* Escalones de superficie del sistema «Balearic Electric» de Stitch:
+       lienzo #111114 → superficie #1C1C1C → controles #2A2A2D. La separación
+       entre planos la hace el tono, no los bordes ni las sombras. */
+    --card: 0 0% 11%;
+    --card-foreground: 0 0% 96%;
 
-    --primary: 267 84% 74%;
-    --primary-foreground: 0 0% 100%;
+    --popover: 0 0% 11%;
+    --popover-foreground: 0 0% 96%;
 
-    --secondary: 240 20% 96%;
-    --secondary-foreground: 231 47% 13%;
+    --primary: 50 100% 49%;
+    /* Casi negro: es lo único legible encima del amarillo. */
+    --primary-foreground: 240 8% 7%;
 
-    --muted: 231 47% 20%;
-    --muted-foreground: 0 0% 70%;
+    --secondary: 240 3% 17%;
+    --secondary-foreground: 0 0% 96%;
 
-    --accent: 24 100% 53%;
-    --accent-foreground: 0 0% 100%;
+    --muted: 240 5% 13%;
+    /* #A1A1A6, el gris del texto secundario sobre oscuro en el diseño. */
+    --muted-foreground: 240 3% 64%;
+
+    --accent: 38 100% 52%;
+    --accent-foreground: 240 8% 7%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 231 47% 20%;
-    --input: 231 47% 20%;
-    --ring: 267 84% 74%;
+    /* Los bordes casi no se ven a propósito: el diseño separa por color. Se
+       conservan tenues para que un campo dentro de una tarjeta oscura no
+       desaparezca. */
+    --border: 240 3% 17%;
+    --input: 240 3% 20%;
+    --ring: 50 100% 49%;
+
+    /* Campos de formulario y gris secundario, con su versión clara más abajo
+       para las tarjetas blancas. */
+    --field: 0 0% 11%;
+    --field-border: 240 3% 20%;
+    --party-gray: 161 161 166;
 
     --radius: 0.75rem;
+
+    /* Curvas y tiempos del movimiento.
+       Están aquí y no sueltas por los componentes para que toda la aplicación
+       se mueva igual. `ease-in` no aparece a propósito: retrasa justo el
+       instante que la persona está mirando. */
+    --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+    --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+    --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+
+    --duration-press: 140ms;
+    --duration-menu: 200ms;
+    --duration-panel: 280ms;
   }
 }
 
@@ -42,13 +74,86 @@
     @apply border-border;
   }
 
+  html {
+    background-color: #111114;
+  }
+
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background font-sans text-foreground antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
+    overscroll-behavior-y: none;
+  }
+
+  /* Los titulares van en Outfit, como en los carteles de las fiestas. */
+  h1,
+  h2,
+  h3 {
+    @apply font-display;
+  }
+
+  /* Superficie clara: las tarjetas blancas de los paneles del local y de
+     administración. En vez de repintar cada control, se redefinen los tokens
+     dentro de la tarjeta y los campos, etiquetas, insignias y grises se
+     adaptan solos. `.cards-light` aplica lo mismo a todas las tarjetas de un
+     contenedor. */
+  .surface-light,
+  .cards-light [data-slot='card'] {
+    --background: 0 0% 100%;
+    --foreground: 240 8% 7%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 8% 7%;
+    --muted: 240 9% 96%;
+    --muted-foreground: 240 4% 40%;
+    --secondary: 240 7% 93%;
+    --secondary-foreground: 240 8% 7%;
+    --border: 240 6% 90%;
+    --input: 240 6% 88%;
+    --field: 240 9% 95%;
+    --field-border: 240 6% 90%;
+    --party-gray: 96 96 104;
+
+    background-color: #ffffff;
+    border-color: transparent;
+    color: hsl(var(--foreground));
+  }
+
+  /* El amarillo como color de texto o de icono no se lee sobre blanco (1,4:1).
+     Dentro de una superficie clara se oscurece a un dorado que sí llega; los
+     rellenos amarillos (`bg-party-primary`) no se tocan. */
+  .surface-light .text-party-primary,
+  .cards-light [data-slot='card'] .text-party-primary {
+    color: #7a6200;
+  }
+
+  /* Cifras que cambian mientras se miran (aforo, contadores): con dígitos de
+     ancho fijo no bailan al pasar de 9 a 10. */
+  .tabular {
+    font-variant-numeric: tabular-nums;
   }
 }
 
 @layer utilities {
+  /* Filas que se desplazan de lado (píldoras, carruseles): la barra de
+     desplazamiento no aporta nada en un móvil y en escritorio estorba. */
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Márgenes de la zona segura del teléfono (muesca y barra de gestos). */
+  .pt-safe {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  /* El diseño es de color plano; el degradado se reserva para el logotipo y
+     se queda dentro de la familia del amarillo para no romperlo. */
   .party-gradient {
     @apply bg-gradient-to-br from-party-primary to-party-accent;
   }
@@ -60,22 +165,357 @@
   .match-gradient {
     @apply bg-gradient-to-r from-party-primary via-party-accent to-party-pink;
   }
+
+  /* ------------------------------------------------------------------------
+     Movimiento
+     ------------------------------------------------------------------------
+     Tres piezas, y ninguna más: respuesta al pulsar, entrada de lo que
+     aparece y escalonado de las listas. Se animan sólo `transform` y
+     `opacity`, que son las dos propiedades que el navegador puede resolver
+     sin recalcular la página. */
+
+  /* Respuesta al pulsar. Es lo que le faltaba a casi todo: sin ella un botón
+     en el móvil no confirma que se ha registrado el toque. */
+  .press {
+    /* En propiedades sueltas y no en el atajo `transition`: el atajo
+       reescribiría `transition-property` entero y se llevaría por delante el
+       `transition-colors` que ya traen los botones. El color va incluido aquí
+       para que no se pierda pase lo que pase con el orden de las reglas. */
+    transition-property: transform, opacity, color, background-color, border-color;
+    transition-duration: var(--duration-press);
+    transition-timing-function: var(--ease-out);
+  }
+
+  .press:active {
+    transform: scale(0.97);
+  }
+
+  .press:disabled:active {
+    transform: none;
+  }
+
+  /* Entrada de un panel, una tarjeta o un aviso. Se entra desde 0.97, nunca
+     desde 0: partir de la nada se lee como un fallo de pintado. */
+  .enter {
+    animation: vybe-enter var(--duration-panel) var(--ease-out) backwards;
+  }
+
+  @keyframes vybe-enter {
+    from {
+      opacity: 0;
+      transform: translateY(8px) scale(0.97);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  /* Escalonado para rejillas y listas que sólo se ven de vez en cuando.
+     El índice lo pone el componente con `style={{ '--i': n }}`. */
+  .stagger > * {
+    animation: vybe-enter var(--duration-panel) var(--ease-out) backwards;
+    animation-delay: calc(var(--i, 0) * 45ms);
+  }
+
+  /* Secciones de la landing que aparecen al llegar a ellas con el scroll
+     (`components/landing/reveal.tsx`). Mismo recorrido y curva que `.enter`;
+     sólo cambia el disparador. */
+  .reveal {
+    opacity: 0;
+    transform: translateY(12px);
+    transition-property: opacity, transform;
+    transition-duration: var(--duration-panel);
+    transition-timing-function: var(--ease-out);
+    transition-delay: calc(var(--i, 0) * 45ms);
+  }
+
+  .reveal[data-visible='true'] {
+    opacity: 1;
+    transform: none;
+  }
 }
 
-/* Estilos personalizados para la tarjeta de perfil */
-.profile-card {
-  perspective: 1500px;
+/* Quien pide menos movimiento conserva el cambio de opacidad, que sigue
+   explicando qué ha aparecido, y pierde sólo el desplazamiento. */
+@media (prefers-reduced-motion: reduce) {
+  .press:active {
+    transform: none;
+  }
+
+  .enter,
+  .stagger > * {
+    animation-name: vybe-fade;
+    animation-duration: 120ms;
+  }
+
+  .reveal {
+    transform: none;
+    transition-duration: 120ms;
+  }
+
+  @keyframes vybe-fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
 }
 
-.profile-card-inner {
-  transition: transform 0.6s;
-  transform-style: preserve-3d;
+/* Lector de QR. `html5-qrcode` pinta el vídeo a su tamaño natural y su propio
+   sombreado alrededor del área de lectura; el visor de Stitch quiere el vídeo a
+   sangre y las esquinas amarillas, que dibuja el componente. */
+#vybe-qr-reader video {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
 }
 
-.profile-card.swiping-right .profile-card-inner {
-  transform: rotate(5deg) translateX(50px);
+#vybe-qr-reader #qr-shaded-region {
+  display: none !important;
 }
 
-.profile-card.swiping-left .profile-card-inner {
-  transform: rotate(-5deg) translateX(-50px);
+/* Alfileres del mapa (`pages/MapPage.tsx`). Son `divIcon` de Leaflet, así que
+   se dibujan con CSS y no con las imágenes de la librería. */
+.vybe-pin {
+  background: none;
+  border: 0;
+}
+
+.vybe-pin-simple,
+.vybe-pin-selected {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.vybe-pin-dot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 9999px;
+  background: #f8d000;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.6);
+}
+
+.vybe-pin-simple::after,
+.vybe-pin-ring::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 6px solid #f8d000;
+}
+
+.vybe-pin-simple {
+  position: relative;
+}
+
+.vybe-pin-ring {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 9999px;
+  background: #131316;
+  box-shadow: 0 0 0 4px #e4e1e6, 0 20px 25px rgba(0, 0, 0, 0.5);
+}
+
+.vybe-pin-ring::after {
+  bottom: -9px;
+  border-top-color: #e4e1e6;
+}
+
+.vybe-pin-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 160px;
+  margin-bottom: 8px;
+  padding: 2px 8px;
+  overflow: hidden;
+  border-radius: 9999px;
+  background: rgba(14, 14, 17, 0.9);
+  color: #ffefbc;
+  font: 700 11px/14px 'Plus Jakarta Sans Variable', 'Plus Jakarta Sans', sans-serif;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.vybe-pin-label i {
+  flex-shrink: 0;
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: #f8d000;
+}
+
+.vybe-me {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+}
+
+.vybe-me span {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: rgba(36, 218, 242, 0.2);
+  animation: vybe-me-pulse 2s var(--ease-out) infinite;
+}
+
+.vybe-me i {
+  width: 14px;
+  height: 14px;
+  border-radius: 9999px;
+  background: #24daf2;
+  box-shadow: 0 0 12px #24daf2;
+}
+
+@keyframes vybe-me-pulse {
+  from {
+    transform: scale(0.5);
+    opacity: 1;
+  }
+  to {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vybe-me span {
+    animation: none;
+  }
+}
+
+/* Leaflet trae un fondo gris claro que asoma mientras cargan las teselas. */
+.leaflet-container {
+  background: #0e0e11;
+  font-family: inherit;
+}
+
+/* ==========================================================================
+   Cartel imprimible del QR de acceso
+   ==========================================================================
+   El cartel vive en el documento y sólo aparece al imprimir. Se hace así, y no
+   abriendo una ventana nueva, porque los navegadores bloquean las emergentes y
+   el local se quedaría sin cartel sin explicación.
+
+   El amarillo es el mismo `party.primary` (#F8D000) de la aplicación, escrito
+   aquí a mano porque `print-color-adjust: exact` obliga a declarar el color en
+   la propia regla para que la impresora no lo convierta en blanco. La tinta va
+   oscura: sobre este amarillo, el texto blanco no se lee. */
+
+.print-poster {
+  display: none;
+}
+
+@media print {
+  /* Cuando hay cartel, la página deja de existir. */
+  body:has(.print-poster) > *:not(.print-poster) {
+    display: none !important;
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+
+  .print-poster {
+    display: flex !important;
+    position: fixed;
+    inset: 0;
+    align-items: center;
+    justify-content: center;
+    background: #F8D000;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .print-poster-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    width: 100%;
+    height: 100%;
+    padding: 14mm 12mm;
+    color: #141414;
+    font-family: ui-sans-serif, system-ui, sans-serif;
+  }
+
+  .print-poster-brand {
+    font-size: 22mm;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+
+  .print-poster-headline {
+    margin-top: 6mm;
+    font-size: 7mm;
+    font-weight: 600;
+    line-height: 1.25;
+    max-width: 150mm;
+    text-wrap: balance;
+  }
+
+  /* El QR ocupa cerca de la mitad del alto: es lo único que hay que escanear
+     desde lejos y con gente delante. */
+  .print-poster-qr {
+    margin-top: 8mm;
+    background: #ffffff;
+    padding: 6mm;
+    border-radius: 6mm;
+    line-height: 0;
+  }
+
+  .print-poster-qr svg {
+    width: 110mm;
+    height: 110mm;
+  }
+
+  .print-poster-code {
+    margin-top: 5mm;
+    font-size: 9mm;
+    font-weight: 700;
+    letter-spacing: 0.25em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .print-poster-event {
+    margin-top: 6mm;
+  }
+
+  .print-poster-event-name {
+    font-size: 8mm;
+    font-weight: 700;
+    line-height: 1.15;
+  }
+
+  .print-poster-venue {
+    margin-top: 1.5mm;
+    font-size: 5.5mm;
+    opacity: 0.85;
+  }
+
+  .print-poster-footer {
+    margin-top: auto;
+    font-size: 4.5mm;
+    opacity: 0.8;
+  }
 }

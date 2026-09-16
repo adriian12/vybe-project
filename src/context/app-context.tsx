@@ -1,541 +1,656 @@
-import { createContext, useState, useContext, ReactNode, useEffect } from "react";
-import { User, Message, Connection } from "@/types/user";
-import { Venue, Event, EventCode, VenueType } from "@/types/venue";
-import { api } from "@/services/api";
-import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import {
+  createContext,
+  useState,
+  useContext,
+  useCallback,
+  useEffect,
+  useRef,
+  ReactNode,
+} from 'react';
+import { useTranslation } from 'react-i18next';
+import type { RealtimeChannel } from '@supabase/supabase-js';
+import { User, Message, ReportType, MatchConnection } from '@/types/user';
+import { Venue, Event, EventAccess } from '@/types/venue';
+import { api, ApiError } from '@/services/api';
+import { socialService, DiscoveryFilters } from '@/services/social';
+import { identifyUser } from '@/lib/observability';
+import { getCurrentPosition, Coordinates } from '@/services/geo';
+import { useToast } from '@/components/ui/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+
+export type UserType = 'user' | 'venue' | 'admin';
+
+const ACTIVE_EVENT_KEY = 'vybe_activeEvent';
+
+/** Cada cuánto refrescamos la asistencia mientras el usuario está en el evento. */
+const HEARTBEAT_INTERVAL_MS = 5 * 60 * 1000;
+
+const readStoredEvent = (): EventAccess | null => {
+  try {
+    const raw = localStorage.getItem(ACTIVE_EVENT_KEY);
+    if (!raw) return null;
+
+    const parsed = JSON.parse(raw) as EventAccess;
+    // Un evento terminado deja de dar acceso, aunque siga en localStorage.
+    if (new Date(parsed.endDate) < new Date()) {
+      localStorage.removeItem(ACTIVE_EVENT_KEY);
+      return null;
+    }
+    return parsed;
+  } catch {
+    return null;
+  }
+};
 
 interface AppContextType {
+  isLoading: boolean;
   isLoggedIn: boolean;
-  isLocationVerified: boolean;
-  isEventVerified: boolean;
-  userType: 'user' | 'venue' | null;
+  userType: UserType | null;
   currentUser: User | null;
   currentVenue: Venue | null;
+
+  activeEvent: EventAccess | null;
+  isEventVerified: boolean;
+
   nearbyProfiles: User[];
-  connections: User[];
   currentProfile: User | null;
+  filters: DiscoveryFilters;
+  setFilters: (filters: DiscoveryFilters) => void;
+  connections: MatchConnection[];
   messages: Record<string, Message[]>;
   events: Event[];
-  setIsLoggedIn: (value: boolean) => void;
-  verifyLocation: () => Promise<boolean>;
-  verifyEventCode: (code: string) => Promise<boolean>;
-  handleSwipeLeft: (userId: string) => void;
+
+  redeemEventCode: (code: string, coords?: Coordinates) => Promise<EventAccess>;
+  leaveEvent: () => void;
+  refreshActiveEvent: () => Promise<void>;
+  refreshLocation: () => Promise<Coordinates>;
+
+  loadProfiles: () => Promise<void>;
+  handleSwipeLeft: (userId: string) => Promise<void>;
   handleSwipeRight: (userId: string) => Promise<boolean>;
-  loadNextProfile: () => void;
-  login: (phone: string) => Promise<boolean>;
-  verifyPhoneCode: (code: string) => Promise<boolean>;
-  verifyFace: (imageData: string) => Promise<boolean>;
-  loginVenue: (email: string, name: string, type: VenueType) => Promise<boolean>;
-  createEvent: (eventData: Omit<Event, 'id'>) => Promise<Event | null>;
+  handleSuperLike: (userId: string) => Promise<boolean>;
+
   sendMessage: (receiverId: string, content: string) => Promise<boolean>;
-  generateQRCode: () => Promise<{qrCode: string, manualCode: string} | null>;
-  logout: () => void;
+  markMessagesAsRead: (senderId: string) => Promise<void>;
+
+  reportUser: (userId: string, type: ReportType, description?: string) => Promise<boolean>;
+  blockUser: (userId: string) => Promise<boolean>;
+
+  /**
+   * Vuelve a resolver quién ha iniciado sesión.
+   *
+   * La pantalla de acceso la espera antes de navegar: si navegara antes, la
+   * guarda de rutas vería todavía «sin sesión» y devolvería al formulario.
+   */
+  refreshSession: () => Promise<void>;
+  refreshProfile: () => Promise<void>;
+  refreshConnections: () => Promise<void>;
+  refreshEvents: () => Promise<void>;
+  createEvent: (eventData: Omit<Event, 'id'>) => Promise<Event | null>;
+
+  logout: () => Promise<void>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAppContext = () => {
   const context = useContext(AppContext);
   if (context === undefined) {
-    throw new Error("useAppContext debe ser usado dentro de un AppProvider");
+    throw new Error('useAppContext debe ser usado dentro de un AppProvider');
   }
   return context;
 };
 
 export const AppProvider = ({ children }: { children: ReactNode }) => {
   const { toast } = useToast();
-  
-  // Initialize state from localStorage
-  const [isLoggedIn, setIsLoggedIn] = useState(() => {
-    const saved = localStorage.getItem('vybe_isLoggedIn');
-    return saved === 'true';
-  });
-  const [isLocationVerified, setIsLocationVerified] = useState(() => {
-    const saved = localStorage.getItem('vybe_isLocationVerified');
-    return saved === 'true';
-  });
-  const [isEventVerified, setIsEventVerified] = useState(() => {
-    const saved = localStorage.getItem('vybe_isEventVerified');
-    return saved === 'true';
-  });
-  const [userType, setUserType] = useState<'user' | 'venue' | null>(() => {
-    const saved = localStorage.getItem('vybe_userType');
-    return saved as 'user' | 'venue' | null;
-  });
-  const [currentUser, setCurrentUser] = useState<User | null>(() => {
-    const saved = localStorage.getItem('vybe_currentUser');
-    return saved ? JSON.parse(saved) : null;
-  });
-  const [currentVenue, setCurrentVenue] = useState<Venue | null>(() => {
-    const saved = localStorage.getItem('vybe_currentVenue');
-    return saved ? JSON.parse(saved) : null;
-  });
+  const { t } = useTranslation();
+
+  const [isLoading, setIsLoading] = useState(true);
+  const [userType, setUserType] = useState<UserType | null>(null);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [currentVenue, setCurrentVenue] = useState<Venue | null>(null);
+
+  const [activeEvent, setActiveEvent] = useState<EventAccess | null>(readStoredEvent);
+
   const [nearbyProfiles, setNearbyProfiles] = useState<User[]>([]);
-  const [connections, setConnections] = useState<User[]>([]);
+  const [filters, setFilters] = useState<DiscoveryFilters>({});
   const [currentProfile, setCurrentProfile] = useState<User | null>(null);
+  const [connections, setConnections] = useState<MatchConnection[]>([]);
   const [messages, setMessages] = useState<Record<string, Message[]>>({});
   const [events, setEvents] = useState<Event[]>([]);
-  const [eventRadius, setEventRadius] = useState(50);
 
-  // Persist state changes to localStorage
-  useEffect(() => {
-    localStorage.setItem('vybe_isLoggedIn', String(isLoggedIn));
-  }, [isLoggedIn]);
+  const lastKnownPosition = useRef<Coordinates | null>(null);
 
-  useEffect(() => {
-    localStorage.setItem('vybe_isLocationVerified', String(isLocationVerified));
-  }, [isLocationVerified]);
+  const isLoggedIn = userType !== null;
 
-  useEffect(() => {
-    localStorage.setItem('vybe_isEventVerified', String(isEventVerified));
-  }, [isEventVerified]);
+  // ==========================================================================
+  // SESIÓN
+  // ==========================================================================
 
-  useEffect(() => {
-    if (userType) {
-      localStorage.setItem('vybe_userType', userType);
-    } else {
-      localStorage.removeItem('vybe_userType');
+  /**
+   * Averigua quién está usando la aplicación.
+   *
+   * `silent` existe por el refresco de token, que ocurre solo cada hora: sin él
+   * la pantalla se pondría en blanco con el cargador en mitad de lo que
+   * estuvieras haciendo. Al iniciar sesión sí se marca como cargando, y ésa es
+   * la corrección importante: `ProtectedRoute` decide con `isLoading` y
+   * `userType`, y mientras esta función estaba a medias veía `isLoading = false`
+   * con `userType = null`, o sea «no ha iniciado sesión», y devolvía a /auth.
+   * Por eso había que meter las credenciales dos veces: la segunda vez el
+   * contexto ya estaba cargado.
+   */
+  const loadSession = useCallback(async (options?: { silent?: boolean }) => {
+    if (!options?.silent) setIsLoading(true);
+
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (!session?.user) {
+      setUserType(null);
+      setCurrentUser(null);
+      setCurrentVenue(null);
+      setIsLoading(false);
+      return;
     }
-  }, [userType]);
 
-  useEffect(() => {
-    if (currentUser) {
-      localStorage.setItem('vybe_currentUser', JSON.stringify(currentUser));
-    } else {
-      localStorage.removeItem('vybe_currentUser');
-    }
-  }, [currentUser]);
+    // Un usuario es o perfil o venue, nunca los dos.
+    const profile = await api.getCurrentProfile();
+    if (profile) {
+      setCurrentUser(profile);
+      setCurrentVenue(null);
+      setUserType(profile.role === 'admin' ? 'admin' : 'user');
+      identifyUser(profile.id, profile.role);
 
-  useEffect(() => {
-    if (currentVenue) {
-      localStorage.setItem('vybe_currentVenue', JSON.stringify(currentVenue));
-    } else {
-      localStorage.removeItem('vybe_currentVenue');
-    }
-  }, [currentVenue]);
-  
-  // Efectos para cargar datos iniciales
-  useEffect(() => {
-    if (isLoggedIn && userType === 'user' && isLocationVerified && isEventVerified) {
-      loadProfiles();
-      loadConnections();
-    }
-  }, [isLoggedIn, userType, isLocationVerified, isEventVerified]);
-  
-  // Simula cargar el perfil actual si hay perfiles cercanos
-  useEffect(() => {
-    if (nearbyProfiles.length > 0 && !currentProfile) {
-      setCurrentProfile(nearbyProfiles[0]);
-    }
-  }, [nearbyProfiles, currentProfile]);
+      // Si el check-in sigue vivo en el servidor, se vuelve a entrar solo. El
+      // localStorage no basta: se borra al cerrar sesión y no viaja de un
+      // teléfono a otro.
+      const ongoing = await api.getActiveEvent();
+      setActiveEvent(ongoing);
 
-  // Carga eventos para usuarios y locales
-  useEffect(() => {
-    if (isLoggedIn) {
-      loadEvents();
+      setIsLoading(false);
+      return;
     }
-  }, [isLoggedIn]);
 
-  // Carga mensajes para usuarios
-  useEffect(() => {
-    if (isLoggedIn && userType === 'user' && currentUser) {
-      loadMessages();
-    }
-  }, [isLoggedIn, userType, currentUser]);
-
-  const loadProfiles = async () => {
-    try {
-      const profiles = await api.getNearbyProfiles();
-      setNearbyProfiles(profiles);
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "No se pudieron cargar los perfiles cercanos",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const loadConnections = async () => {
-    try {
-      const connectionsData = await api.getMatches();
-      setConnections(connectionsData);
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "No se pudieron cargar tus conexiones",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const loadMessages = async () => {
-    if (!currentUser) return;
-    
-    try {
-      const messagesData = await api.getMessages(currentUser.id);
-      setMessages(messagesData);
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "No se pudieron cargar tus mensajes",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const loadEvents = async () => {
-    try {
-      const eventsData = await api.getEvents();
-      setEvents(eventsData);
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "No se pudieron cargar los eventos",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const verifyLocation = async () => {
-    try {
-      // En un caso real, obtendríamos las coordenadas del usuario
-      const isValid = await api.verifyLocation(40.416775, -3.70379);
-      setIsLocationVerified(isValid);
-      return isValid;
-    } catch (error) {
-      toast({
-        title: "Error de ubicación",
-        description: "No se pudo verificar tu ubicación",
-        variant: "destructive",
-      });
-      return false;
-    }
-  };
-
-  const verifyEventCode = async (code: string) => {
-    try {
-      // Aquí verificaríamos si el código corresponde a un festival para ajustar el radio
-      const eventData = await api.verifyEventCode(code);
-      
-      if (eventData.isValid) {
-        setIsEventVerified(true);
-        // Ajusta el radio dependiendo del tipo de evento
-        if (eventData.eventType === 'festival') {
-          setEventRadius(500); // 500m para festivales
-        } else {
-          setEventRadius(50); // 50m para el resto de eventos
-        }
-        return true;
-      }
-      return false;
-    } catch (error) {
-      toast({
-        title: "Error de código",
-        description: "El código del evento no es válido",
-        variant: "destructive",
-      });
-      return false;
-    }
-  };
-
-  const handleSwipeLeft = (userId: string) => {
-    // Eliminar el perfil de la lista
-    setNearbyProfiles(profiles => profiles.filter(p => p.id !== userId));
-    loadNextProfile();
-  };
-
-  const handleSwipeRight = async (userId: string): Promise<boolean> => {
-    try {
-      const isMatch = await api.likeProfile(userId);
-      
-      // Si hay match, añadirlo a la lista de connections
-      if (isMatch) {
-        const matchedUser = nearbyProfiles.find(p => p.id === userId);
-        if (matchedUser) {
-          setConnections(prev => [...prev, matchedUser]);
-          toast({
-            title: "¡Nueva conexión!",
-            description: `Has conectado con ${matchedUser.name}`,
-          });
-        }
-      }
-      
-      // Eliminar el perfil de la lista
-      setNearbyProfiles(profiles => profiles.filter(p => p.id !== userId));
-      loadNextProfile();
-      
-      return isMatch;
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Hubo un problema al procesar tu acción",
-        variant: "destructive",
-      });
-      return false;
-    }
-  };
-
-  const loadNextProfile = () => {
-    if (nearbyProfiles.length > 0) {
-      setCurrentProfile(nearbyProfiles[0]);
-    } else {
-      setCurrentProfile(null);
-    }
-  };
-
-  const login = async (phone: string) => {
-    try {
-      const result = await api.login(phone);
-      if (result.success) {
-        setIsLoggedIn(true);
-        setUserType('user');
-        // Aquí simularíamos cargar los datos del usuario
-        setCurrentUser({
-          id: result.userId || "user123",
-          name: "Tú",
-          age: 28,
-          bio: "Tu perfil",
-          photos: ["https://i.pravatar.cc/300?img=32"],
-          isVerified: true,
-          phone: phone
-        });
-        return true;
-      }
-      return false;
-    } catch (error) {
-      toast({
-        title: "Error de inicio de sesión",
-        description: "No se pudo iniciar sesión. Intenta de nuevo más tarde.",
-        variant: "destructive",
-      });
-      return false;
-    }
-  };
-
-  const verifyPhoneCode = async (code: string): Promise<boolean> => {
-    try {
-      const isValid = await api.verifyCode(code, 'phone');
-      
-      if (isValid && currentUser) {
-        setCurrentUser({
-          ...currentUser,
-          phoneVerified: true
-        });
-        
-        toast({
-          title: "Teléfono verificado",
-          description: "Tu número de teléfono ha sido verificado correctamente",
-        });
-      }
-      
-      return isValid;
-    } catch (error) {
-      toast({
-        title: "Error de verificación",
-        description: "No se pudo verificar el código. Intenta de nuevo.",
-        variant: "destructive",
-      });
-      return false;
-    }
-  };
-
-  const verifyFace = async (imageData: string): Promise<boolean> => {
-    try {
-      const isValid = await api.verifyFace(imageData);
-      
-      if (isValid && currentUser) {
-        setCurrentUser({
-          ...currentUser,
-          faceVerified: true
-        });
-        
-        toast({
-          title: "Identidad verificada",
-          description: "Tu identidad ha sido verificada correctamente",
-        });
-      }
-      
-      return isValid;
-    } catch (error) {
-      toast({
-        title: "Error de verificación",
-        description: "No se pudo verificar tu identidad. Intenta de nuevo.",
-        variant: "destructive",
-      });
-      return false;
-    }
-  };
-
-  const loginVenue = async (email: string, name: string, type: VenueType) => {
-    try {
-      // Determinamos el radio basado en el tipo
-      let radius = 50;
-      switch (type) {
-        case 'discoteca':
-          radius = 100;
-          break;
-        case 'festival':
-          radius = 500;
-          break;
-        case 'evento_empresarial':
-          radius = 250;
-          break;
-        default:
-          radius = 50;
-      }
-      
-      // Simulamos el registro/login de un local
-      setIsLoggedIn(true);
+    const venue = await api.getCurrentVenue();
+    if (venue) {
+      setCurrentVenue(venue);
+      setCurrentUser(null);
       setUserType('venue');
-      setCurrentVenue({
-        id: "venue123",
-        name: name,
-        email: email,
-        type: type,
-        isVerified: false, // Inicialmente no verificado
-        eventRadius: radius
-      });
-      
-      toast({
-        title: "¡Bienvenido!",
-        description: "Tu local está en proceso de verificación.",
-      });
-      
-      return true;
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "No se pudo completar el registro. Intenta más tarde.",
-        variant: "destructive",
-      });
-      return false;
+      setIsLoading(false);
+      return;
     }
-  };
 
-  const createEvent = async (eventData: Omit<Event, 'id'>): Promise<Event | null> => {
-    if (!currentVenue) return null;
-    
-    try {
-      const newEvent = await api.createEvent(eventData);
-      
-      setEvents(prev => [...prev, newEvent]);
-      
-      toast({
-        title: "Evento creado",
-        description: "Tu evento ha sido creado correctamente",
-      });
-      
-      return newEvent;
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "No se pudo crear el evento. Intenta más tarde.",
-        variant: "destructive",
-      });
-      return null;
-    }
-  };
-
-  const sendMessage = async (receiverId: string, content: string): Promise<boolean> => {
-    if (!currentUser) return false;
-    
-    try {
-      const message = await api.sendMessage(currentUser.id, receiverId, content);
-      
-      // Actualizamos los mensajes localmente
-      setMessages(prev => {
-        const receiverMessages = prev[receiverId] || [];
-        return {
-          ...prev,
-          [receiverId]: [...receiverMessages, message]
-        };
-      });
-      
-      return true;
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "No se pudo enviar el mensaje. Intenta más tarde.",
-        variant: "destructive",
-      });
-      return false;
-    }
-  };
-
-  const generateQRCode = async (): Promise<{qrCode: string, manualCode: string} | null> => {
-    if (!currentVenue) return null;
-    
-    try {
-      const { qrCode, manualCode } = await api.generateQRCode(currentVenue.id);
-      
-      // Actualizamos el local con el código QR
-      setCurrentVenue({
-        ...currentVenue,
-        qrCode
-      });
-      
-      return { qrCode, manualCode };
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "No se pudo generar el código QR. Intenta más tarde.",
-        variant: "destructive",
-      });
-      return null;
-    }
-  };
-
-  const logout = () => {
-    // Clear localStorage
-    localStorage.removeItem('vybe_isLoggedIn');
-    localStorage.removeItem('vybe_isLocationVerified');
-    localStorage.removeItem('vybe_isEventVerified');
-    localStorage.removeItem('vybe_userType');
-    localStorage.removeItem('vybe_currentUser');
-    localStorage.removeItem('vybe_currentVenue');
-    
-    setIsLoggedIn(false);
-    setIsLocationVerified(false);
-    setIsEventVerified(false);
+    // Sesión válida sin fila asociada: el trigger de alta aún no ha corrido.
     setUserType(null);
     setCurrentUser(null);
     setCurrentVenue(null);
+    setIsLoading(false);
+  }, []);
+
+  useEffect(() => {
+    void loadSession();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_OUT') {
+        identifyUser(null);
+        setUserType(null);
+        setCurrentUser(null);
+        setCurrentVenue(null);
+        setNearbyProfiles([]);
+        setConnections([]);
+        setMessages({});
+        setEvents([]);
+        setActiveEvent(null);
+        localStorage.removeItem(ACTIVE_EVENT_KEY);
+        return;
+      }
+
+      if (event === 'SIGNED_IN') {
+        void loadSession();
+        return;
+      }
+
+      // El token se refresca solo cada hora: recargar en silencio evita que la
+      // pantalla se ponga en blanco en mitad de una conversación.
+      if (event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
+        void loadSession({ silent: true });
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [loadSession]);
+
+  // Persistimos el evento activo para que un refresco no eche al usuario fuera.
+  useEffect(() => {
+    if (activeEvent) {
+      localStorage.setItem(ACTIVE_EVENT_KEY, JSON.stringify(activeEvent));
+    } else {
+      localStorage.removeItem(ACTIVE_EVENT_KEY);
+    }
+  }, [activeEvent]);
+
+  // ==========================================================================
+  // UBICACIÓN
+  // ==========================================================================
+
+  const refreshLocation = useCallback(async (): Promise<Coordinates> => {
+    const coords = await getCurrentPosition();
+    lastKnownPosition.current = coords;
+    await api.updateLocation(coords.latitude, coords.longitude);
+    return coords;
+  }, []);
+
+  // ==========================================================================
+  // ACCESO A EVENTOS
+  // ==========================================================================
+
+  const redeemEventCode = useCallback(
+    async (code: string, coords?: Coordinates): Promise<EventAccess> => {
+      const position = coords ?? lastKnownPosition.current ?? undefined;
+      const access = await api.redeemEventCode(code, position?.latitude, position?.longitude);
+      setActiveEvent(access);
+      return access;
+    },
+    [],
+  );
+
+  /** Vuelve a preguntar al servidor por el evento en curso y su foto. */
+  const refreshActiveEvent = useCallback(async () => {
+    setActiveEvent(await api.getActiveEvent());
+  }, []);
+
+  const leaveEvent = useCallback(() => {
+    setActiveEvent(null);
     setNearbyProfiles([]);
-    setConnections([]);
     setCurrentProfile(null);
+  }, []);
+
+  // Mantiene viva la asistencia mientras la pestaña está abierta.
+  useEffect(() => {
+    if (!activeEvent || userType !== 'user') return;
+
+    const beat = () => {
+      const coords = lastKnownPosition.current;
+      void api.heartbeatAttendance(activeEvent.eventId, coords?.latitude, coords?.longitude);
+    };
+
+    beat();
+    const interval = setInterval(beat, HEARTBEAT_INTERVAL_MS);
+    return () => clearInterval(interval);
+  }, [activeEvent, userType]);
+
+  // Expulsa automáticamente cuando el evento termina.
+  useEffect(() => {
+    if (!activeEvent) return;
+
+    const remaining = new Date(activeEvent.endDate).getTime() - Date.now();
+    if (remaining <= 0) {
+      leaveEvent();
+      return;
+    }
+
+    const timeout = setTimeout(() => {
+      leaveEvent();
+      toast({ title: t('home.empty'), description: t('eventAccess.notFoundBody') });
+    }, Math.min(remaining, 2 ** 31 - 1));
+
+    return () => clearTimeout(timeout);
+  }, [activeEvent, leaveEvent, toast, t]);
+
+  // ==========================================================================
+  // DATOS
+  // ==========================================================================
+
+  const loadProfiles = useCallback(async () => {
+    if (!activeEvent) return;
+
+    try {
+      const coords = lastKnownPosition.current ?? (await getCurrentPosition().catch(() => null));
+      if (coords) lastKnownPosition.current = coords;
+
+      const origin = coords ?? currentUser?.location;
+      if (!origin) {
+        toast({
+          title: t('location.title'),
+          description: t('location.bodyTwo'),
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      const profiles = await socialService.getNearbyProfiles(
+        origin.latitude,
+        origin.longitude,
+        activeEvent.eventRadius,
+        activeEvent.eventId,
+        filters,
+      );
+
+      setNearbyProfiles(profiles);
+      setCurrentProfile(profiles[0] ?? null);
+    } catch (error) {
+      console.error('Error loading profiles:', error);
+      toast({ title: t('common.error'), description: t('errors.generic'), variant: 'destructive' });
+    }
+  }, [activeEvent, currentUser?.location, filters, toast, t]);
+
+  const loadConnections = useCallback(async () => {
+    setConnections(await api.getMatches());
+  }, []);
+
+  const loadMessages = useCallback(async () => {
+    setMessages(await api.getMessages());
+  }, []);
+
+  const refreshEvents = useCallback(async () => {
+    setEvents(await api.getEvents());
+  }, []);
+
+  const refreshProfile = useCallback(async () => {
+    const profile = await api.getCurrentProfile();
+    if (profile) setCurrentUser(profile);
+  }, []);
+
+  useEffect(() => {
+    if (userType === 'user' || userType === 'admin') {
+      void loadConnections();
+      void loadMessages();
+      void refreshEvents();
+    } else if (userType === 'venue') {
+      void refreshEvents();
+    }
+  }, [userType, loadConnections, loadMessages, refreshEvents]);
+
+  useEffect(() => {
+    if (activeEvent && (userType === 'user' || userType === 'admin')) {
+      void loadProfiles();
+    }
+  }, [activeEvent, userType, loadProfiles]);
+
+  // ==========================================================================
+  // REALTIME
+  // ==========================================================================
+
+  const applyRealtimeMessage = useCallback(
+    (payload: { eventType: string; new: MessageRecord }, profileId: string) => {
+      const record = payload.new;
+      if (!record) return;
+
+      const otherUserId = record.sender_id === profileId ? record.receiver_id : record.sender_id;
+
+      setMessages((prev) => {
+        const existing = prev[otherUserId] ?? [];
+
+        if (payload.eventType === 'INSERT') {
+          if (existing.some((m) => m.id === record.id)) return prev;
+          return {
+            ...prev,
+            [otherUserId]: [
+              ...existing,
+              {
+                id: record.id,
+                senderId: record.sender_id,
+                receiverId: record.receiver_id,
+                content: record.content,
+                read: record.read,
+                createdAt: record.created_at,
+              },
+            ],
+          };
+        }
+
+        if (payload.eventType === 'UPDATE') {
+          return {
+            ...prev,
+            [otherUserId]: existing.map((m) =>
+              m.id === record.id ? { ...m, read: record.read } : m,
+            ),
+          };
+        }
+
+        return prev;
+      });
+    },
+    [],
+  );
+
+  useEffect(() => {
+    if (!currentUser || (userType !== 'user' && userType !== 'admin')) return;
+
+    const profileId = currentUser.id;
+    let channel: RealtimeChannel | null = null;
+
+    channel = supabase
+      .channel(`vybe:${profileId}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'messages', filter: `sender_id=eq.${profileId}` },
+        (payload) => applyRealtimeMessage(payload as never, profileId),
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'messages', filter: `receiver_id=eq.${profileId}` },
+        (payload) => applyRealtimeMessage(payload as never, profileId),
+      )
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'connections' },
+        () => {
+          void loadConnections();
+        },
+      )
+      .subscribe((status) => {
+        if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+          console.warn('Realtime no disponible; el chat funcionará sin actualización automática.');
+        }
+      });
+
+    return () => {
+      if (channel) void supabase.removeChannel(channel);
+    };
+  }, [currentUser, userType, applyRealtimeMessage, loadConnections]);
+
+  // ==========================================================================
+  // ACCIONES
+  // ==========================================================================
+
+  const advanceProfile = useCallback((swipedId: string) => {
+    setNearbyProfiles((profiles) => {
+      const remaining = profiles.filter((p) => p.id !== swipedId);
+      setCurrentProfile(remaining[0] ?? null);
+      return remaining;
+    });
+  }, []);
+
+  const registerSwipe = useCallback(
+    async (userId: string, type: 'like' | 'dislike' | 'super_like'): Promise<boolean> => {
+      try {
+        const isMatch = await api.swipe(userId, type, activeEvent?.eventId);
+
+        if (isMatch) {
+          const matched = nearbyProfiles.find((p) => p.id === userId);
+          await loadConnections();
+          if (matched) {
+            toast({
+              title: t('match.newConnection'),
+              description: t('match.connectedWith', { name: matched.name }),
+            });
+          }
+        }
+
+        advanceProfile(userId);
+        return isMatch;
+      } catch (error) {
+        toast({
+          title: t('common.error'),
+          description: error instanceof ApiError ? error.message : t('errors.generic'),
+          variant: 'destructive',
+        });
+        return false;
+      }
+    },
+    [activeEvent?.eventId, nearbyProfiles, advanceProfile, loadConnections, toast, t],
+  );
+
+  const handleSwipeLeft = useCallback(
+    async (userId: string) => {
+      await registerSwipe(userId, 'dislike');
+    },
+    [registerSwipe],
+  );
+
+  const handleSwipeRight = useCallback(
+    (userId: string) => registerSwipe(userId, 'like'),
+    [registerSwipe],
+  );
+
+  const handleSuperLike = useCallback(
+    (userId: string) => registerSwipe(userId, 'super_like'),
+    [registerSwipe],
+  );
+
+  const sendMessage = useCallback(
+    async (receiverId: string, content: string): Promise<boolean> => {
+      try {
+        const message = await api.sendMessage(receiverId, content);
+
+        setMessages((prev) => {
+          const existing = prev[receiverId] ?? [];
+          if (existing.some((m) => m.id === message.id)) return prev;
+          return { ...prev, [receiverId]: [...existing, message] };
+        });
+
+        return true;
+      } catch (error) {
+        toast({
+          title: t('common.error'),
+          description: error instanceof ApiError ? error.message : t('errors.generic'),
+          variant: 'destructive',
+        });
+        return false;
+      }
+    },
+    [toast],
+  );
+
+  const markMessagesAsRead = useCallback(async (senderId: string) => {
+    const updated = await api.markMessagesAsRead(senderId);
+    if (!updated) return;
+
+    setMessages((prev) => ({
+      ...prev,
+      [senderId]: (prev[senderId] ?? []).map((msg) => ({ ...msg, read: true })),
+    }));
+  }, []);
+
+  const reportUser = useCallback(
+    async (userId: string, type: ReportType, description?: string) => {
+      const ok = await api.reportUser(userId, type, description);
+      toast(
+        ok
+          ? { title: t('report.sent'), description: t('report.sentBody') }
+          : { title: t('common.error'), description: t('errors.generic'), variant: 'destructive' },
+      );
+      return ok;
+    },
+    [toast, t],
+  );
+
+  const blockUser = useCallback(
+    async (userId: string) => {
+      const ok = await api.blockUser(userId);
+      if (ok) {
+        setConnections((prev) => prev.filter((c) => c.user.id !== userId));
+        advanceProfile(userId);
+        toast({ title: t('report.blocked'), description: t('report.blockedBody') });
+      } else {
+        toast({ title: t('common.error'), description: t('errors.generic'), variant: 'destructive' });
+      }
+      return ok;
+    },
+    [advanceProfile, toast, t],
+  );
+
+  const createEvent = useCallback(
+    async (eventData: Omit<Event, 'id'>): Promise<Event | null> => {
+      try {
+        const newEvent = await api.createEvent(eventData);
+        setEvents((prev) => [...prev, newEvent]);
+        toast({ title: t('venue.events.created'), description: t('venue.events.createdBody') });
+        return newEvent;
+      } catch (error) {
+        toast({
+          title: t('common.error'),
+          description: error instanceof ApiError ? error.message : t('errors.generic'),
+          variant: 'destructive',
+        });
+        return null;
+      }
+    },
+    [toast, t],
+  );
+
+  const logout = useCallback(async () => {
+    await supabase.auth.signOut();
+    localStorage.removeItem(ACTIVE_EVENT_KEY);
+    setUserType(null);
+    setCurrentUser(null);
+    setCurrentVenue(null);
+    setActiveEvent(null);
+    setNearbyProfiles([]);
+    setCurrentProfile(null);
+    setConnections([]);
     setMessages({});
     setEvents([]);
-  };
+  }, []);
 
-  const value = {
+  const value: AppContextType = {
+    isLoading,
     isLoggedIn,
-    isLocationVerified,
-    isEventVerified,
     userType,
     currentUser,
     currentVenue,
+    activeEvent,
+    isEventVerified: activeEvent !== null,
     nearbyProfiles,
-    connections,
     currentProfile,
+    filters,
+    setFilters,
+    connections,
     messages,
     events,
-    setIsLoggedIn,
-    verifyLocation,
-    verifyEventCode,
+    redeemEventCode,
+    leaveEvent,
+    refreshActiveEvent,
+    refreshLocation,
+    loadProfiles,
     handleSwipeLeft,
     handleSwipeRight,
-    loadNextProfile,
-    login,
-    verifyPhoneCode,
-    verifyFace,
-    loginVenue,
-    createEvent,
+    handleSuperLike,
     sendMessage,
-    generateQRCode,
-    logout
+    markMessagesAsRead,
+    reportUser,
+    blockUser,
+    refreshSession: loadSession,
+    refreshProfile,
+    refreshConnections: loadConnections,
+    refreshEvents,
+    createEvent,
+    logout,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };
+
+interface MessageRecord {
+  id: string;
+  sender_id: string;
+  receiver_id: string;
+  content: string;
+  read: boolean;
+  created_at: string;
+}

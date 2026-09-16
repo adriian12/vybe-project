@@ -5,7 +5,10 @@ import reactRefresh from "eslint-plugin-react-refresh";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
-  { ignores: ["dist"] },
+  // `android` e `ios` los genera Capacitor: dentro hay JavaScript del puente
+  // nativo y ficheros de compilación que no son nuestros y que no tiene sentido
+  // revisar.
+  { ignores: ["dist", "android", "ios"] },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ["**/*.{ts,tsx}"],

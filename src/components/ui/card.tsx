@@ -8,8 +8,12 @@ const Card = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
+    // Marca para que los paneles del local y de administración, que en Stitch
+    // son tarjetas blancas, puedan volverlas claras sin tocar cada componente.
+    data-slot="card"
     className={cn(
-      "rounded-lg border bg-card text-card-foreground shadow-sm",
+      // 16 px de radio y sin sombra: la tarjeta se separa del lienzo por tono.
+      "rounded-2xl border border-white/[0.04] bg-card text-card-foreground",
       className
     )}
     {...props}
@@ -36,7 +40,7 @@ const CardTitle = React.forwardRef<
   <h3
     ref={ref}
     className={cn(
-      "text-2xl font-semibold leading-none tracking-tight",
+      "font-display text-headline-md leading-tight",
       className
     )}
     {...props}
