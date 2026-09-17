@@ -36,7 +36,9 @@ import Reveal from '@/components/landing/reveal';
 import VenueLeadForm from '@/components/landing/venue-lead-form';
 import { PanelMock, PhoneMock } from '@/components/landing/landing-showcase';
 import { useAppContext } from '@/context/app-context';
+import StoreButtons from '@/components/store-buttons';
 import { COMPANY } from '@/lib/company';
+import { appHref, isExternalHref } from '@/lib/hosts';
 import { cn } from '@/lib/utils';
 import { PLAN_FEATURES, PLANS, PlanId } from '@/lib/venue-plans';
 
@@ -53,8 +55,18 @@ import { PLAN_FEATURES, PLANS, PlanId } from '@/lib/venue-plans';
  * cifras y testimonios inventados. Aquí todo lo que se afirma es verdad hoy.
  */
 
-const USER_SIGNUP = '/auth?type=user&mode=register';
+const DOWNLOAD = '#descargar';
 const VENUE_SIGNUP = '/auth?type=venue&mode=register';
+const VENUE_LOGIN = '/auth?type=venue';
+
+/**
+ * Enlace a una pantalla de la aplicación. Desde vybes.es sale a app.vybes.es
+ * (otro origen, así que con `<a>`); en local y en las previews, `<Link>`.
+ */
+const AppLink = ({ to, ...props }: { to: string; className?: string; children: React.ReactNode }) => {
+  const href = to.startsWith('/legal') ? to : appHref(to);
+  return isExternalHref(href) ? <a href={href} {...props} /> : <Link to={href} {...props} />;
+};
 
 const SectionHeading = ({
   eyebrow,
@@ -168,13 +180,13 @@ const LandingPage = () => {
           />
         ))}
       </ul>
-      <Link
-        to={USER_SIGNUP}
+      <a
+        href={DOWNLOAD}
         className="press mt-5 flex h-12 items-center justify-center gap-2 rounded-xl bg-party-primary font-display text-title-card text-ink hover:bg-[#E0BC00]"
       >
         {t('landing.eco.users.cta')}
         <ArrowRight size={17} />
-      </Link>
+      </a>
     </div>
   );
 
@@ -207,12 +219,12 @@ const LandingPage = () => {
           {t('landing.eco.venues.cta')}
           <ArrowRight size={17} />
         </a>
-        <Link
+        <AppLink
           to={VENUE_SIGNUP}
           className="press flex h-12 items-center justify-center rounded-xl bg-surface-high font-display text-title-card hover:bg-surface-highest"
         >
           {t('landing.eco.venues.ctaSecondary')}
-        </Link>
+        </AppLink>
       </div>
     </div>
   );
@@ -243,26 +255,26 @@ const LandingPage = () => {
           <div className="ml-auto flex items-center gap-2">
             <LanguageSwitcher className="hidden sm:flex" />
             {isLoggedIn ? (
-              <Link
+              <AppLink
                 to={appHome}
                 className="press flex h-10 items-center rounded-xl bg-party-primary px-4 font-display text-title-card text-ink hover:bg-[#E0BC00]"
               >
                 {t('landing.nav.openApp')}
-              </Link>
+              </AppLink>
             ) : (
               <>
-                <Link
+                <AppLink
                   to={VENUE_SIGNUP}
                   className="press hidden h-10 items-center rounded-xl bg-surface-low px-4 font-display text-title-card hover:bg-surface-high md:flex"
                 >
                   {t('landing.nav.registerVenue')}
-                </Link>
-                <Link
-                  to="/auth"
+                </AppLink>
+                <AppLink
+                  to={VENUE_LOGIN}
                   className="press flex h-10 items-center rounded-xl bg-party-primary px-4 font-display text-title-card text-ink hover:bg-[#E0BC00]"
                 >
                   {t('landing.nav.login')}
-                </Link>
+                </AppLink>
               </>
             )}
             <button
@@ -297,12 +309,12 @@ const LandingPage = () => {
             <div className="mt-4 flex items-center justify-between gap-3">
               <LanguageSwitcher />
               {!isLoggedIn && (
-                <Link
+                <AppLink
                   to={VENUE_SIGNUP}
                   className="press flex h-11 flex-1 items-center justify-center rounded-xl bg-surface-low font-display text-title-card"
                 >
                   {t('landing.nav.registerVenue')}
-                </Link>
+                </AppLink>
               )}
             </div>
           </div>
@@ -342,13 +354,13 @@ const LandingPage = () => {
                 style={{ '--i': 3 } as React.CSSProperties}
                 className="mx-auto mt-8 flex max-w-md flex-col gap-3 sm:max-w-none sm:flex-row sm:justify-center"
               >
-                <Link
-                  to={USER_SIGNUP}
+                <a
+                  href={DOWNLOAD}
                   className="press flex h-14 items-center justify-center gap-2 rounded-xl bg-party-primary px-7 font-display text-headline-md text-ink hover:bg-[#E0BC00]"
                 >
-                  <Zap size={19} />
+                  <Smartphone size={19} />
                   {t('landing.hero.ctaUser')}
-                </Link>
+                </a>
                 <a
                   href="#ecosistema"
                   onClick={() => setTab('venues')}
@@ -550,12 +562,12 @@ const LandingPage = () => {
                       ))}
                     </ul>
                     {id === 'free' ? (
-                      <Link
+                      <AppLink
                         to={VENUE_SIGNUP}
                         className="press mt-6 flex h-12 items-center justify-center rounded-xl bg-surface-high font-display text-title-card hover:bg-surface-highest"
                       >
                         {t('landing.plans.ctaFree')}
-                      </Link>
+                      </AppLink>
                     ) : (
                       <a
                         href="#contacto"
@@ -595,7 +607,10 @@ const LandingPage = () => {
         </section>
 
         {/* ------------------------------------------------ llamada y contacto */}
+        {/* `#descargar` y `#contacto` llevan aquí: la app para clubbers a la izquierda,
+            la solicitud de demo para locales a la derecha. */}
         <section id="contacto" className="scroll-mt-20 px-margin pb-16 lg:px-8 lg:pb-24">
+          <span id="descargar" className="block scroll-mt-20" aria-hidden="true" />
           <div className="mx-auto grid max-w-7xl items-center gap-8 rounded-[28px] bg-surface-container p-5 sm:p-8 lg:grid-cols-[1fr_minmax(0,460px)] lg:gap-12 lg:p-14">
             <Reveal>
               <p className="text-label-pill uppercase tracking-[0.12em] text-party-primary">{t('landing.cta.eyebrow')}</p>
@@ -603,25 +618,7 @@ const LandingPage = () => {
                 {t('landing.cta.title')}
               </h2>
               <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-party-gray lg:text-base">{t('landing.cta.body')}</p>
-              <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-                <Link
-                  to={USER_SIGNUP}
-                  className="press flex h-12 items-center justify-center gap-2 rounded-xl bg-party-primary px-6 font-display text-title-card text-ink hover:bg-[#E0BC00]"
-                >
-                  <Zap size={17} />
-                  {t('landing.cta.user')}
-                </Link>
-                <Link
-                  to="/auth"
-                  className="press flex h-12 items-center justify-center rounded-xl bg-surface-high px-6 font-display text-title-card hover:bg-surface-highest"
-                >
-                  {t('landing.cta.login')}
-                </Link>
-              </div>
-              <p className="mt-4 flex items-center gap-2 text-body-sm text-party-gray">
-                <Smartphone size={16} />
-                {t('landing.cta.stores')}
-              </p>
+              <StoreButtons className="mt-7" />
             </Reveal>
             <Reveal index={1}>
               <VenueLeadForm />
@@ -644,8 +641,7 @@ const LandingPage = () => {
             {
               title: t('landing.footer.users'),
               links: [
-                { to: USER_SIGNUP, label: t('landing.footer.signup') },
-                { to: '/auth?type=user', label: t('landing.footer.login') },
+                { href: DOWNLOAD, label: t('landing.footer.signup') },
                 { href: '#como-funciona', label: t('landing.nav.how') },
                 { href: '#preguntas', label: t('landing.nav.faq') },
               ],
@@ -654,7 +650,7 @@ const LandingPage = () => {
               title: t('landing.footer.venues'),
               links: [
                 { to: VENUE_SIGNUP, label: t('landing.footer.registerVenue') },
-                { to: '/auth?type=venue', label: t('landing.footer.venueLogin') },
+                { to: VENUE_LOGIN, label: t('landing.footer.venueLogin') },
                 { href: '#planes', label: t('landing.nav.plans') },
                 { href: '#contacto', label: t('landing.footer.demo') },
               ],
@@ -674,9 +670,9 @@ const LandingPage = () => {
                 {col.links.map((link) => (
                   <li key={link.label}>
                     {'to' in link && link.to ? (
-                      <Link to={link.to} className="text-body-md font-normal text-party-gray hover:text-foreground">
+                      <AppLink to={link.to} className="text-body-md font-normal text-party-gray hover:text-foreground">
                         {link.label}
-                      </Link>
+                      </AppLink>
                     ) : (
                       <a href={link.href} className="text-body-md font-normal text-party-gray hover:text-foreground">
                         {link.label}

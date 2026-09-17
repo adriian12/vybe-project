@@ -13,7 +13,18 @@ import { adminClient } from '../_shared/supabase.ts';
  *
  * Se configura en Resend, en Webhooks, apuntando a esta función.
  *
- * Variables: RESEND_WEBHOOK_SECRET (el «signing secret» que da Resend).
+ * También recibe `email.received`: el correo que llega a cualquier dirección de
+ * vybes.es (soporte@, admin@, hola@…), porque el MX del dominio apunta a Resend.
+ * Resend no tiene buzón con IMAP, así que se reenvía a un correo de verdad con
+ * `Reply-To` al remitente: contestar desde Gmail le responde a él.
+ *
+ * Variables:
+ *   - RESEND_WEBHOOK_SECRET: el «signing secret» del webhook.
+ *   - INBOUND_FORWARD_TO: a quién se reenvía (varios, separados por comas).
+ *   - INBOUND_FORWARD_FROM: remitente del reenvío, p. ej. `Vybe <reenvio@vybes.es>`
+ *     (si falta, AUTH_FROM_EMAIL).
+ *   - RESEND_FULL_API_KEY: clave de Resend con acceso completo. La de envío
+ *     (RESEND_API_KEY) no puede leer los correos recibidos.
  */
 
 interface ResendEvent {
@@ -67,6 +78,90 @@ const firmaValida = async (
     .some((firma) => firma === esperada);
 };
 
+const escapar = (valor: string): string =>
+  valor.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
+
+/** Resend puede devolver el HTML como `data:text/html;base64,…`. */
+const htmlDe = (valor: unknown): string | null => {
+  if (typeof valor !== 'string' || valor === '') return null;
+  const dataUri = /^data:[^,]*?(;base64)?,(.*)$/s.exec(valor);
+  if (!dataUri) return valor;
+  try {
+    if (!dataUri[1]) return decodeURIComponent(dataUri[2]);
+    const bytes = Uint8Array.from(atob(dataUri[2]), (c) => c.charCodeAt(0));
+    return new TextDecoder().decode(bytes);
+  } catch {
+    return null;
+  }
+};
+
+interface CorreoRecibido {
+  from?: string;
+  to?: string[];
+  subject?: string | null;
+  html?: string | null;
+  text?: string | null;
+  headers?: Record<string, string>;
+  attachments?: { filename?: string; size?: number }[];
+}
+
+/** Reenvía un correo entrante de vybes.es al buzón configurado. */
+const reenviarRecibido = async (emailId: string): Promise<void> => {
+  const clave = Deno.env.get('RESEND_FULL_API_KEY') ?? Deno.env.get('RESEND_API_KEY');
+  const destino = (Deno.env.get('INBOUND_FORWARD_TO') ?? '')
+    .split(',')
+    .map((d) => d.trim())
+    .filter(Boolean);
+  const remitente = Deno.env.get('INBOUND_FORWARD_FROM') ?? Deno.env.get('AUTH_FROM_EMAIL');
+
+  if (!clave || destino.length === 0 || !remitente) {
+    console.error('resend-webhook: correo recibido sin reenviar (faltan RESEND_FULL_API_KEY, INBOUND_FORWARD_TO o INBOUND_FORWARD_FROM)');
+    return;
+  }
+
+  const respuesta = await fetch(`https://api.resend.com/emails/receiving/${emailId}`, {
+    headers: { Authorization: `Bearer ${clave}` },
+  });
+  if (!respuesta.ok) {
+    console.error('resend-webhook: no se pudo leer el correo recibido', respuesta.status, await respuesta.text());
+    return;
+  }
+
+  const correo = (await respuesta.json()) as CorreoRecibido;
+  const de = correo.headers?.from ?? correo.from ?? '';
+
+  // Un reenvío que vuelve a entrar en vybes.es crearía un bucle infinito.
+  const direccionRemitente = /<([^>]+)>/.exec(remitente)?.[1] ?? remitente;
+  if (de.includes(direccionRemitente)) return;
+
+  const para = (correo.to ?? []).join(', ');
+  const adjuntos = (correo.attachments ?? []).map((a) => a.filename).filter(Boolean);
+  const aviso = adjuntos.length
+    ? ` · ${adjuntos.length} adjunto(s): ${adjuntos.join(', ')} (descárgalos en Resend → Emails → Receiving)`
+    : '';
+
+  const cabeceraHtml = `<p style="font:13px Arial,sans-serif;color:#6b6b70;margin:0 0 12px">Recibido en <b>${escapar(para)}</b> de <b>${escapar(de)}</b>${escapar(aviso)}</p><hr style="border:0;border-top:1px solid #e4e4e7;margin:0 0 16px">`;
+  const html = htmlDe(correo.html);
+  const texto = correo.text ?? '';
+
+  const envio = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${clave}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      from: remitente,
+      to: destino,
+      reply_to: correo.from,
+      subject: `[${para}] ${correo.subject || '(sin asunto)'}`,
+      html: cabeceraHtml + (html ?? `<pre style="white-space:pre-wrap;font:14px Arial,sans-serif">${escapar(texto)}</pre>`),
+      text: `Recibido en ${para} de ${de}${aviso}\n\n${texto}`,
+    }),
+  });
+
+  if (!envio.ok) {
+    console.error('resend-webhook: no se pudo reenviar el correo', envio.status, await envio.text());
+  }
+};
+
 serve(async (req: Request): Promise<Response> => {
   const early = preflight(req);
   if (early) return early;
@@ -99,6 +194,13 @@ serve(async (req: Request): Promise<Response> => {
 
   try {
     const evento = JSON.parse(body) as ResendEvent;
+
+    // Correo que entra en vybes.es: se reenvía, no es un evento de un envío nuestro.
+    if (evento.type === 'email.received') {
+      if (evento.data?.email_id) await reenviarRecibido(evento.data.email_id);
+      return json({ ok: true });
+    }
+
     const destinatarios = Array.isArray(evento.data?.to)
       ? evento.data?.to
       : [evento.data?.to].filter(Boolean);

@@ -44,6 +44,7 @@ android/local.properties
 # Configuración de Firebase: no es secreta —viaja dentro del APK— pero es
 # de cada proyecto, y tenerla versionada invita a compilar contra la de otro.
 android/app/google-services.json
+android/app/google-services*.json.bak
 ios/App/App/GoogleService-Info.plist
 android/app/src/main/assets/public/
 ios/App/build/

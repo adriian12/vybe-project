@@ -1,5 +1,5 @@
 /// <reference types="vitest" />
-import { defineConfig } from "vite";
+import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
@@ -15,8 +15,24 @@ import { readFileSync } from "node:fs";
 const release = `vybe@${JSON.parse(readFileSync("./package.json", "utf8")).version}+${Date.now()
   .toString(36)}`;
 
+/**
+ * Todo lo que empieza por VITE_ acaba dentro del JavaScript público (web y APK).
+ * El «API Access Token» del Workspace de CARTO es un JWT (`eyJ…`) que da acceso a
+ * los datos de la cuenta; la clave de mapas de carto.com/basemaps/apikey no lo
+ * es. Confundirlas publicaría el token, así que la compilación se para.
+ */
+const comprobarVariablesPublicas = (mode: string) => {
+  const env = loadEnv(mode, process.cwd(), "VITE_");
+  if (env.VITE_CARTO_API_KEY?.startsWith("eyJ")) {
+    throw new Error(
+      "VITE_CARTO_API_KEY tiene un API Access Token de CARTO (privado). " +
+        "Pon ahí la clave de https://carto.com/basemaps/apikey y el token en CARTO_API_TOKEN.",
+    );
+  }
+};
+
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => ({
+export default defineConfig(({ mode }) => (comprobarVariablesPublicas(mode), {
   server: {
     host: "::",
     // 5173 es el puerto que documentan README.md, SETUP.md y la configuración

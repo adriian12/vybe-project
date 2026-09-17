@@ -1,4 +1,4 @@
-package party.vybe.app;
+package com.vybe.app;
 
 import com.getcapacitor.BridgeActivity;
 

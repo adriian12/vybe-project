@@ -255,6 +255,11 @@ npm run native:android   # abre el proyecto en Android Studio
 npm run native:ios       # abre el proyecto en Xcode (sólo en macOS)
 ```
 
+Capacitor 8: Android 16 (API 36, mínimo Android 7 / API 24) e iOS 15. El
+identificador es `com.vybe.app`. Compilar Android pide **JDK 21**;
+`npm run native:apk` lo busca solo (`scripts/java21.mjs`: `VYBE_JAVA_HOME`,
+Android Studio, `~/.jdks/jdk-21*`…) sin cambiar el Java del sistema.
+
 El APK de pruebas queda en
 `android/app/build/outputs/apk/debug/app-debug.apk`. Para instalarlo en un
 teléfono hay que permitir orígenes desconocidos: no está firmado para tienda.
@@ -282,9 +287,11 @@ En el navegador se usa Web Push. En la aplicación instalada el aviso lo entrega
 el sistema operativo a través de Firebase, y `send-push` elige el canal según el
 dispositivo: quien usa las dos cosas recibe el aviso en ambas.
 
-**Hecho:** `android/app/google-services.json` está puesto, el plugin de Gradle
-lo procesa y el APK ya lleva dentro las librerías de Firebase y el identificador
-del proyecto (`party-vybe-app`). El teléfono registra su token al conceder el
+**Pendiente tras el cambio a `com.vybe.app`:** el `google-services.json` estaba
+registrado para el paquete antiguo y se apartó (`google-services.party.vybe.app.json.bak`).
+Hay que añadir la app Android `com.vybe.app` al proyecto de Firebase
+`party-vybe-app` y poner su `google-services.json` en `android/app/`. Con él, el
+plugin de Gradle lo procesa y el APK lleva las librerías de Firebase. El teléfono registra su token al conceder el
 permiso y lo guarda con `save_native_push_token()`.
 
 **Falta la credencial del servidor.** Para escribir a esos tokens, Firebase pide

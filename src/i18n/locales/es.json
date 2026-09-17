@@ -160,7 +160,10 @@
         "toRegisterShort": "Regístrate",
         "toLoginShort": "Inicia sesión",
         "showPassword": "Mostrar contraseña",
-        "hidePassword": "Ocultar contraseña"
+        "hidePassword": "Ocultar contraseña",
+        "adminAccess": "Acceso de administración",
+        "toAdminAccess": "¿Eres del equipo de Vybe? Acceso de administración",
+        "toVenueAccess": "Volver al acceso de locales"
     },
     "consent": {
         "title": "Antes de empezar",
@@ -1472,7 +1475,7 @@
             "how": "Cómo funciona",
             "plans": "Planes",
             "faq": "Preguntas",
-            "login": "Entrar",
+            "login": "Acceso locales",
             "registerVenue": "Registrar mi local",
             "openApp": "Abrir Vybe",
             "menu": "Abrir menú",
@@ -1484,7 +1487,7 @@
             "titleBrand": "Vybe",
             "titleEnd": "conecta clubbers y salas en tiempo real.",
             "body": "Descubre las fiestas de tu zona, entra con el QR del local y haz Vybe Check sólo con quien está dentro contigo. Y si tienes un local: aforo en directo, códigos para tus RRPP y promociones para quien ya está en la pista.",
-            "ctaUser": "Crear mi cuenta gratis",
+            "ctaUser": "Descargar la app",
             "ctaVenue": "Vybe para locales",
             "imageAlt": "Gente bailando en una discoteca con luces amarillas",
             "imageTag": "Mallorca",
@@ -1528,7 +1531,7 @@
             "users": {
                 "eyebrow": "Para clubbers",
                 "title": "Vive la noche sin perder el tiempo",
-                "cta": "Crear mi cuenta gratis",
+                "cta": "Descargar la app",
                 "items": {
                     "matches": {
                         "title": "Matches reales en la pista",
@@ -1673,18 +1676,15 @@
                     "a": "Empezamos en Mallorca. Si tu local está en otra zona, escríbenos y te avisamos cuando lleguemos."
                 },
                 "apps": {
-                    "q": "¿Hay app para iPhone y Android?",
-                    "a": "Vybe funciona desde el navegador del móvil y se instala en la pantalla de inicio. Las apps de App Store y Google Play están en camino."
+                    "q": "¿Dónde descargo Vybe?",
+                    "a": "Vybe para salir de fiesta es una app para iPhone y Android, y la estamos publicando en App Store y Google Play. La web app.vybes.es es sólo para locales y su equipo."
                 }
             }
         },
         "cta": {
             "eyebrow": "Empieza la noche",
             "title": "¿Listo para vivir la noche de otra forma?",
-            "body": "Crea tu cuenta gratis y entra en tu próxima fiesta con Vybe. Si tienes un local, cuéntanos y te lo enseñamos.",
-            "user": "Crear mi cuenta gratis",
-            "login": "Ya tengo cuenta",
-            "stores": "App Store y Google Play, muy pronto"
+            "body": "Descarga Vybe y entra en tu próxima fiesta. Si tienes un local, cuéntanos y te lo enseñamos."
         },
         "form": {
             "title": "¿Tienes una discoteca, bar o festival?",
@@ -1722,8 +1722,7 @@
             "users": "Clubbers",
             "venues": "Locales",
             "legal": "Legal",
-            "signup": "Crear cuenta",
-            "login": "Entrar",
+            "signup": "Descargar la app",
             "registerVenue": "Registrar mi local",
             "venueLogin": "Acceso para locales",
             "demo": "Solicitar demo",
@@ -1732,6 +1731,18 @@
             "contact": "Contacto",
             "rights": "© {{year}} Vybe. Todos los derechos reservados.",
             "made": "Hecho en Palma de Mallorca"
+        },
+        "download": {
+            "googlePlay": "Google Play",
+            "appStore": "App Store",
+            "getIt": "Disponible en",
+            "soon": "Próximamente"
         }
+    },
+    "mobileOnly": {
+        "title": "Vybe se vive desde el móvil",
+        "body": "Esta web es para locales y administración. Para descubrir fiestas, entrar con el QR y hacer Vybe Check, descarga la app.",
+        "logout": "Cerrar sesión",
+        "venueAccess": "¿Tienes un local? Accede aquí"
     }
 }

@@ -160,7 +160,10 @@
         "toRegisterShort": "Sign up",
         "toLoginShort": "Log in",
         "showPassword": "Show password",
-        "hidePassword": "Hide password"
+        "hidePassword": "Hide password",
+        "adminAccess": "Admin access",
+        "toAdminAccess": "Part of the Vybe team? Admin access",
+        "toVenueAccess": "Back to venue login"
     },
     "consent": {
         "title": "Before you start",
@@ -1472,7 +1475,7 @@
             "how": "How it works",
             "plans": "Plans",
             "faq": "FAQ",
-            "login": "Log in",
+            "login": "Venue login",
             "registerVenue": "Register my venue",
             "openApp": "Open Vybe",
             "menu": "Open menu",
@@ -1484,7 +1487,7 @@
             "titleBrand": "Vybe",
             "titleEnd": "connects clubbers and venues in real time.",
             "body": "Discover parties near you, get in with the venue's QR code and do a Vybe Check only with people who are inside with you. And if you run a venue: live capacity, codes for your promoters and offers for people already on the floor.",
-            "ctaUser": "Create my free account",
+            "ctaUser": "Get the app",
             "ctaVenue": "Vybe for venues",
             "imageAlt": "People dancing in a club under yellow lights",
             "imageTag": "Mallorca",
@@ -1528,7 +1531,7 @@
             "users": {
                 "eyebrow": "For clubbers",
                 "title": "Enjoy the night without wasting time",
-                "cta": "Create my free account",
+                "cta": "Get the app",
                 "items": {
                     "matches": {
                         "title": "Real matches on the floor",
@@ -1673,18 +1676,15 @@
                     "a": "We're starting in Mallorca. If your venue is somewhere else, get in touch and we'll let you know when we arrive."
                 },
                 "apps": {
-                    "q": "Is there an app for iPhone and Android?",
-                    "a": "Vybe works in your phone's browser and can be installed on your home screen. The App Store and Google Play apps are on the way."
+                    "q": "Where can I download Vybe?",
+                    "a": "Vybe for going out is an iPhone and Android app, and we're publishing it on the App Store and Google Play. The app.vybes.es website is only for venues and their staff."
                 }
             }
         },
         "cta": {
             "eyebrow": "Start the night",
             "title": "Ready to experience nightlife differently?",
-            "body": "Create your free account and join your next party with Vybe. If you run a venue, tell us about it and we'll show you around.",
-            "user": "Create my free account",
-            "login": "I already have an account",
-            "stores": "App Store and Google Play, coming soon"
+            "body": "Download Vybe and join your next party. If you run a venue, tell us about it and we'll show you around."
         },
         "form": {
             "title": "Do you run a club, bar or festival?",
@@ -1722,8 +1722,7 @@
             "users": "Clubbers",
             "venues": "Venues",
             "legal": "Legal",
-            "signup": "Create account",
-            "login": "Log in",
+            "signup": "Get the app",
             "registerVenue": "Register my venue",
             "venueLogin": "Venue login",
             "demo": "Request a demo",
@@ -1732,6 +1731,18 @@
             "contact": "Contact",
             "rights": "© {{year}} Vybe. All rights reserved.",
             "made": "Made in Palma de Mallorca"
+        },
+        "download": {
+            "googlePlay": "Google Play",
+            "appStore": "App Store",
+            "getIt": "Get it on",
+            "soon": "Coming soon"
         }
+    },
+    "mobileOnly": {
+        "title": "Vybe lives on your phone",
+        "body": "This website is for venues and admins. To discover parties, get in with the QR code and do a Vybe Check, download the app.",
+        "logout": "Log out",
+        "venueAccess": "Run a venue? Log in here"
     }
 }

@@ -6,7 +6,7 @@ import 'leaflet/dist/leaflet.css';
 import { ChevronRight, LocateFixed, Music, Navigation, Search, SlidersHorizontal, X } from 'lucide-react';
 import Header from '@/components/header';
 import Footer from '@/components/footer';
-import { DARK_TILES, TILES_ATTRIBUTION } from '@/components/map-thumb';
+import { DARK_TILES, HAS_MAP_TILES, TILES_ATTRIBUTION } from '@/components/map-thumb';
 import { dayAndMonth } from '@/components/event-bits';
 import {
   DropdownMenu,
@@ -122,11 +122,14 @@ const MapPage = () => {
       attributionControl: false,
     }).setView(PALMA, 12);
 
-    L.tileLayer(DARK_TILES, {
-      subdomains: 'abcd',
-      maxZoom: 19,
-      detectRetina: true,
-    }).addTo(m);
+    // Sin clave de CARTO cada tesela sería una marca de agua: mejor el fondo solo.
+    if (HAS_MAP_TILES) {
+      L.tileLayer(DARK_TILES, {
+        subdomains: 'abcd',
+        maxZoom: 19,
+        detectRetina: true,
+      }).addTo(m);
+    }
 
     capa.current = L.layerGroup().addTo(m);
     mapa.current = m;

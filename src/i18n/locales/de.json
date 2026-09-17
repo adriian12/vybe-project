@@ -160,7 +160,10 @@
         "toRegisterShort": "Registrieren",
         "toLoginShort": "Anmelden",
         "showPassword": "Passwort anzeigen",
-        "hidePassword": "Passwort verbergen"
+        "hidePassword": "Passwort verbergen",
+        "adminAccess": "Admin-Zugang",
+        "toAdminAccess": "Gehörst du zum Vybe-Team? Admin-Zugang",
+        "toVenueAccess": "Zurück zum Login für Locations"
     },
     "consent": {
         "title": "Bevor es losgeht",
@@ -1472,7 +1475,7 @@
             "how": "So funktioniert's",
             "plans": "Tarife",
             "faq": "Fragen",
-            "login": "Anmelden",
+            "login": "Login für Locations",
             "registerVenue": "Location registrieren",
             "openApp": "Vybe öffnen",
             "menu": "Menü öffnen",
@@ -1484,7 +1487,7 @@
             "titleBrand": "Vybe",
             "titleEnd": "verbindet Clubber und Locations in Echtzeit.",
             "body": "Entdecke Partys in deiner Nähe, komm mit dem QR-Code der Location rein und mach den Vybe Check nur mit Leuten, die mit dir drin sind. Und wenn du eine Location hast: Live-Auslastung, Codes für deine Promoter und Angebote für alle, die schon auf der Tanzfläche sind.",
-            "ctaUser": "Kostenloses Konto erstellen",
+            "ctaUser": "App herunterladen",
             "ctaVenue": "Vybe für Locations",
             "imageAlt": "Menschen tanzen in einem Club unter gelbem Licht",
             "imageTag": "Mallorca",
@@ -1528,7 +1531,7 @@
             "users": {
                 "eyebrow": "Für Clubber",
                 "title": "Genieß die Nacht ohne Zeitverlust",
-                "cta": "Kostenloses Konto erstellen",
+                "cta": "App herunterladen",
                 "items": {
                     "matches": {
                         "title": "Echte Matches auf der Tanzfläche",
@@ -1673,18 +1676,15 @@
                     "a": "Wir starten auf Mallorca. Wenn deine Location woanders ist, schreib uns und wir melden uns, sobald wir dort sind."
                 },
                 "apps": {
-                    "q": "Gibt es eine App für iPhone und Android?",
-                    "a": "Vybe läuft im Browser deines Handys und lässt sich auf dem Startbildschirm installieren. Die Apps für App Store und Google Play sind unterwegs."
+                    "q": "Wo lade ich Vybe herunter?",
+                    "a": "Vybe zum Feiern ist eine App für iPhone und Android, die wir gerade im App Store und bei Google Play veröffentlichen. Die Website app.vybes.es ist nur für Locations und ihr Team."
                 }
             }
         },
         "cta": {
             "eyebrow": "Die Nacht beginnt",
             "title": "Bereit, die Nacht anders zu erleben?",
-            "body": "Erstelle dein kostenloses Konto und geh mit Vybe auf deine nächste Party. Wenn du eine Location hast, erzähl uns davon und wir zeigen dir alles.",
-            "user": "Kostenloses Konto erstellen",
-            "login": "Ich habe schon ein Konto",
-            "stores": "App Store und Google Play, bald verfügbar"
+            "body": "Lade Vybe herunter und geh auf deine nächste Party. Wenn du eine Location hast, erzähl uns davon und wir zeigen dir alles."
         },
         "form": {
             "title": "Hast du einen Club, eine Bar oder ein Festival?",
@@ -1722,8 +1722,7 @@
             "users": "Clubber",
             "venues": "Locations",
             "legal": "Rechtliches",
-            "signup": "Konto erstellen",
-            "login": "Anmelden",
+            "signup": "App herunterladen",
             "registerVenue": "Location registrieren",
             "venueLogin": "Login für Locations",
             "demo": "Demo anfragen",
@@ -1732,6 +1731,18 @@
             "contact": "Kontakt",
             "rights": "© {{year}} Vybe. Alle Rechte vorbehalten.",
             "made": "Gemacht in Palma de Mallorca"
+        },
+        "download": {
+            "googlePlay": "Google Play",
+            "appStore": "App Store",
+            "getIt": "Jetzt bei",
+            "soon": "Demnächst"
         }
+    },
+    "mobileOnly": {
+        "title": "Vybe erlebst du auf dem Handy",
+        "body": "Diese Website ist für Locations und Administration. Um Partys zu entdecken, mit dem QR-Code reinzukommen und den Vybe Check zu machen, lade die App herunter.",
+        "logout": "Abmelden",
+        "venueAccess": "Du hast eine Location? Hier anmelden"
     }
 }

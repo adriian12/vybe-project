@@ -13,6 +13,7 @@ import { spawnSync } from 'node:child_process';
 import { copyFileSync, existsSync, statSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { root } from './supabase-project.mjs';
+import { findJava21 } from './java21.mjs';
 
 const NOMBRE = 'Vybe.apk';
 
@@ -33,10 +34,21 @@ const destino = resolve(root, '..', NOMBRE);
 //     sin comillas cmd la partiría en dos.
 const wrapper = resolve(android, 'gradlew.bat');
 
+// Capacitor 8 compila con Java 21; el del sistema puede ser otro (ver java21.mjs).
+const java21 = findJava21();
+if (!java21) {
+  console.error(
+    'Falta un JDK 21. Instala Android Studio Otter o Temurin 21, o apunta VYBE_JAVA_HOME a uno.',
+  );
+  process.exit(1);
+}
+console.log(`Java 21: ${java21}`);
+
 const gradle = spawnSync(`"${wrapper}" assembleDebug --console=plain`, {
   cwd: android,
   shell: true,
   stdio: 'inherit',
+  env: { ...process.env, JAVA_HOME: java21 },
 });
 
 if (gradle.status !== 0) {

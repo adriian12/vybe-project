@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 /**
- * Configuración de la aplicación nativa.
+ * Configuración de la aplicación nativa (Capacitor 8: Android 16 / API 36, iOS 15).
  *
  * Capacitor envuelve el mismo código de la web en un contenedor de Android y de
  * iOS, así que no hay dos aplicaciones que mantener: lo que se arregla aquí se
@@ -11,7 +11,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
  * se puede cambiar una vez publicada.
  */
 const config: CapacitorConfig = {
-  appId: 'party.vybe.app',
+  appId: 'com.vybe.app',
   appName: 'Vybe',
   webDir: 'dist',
 
@@ -44,6 +44,16 @@ const config: CapacitorConfig = {
       presentationOptions: ['badge', 'sound', 'alert'],
     },
 
+    // Android 15 y 16 dibujan la app de borde a borde: la barra de estado ya no
+    // tiene color propio y el contenido pasa por debajo. SystemBars (incluido en
+    // Capacitor 8) expone los márgenes como `--safe-area-inset-*`, que es lo que
+    // usan `.pt-safe` y `.pb-safe`.
+    SystemBars: {
+      insetsHandling: 'css',
+      style: 'DARK',
+    },
+
+    // Sólo tiene efecto hasta Android 14.
     StatusBar: {
       style: 'DARK',
       backgroundColor: '#111114',

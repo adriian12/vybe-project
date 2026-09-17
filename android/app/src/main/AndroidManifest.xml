@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <application
         android:allowBackup="true"
@@ -10,7 +11,7 @@
         android:theme="@style/AppTheme">
 
         <activity
-            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode|navigation|density"
             android:name=".MainActivity"
             android:label="@string/title_activity_main"
             android:theme="@style/AppTheme.NoActionBarLaunch"
@@ -22,15 +23,24 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <!-- Enlaces directos: un QR o un enlace compartido de vybe abre la
-                 aplicacion instalada en vez del navegador. Requiere publicar
-                 /.well-known/assetlinks.json en el dominio; hasta entonces el
-                 sistema abrira el navegador, sin romper nada. -->
+            <!-- Enlaces directos: un enlace compartido de app.vybes.es (una
+                 fiesta, un perfil, el correo de verificacion) abre la aplicacion
+                 instalada en vez del navegador. Solo las rutas de clubber: el
+                 panel de local y el de administracion siguen en el navegador.
+                 Requiere publicar /.well-known/assetlinks.json con la huella de
+                 la clave de firma; hasta entonces se abre el navegador. -->
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="https" android:host="@string/deep_link_host" />
+                <data android:pathPrefix="/event/" />
+                <data android:pathPrefix="/u/" />
+                <data android:pathPrefix="/chat/" />
+                <data android:pathPrefix="/matches" />
+                <data android:pathPrefix="/home" />
+                <data android:pathPrefix="/auth/verify-email" />
+                <data android:pathPrefix="/auth/reset-password" />
             </intent-filter>
 
             <!-- Esquema propio, como respaldo: funciona sin dominio ni
@@ -44,6 +54,19 @@
             </intent-filter>
 
         </activity>
+
+        <!-- Selector de fotos del sistema también en Android 11 y 12: Google
+             Play instala el módulo compatible la primera vez que hace falta. -->
+        <service
+            android:name="com.google.android.gms.metadata.ModuleDependencies"
+            android:enabled="false"
+            android:exported="false"
+            tools:ignore="MissingClass">
+            <intent-filter>
+                <action android:name="com.google.android.gms.metadata.MODULE_DEPENDENCIES" />
+            </intent-filter>
+            <meta-data android:name="photopicker_activity:0:required" android:value="" />
+        </service>
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -79,9 +102,10 @@
     <!-- Avisos. Desde Android 13 hay que pedirlo explícitamente. -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
-    <!-- Galería, sólo para las fotos de perfil de quien tiene Premium. -->
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
-    <uses-permission
-        android:name="android.permission.READ_EXTERNAL_STORAGE"
-        android:maxSdkVersion="32" />
+    <!--
+        Galería (fotos de perfil de Premium): desde Capacitor 8 la cámara usa el
+        selector de fotos del sistema, que no necesita permiso. Google Play sólo
+        admite READ_MEDIA_IMAGES en apps cuya función principal son las fotos, así
+        que no se pide.
+    -->
 </manifest>

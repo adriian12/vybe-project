@@ -40,6 +40,7 @@ import {
 import { api } from '@/services/api';
 import { isValidNif, normalizeNif } from '@/lib/nif';
 import { track } from '@/lib/observability';
+import { landingHref, siteMode } from '@/lib/hosts';
 import { VENUE_RADIUS, VenueType } from '@/types/venue';
 
 const VENUE_TYPES: VenueType[] = [
@@ -1086,10 +1087,16 @@ const AuthPage = () => {
 
   // `type` identifica la cuenta y `mode` el formulario. Antes ambos leían el
   // mismo parámetro, así que /auth?type=register no renderizaba nada.
-  const accountType = searchParams.get('type') === 'venue' ? 'venue' : 'user';
   const [authMode, setAuthMode] = useState<'login' | 'register'>(
     searchParams.get('mode') === 'register' ? 'register' : 'login',
   );
+
+  // En app.vybes.es la web es de locales y administración: sólo se registran
+  // locales, y el acceso «de usuario» es el de administración (los admins son
+  // perfiles con rol). Los clubbers se registran desde la app del móvil.
+  const soloEmpresas = siteMode() === 'app';
+  const accountType =
+    searchParams.get('type') === 'venue' || (soloEmpresas && authMode === 'register') ? 'venue' : 'user';
 
   useEffect(() => {
     setAuthMode(searchParams.get('mode') === 'register' ? 'register' : 'login');
@@ -1098,8 +1105,10 @@ const AuthPage = () => {
   const toggleMode = () => {
     const next = authMode === 'login' ? 'register' : 'login';
     setAuthMode(next);
-    setSearchParams({ type: accountType, mode: next }, { replace: true });
+    setSearchParams({ type: soloEmpresas ? 'venue' : accountType, mode: next }, { replace: true });
   };
+
+  const backClass = 'press flex h-10 w-10 items-center justify-center rounded-full bg-card text-foreground';
 
   const renderForm = () => {
     if (accountType === 'venue') {
@@ -1117,13 +1126,15 @@ const AuthPage = () => {
         <div className="flex items-center justify-between">
           {/* Sólo la flecha: el nombre sigue estando para quien use lector de
               pantalla. */}
-          <Link
-            to="/"
-            aria-label={t('auth.backHome')}
-            className="press flex h-10 w-10 items-center justify-center rounded-full bg-card text-foreground"
-          >
-            <ArrowLeft size={20} />
-          </Link>
+          {soloEmpresas ? (
+            <a href={landingHref('/')} aria-label={t('auth.backHome')} className={backClass}>
+              <ArrowLeft size={20} />
+            </a>
+          ) : (
+            <Link to="/" aria-label={t('auth.backHome')} className={backClass}>
+              <ArrowLeft size={20} />
+            </Link>
+          )}
           <LanguageSwitcher />
         </div>
 
@@ -1131,7 +1142,7 @@ const AuthPage = () => {
           <div>
             <p className="flex items-center gap-2 text-label-pill uppercase tracking-wider text-party-primary">
               {accountType === 'user' ? <UserIcon size={14} /> : <Building size={14} />}
-              {t(accountType === 'user' ? 'auth.userAccess' : 'auth.venueAccess')}
+              {t(accountType === 'venue' ? 'auth.venueAccess' : soloEmpresas ? 'auth.adminAccess' : 'auth.userAccess')}
             </p>
             <h1 className="mt-1 font-display text-headline-xl">
               {t(authMode === 'login' ? 'auth.loginTitle' : 'auth.registerTitle')}
@@ -1147,16 +1158,31 @@ const AuthPage = () => {
           {renderForm()}
         </div>
 
-        <p className="mt-6 text-center text-body-md text-party-gray">
-          {t(authMode === 'login' ? 'auth.noAccount' : 'auth.haveAccount')}{' '}
-          <button
-            type="button"
-            onClick={toggleMode}
-            className="press font-bold text-party-primary hover:underline"
-          >
-            {t(authMode === 'login' ? 'auth.toRegisterShort' : 'auth.toLoginShort')}
-          </button>
-        </p>
+        {/* El acceso de administración no tiene registro. */}
+        {!(soloEmpresas && accountType === 'user') && (
+          <p className="mt-6 text-center text-body-md text-party-gray">
+            {t(authMode === 'login' ? 'auth.noAccount' : 'auth.haveAccount')}{' '}
+            <button
+              type="button"
+              onClick={toggleMode}
+              className="press font-bold text-party-primary hover:underline"
+            >
+              {t(authMode === 'login' ? 'auth.toRegisterShort' : 'auth.toLoginShort')}
+            </button>
+          </p>
+        )}
+
+        {soloEmpresas && authMode === 'login' && (
+          <p className="mt-4 text-center text-caption font-normal text-party-gray">
+            <button
+              type="button"
+              onClick={() => setSearchParams({ type: accountType === 'venue' ? 'user' : 'venue', mode: 'login' }, { replace: true })}
+              className="press underline underline-offset-2 hover:text-foreground"
+            >
+              {t(accountType === 'venue' ? 'auth.toAdminAccess' : 'auth.toVenueAccess')}
+            </button>
+          </p>
+        )}
       </div>
     </div>
   );

@@ -5,8 +5,25 @@ import { cn } from '@/lib/utils';
 /**
  * Teselas oscuras de CARTO sobre datos de OpenStreetMap. Son las mismas que usa
  * la pantalla del mapa, así que la miniatura y el mapa grande se parecen.
+ *
+ * CARTO exige clave desde 2026: sin ella cada tesela es una imagen con «API KEY
+ * REQUIRED». La clave es gratuita (5 millones de teselas al mes, uso comercial
+ * permitido) y se pide en https://carto.com/basemaps/apikey. Va en
+ * `VITE_CARTO_API_KEY`; si falta, no se piden teselas y el mapa queda en su
+ * fondo oscuro con los alfileres, en vez de llenarse de marcas de agua.
  */
-export const DARK_TILES = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+const CARTO_KEY = (import.meta.env.VITE_CARTO_API_KEY as string | undefined) || '';
+
+export const HAS_MAP_TILES = CARTO_KEY !== '';
+
+if (!HAS_MAP_TILES && import.meta.env.DEV) {
+  console.warn('[mapa] Falta VITE_CARTO_API_KEY: el mapa se pinta sin teselas.');
+}
+
+const withKey = (url: string): string => (HAS_MAP_TILES ? `${url}?key=${encodeURIComponent(CARTO_KEY)}` : url);
+
+// eslint-disable-next-line react-refresh/only-export-components
+export const DARK_TILES = withKey('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png');
 export const TILES_ATTRIBUTION =
   '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>';
 
@@ -52,14 +69,14 @@ const MapThumb: React.FC<MapThumbProps> = ({
         const wrapped = ((tx % n) + n) % n;
         lista.push({
           key: `${tx}-${ty}`,
-          src: `https://a.basemaps.cartocdn.com/dark_all/${zoom}/${wrapped}/${ty}@2x.png`,
+          src: withKey(`https://a.basemaps.cartocdn.com/dark_all/${zoom}/${wrapped}/${ty}@2x.png`),
           x: tx * TILE - left,
           y: ty * TILE - top,
         });
       }
     }
 
-    return lista;
+    return HAS_MAP_TILES ? lista : [];
   }, [latitude, longitude, size, zoom]);
 
   return (
@@ -84,6 +101,12 @@ const MapThumb: React.FC<MapThumbProps> = ({
           <MapPin size={14} />
         </span>
       </span>
+      {/* CARTO y OpenStreetMap piden que la atribución se vea. */}
+      {HAS_MAP_TILES && (
+        <span className="absolute inset-x-0 bottom-0 bg-black/55 px-1 text-center text-[7px] leading-[10px] text-white/80">
+          © OSM · CARTO
+        </span>
+      )}
     </div>
   );
 };

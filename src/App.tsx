@@ -1,7 +1,7 @@
 import { Suspense, lazy, useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Navigate, Routes, Route, useNavigate } from 'react-router-dom';
 import { Toaster } from '@/components/ui/toaster';
 import { Toaster as Sonner } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -13,7 +13,9 @@ import PwaPrompt from '@/components/pwa-prompt';
 import ConsentGate from '@/components/consent-gate';
 import ErrorBoundary from '@/components/error-boundary';
 import { isNative, setupDeepLinks } from '@/services/native';
+import { APP_URL, siteMode } from '@/lib/hosts';
 import DevSentryCheck from '@/components/dev-sentry-check';
+import RedirectIfLoggedIn from '@/components/redirect-if-logged-in';
 import Index from './pages/Index';
 import NotFound from './pages/NotFound';
 import AuthPage from './pages/AuthPage';
@@ -45,6 +47,7 @@ const UserProfilePage = lazy(() => import('./pages/UserProfilePage'));
 const EventSwipingPage = lazy(() => import('./pages/EventSwipingPage'));
 const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage'));
 const LandingPage = lazy(() => import('./pages/LandingPage'));
+const MobileOnlyPage = lazy(() => import('./pages/MobileOnlyPage'));
 
 /**
  * `/` es la landing en el navegador y la bienvenida dentro de la app instalada
@@ -52,10 +55,32 @@ const LandingPage = lazy(() => import('./pages/LandingPage'));
  * no necesita que se la vendan.
  */
 const RootPage = () => {
+  if (MODE === 'app') return <Navigate to="/auth?type=venue" replace />;
   const installed =
     isNative() ||
     (typeof window !== 'undefined' && window.matchMedia?.('(display-mode: standalone)').matches);
-  return installed ? <Index /> : <LandingPage />;
+  return installed ? (
+    <RedirectIfLoggedIn>
+      <Index />
+    </RedirectIfLoggedIn>
+  ) : (
+    <LandingPage />
+  );
+};
+
+/** Qué parte de Vybe sirve este dominio (`src/lib/hosts.ts`). No cambia sin recargar. */
+const MODE = siteMode();
+
+/**
+ * En `vybes.es` sólo viven la landing y los textos legales: cualquier otra ruta
+ * (un enlace viejo, el de un correo) se abre en `app.vybes.es` tal cual.
+ */
+const GoToApp = () => {
+  useEffect(() => {
+    const { pathname, search, hash } = window.location;
+    window.location.replace(`${APP_URL}${pathname}${search}${hash}`);
+  }, []);
+  return <PantallaCargando />;
 };
 
 /** Lo que se ve mientras llega una pantalla. */
@@ -78,6 +103,13 @@ const guarded = (
     <ErrorBoundary area="route">{element}</ErrorBoundary>
   </ProtectedRoute>
 );
+
+/**
+ * Pantalla de clubber. En `app.vybes.es` no se abre: la web es para locales y
+ * administración, y quien sale de fiesta usa la app del móvil.
+ */
+const clubber = (element: React.ReactNode, options: { requireEvent?: boolean } = {}) =>
+  MODE === 'app' ? <MobileOnlyPage /> : guarded(element, { allow: ['user', 'admin'], ...options });
 
 /**
  * Escucha los enlaces que abren la aplicación instalada y navega a su pantalla.
@@ -117,80 +149,71 @@ const App = () => (
 
             <Suspense fallback={<PantallaCargando />}>
               <ConsentGate>
-                <Routes>
-                  {/* Públicas */}
-                  <Route path="/" element={<RootPage />} />
-                  <Route path="/bienvenida" element={<Index />} />
-                  <Route path="/auth" element={<AuthPage />} />
-                  <Route path="/auth/verify-email" element={<VerifyEmailPage />} />
-                  <Route path="/auth/verify-email-pending" element={<VerifyEmailPage />} />
-                  <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
-                  <Route path="/legal/:document" element={<LegalPage />} />
+                {MODE === 'landing' ? (
+                  <Routes>
+                    <Route path="/" element={<LandingPage />} />
+                    <Route path="/legal/:document" element={<LegalPage />} />
+                    <Route path="*" element={<GoToApp />} />
+                  </Routes>
+                ) : (
+                  <Routes>
+                    {/* Públicas */}
+                    <Route path="/" element={<RootPage />} />
+                    <Route
+                      path="/bienvenida"
+                      element={
+                        MODE === 'app' ? (
+                          <Navigate to="/auth?type=venue" replace />
+                        ) : (
+                          <RedirectIfLoggedIn>
+                            <Index />
+                          </RedirectIfLoggedIn>
+                        )
+                      }
+                    />
+                    <Route
+                      path="/auth"
+                      element={
+                        <RedirectIfLoggedIn>
+                          <AuthPage />
+                        </RedirectIfLoggedIn>
+                      }
+                    />
+                    <Route path="/auth/verify-email" element={<VerifyEmailPage />} />
+                    <Route path="/auth/verify-email-pending" element={<VerifyEmailPage />} />
+                    <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
+                    <Route path="/legal/:document" element={<LegalPage />} />
+                    <Route path="/descargar" element={<MobileOnlyPage />} />
 
-                  {/* Usuarios */}
-                  <Route path="/home" element={guarded(<HomePage />, { allow: ['user', 'admin'] })} />
-                  <Route
-                    path="/location"
-                    element={guarded(<LocationPage />, { allow: ['user', 'admin'] })}
-                  />
-                  <Route
-                    path="/map"
-                    element={guarded(<MapPage />, { allow: ['user', 'admin'] })}
-                  />
-                  <Route
-                    path="/tickets"
-                    element={guarded(<TicketsPage />, { allow: ['user', 'admin'] })}
-                  />
-                  <Route
-                    path="/matches"
-                    element={guarded(<MatchesPage />, { allow: ['user', 'admin'] })}
-                  />
-                  <Route
-                    path="/likes"
-                    element={guarded(<LikesPage />, { allow: ['user', 'admin'] })}
-                  />
-                  <Route
-                    path="/u/:userId"
-                    element={guarded(<UserProfilePage />, { allow: ['user', 'admin'] })}
-                  />
-                  <Route
-                    path="/chat/:userId"
-                    element={guarded(<ChatPage />, { allow: ['user', 'admin'] })}
-                  />
-                  <Route
-                    path="/profile"
-                    element={guarded(<ProfilePage />, { allow: ['user', 'admin'] })}
-                  />
-                  <Route
-                    path="/event/:eventId"
-                    element={guarded(<EventDetailPage />, { allow: ['user', 'admin'] })}
-                  />
-                  <Route
-                    path="/event/:eventId/access"
-                    element={guarded(<EventAccessPage />, { allow: ['user', 'admin'] })}
-                  />
-                  <Route
-                    path="/event/:eventId/live"
-                    element={guarded(<EventSwipingPage />, {
-                      allow: ['user', 'admin'],
-                      requireEvent: true,
-                    })}
-                  />
+                    {/* Clubbers */}
+                    <Route path="/home" element={clubber(<HomePage />)} />
+                    <Route path="/location" element={clubber(<LocationPage />)} />
+                    <Route path="/map" element={clubber(<MapPage />)} />
+                    <Route path="/tickets" element={clubber(<TicketsPage />)} />
+                    <Route path="/matches" element={clubber(<MatchesPage />)} />
+                    <Route path="/likes" element={clubber(<LikesPage />)} />
+                    <Route path="/u/:userId" element={clubber(<UserProfilePage />)} />
+                    <Route path="/chat/:userId" element={clubber(<ChatPage />)} />
+                    <Route path="/profile" element={clubber(<ProfilePage />)} />
+                    <Route path="/event/:eventId" element={clubber(<EventDetailPage />)} />
+                    <Route path="/event/:eventId/access" element={clubber(<EventAccessPage />)} />
+                    <Route path="/event/:eventId/live" element={clubber(<EventSwipingPage />, { requireEvent: true })} />
 
-                  {/* Locales */}
-                  <Route
-                    path="/venue/dashboard"
-                    element={guarded(<VenueDashboardPage />, { allow: ['venue'] })}
-                  />
+                    {/* Locales */}
+                    <Route
+                      path="/venue/dashboard"
+                      element={guarded(<VenueDashboardPage />, { allow: ['venue'] })}
+                    />
 
-                  {/* Administración */}
-                  <Route
-                    path="/admin/dashboard"
-                    element={guarded(<AdminDashboardPage />, { allow: ['admin'] })}
-                  />
+                    {/* Administración */}
+                    <Route
+                      path="/admin/dashboard"
+                      element={guarded(<AdminDashboardPage />, { allow: ['admin'] })}
+                    />
 
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                )}
               </ConsentGate>
             </Suspense>
           </PremiumProvider>

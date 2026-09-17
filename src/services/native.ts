@@ -1,4 +1,5 @@
 import { Capacitor } from '@capacitor/core';
+import { supabase } from '@/integrations/supabase/client';
 
 /**
  * Puente con el contenedor nativo.
@@ -38,7 +39,9 @@ export const setupNativeShell = async (): Promise<void> => {
 
     if (platform() === 'android') {
       // El lienzo del sistema de diseño: la barra de estado se funde con la
-      // cabecera en vez de dibujar una franja de otro negro.
+      // cabecera en vez de dibujar una franja de otro negro. Sólo hasta
+      // Android 14: desde el 15 la app va de borde a borde y la barra es
+      // transparente sobre el propio fondo (`capacitor.config.ts`, SystemBars).
       await StatusBar.setBackgroundColor({ color: '#111114' });
     }
 
@@ -74,7 +77,7 @@ export const setupBackButton = async (onBack: () => boolean): Promise<() => void
 /**
  * Enlaces que abren la aplicación instalada.
  *
- * Cuando alguien toca `https://vybe.app/event/…` —en un cartel, en un correo,
+ * Cuando alguien toca `https://app.vybes.es/event/…` —en un cartel, en un correo,
  * en un mensaje— con la aplicación instalada, Android e iOS la abren en lugar
  * del navegador. Lo que llega es la URL entera; aquí se queda sólo el camino,
  * porque el resto de la aplicación navega por rutas y no por dominios.
@@ -200,4 +203,25 @@ export const openExternal = async (url: string): Promise<void> => {
 
   const { Browser } = await import('@capacitor/browser');
   await Browser.open({ url });
+};
+
+/**
+ * Renovación del token con la app en segundo plano.
+ *
+ * El temporizador que renueva la sesión se congela cuando la app no está en
+ * pantalla. Al volver, se reanuda enseguida para que la primera petición no
+ * salga con un token caducado; al irse, se para para no gastar batería.
+ */
+export const setupAuthRefreshOnResume = async (): Promise<void> => {
+  if (!isNative()) return;
+
+  try {
+    const { App } = await import('@capacitor/app');
+    await App.addListener('appStateChange', ({ isActive }) => {
+      if (isActive) void supabase.auth.startAutoRefresh();
+      else void supabase.auth.stopAutoRefresh();
+    });
+  } catch (error) {
+    console.error('No se pudo vigilar el estado de la app:', error);
+  }
 };
