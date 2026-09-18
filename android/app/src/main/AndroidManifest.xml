@@ -77,6 +77,19 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths"></meta-data>
         </provider>
+
+        <!-- Avisos de Firebase: la V blanca, el amarillo de la marca y el canal
+             que crea la app (`native-push.ts`). Valen para los avisos que llegan
+             sin icono, color o canal propios. -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_stat_vybe" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/vybe_accent" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="vybe" />
     </application>
 
     <!-- Permisos -->

@@ -13,9 +13,12 @@ import PwaPrompt from '@/components/pwa-prompt';
 import ConsentGate from '@/components/consent-gate';
 import ErrorBoundary from '@/components/error-boundary';
 import { isNative, setupDeepLinks } from '@/services/native';
-import { APP_URL, siteMode } from '@/lib/hosts';
+import { APP_URL, DOWNLOAD_PATH, siteMode } from '@/lib/hosts';
 import DevSentryCheck from '@/components/dev-sentry-check';
 import RedirectIfLoggedIn from '@/components/redirect-if-logged-in';
+import NativePushBridge from '@/components/native-push-bridge';
+import StaffOnlyWeb from '@/components/staff-only-web';
+import WhereNextPrompt from '@/components/where-next-prompt';
 import Index from './pages/Index';
 import NotFound from './pages/NotFound';
 import AuthPage from './pages/AuthPage';
@@ -48,6 +51,8 @@ const EventSwipingPage = lazy(() => import('./pages/EventSwipingPage'));
 const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage'));
 const LandingPage = lazy(() => import('./pages/LandingPage'));
 const MobileOnlyPage = lazy(() => import('./pages/MobileOnlyPage'));
+// El contador del portero: se abre sin cuenta, desde el enlace que crea el local.
+const CounterPage = lazy(() => import('./pages/CounterPage'));
 
 /**
  * `/` es la landing en el navegador y la bienvenida dentro de la app instalada
@@ -146,6 +151,9 @@ const App = () => (
             <PremiumFeatures />
             <DevSentryCheck />
             <DeepLinks />
+            <NativePushBridge />
+            <StaffOnlyWeb />
+            <WhereNextPrompt />
 
             <Suspense fallback={<PantallaCargando />}>
               <ConsentGate>
@@ -183,7 +191,8 @@ const App = () => (
                     <Route path="/auth/verify-email-pending" element={<VerifyEmailPage />} />
                     <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
                     <Route path="/legal/:document" element={<LegalPage />} />
-                    <Route path="/descargar" element={<MobileOnlyPage />} />
+                    <Route path={DOWNLOAD_PATH} element={<MobileOnlyPage />} />
+                    <Route path="/contador/:token" element={<CounterPage />} />
 
                     {/* Clubbers */}
                     <Route path="/home" element={clubber(<HomePage />)} />

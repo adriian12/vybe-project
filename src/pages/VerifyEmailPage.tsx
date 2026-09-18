@@ -6,6 +6,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { PartyButton } from '@/components/ui-custom/party-button';
 import { Mail, CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import { api } from '@/services/api';
+import { DOWNLOAD_PATH, DownloadReason, siteMode } from '@/lib/hosts';
 import { authEmailService, authEmailMessage } from '@/services/auth-email';
 
 type Status = 'verifying' | 'success' | 'error' | 'pending';
@@ -39,6 +40,19 @@ const VerifyEmailPage = () => {
   /** Tras confirmar, cada tipo de cuenta va a su propia zona. */
   const redirectAfterSuccess = useCallback(async () => {
     const venue = await api.getCurrentVenue();
+
+    // En app.vybes.es no hay pantallas de clubber: el correo se confirma aquí,
+    // pero se entra desde la app del móvil.
+    if (!venue && siteMode() === 'app') {
+      const profile = await api.getCurrentProfile();
+      if (profile?.role !== 'admin') {
+        await supabase.auth.signOut();
+        const state: { motivo: DownloadReason } = { motivo: 'verified' };
+        setTimeout(() => navigate(DOWNLOAD_PATH, { replace: true, state }), 1500);
+        return;
+      }
+    }
+
     setTimeout(() => navigate(venue ? '/venue/dashboard' : '/home', { replace: true }), 1500);
   }, [navigate]);
 
@@ -156,7 +170,7 @@ const VerifyEmailPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6">
+    <div className="min-h-screen flex flex-col items-center justify-center px-6 pt-[calc(1.5rem+var(--safe-top))] pb-[calc(1.5rem+var(--safe-bottom))]">
       <div className="w-full max-w-md text-center">
         {status === 'verifying' && (
           <>

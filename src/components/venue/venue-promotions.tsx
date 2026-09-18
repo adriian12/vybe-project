@@ -22,9 +22,13 @@ import {
   PromotionStats,
   VenuePlanStatus,
 } from '@/services/venue-service';
+import { nightService } from '@/services/night';
+import VenuePromoTemplates from '@/components/venue/venue-promo-templates';
+import VenueRaffles from '@/components/venue/venue-raffles';
+import VenueStampCard from '@/components/venue/venue-stamp-card';
 
 interface VenuePromotionsProps {
-  eventId: string;
+  event: { id: string; startDate: string; endDate: string };
   venueId: string;
   plan: VenuePlanStatus | null;
   onUpgrade: () => void;
@@ -41,8 +45,10 @@ const DURATIONS = [30, 60, 120, 240];
  * se valida escribiendo el código que enseña la persona: es lo que hay que
  * hacer con una mano y sin soltar la copa.
  */
-const VenuePromotions = ({ eventId, venueId, plan, onUpgrade }: VenuePromotionsProps) => {
+const VenuePromotions = ({ event, venueId, plan, onUpgrade }: VenuePromotionsProps) => {
+  const eventId = event.id;
   const { t } = useTranslation();
+  const [eventStamps, setEventStamps] = useState(true);
   const { toast } = useToast();
 
   const [promotions, setPromotions] = useState<Promotion[]>([]);
@@ -75,12 +81,14 @@ const VenuePromotions = ({ eventId, venueId, plan, onUpgrade }: VenuePromotionsP
   );
 
   const load = useCallback(async () => {
-    const [list, result] = await Promise.all([
+    const [list, result, live] = await Promise.all([
       venueService.getPromotions(eventId),
       venueService.getPromotionStats(eventId),
+      nightService.getEventLive(eventId),
     ]);
     setPromotions(list);
     setStats(result);
+    setEventStamps(live.stamps);
     setIsLoading(false);
   }, [eventId]);
 
@@ -159,9 +167,25 @@ const VenuePromotions = ({ eventId, venueId, plan, onUpgrade }: VenuePromotionsP
   }
 
   const statsFor = (promotionId: string) => stats.find((s) => s.promotionId === promotionId);
+  // En la lista, las que se crean a mano: las de plantilla tienen su tarjeta y
+  // los premios (sorteos, sellos) no son promociones que el local gestione aquí.
+  const propias = promotions.filter((p) => !p.templateKey && p.kind !== 'prize');
 
   return (
-    <div className="space-y-4">
+    <div className="grid gap-4 lg:grid-cols-2">
+      <div className="space-y-4">
+        <VenuePromoTemplates
+          event={event}
+          venueId={venueId}
+          promotions={promotions}
+          canUse={canUse}
+          onUpgrade={onUpgrade}
+          onChange={() => void load()}
+        />
+      </div>
+      <div className="space-y-4">
+        <VenueRaffles event={event} />
+        <VenueStampCard eventId={eventId} eventStamps={eventStamps} onEventChange={() => void load()} />
       {/* ---------------------------------------------------------------- */}
       {/* Validar un vale en barra                                        */}
       {/* ---------------------------------------------------------------- */}
@@ -348,7 +372,7 @@ const VenuePromotions = ({ eventId, venueId, plan, onUpgrade }: VenuePromotionsP
       {/* ---------------------------------------------------------------- */}
       {/* Resultado de cada promoción                                     */}
       {/* ---------------------------------------------------------------- */}
-      {promotions.length > 0 && (
+      {propias.length > 0 && (
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-title-card uppercase tracking-wide">{t('venue.promotions.active')}</CardTitle>
@@ -356,7 +380,7 @@ const VenuePromotions = ({ eventId, venueId, plan, onUpgrade }: VenuePromotionsP
 
           <CardContent>
             <ul className="space-y-2">
-              {promotions.map((promotion) => {
+              {propias.map((promotion) => {
                 const result = statsFor(promotion.id);
                 const ended = promotion.endsAt && new Date(promotion.endsAt) < new Date();
 
@@ -421,6 +445,7 @@ const VenuePromotions = ({ eventId, venueId, plan, onUpgrade }: VenuePromotionsP
           </CardContent>
         </Card>
       )}
+      </div>
     </div>
   );
 };

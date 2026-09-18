@@ -166,7 +166,7 @@ const HomePage = () => {
   const saludo = hora >= 6 && hora < 14 ? t('home.greetingDay') : t('home.greetingNight');
 
   return (
-    <div className="min-h-screen pb-24 pt-16">
+    <div className="min-h-screen pb-[calc(var(--nav-h)+2rem)] pt-[var(--header-h)]">
       <Header />
 
       <main className="mx-auto max-w-2xl space-y-6 pt-3">

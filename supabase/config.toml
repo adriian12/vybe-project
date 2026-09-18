@@ -114,3 +114,7 @@ verify_jwt = false
 # Formulario público de la landing: quien lo envía aún no tiene cuenta.
 [functions.venue-lead]
 verify_jwt = false
+
+# Contador de puerta con enlace: el portero no tiene cuenta, lo protege el token.
+[functions.door-counter]
+verify_jwt = false

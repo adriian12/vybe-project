@@ -21,10 +21,11 @@ const ChatPage = () => {
     );
   }
 
-  // El chat ocupa exactamente el hueco entre la cabecera y la barra de abajo:
+  // El chat ocupa exactamente el hueco entre la cabecera y la barra de abajo
+  // (`--header-h` y `--nav-h` ya suman la zona segura del teléfono):
   // así el campo de escribir queda siempre a la vista, también con el teclado.
   return (
-    <div className="flex h-[100dvh] flex-col overflow-hidden pb-16 pt-16">
+    <div className="flex h-[100dvh] flex-col overflow-hidden pb-[var(--nav-h)] pt-[var(--header-h)]">
       <Header />
       <div className="mx-auto w-full max-w-2xl flex-1 overflow-hidden">
         <ChatWindow matchId={userId} />

@@ -121,7 +121,7 @@ const UserProfilePage = () => {
   };
 
   return (
-    <div className="min-h-screen pb-44 pt-16">
+    <div className="min-h-screen pb-[calc(var(--nav-h)+7rem)] pt-[var(--header-h)]">
       <Header />
 
       <main className="mx-auto max-w-md space-y-5 px-margin pt-4">
@@ -309,7 +309,7 @@ const UserProfilePage = () => {
       </main>
 
       {/* --------------------------------------------------- acciones abajo */}
-      <div className="fixed inset-x-0 bottom-16 z-20 bg-background/95 px-margin py-3 backdrop-blur-lg">
+      <div className="fixed inset-x-0 bottom-[var(--nav-h)] z-20 bg-background/95 px-margin py-3 backdrop-blur-lg">
         <div className="mx-auto flex max-w-md items-center gap-3">
           <button
             type="button"

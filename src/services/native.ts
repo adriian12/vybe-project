@@ -29,11 +29,10 @@ export const platform = (): string => Capacitor.getPlatform();
 export const setupNativeShell = async (): Promise<void> => {
   if (!isNative()) return;
 
+  void removeServiceWorkers();
+
   try {
-    const [{ SplashScreen }, { StatusBar, Style }] = await Promise.all([
-      import('@capacitor/splash-screen'),
-      import('@capacitor/status-bar'),
-    ]);
+    const { StatusBar, Style } = await import('@capacitor/status-bar');
 
     await StatusBar.setStyle({ style: Style.Dark });
 
@@ -44,11 +43,32 @@ export const setupNativeShell = async (): Promise<void> => {
       // transparente sobre el propio fondo (`capacitor.config.ts`, SystemBars).
       await StatusBar.setBackgroundColor({ color: '#111114' });
     }
-
-    await SplashScreen.hide();
   } catch (error) {
     // Que falle el aspecto no puede impedir que la aplicación arranque.
-    console.error('No se pudo preparar la interfaz nativa:', error);
+    console.error('No se pudo preparar la barra de estado:', error);
+  }
+
+  // Aparte: si la barra de estado falla, el arranque no puede quedarse tapado.
+  try {
+    const { SplashScreen } = await import('@capacitor/splash-screen');
+    await SplashScreen.hide();
+  } catch (error) {
+    console.error('No se pudo quitar la pantalla de arranque:', error);
+  }
+};
+
+/**
+ * La app instalada no usa service worker (`use-pwa.ts`). Si una versión anterior
+ * llegó a registrar uno, se quita: seguiría sirviendo los ficheros viejos
+ * después de actualizar.
+ */
+const removeServiceWorkers = async (): Promise<void> => {
+  try {
+    if (!('serviceWorker' in navigator)) return;
+    const registrations = await navigator.serviceWorker.getRegistrations();
+    await Promise.all(registrations.map((registration) => registration.unregister()));
+  } catch {
+    // Sin service worker no hay nada que quitar.
   }
 };
 
@@ -212,6 +232,37 @@ export const openExternal = async (url: string): Promise<void> => {
  * pantalla. Al volver, se reanuda enseguida para que la primera petición no
  * salga con un token caducado; al irse, se para para no gastar batería.
  */
+/**
+ * Llama a `callback` cada vez que la app vuelve a primer plano: dentro de la app
+ * instalada, con el `resume` del sistema; en el navegador, al volver a la
+ * pestaña. Devuelve la función que deja de escuchar.
+ */
+export const onAppResume = (callback: () => void): (() => void) => {
+  let quitar: (() => void) | undefined;
+  let cancelado = false;
+
+  if (isNative()) {
+    void import('@capacitor/app')
+      .then(async ({ App }) => {
+        const handle = await App.addListener('resume', callback);
+        if (cancelado) void handle.remove();
+        else quitar = () => void handle.remove();
+      })
+      .catch((error) => console.error('No se pudo vigilar la vuelta a la app:', error));
+  } else {
+    const alVolver = () => {
+      if (document.visibilityState === 'visible') callback();
+    };
+    document.addEventListener('visibilitychange', alVolver);
+    quitar = () => document.removeEventListener('visibilitychange', alVolver);
+  }
+
+  return () => {
+    cancelado = true;
+    quitar?.();
+  };
+};
+
 export const setupAuthRefreshOnResume = async (): Promise<void> => {
   if (!isNative()) return;
 

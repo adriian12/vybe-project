@@ -1,12 +1,12 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Building, LogOut, Smartphone } from 'lucide-react';
+import { Building, CheckCircle2, Smartphone } from 'lucide-react';
 import LanguageSwitcher from '@/components/language-switcher';
 import StoreButtons from '@/components/store-buttons';
 import { VybeMark } from '@/components/brand/vybe-logo';
-import { useAppContext } from '@/context/app-context';
-import { supabase } from '@/integrations/supabase/client';
-import { landingHref } from '@/lib/hosts';
+import { DownloadReason, landingHref } from '@/lib/hosts';
+
+const MOTIVOS: DownloadReason[] = ['clubber', 'verified', 'password'];
 
 /**
  * Lo que se ve en `app.vybes.es` al abrir una pantalla de clubber.
@@ -15,15 +15,15 @@ import { landingHref } from '@/lib/hosts';
  * el QR y hacer Vybe Check se hace desde la app del móvil. Si el enlace venía de
  * compartir una fiesta y la app está instalada, Android lo abre directamente en
  * la app y esta página ni llega a verse.
+ *
+ * Una cuenta de clubber nunca tiene sesión aquí (`StaffOnlyWeb` la cierra), así
+ * que no hace falta botón de salir. Si se llega desde un trámite —confirmar el
+ * email, cambiar la contraseña— o tras intentar entrar, una línea lo explica.
  */
 const MobileOnlyPage = () => {
   const { t } = useTranslation();
-  const { isLoggedIn, userType } = useAppContext();
-
-  const salir = async () => {
-    await supabase.auth.signOut();
-    window.location.assign('/auth?type=venue');
-  };
+  const { state } = useLocation();
+  const motivo = MOTIVOS.find((m) => m === (state as { motivo?: unknown } | null)?.motivo);
 
   return (
     <div className="pt-safe pb-safe flex min-h-[100dvh] flex-col px-margin">
@@ -36,6 +36,16 @@ const MobileOnlyPage = () => {
       </div>
 
       <main className="enter mx-auto flex w-full max-w-md flex-1 flex-col justify-center py-10 text-center">
+        {motivo && (
+          <p
+            role="status"
+            className="mb-8 flex items-start gap-2 rounded-2xl bg-surface-low px-4 py-3 text-left text-body-sm"
+          >
+            <CheckCircle2 size={18} className="mt-0.5 shrink-0 text-party-primary" />
+            {t(`mobileOnly.reason.${motivo}`)}
+          </p>
+        )}
+
         <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-party-primary text-ink">
           <Smartphone size={30} />
         </span>
@@ -45,24 +55,13 @@ const MobileOnlyPage = () => {
         <StoreButtons className="mt-8 justify-center" />
 
         <div className="mt-10 space-y-3 border-t border-white/[0.06] pt-6">
-          {isLoggedIn && userType === 'user' ? (
-            <button
-              type="button"
-              onClick={() => void salir()}
-              className="press mx-auto flex h-11 items-center gap-2 rounded-xl bg-surface-low px-4 font-display text-title-card"
-            >
-              <LogOut size={17} />
-              {t('mobileOnly.logout')}
-            </button>
-          ) : (
-            <Link
-              to="/auth?type=venue"
-              className="press mx-auto flex h-11 w-fit items-center gap-2 rounded-xl bg-surface-low px-4 font-display text-title-card"
-            >
-              <Building size={17} />
-              {t('mobileOnly.venueAccess')}
-            </Link>
-          )}
+          <Link
+            to="/auth?type=venue"
+            className="press mx-auto flex h-11 w-fit items-center gap-2 rounded-xl bg-surface-low px-4 font-display text-title-card"
+          >
+            <Building size={17} />
+            {t('mobileOnly.venueAccess')}
+          </Link>
         </div>
       </main>
     </div>

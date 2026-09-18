@@ -7,6 +7,19 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { api } from '@/services/api';
+import { DOWNLOAD_PATH, DownloadReason, siteMode } from '@/lib/hosts';
+
+/** ¿La cuenta con sesión es de un local o de administración? */
+const esCuentaDeEquipo = async (): Promise<boolean> => {
+  try {
+    if (await api.getCurrentVenue()) return true;
+    const profile = await api.getCurrentProfile();
+    return profile?.role === 'admin';
+  } catch {
+    return false;
+  }
+};
 
 type Estado = 'comprobando' | 'listo' | 'guardado' | 'caducado';
 
@@ -77,10 +90,21 @@ const ResetPasswordPage = () => {
       setEstado('guardado');
       toast({ title: t('auth.reset.savedTitle') });
 
+      // En app.vybes.es una cuenta de clubber no puede entrar: se le dice que
+      // use la contraseña nueva en la app. Hay que mirarlo antes de cerrar la
+      // sesión, que es lo que dice de quién es la cuenta.
+      const soloApp = siteMode() === 'app' && !(await esCuentaDeEquipo());
+
       // Se cierra la sesión del enlace y se entra con la contraseña nueva, que
       // es la forma de comprobar que de verdad ha quedado guardada.
       await supabase.auth.signOut();
-      setTimeout(() => navigate('/auth', { replace: true }), 1800);
+
+      if (soloApp) {
+        const state: { motivo: DownloadReason } = { motivo: 'password' };
+        setTimeout(() => navigate(DOWNLOAD_PATH, { replace: true, state }), 1800);
+      } else {
+        setTimeout(() => navigate('/auth', { replace: true }), 1800);
+      }
     } catch {
       toast({
         title: t('common.error'),
@@ -93,7 +117,7 @@ const ResetPasswordPage = () => {
   }, [password, repetida, navigate, toast, t]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6">
+    <div className="min-h-screen flex flex-col items-center justify-center px-6 pt-[calc(1.5rem+var(--safe-top))] pb-[calc(1.5rem+var(--safe-bottom))]">
       <div className="w-full max-w-sm text-center">
         {estado === 'comprobando' && (
           <Loader2 size={48} className="mx-auto text-party-primary animate-spin" />

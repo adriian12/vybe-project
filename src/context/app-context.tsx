@@ -15,6 +15,10 @@ import { api, ApiError } from '@/services/api';
 import { socialService, DiscoveryFilters } from '@/services/social';
 import { identifyUser } from '@/lib/observability';
 import { getCurrentPosition, Coordinates } from '@/services/geo';
+import { markMatchCelebrated, unregisterNativePush } from '@/services/native-push';
+import { onAppResume } from '@/services/native';
+import type { VenueRole } from '@/services/venue-service';
+import { siteMode } from '@/lib/hosts';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -48,6 +52,11 @@ interface AppContextType {
   userType: UserType | null;
   currentUser: User | null;
   currentVenue: Venue | null;
+  /**
+   * Papel en el local: `owner` para la cuenta del local; `staff` o `marketing`
+   * para el equipo, que en `app.vybes.es` entra al panel con su propia cuenta.
+   */
+  venueRole: VenueRole | null;
 
   activeEvent: EventAccess | null;
   isEventVerified: boolean;
@@ -110,6 +119,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [userType, setUserType] = useState<UserType | null>(null);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [currentVenue, setCurrentVenue] = useState<Venue | null>(null);
+  const [venueRole, setVenueRole] = useState<VenueRole | null>(null);
 
   const [activeEvent, setActiveEvent] = useState<EventAccess | null>(readStoredEvent);
 
@@ -140,24 +150,47 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
    * Por eso había que meter las credenciales dos veces: la segunda vez el
    * contexto ya estaba cargado.
    */
-  const loadSession = useCallback(async (options?: { silent?: boolean }) => {
+  // Con qué cuenta se cargó la sesión por última vez (ver `SIGNED_IN` abajo).
+  const usuarioCargado = useRef<string | null>(null);
+
+  const cargarSesion = useCallback(async (options?: { silent?: boolean }) => {
     if (!options?.silent) setIsLoading(true);
 
     const {
       data: { session },
     } = await supabase.auth.getSession();
 
+    usuarioCargado.current = session?.user?.id ?? null;
+
     if (!session?.user) {
       setUserType(null);
       setCurrentUser(null);
       setCurrentVenue(null);
+      setVenueRole(null);
       setIsLoading(false);
       return;
     }
 
     // Un usuario es o perfil o venue, nunca los dos.
     const profile = await api.getCurrentProfile();
+
+    // En app.vybes.es no hay parte de clubber: quien es del equipo de un local
+    // (personal, marketing) entra al panel de ese local con su propia cuenta.
+    // En la app del móvil sigue siendo un clubber más.
+    if (profile && profile.role !== 'admin' && siteMode() === 'app') {
+      const membership = await api.getMyVenueMembership();
+      if (membership) {
+        setCurrentUser(profile);
+        setCurrentVenue(membership.venue);
+        setVenueRole(membership.role);
+        setUserType('venue');
+        setIsLoading(false);
+        return;
+      }
+    }
+
     if (profile) {
+      setVenueRole(null);
       setCurrentUser(profile);
       setCurrentVenue(null);
       setUserType(profile.role === 'admin' ? 'admin' : 'user');
@@ -177,6 +210,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     if (venue) {
       setCurrentVenue(venue);
       setCurrentUser(null);
+      setVenueRole('owner');
       setUserType('venue');
       setIsLoading(false);
       return;
@@ -189,12 +223,26 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     setIsLoading(false);
   }, []);
 
+  const loadSession = useCallback(
+    async (options?: { silent?: boolean }) => {
+      try {
+        await cargarSesion(options);
+      } catch (error) {
+        // Un fallo aquí (almacenamiento nativo, red) no puede dejar la app en el
+        // cargador para siempre: se sigue sin sesión y queda rastro en Sentry.
+        console.error('No se pudo cargar la sesión:', error);
+        setIsLoading(false);
+      }
+    },
+    [cargarSesion],
+  );
+
   useEffect(() => {
     void loadSession();
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_OUT') {
         identifyUser(null);
         setUserType(null);
@@ -209,8 +257,13 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         return;
       }
 
+      // Supabase vuelve a emitir SIGNED_IN cada vez que la pestaña recupera el
+      // foco. Con la misma cuenta se recarga en silencio: con el cargador, la
+      // pantalla (el panel del local) se desmontaba y se perdía lo que estabas
+      // haciendo al cambiar de pestaña y volver.
       if (event === 'SIGNED_IN') {
-        void loadSession();
+        const misma = session?.user?.id !== undefined && session.user.id === usuarioCargado.current;
+        void loadSession({ silent: misma });
         return;
       }
 
@@ -454,6 +507,21 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     };
   }, [currentUser, userType, applyRealtimeMessage, loadConnections]);
 
+  // Realtime sólo entrega lo que pasa con la conexión abierta. Con la app en
+  // segundo plano el sistema la corta y lo que llegó entretanto no se repite:
+  // al volver (por ejemplo, tocando el aviso de un mensaje) la conversación
+  // salía sin ese mensaje. Se recarga al volver a primer plano.
+  const sesionDeClubber = Boolean(currentUser) && (userType === 'user' || userType === 'admin');
+
+  useEffect(() => {
+    if (!sesionDeClubber) return;
+
+    return onAppResume(() => {
+      void loadMessages();
+      void loadConnections();
+    });
+  }, [sesionDeClubber, loadMessages, loadConnections]);
+
   // ==========================================================================
   // ACCIONES
   // ==========================================================================
@@ -472,6 +540,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         const isMatch = await api.swipe(userId, type, activeEvent?.eventId);
 
         if (isMatch) {
+          // Esta pantalla ya lo celebra: el aviso push del mismo match sobra.
+          markMatchCelebrated(userId);
           const matched = nearbyProfiles.find((p) => p.id === userId);
           await loadConnections();
           if (matched) {
@@ -595,11 +665,15 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   );
 
   const logout = useCallback(async () => {
+    // Antes de cerrar la sesión: sin ella el servidor no sabe de quién es el
+    // token y quien entrase después en este móvil recibiría estos avisos.
+    await unregisterNativePush();
     await supabase.auth.signOut();
     localStorage.removeItem(ACTIVE_EVENT_KEY);
     setUserType(null);
     setCurrentUser(null);
     setCurrentVenue(null);
+    setVenueRole(null);
     setActiveEvent(null);
     setNearbyProfiles([]);
     setCurrentProfile(null);
@@ -614,6 +688,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     userType,
     currentUser,
     currentVenue,
+    venueRole,
     activeEvent,
     isEventVerified: activeEvent !== null,
     nearbyProfiles,

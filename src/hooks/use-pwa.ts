@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 import { useNavigate } from 'react-router-dom';
+import { Capacitor } from '@capacitor/core';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -8,6 +9,21 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 const INSTALL_DISMISSED_KEY = 'vybe_installDismissed';
+
+/**
+ * Dentro de la app instalada no hay service worker. Los ficheros ya van dentro
+ * del APK, así que no aporta nada, y estorba: la WebView de Android no pasa sus
+ * peticiones por el servidor local de Capacitor (la precarga fallaba con 404) y,
+ * si llegara a instalarse, seguiría sirviendo la versión anterior después de
+ * actualizar la app desde la tienda.
+ */
+const useNoServiceWorker: typeof useRegisterSW = () => ({
+  needRefresh: [false, () => undefined],
+  offlineReady: [false, () => undefined],
+  updateServiceWorker: async () => undefined,
+});
+
+const useServiceWorker = Capacitor.isNativePlatform() ? useNoServiceWorker : useRegisterSW;
 
 /**
  * Actualización e instalación de la PWA.
@@ -22,7 +38,7 @@ export const usePwa = () => {
   const {
     needRefresh: [needRefresh, setNeedRefresh],
     updateServiceWorker,
-  } = useRegisterSW({
+  } = useServiceWorker({
     onRegisteredSW(_url, registration) {
       // Comprobamos actualizaciones cada hora: una noche de fiesta es larga.
       if (registration) setInterval(() => void registration.update(), 60 * 60 * 1000);

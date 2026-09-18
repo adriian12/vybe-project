@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { ArrowRight, Bookmark, BookmarkCheck, Clock, MapPin, Music, Ticket } from 'lucide-react';
 import { formatDistance } from '@/services/geo';
-import { socialService } from '@/services/social';
+import { EventActivity, socialService } from '@/services/social';
 import { Event } from '@/types/venue';
 import { cn } from '@/lib/utils';
 import {
@@ -17,7 +17,7 @@ interface EventCardProps {
   event: Event;
   /** Distancia en metros, o `null` si no hay ubicación todavía. */
   distance: number | null;
-  activity?: { going: number; inside: number };
+  activity?: EventActivity;
   /** Ha marcado «voy a ir». */
   going: boolean;
   busy: boolean;
@@ -185,7 +185,7 @@ const EventCard: React.FC<EventCardProps> = ({
             featured ? 'mt-3 pt-2' : 'mt-3 border-t border-black/[0.06] pt-3',
           )}
         >
-          <AttendeeStack going={activity?.going ?? 0} inside={activity?.inside ?? 0} />
+          <AttendeeStack activity={activity} />
 
           {featured ? (
             <span

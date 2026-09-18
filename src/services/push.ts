@@ -1,6 +1,11 @@
 import { supabase } from '@/integrations/supabase/client';
 import { isNative } from '@/services/native';
-import { registerNativePush, nativePushToken, unregisterNativePush } from '@/services/native-push';
+import {
+  isNativePushEnabled,
+  nativePushToken,
+  registerNativePush,
+  unregisterNativePush,
+} from '@/services/native-push';
 
 const VAPID_PUBLIC_KEY = import.meta.env.VITE_VAPID_PUBLIC_KEY as string | undefined;
 
@@ -96,7 +101,8 @@ export const pushService = {
 
   unsubscribe: async (): Promise<void> => {
     if (isNative()) {
-      await unregisterNativePush();
+      // Apagado desde el perfil: no se vuelve a encender solo al abrir la app.
+      await unregisterNativePush({ optOut: true });
       return;
     }
 
@@ -112,6 +118,9 @@ export const pushService = {
 
   /** Comprueba si la suscripción del navegador sigue registrada en el servidor. */
   isSubscribed: async (): Promise<boolean> => {
+    // En el teléfono no hay `Notification` ni service worker que consultar.
+    if (isNative()) return isNativePushEnabled();
+
     if (!pushService.isSupported() || Notification.permission !== 'granted') return false;
 
     const registration = await navigator.serviceWorker.ready;

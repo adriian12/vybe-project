@@ -128,7 +128,7 @@ const TicketsPage = () => {
   };
 
   return (
-    <div className="min-h-screen pb-24 pt-16">
+    <div className="min-h-screen pb-[calc(var(--nav-h)+2rem)] pt-[var(--header-h)]">
       <Header />
 
       <main className="mx-auto max-w-md space-y-5 px-margin pt-5">

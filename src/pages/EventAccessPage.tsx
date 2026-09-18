@@ -9,6 +9,8 @@ import { formatHour } from '@/components/event-bits';
 import { PartyButton } from '@/components/ui-custom/party-button';
 import { useAppContext } from '@/context/app-context';
 import { api, ApiError } from '@/services/api';
+import { nightService } from '@/services/night';
+import { useToast } from '@/components/ui/use-toast';
 import {
   calculateDistance,
   Coordinates,
@@ -43,6 +45,7 @@ const EventAccessPage = () => {
   const { eventId } = useParams<{ eventId: string }>();
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { toast } = useToast();
   const { redeemEventCode } = useAppContext();
 
   const [event, setEvent] = useState<Event | null>(null);
@@ -135,6 +138,17 @@ const EventAccessPage = () => {
         const access = await redeemEventCode(code, coords ?? undefined);
         track('code_redeemed', { eventId: access.eventId });
 
+        // Si el local tiene tarjeta de sellos, se dice al entrar cómo va.
+        void nightService.getMyStampCard(access.eventId).then((card) => {
+          if (!card || !card.eventCounts) return;
+          toast({
+            title: t('night.stamps.gotOne', { venue: card.venueName }),
+            description: card.canClaim
+              ? t('night.stamps.full', { reward: card.rewardTitle })
+              : t('night.stamps.progress', { stamps: Math.min(card.stamps, card.required), total: card.required }),
+          });
+        });
+
         // Un código válido de otro evento lleva a ese evento, no a este.
         navigate(`/event/${access.eventId}/live`, { replace: true });
       } catch (error) {
@@ -144,7 +158,7 @@ const EventAccessPage = () => {
         setIsValidating(false);
       }
     },
-    [eventId, coords, redeemEventCode, navigate, t],
+    [eventId, coords, redeemEventCode, navigate, t, toast],
   );
 
   if (cargando) {
@@ -235,7 +249,7 @@ const EventAccessPage = () => {
   );
 
   return (
-    <div className="min-h-screen pb-24 pt-16">
+    <div className="min-h-screen pb-[calc(var(--nav-h)+2rem)] pt-[var(--header-h)]">
       <Header />
 
       <main className="mx-auto max-w-md space-y-5 px-margin pt-5">

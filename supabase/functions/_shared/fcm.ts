@@ -41,8 +41,13 @@ const readServiceAccount = (): ServiceAccount | null => {
     projectId,
     clientEmail,
     // Al guardarla como variable de entorno los saltos de línea llegan
-    // escapados, y sin ellos la clave no se puede importar.
-    privateKey: privateKey.replace(/\\n/g, '\n'),
+    // escapados, a veces dos veces (`\\n` con dos barras, al copiarla de un JSON
+    // ya escapado). Así estaba en Supabase: la clave no se podía importar y
+    // ningún aviso llegaba a los teléfonos.
+    privateKey: privateKey
+      .trim()
+      .replace(/^['"]|['"]$/g, '')
+      .replace(/\\+n/g, '\n'),
   };
 };
 
@@ -63,7 +68,8 @@ const importPrivateKey = async (pem: string): Promise<CryptoKey> => {
   const body = pem
     .replace('-----BEGIN PRIVATE KEY-----', '')
     .replace('-----END PRIVATE KEY-----', '')
-    .replace(/\s/g, '');
+    // Todo lo que no sea base64 fuera: una barra suelta hace fallar a `atob`.
+    .replace(/[^A-Za-z0-9+/=]/g, '');
 
   const der = Uint8Array.from(atob(body), (c) => c.charCodeAt(0));
 
@@ -176,8 +182,14 @@ export const sendFcm = async (
             notification: {
               // Agrupa los avisos del mismo hilo en lugar de apilarlos.
               tag: notification.tag,
-              // El morado de la aplicación en el icono pequeño.
-              color: '#9b87f5',
+              // El canal lo crea la app al registrarse (`native-push.ts`), con
+              // importancia alta para que el aviso se vea aunque esté el móvil
+              // desbloqueado. Si aún no existe, Android usa uno genérico.
+              channel_id: 'vybe',
+              // La V en blanco (`ic_stat_vybe`) y el amarillo de la marca.
+              icon: 'ic_stat_vybe',
+              color: '#F8D000',
+              sound: 'default',
             },
           },
           apns: {

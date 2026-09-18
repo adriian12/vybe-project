@@ -39,9 +39,11 @@ const config: CapacitorConfig = {
     },
 
     PushNotifications: {
-      // El icono y el sonido los pone el sistema; `badge` sólo tiene efecto en
-      // iOS, donde el número del icono es lo que trae a la gente de vuelta.
-      presentationOptions: ['badge', 'sound', 'alert'],
+      // Con la app delante el aviso no lo enseña el sistema sino la propia app
+      // (`native-push-bridge.tsx`), que sabe callarse si ya estás en ese chat.
+      // Con `alert`, Android pintaba el aviso del sistema encima de la
+      // conversación en la que estabas escribiendo. `badge` sólo cuenta en iOS.
+      presentationOptions: ['badge'],
     },
 
     // Android 15 y 16 dibujan la app de borde a borde: la barra de estado ya no

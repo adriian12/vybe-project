@@ -11,6 +11,12 @@ const VENUE_ERROR_KEYS: Record<string, string> = {
   PROMOTION_EXHAUSTED: 'venue.promotions.errors.exhausted',
   CODE_EXHAUSTED: 'venue.codes.errors.exhausted',
   ALERT_NOT_FOUND: 'venue.safety.errors.alertNotFound',
+  CAPACITY_REQUIRED: 'venue.counter.errors.capacityRequired',
+  EVENT_NOT_LIVE: 'venue.counter.errors.notLive',
+  INVALID_DELTA: 'venue.counter.errors.invalid',
+  INVALID_TOTAL: 'venue.counter.errors.invalid',
+  TOO_MANY_LINKS: 'venue.counter.errors.tooManyLinks',
+  PLAN_REQUIRED: 'venue.plan.errors.upgradeRequired',
 };
 
 const venueError = (message: string): ApiError => {
@@ -44,12 +50,37 @@ export interface HourlyPoint {
 }
 
 export interface EventOccupancy {
+  /** Gente con Vybe dentro. */
   inside: number;
   totalCheckIns: number;
   capacity: number | null;
+  /** Ocupación sobre el aforo: con el total del local si está al día. */
   ratio: number | null;
   /** El aforo está en el umbral configurado o por encima. */
   alert: boolean;
+  /** Total real que da la puerta (el último, aunque sea viejo). */
+  headcount: number | null;
+  headcountAt: string | null;
+  /** Parte del público que usa Vybe (0–1). */
+  vybeShare: number | null;
+}
+
+/** Enlace de contador para el portero. El token sólo se ve al crearlo. */
+export interface CounterLink {
+  id: string;
+  label: string | null;
+  createdAt: string;
+  expiresAt: string;
+  revokedAt: string | null;
+  lastUsedAt: string | null;
+}
+
+/** Un tramo de 15 minutos de la curva de la noche. */
+export interface HeadcountPoint {
+  bucket: string;
+  /** Total que daba la puerta; null si aún no se contaba. */
+  total: number | null;
+  vybe: number;
 }
 
 export type CodeKind = 'general' | 'promoter' | 'guest_list' | 'staff';
@@ -77,13 +108,18 @@ export interface Promotion {
   eventId: string;
   title: string;
   description: string | null;
-  kind: 'offer' | 'voucher' | 'ticket';
+  kind: 'offer' | 'voucher' | 'ticket' | 'prize' | 'challenge';
   startsAt: string | null;
   endsAt: string | null;
   maxRedemptions: number | null;
   maxPerPerson: number;
   premiumOnly: boolean;
   active: boolean;
+  /** Plantilla de la que salió (retos y promos preestablecidas). */
+  templateKey: string | null;
+  challengeType: string | null;
+  challengeTarget: number | null;
+  challengeDeadline: string | null;
 }
 
 export interface PromotionStats {
@@ -367,7 +403,77 @@ export const venueService = {
       capacity: row.capacity,
       ratio: row.ratio !== null ? Number(row.ratio) : null,
       alert: row.alert,
+      headcount: row.headcount ?? null,
+      headcountAt: row.headcount_at ?? null,
+      vybeShare: row.vybe_share !== null && row.vybe_share !== undefined ? Number(row.vybe_share) : null,
     };
+  },
+
+  // ==========================================================================
+  // AFORO REAL (contador de puerta)
+  // ==========================================================================
+
+  /** Suma o resta gente desde el panel. Devuelve el total nuevo. */
+  adjustHeadcount: async (eventId: string, delta: number): Promise<number> => {
+    const { data, error } = await supabase.rpc('adjust_event_headcount', {
+      p_event_id: eventId,
+      p_delta: delta,
+    });
+    if (error) throw venueError(error.message);
+    return Number(data);
+  },
+
+  /** Corrige el total de golpe (al abrir, o si el contador se ha desviado). */
+  setHeadcount: async (eventId: string, total: number): Promise<number> => {
+    const { data, error } = await supabase.rpc('set_event_headcount', {
+      p_event_id: eventId,
+      p_total: total,
+    });
+    if (error) throw venueError(error.message);
+    return Number(data);
+  },
+
+  createCounterLink: async (
+    eventId: string,
+    label?: string,
+  ): Promise<{ id: string; token: string; expiresAt: string }> => {
+    const { data, error } = await supabase.rpc('create_counter_link', {
+      p_event_id: eventId,
+      p_label: label ?? null,
+    });
+    if (error) throw venueError(error.message);
+    const row = data?.[0];
+    if (!row) throw new ApiError('COUNTER_LINK_FAILED', 'errors.generic');
+    return { id: row.id, token: row.token, expiresAt: row.expires_at };
+  },
+
+  listCounterLinks: async (eventId: string): Promise<CounterLink[]> => {
+    const { data, error } = await supabase.rpc('list_counter_links', { p_event_id: eventId });
+    if (error || !data) return [];
+    return data.map((row) => ({
+      id: row.id,
+      label: row.label,
+      createdAt: row.created_at,
+      expiresAt: row.expires_at,
+      revokedAt: row.revoked_at,
+      lastUsedAt: row.last_used_at,
+    }));
+  },
+
+  revokeCounterLink: async (linkId: string): Promise<void> => {
+    const { error } = await supabase.rpc('revoke_counter_link', { p_link_id: linkId });
+    if (error) throw venueError(error.message);
+  },
+
+  /** Curva de la noche: total real frente a Vybe. Sólo Pro y Business. */
+  getHeadcountCurve: async (eventId: string): Promise<HeadcountPoint[]> => {
+    const { data, error } = await supabase.rpc('get_headcount_curve', { p_event_id: eventId });
+    if (error) throw venueError(error.message);
+    return (data ?? []).map((row) => ({
+      bucket: row.bucket,
+      total: row.total ?? null,
+      vybe: Number(row.vybe),
+    }));
   },
 
   setCapacity: async (
@@ -469,6 +575,10 @@ export const venueService = {
       maxPerPerson: row.max_per_person,
       premiumOnly: row.premium_only,
       active: row.active,
+      templateKey: row.template_key,
+      challengeType: row.challenge_type,
+      challengeTarget: row.challenge_target,
+      challengeDeadline: row.challenge_deadline,
     }));
   },
 
@@ -479,10 +589,15 @@ export const venueService = {
       title: string;
       description?: string;
       kind: Promotion['kind'];
+      startsAt?: string;
       endsAt?: string;
       maxRedemptions?: number;
       maxPerPerson?: number;
       premiumOnly?: boolean;
+      templateKey?: string;
+      challengeType?: string;
+      challengeTarget?: number;
+      challengeDeadline?: string;
     },
   ): Promise<void> => {
     const { error } = await supabase.from('promotions').insert({
@@ -491,10 +606,15 @@ export const venueService = {
       title: input.title,
       description: input.description ?? null,
       kind: input.kind,
+      starts_at: input.startsAt ?? null,
       ends_at: input.endsAt ?? null,
       max_redemptions: input.maxRedemptions ?? null,
       max_per_person: input.maxPerPerson ?? 1,
       premium_only: input.premiumOnly ?? false,
+      template_key: input.templateKey ?? null,
+      challenge_type: input.challengeType ?? null,
+      challenge_target: input.challengeTarget ?? null,
+      challenge_deadline: input.challengeDeadline ?? null,
     });
 
     if (error) throw venueError(error.message);
@@ -503,6 +623,15 @@ export const venueService = {
   setPromotionActive: async (promotionId: string, active: boolean): Promise<void> => {
     const { error } = await supabase.from('promotions').update({ active }).eq('id', promotionId);
     if (error) throw new ApiError('PROMOTION_FAILED', 'errors.generic');
+  },
+
+  /** Programar (o activar ya) una promoción que ya existe. */
+  schedulePromotion: async (promotionId: string, startsAt: string | null): Promise<void> => {
+    const { error } = await supabase
+      .from('promotions')
+      .update({ starts_at: startsAt, active: true })
+      .eq('id', promotionId);
+    if (error) throw venueError(error.message);
   },
 
   /** Valida el vale que alguien enseña en barra. */

@@ -1,16 +1,19 @@
 import { serve } from 'https://deno.land/std@0.193.0/http/server.ts';
 import { json, preflight } from '../_shared/cors.ts';
 import { adminClient } from '../_shared/supabase.ts';
+import { pushTexts, VibeLevel } from '../_shared/push-texts.ts';
 
 /**
  * Manda los avisos de evento y vacía la cola de avisos generales.
  *
- * La llama un programador cada pocos minutos. Dos cosas:
+ * La llama un programador cada pocos minutos. Tres cosas:
  *
- *   1. A quien dijo «voy a ir» y no ha entrado: que el local ha abierto, y más
+ *   1. A quien dijo «voy a ir» y no ha entrado: que el evento ha empezado, y más
  *      tarde que ya hay gente dentro. Es el momento en que se gana o se pierde
  *      una noche, y hasta ahora marcar la intención no servía de nada.
- *   2. Los avisos que hayan encolado administración o un local.
+ *   2. A quien está dentro, media hora antes del cierre: que escriba a sus vybes
+ *      y los conserve, porque las conversaciones caducan.
+ *   3. Los avisos que hayan encolado administración o un local.
  *
  * Se autentica con `x-push-secret`, el mismo secreto que usa `send-push`: la
  * llama un programador, no una persona, así que no hay JWT que comprobar.
@@ -21,25 +24,35 @@ import { adminClient } from '../_shared/supabase.ts';
 interface PendingPush {
   profile_id: string;
   event_id: string;
-  kind: 'doors_open' | 'filling_up';
+  kind: 'doors_open' | 'filling_up' | 'ending_soon';
   event_name: string;
   venue_name: string;
   inside: number;
+  vybes: number;
+  locale: string | null;
+  /** Ambiente según el total de la puerta; null si el local no cuenta. */
+  vibe_level: VibeLevel | null;
 }
 
-/** Textos de cada aviso. Se quedan aquí porque el envío no tiene interfaz. */
-const compose = (push: PendingPush): { title: string; body: string } => {
+/** Texto y destino de cada aviso, en el idioma de quien lo recibe. */
+const compose = (push: PendingPush): { title: string; body: string; url: string } => {
+  const texts = pushTexts(push.locale);
+
   if (push.kind === 'doors_open') {
-    return {
-      title: `${push.event_name} ha abierto`,
-      body: `${push.venue_name} ya está abierto. Dijiste que ibas: no te quedes en casa.`,
-    };
+    return { ...texts.doorsOpen(push.event_name, push.venue_name), url: `/event/${push.event_id}/access` };
   }
 
-  return {
-    title: `Ya hay ${push.inside} personas en ${push.event_name}`,
-    body: '¿Te lo vas a perder? Acércate y escanea el código para entrar.',
-  };
+  if (push.kind === 'ending_soon') {
+    // A la lista de vybes, que es donde se escribe y se pulsa «Conservar».
+    return { ...texts.endingSoon(push.event_name, Number(push.vybes) || 0), url: '/matches' };
+  }
+
+  // Si el local cuenta en la puerta, el aviso habla del ambiente (sin su cifra);
+  // si no, de la gente con Vybe.
+  const texto = push.vibe_level
+    ? texts.fillingUpVibe(push.event_name, push.vibe_level)
+    : texts.fillingUp(push.event_name, Number(push.inside) || 0);
+  return { ...texto, url: `/event/${push.event_id}/access` };
 };
 
 serve(async (req: Request): Promise<Response> => {
@@ -79,14 +92,14 @@ serve(async (req: Request): Promise<Response> => {
       console.error('pending_event_pushes:', error);
     } else {
       for (const row of (pending ?? []) as PendingPush[]) {
-        const { title, body } = compose(row);
+        const { title, body, url } = compose(row);
 
         const sent = await push({
           profileId: row.profile_id,
           kind: 'event',
           title,
           body,
-          url: `/event/${row.event_id}/access`,
+          url,
           tag: `event-${row.event_id}-${row.kind}`,
         });
 

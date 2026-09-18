@@ -16,12 +16,14 @@ import {
   Share2,
   Ticket,
   Undo2,
+  Zap,
 } from 'lucide-react';
 import Header from '@/components/header';
 import Footer from '@/components/footer';
 import WhoIsGoing from '@/components/who-is-going';
 import MapThumb from '@/components/map-thumb';
 import { LivePill, formatHourRange } from '@/components/event-bits';
+import LiveThermometer from '@/components/live-thermometer';
 import { PartyButton } from '@/components/ui-custom/party-button';
 import { useToast } from '@/components/ui/use-toast';
 import { useAppContext } from '@/context/app-context';
@@ -29,7 +31,7 @@ import { isEventLive, useEventsFeed } from '@/hooks/use-events-feed';
 import { api } from '@/services/api';
 import { formatDistance } from '@/services/geo';
 import { openExternal } from '@/services/native';
-import { socialService } from '@/services/social';
+import { EMPTY_ACTIVITY, socialService } from '@/services/social';
 import { publicLink, shareOrCopy } from '@/lib/share';
 import { track } from '@/lib/observability';
 import { cn } from '@/lib/utils';
@@ -118,7 +120,7 @@ const EventDetailPage = () => {
   const going = intents.includes(event.id);
   const dentro = activeEvent?.eventId === event.id;
   const distancia = withDistance.find((e) => e.event.id === event.id)?.distance ?? null;
-  const cifras = activity[event.id] ?? { going: 0, inside: 0 };
+  const cifras = activity[event.id] ?? EMPTY_ACTIVITY;
 
   const fecha = new Date(event.startDate)
     .toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' })
@@ -143,7 +145,7 @@ const EventDetailPage = () => {
   };
 
   return (
-    <div className="min-h-screen pb-44 pt-16">
+    <div className="min-h-screen pb-[calc(var(--nav-h)+7rem)] pt-[var(--header-h)]">
       <Header />
 
       <main className="mx-auto max-w-2xl">
@@ -217,6 +219,11 @@ const EventDetailPage = () => {
             />
           </div>
 
+          {/* ------------------------------------------------ ahora mismo */}
+          {/* El ambiente lo da el local desde la puerta; la cifra no se enseña
+              nunca, sólo el nivel y de cuándo es. */}
+          {live && <LiveThermometer activity={cifras} />}
+
           {/* ---------------------------------------------------- quién va */}
           {cifras.inside > 0 && (
             <p className="flex items-center gap-2 text-body-md font-bold text-party-primary">
@@ -224,7 +231,18 @@ const EventDetailPage = () => {
               {t('home.inside', { count: cifras.inside })}
             </p>
           )}
+          {cifras.friendsGoing > 0 && !terminado && (
+            <p className="flex items-center gap-2 text-body-md font-bold">
+              <Zap size={16} className="text-party-primary" />
+              {t('vibe.friendsGoing', { count: cifras.friendsGoing })}
+            </p>
+          )}
           <WhoIsGoing eventId={event.id} going={cifras.going} />
+          {/* Lista Vybe: el local ve quién ha dicho que va. Se avisa aquí,
+              donde se decide marcarlo. */}
+          {!terminado && !live && (
+            <p className="text-caption text-party-gray">{t('eventDetail.intentNote')}</p>
+          )}
 
           {/* ---------------------------------------------------- píldoras */}
           <div className="no-scrollbar -mx-margin flex items-center gap-1 overflow-x-auto px-margin py-0.5">
@@ -296,7 +314,7 @@ const EventDetailPage = () => {
       </main>
 
       {/* ---------------------------------------------- barra de la acción */}
-      <div className="fixed inset-x-0 bottom-16 z-20 bg-surface-low/95 px-margin py-3 backdrop-blur-lg">
+      <div className="fixed inset-x-0 bottom-[var(--nav-h)] z-20 bg-surface-low/95 px-margin py-3 backdrop-blur-lg">
         <div className="mx-auto flex max-w-md items-center gap-3">
           <button
             type="button"

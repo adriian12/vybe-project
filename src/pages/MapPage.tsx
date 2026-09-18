@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -8,6 +8,7 @@ import Header from '@/components/header';
 import Footer from '@/components/footer';
 import { DARK_TILES, HAS_MAP_TILES, TILES_ATTRIBUTION } from '@/components/map-thumb';
 import { dayAndMonth } from '@/components/event-bits';
+import { vibeKey } from '@/lib/vibe';
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -81,6 +82,15 @@ const MapPage = () => {
   const [seleccion, setSeleccion] = useState<string | null>(null);
   const [lista, setLista] = useState(false);
 
+  // «¿Dónde seguimos?»: con `?desde=<hora>` sólo salen las fiestas abiertas
+  // después de esa hora (las que siguen en marcha o empiezan poco después).
+  const [params, setParams] = useSearchParams();
+  const desde = useMemo(() => {
+    const valor = params.get('desde');
+    const fecha = valor ? new Date(valor) : null;
+    return fecha && !Number.isNaN(fecha.getTime()) ? fecha : null;
+  }, [params]);
+
   const conPunto = useMemo(() => withDistance.filter(({ event }) => event.location), [withDistance]);
 
   const tiposPresentes = useMemo(
@@ -100,6 +110,13 @@ const MapPage = () => {
       if (soloDirecto && !isEventLive(event)) return false;
       if (soloEstaNoche && !isEventTonight(event)) return false;
       if (soloGratis && (event.price ?? 0) > 0) return false;
+      if (
+        desde &&
+        (new Date(event.endDate).getTime() <= desde.getTime() + 30 * 60_000 ||
+          new Date(event.startDate).getTime() > desde.getTime() + 2 * 60 * 60_000)
+      ) {
+        return false;
+      }
       if (!q) return true;
       const texto = [event.name, event.venueName, event.city, event.region, event.theme]
         .filter(Boolean)
@@ -109,7 +126,7 @@ const MapPage = () => {
         .replace(/\p{Diacritic}/gu, '');
       return texto.includes(q);
     });
-  }, [conPunto, busqueda, tipo, soloDirecto, soloEstaNoche, soloGratis]);
+  }, [conPunto, busqueda, tipo, soloDirecto, soloEstaNoche, soloGratis, desde]);
 
   // --------------------------------------------------------------- el mapa
   useEffect(() => {
@@ -223,11 +240,11 @@ const MapPage = () => {
   const cercanos = visibles.filter((e) => e.distance !== null && e.distance <= 10_000).length;
 
   return (
-    <div className="flex h-[100dvh] flex-col overflow-hidden pt-16">
+    <div className="flex h-[100dvh] flex-col overflow-hidden pt-[var(--header-h)]">
       <Header />
 
-      <main className="relative flex-1 overflow-hidden pb-16">
-        <div ref={contenedor} className="absolute inset-0 bottom-16 z-0 bg-[#0E0E11]" />
+      <main className="relative flex-1 overflow-hidden pb-[var(--nav-h)]">
+        <div ref={contenedor} className="absolute inset-0 bottom-[var(--nav-h)] z-0 bg-[#0E0E11]" />
 
         {/* -------------------------------------------- buscador y filtros */}
         <div className="pointer-events-none absolute inset-x-0 top-3 z-[500] mx-auto flex max-w-2xl flex-col gap-2 px-margin">
@@ -284,6 +301,19 @@ const MapPage = () => {
             </DropdownMenu>
           </div>
 
+          {desde && (
+            <button
+              type="button"
+              onClick={() => setParams({}, { replace: true })}
+              className="press pointer-events-auto flex h-9 w-fit items-center gap-2 rounded-full bg-party-primary px-4 text-label-pill text-ink shadow-md"
+            >
+              {t('map.openAfter', {
+                time: desde.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }),
+              })}
+              <X size={15} />
+            </button>
+          )}
+
           {tiposPresentes.length > 1 && (
             <div className="no-scrollbar pointer-events-auto -mx-margin flex items-center gap-1 overflow-x-auto px-margin py-0.5">
               {[null, ...tiposPresentes].map((tp) => (
@@ -312,7 +342,7 @@ const MapPage = () => {
             aria-label={t('map.recenter')}
             className={cn(
               'press absolute right-margin z-[500] flex h-11 w-11 items-center justify-center rounded-full bg-surface-high/90 text-foreground shadow-xl backdrop-blur-md',
-              lista ? 'hidden' : 'bottom-[17rem]',
+              lista ? 'hidden' : 'bottom-[calc(var(--nav-h)+13rem)]',
             )}
           >
             <LocateFixed size={20} />
@@ -323,7 +353,7 @@ const MapPage = () => {
         <section
           aria-label={t('map.nearby')}
           className={cn(
-            'absolute inset-x-0 bottom-16 z-[600] mx-auto flex max-w-2xl flex-col gap-2 rounded-t-[24px] bg-[#0E0E11] px-margin pb-3 pt-2.5 shadow-[0_-8px_30px_rgba(0,0,0,0.7)] transition-[max-height] duration-300 [transition-timing-function:var(--ease-drawer)]',
+            'absolute inset-x-0 bottom-[var(--nav-h)] z-[600] mx-auto flex max-w-2xl flex-col gap-2 rounded-t-[24px] bg-[#0E0E11] px-margin pb-3 pt-2.5 shadow-[0_-8px_30px_rgba(0,0,0,0.7)] transition-[max-height] duration-300 [transition-timing-function:var(--ease-drawer)]',
             lista ? 'max-h-[calc(100%-5rem)]' : 'max-h-[16rem]',
           )}
         >
@@ -412,7 +442,9 @@ const MapPage = () => {
                             {formatDistance(distance)}
                           </span>
                         )}
-                        {cifras?.inside ? (
+                        {cifras?.vibeLevel ? (
+                          <span className="font-bold">· {t(vibeKey(cifras.vibeLevel))}</span>
+                        ) : cifras?.inside ? (
                           <span className="font-bold">· {t('home.inside', { count: cifras.inside })}</span>
                         ) : cifras?.going ? (
                           <span>· {t('map.going', { count: cifras.going })}</span>

@@ -24,6 +24,7 @@ import {
   Trash2,
   Users,
   DoorOpen,
+  Pencil,
 } from 'lucide-react';
 import { useAppContext } from '@/context/app-context';
 import VenueQRCode from '@/components/venue/venue-qr-code';
@@ -34,6 +35,8 @@ import VenueDoor from '@/components/venue/venue-door';
 import VenuePromotions from '@/components/venue/venue-promotions';
 import VenueInsights from '@/components/venue/venue-insights';
 import VenuePlan from '@/components/venue/venue-plan';
+import EventPicker from '@/components/venue/event-picker';
+import VenueWeeklyReport from '@/components/venue/venue-weekly-report';
 import VenueSosBanner from '@/components/venue/venue-sos-banner';
 import VenueDocuments from '@/components/venue/venue-documents';
 import VenueBroadcast from '@/components/venue/venue-broadcast';
@@ -77,7 +80,7 @@ import {
 } from '@/services/venue-service';
 import { cn } from '@/lib/utils';
 import { COMPANY } from '@/lib/company';
-import { VenueStats } from '@/types/venue';
+import { Event as VybeEvent, VenueStats } from '@/types/venue';
 
 /**
  * Secciones del panel.
@@ -94,6 +97,17 @@ type Drawer = null | 'menu' | 'venue' | 'documents' | 'broadcast';
 
 const PERIODS: Period[] = ['total', 'year', 'month', 'week'];
 const PROFILE_SECTIONS: Section[] = ['stats', 'promos', 'team', 'plan'];
+
+/**
+ * Lo que ve cada papel del equipo. El propietario, todo; el personal, la puerta
+ * (contador, códigos, pantalla de entrada); marketing, datos y promociones. La
+ * base de datos pone sus propios límites: esto sólo ordena el panel.
+ */
+const SECCIONES_POR_ROL: Record<VenueRole, Section[]> = {
+  owner: ['qr', 'door', 'events', 'stats', 'promos', 'team', 'plan'],
+  staff: ['qr', 'door'],
+  marketing: ['stats', 'promos'],
+};
 
 const periodStart = (period: Period): Date | undefined => {
   if (period === 'total') return undefined;
@@ -116,12 +130,32 @@ const iniciales = (nombre: string) =>
     .join('');
 
 const VenueDashboardPage = () => {
-  const { currentVenue, logout, events, refreshEvents } = useAppContext();
+  const { currentVenue, logout, events, refreshEvents, venueRole } = useAppContext();
   const { t } = useTranslation();
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  const [section, setSection] = useState<Section>('qr');
+  // La sección se recuerda en la sesión del navegador: al recargar o volver de
+  // otra pestaña se sigue donde estabas.
+  const [section, setSection] = useState<Section>(() => {
+    try {
+      const guardada = window.sessionStorage.getItem('vybe_venue_section') as Section | null;
+      return guardada ?? 'qr';
+    } catch {
+      return 'qr';
+    }
+  });
+  const [eventoPanel, setEventoPanel] = useState<string | null>(null);
+  const [editing, setEditing] = useState<VybeEvent | null>(null);
+  const [reportOpen, setReportOpen] = useState(false);
+
+  useEffect(() => {
+    try {
+      window.sessionStorage.setItem('vybe_venue_section', section);
+    } catch {
+      // Sin almacenamiento se vuelve al principio al recargar; no es grave.
+    }
+  }, [section]);
   const [statsPeriod, setStatsPeriod] = useState<Period>('total');
   const [stats, setStats] = useState<VenueStats>(EMPTY_STATS);
   const [summary, setSummary] = useState<EventSummary[]>([]);
@@ -135,6 +169,19 @@ const VenueDashboardPage = () => {
   const [creating, setCreating] = useState(false);
   const [eventFilter, setEventFilter] = useState<EventFilter>('live');
   const [toDelete, setToDelete] = useState<{ id: string; name: string } | null>(null);
+
+  // El papel en el local: el contexto lo sabe al entrar; `role` lo confirma la
+  // base de datos. Mientras tanto, propietario (la cuenta del local).
+  const papel: VenueRole = venueRole ?? role ?? 'owner';
+  const puede = useCallback((s: Section) => SECCIONES_POR_ROL[papel].includes(s), [papel]);
+  const esPropietario = papel === 'owner';
+  const puedeDifundir = papel === 'owner' || papel === 'marketing';
+
+  // Si la sección abierta no es de este papel (marketing entra en «qr»), a la
+  // primera que sí lo sea.
+  useEffect(() => {
+    if (!puede(section)) setSection(SECCIONES_POR_ROL[papel][0]);
+  }, [papel, puede, section]);
 
   const myEvents = useMemo(
     () => events.filter((event) => event.venueId === currentVenue?.id),
@@ -261,32 +308,60 @@ const VenueDashboardPage = () => {
 
   // El evento sobre el que trabajan puerta, promociones y datos: el que está en
   // marcha, o el primero de la lista.
-  const workingEventId = liveEvent?.id ?? selectedEventId ?? myEvents[0]?.id ?? null;
+  const eventosAbiertos = [...myEvents]
+    .filter((event) => new Date(event.endDate).getTime() > Date.now())
+    .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
+  const workingEventId =
+    (eventoPanel && eventosAbiertos.some((event) => event.id === eventoPanel) ? eventoPanel : null) ??
+    liveEvent?.id ??
+    eventosAbiertos[0]?.id ??
+    selectedEventId ??
+    null;
+  const workingEvent = myEvents.find((event) => event.id === workingEventId) ?? null;
+  const picker = <EventPicker events={eventosAbiertos} value={workingEventId} onChange={setEventoPanel} />;
   const esPerfil = PROFILE_SECTIONS.includes(section);
   const nombrePlan = plan ? t(`venue.plan.names.${plan.plan}`) : null;
+  const primeraDePerfil = PROFILE_SECTIONS.find(puede);
 
   const mobileTabs = [
-    { key: 'qr', label: t('venue.tabs.qr'), active: section === 'qr', go: () => goTo('qr') },
-    { key: 'door', label: t('venue.tabs.door'), active: section === 'door', go: () => goTo('door') },
-    { key: 'events', label: t('venue.tabs.events'), active: section === 'events', go: () => goTo('events') },
-    { key: 'profile', label: t('venue.tabs.profile'), active: esPerfil, go: () => goTo(esPerfil ? section : 'stats') },
-  ];
+    { key: 'qr', label: t('venue.tabs.qr'), active: section === 'qr', go: () => goTo('qr'), show: puede('qr') },
+    { key: 'door', label: t('venue.tabs.door'), active: section === 'door', go: () => goTo('door'), show: puede('door') },
+    {
+      key: 'events',
+      label: t('venue.tabs.events'),
+      active: section === 'events',
+      go: () => goTo('events'),
+      show: puede('events'),
+    },
+    {
+      key: 'profile',
+      label: t('venue.tabs.profile'),
+      active: esPerfil,
+      go: () => goTo(esPerfil ? section : (primeraDePerfil ?? 'stats')),
+      show: Boolean(primeraDePerfil),
+    },
+  ].filter((tab) => tab.show);
 
-  const desktopTabs: { section: Section; label: string; icon: typeof QrCode; also?: Section[] }[] = [
-    { section: 'qr', label: t('venue.nav.qr'), icon: QrCode },
-    { section: 'door', label: t('venue.nav.door'), icon: DoorOpen },
-    { section: 'events', label: t('venue.nav.events'), icon: CalendarDays },
-    { section: 'stats', label: t('venue.nav.stats'), icon: BarChart3 },
-    { section: 'promos', label: t('venue.nav.promos'), icon: Tag, also: ['team'] },
-    { section: 'plan', label: t('venue.nav.plan'), icon: CreditCard },
-  ];
+  const desktopTabs = (
+    [
+      { section: 'qr', label: t('venue.nav.qr'), icon: QrCode },
+      { section: 'door', label: t('venue.nav.door'), icon: DoorOpen },
+      { section: 'events', label: t('venue.nav.events'), icon: CalendarDays },
+      { section: 'stats', label: t('venue.nav.stats'), icon: BarChart3 },
+      { section: 'promos', label: t('venue.nav.promos'), icon: Tag },
+      { section: 'team', label: t('venue.tabs.team'), icon: Users },
+      { section: 'plan', label: t('venue.nav.plan'), icon: CreditCard },
+    ] as { section: Section; label: string; icon: typeof QrCode; also?: Section[] }[]
+  ).filter((tab) => puede(tab.section));
 
-  const profileTabs: { section: Section; label: string }[] = [
-    { section: 'stats', label: t('venue.tabs.stats') },
-    { section: 'promos', label: t('venue.tabs.promos') },
-    { section: 'team', label: t('venue.tabs.team') },
-    { section: 'plan', label: t('venue.tabs.plan') },
-  ];
+  const profileTabs = (
+    [
+      { section: 'stats', label: t('venue.tabs.stats') },
+      { section: 'promos', label: t('venue.tabs.promos') },
+      { section: 'team', label: t('venue.tabs.team') },
+      { section: 'plan', label: t('venue.tabs.plan') },
+    ] as { section: Section; label: string }[]
+  ).filter((tab) => puede(tab.section));
 
   // ---------------------------------------------------------------- eventos
   const ahora = Date.now();
@@ -342,7 +417,7 @@ const VenueDashboardPage = () => {
         <span className="shrink-0 font-display text-title-card">
           <span className="mr-1 text-caption uppercase text-party-gray">{t('venue.capacity')}</span>
           <span className={occupancy.alert ? 'text-party-accent' : 'text-party-primary'}>
-            {occupancy.inside}
+            {occupancy.headcount ?? occupancy.inside}
             {occupancy.capacity ? `/${occupancy.capacity}` : ''}
           </span>
         </span>
@@ -389,14 +464,16 @@ const VenueDashboardPage = () => {
             )}
           </div>
           <div className="flex shrink-0 items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setDrawer('broadcast')}
-              aria-label={t('venue.broadcast.title')}
-              className="press flex h-9 w-9 items-center justify-center rounded-full bg-surface-high"
-            >
-              <Megaphone size={17} />
-            </button>
+            {puedeDifundir && (
+              <button
+                type="button"
+                onClick={() => setDrawer('broadcast')}
+                aria-label={t('venue.broadcast.title')}
+                className="press flex h-9 w-9 items-center justify-center rounded-full bg-surface-high"
+              >
+                <Megaphone size={17} />
+              </button>
+            )}
             <button
               type="button"
               onClick={() => setDrawer('menu')}
@@ -439,14 +516,16 @@ const VenueDashboardPage = () => {
           </div>
 
           <div className="flex shrink-0 items-center gap-3">
-            <button
-              type="button"
-              onClick={() => setDrawer('broadcast')}
-              className="press flex h-9 items-center gap-2 rounded-full bg-surface-high px-3 text-caption"
-            >
-              <Megaphone size={15} className="text-party-primary" />
-              {t('venue.broadcastShort')}
-            </button>
+            {puedeDifundir && (
+              <button
+                type="button"
+                onClick={() => setDrawer('broadcast')}
+                className="press flex h-9 items-center gap-2 rounded-full bg-surface-high px-3 text-caption"
+              >
+                <Megaphone size={15} className="text-party-primary" />
+                {t('venue.broadcastShort')}
+              </button>
+            )}
             <div className="text-right leading-tight">
               <p className="font-display text-title-card">{currentVenue.email}</p>
               <p className="text-caption text-party-gray">
@@ -465,7 +544,7 @@ const VenueDashboardPage = () => {
         </div>
 
         {/* ---- pestañas ---- */}
-        <nav className="grid grid-cols-4 gap-1 px-3 pb-2 lg:hidden">
+        <nav className="grid auto-cols-fr grid-flow-col gap-1 px-3 pb-2 lg:hidden">
           {mobileTabs.map((tab) => (
             <button
               key={tab.key}
@@ -505,7 +584,7 @@ const VenueDashboardPage = () => {
         <div className="border-t border-white/[0.06] px-4 py-2 lg:hidden">{franjaDirecto}</div>
 
         {esPerfil && (
-          <nav className="grid grid-cols-4 border-t border-white/[0.06] lg:hidden">
+          <nav className="grid auto-cols-fr grid-flow-col border-t border-white/[0.06] lg:hidden">
             {profileTabs.map((tab) => (
               <button
                 key={tab.section}
@@ -542,8 +621,9 @@ const VenueDashboardPage = () => {
         {/* ------------------------------------------------------------ QR */}
         {section === 'qr' && (
           <div className="grid gap-4 lg:grid-cols-12">
+            <div className="space-y-3 lg:col-span-12">{picker}</div>
             <div className="lg:col-span-7">
-              <VenueQRCode onCodeGenerated={loadStats} />
+              <VenueQRCode eventId={workingEventId} onCodeGenerated={loadStats} />
             </div>
             <div className="space-y-4 lg:col-span-5">
               <div className="grid grid-cols-2 gap-3">
@@ -562,9 +642,11 @@ const VenueDashboardPage = () => {
         )}
 
         {/* --------------------------------------------------------- puerta */}
+        {section === 'door' && picker}
         {section === 'door' &&
           (workingEventId ? (
             <VenueDoor
+              key={workingEventId}
               eventId={workingEventId}
               venueId={currentVenue.id}
               plan={plan}
@@ -617,13 +699,15 @@ const VenueDashboardPage = () => {
                       month: 'short',
                     });
 
+                    const editable = !acabado ? myEvents.find((e) => e.id === event.id) : undefined;
                     return (
                       <li
                         key={event.id}
                         style={{ '--i': Math.min(index, 8) } as React.CSSProperties}
+                        onClick={editable ? () => setEditing(editable) : undefined}
                         className={cn(
                           'flex items-center gap-3 rounded-2xl p-3',
-                          acabado ? 'bg-[#C8C6C5] text-ink/70' : 'bg-white text-ink',
+                          acabado ? 'bg-[#C8C6C5] text-ink/70' : 'cursor-pointer bg-white text-ink hover:bg-white/90',
                         )}
                       >
                         <span className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[#EDEBFA]">
@@ -657,12 +741,19 @@ const VenueDashboardPage = () => {
                           {!acabado && (
                             <DropdownMenu>
                               <DropdownMenuTrigger
+                                onClick={(e) => e.stopPropagation()}
                                 aria-label={t('venue.events.options')}
                                 className="press flex h-7 w-7 items-center justify-center rounded-full text-ink/50 hover:bg-black/5"
                               >
                                 <MoreVertical size={17} />
                               </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
+                              <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
+                                {editable && (
+                                  <DropdownMenuItem onClick={() => setEditing(editable)}>
+                                    <Pencil size={15} className="mr-2" />
+                                    {t('common.edit')}
+                                  </DropdownMenuItem>
+                                )}
                                 <DropdownMenuItem onClick={() => goTo('stats')}>
                                   <BarChart3 size={15} className="mr-2" />
                                   {t('venue.tabs.stats')}
@@ -783,23 +874,26 @@ const VenueDashboardPage = () => {
         )}
 
         {/* ------------------------------------------------ promos y equipo */}
-        {(section === 'promos' || section === 'team') && (
-          <div className="grid gap-4 lg:grid-cols-2">
-            <div className={cn(section === 'team' && 'hidden lg:block')}>
-              {workingEventId ? (
-                <VenuePromotions
-                  eventId={workingEventId}
-                  venueId={currentVenue.id}
-                  plan={plan}
-                  onUpgrade={() => goTo('plan')}
-                />
-              ) : (
-                <Vacio icon={Tag} text={t('venue.door.noEvent')} />
-              )}
-            </div>
-            <div className={cn(section === 'promos' && 'hidden lg:block')}>
-              <VenueTeam venueId={currentVenue.id} role={role} />
-            </div>
+        {section === 'promos' && (
+          <div className="space-y-4">
+            {picker}
+            {workingEvent ? (
+              <VenuePromotions
+                key={workingEvent.id}
+                event={workingEvent}
+                venueId={currentVenue.id}
+                plan={plan}
+                onUpgrade={() => goTo('plan')}
+              />
+            ) : (
+              <Vacio icon={Tag} text={t('venue.door.noEvent')} />
+            )}
+          </div>
+        )}
+
+        {section === 'team' && (
+          <div className="mx-auto max-w-2xl">
+            <VenueTeam venueId={currentVenue.id} role={role} />
           </div>
         )}
 
@@ -821,10 +915,29 @@ const VenueDashboardPage = () => {
 
           <nav className="flex-1 space-y-1 p-3">
             {[
-              { icon: Building2, label: t('venue.myVenue'), onClick: () => setDrawer('venue') },
-              { icon: FileText, label: t('venue.drawer.documents'), onClick: () => setDrawer('documents') },
-              { icon: CreditCard, label: t('venue.drawer.billing'), onClick: () => goTo('plan') },
-              { icon: Megaphone, label: t('venue.drawer.broadcast'), onClick: () => setDrawer('broadcast') },
+              { icon: Building2, label: t('venue.myVenue'), onClick: () => setDrawer('venue'), show: esPropietario },
+              {
+                icon: FileText,
+                label: t('venue.drawer.documents'),
+                onClick: () => setDrawer('documents'),
+                show: esPropietario,
+              },
+              { icon: CreditCard, label: t('venue.drawer.billing'), onClick: () => goTo('plan'), show: esPropietario },
+              {
+                icon: FileText,
+                label: t('venue.report.title'),
+                onClick: () => {
+                  setDrawer(null);
+                  setReportOpen(true);
+                },
+                show: puedeDifundir,
+              },
+              {
+                icon: Megaphone,
+                label: t('venue.drawer.broadcast'),
+                onClick: () => setDrawer('broadcast'),
+                show: puedeDifundir,
+              },
               {
                 icon: HelpCircle,
                 label: t('venue.drawer.help'),
@@ -832,8 +945,11 @@ const VenueDashboardPage = () => {
                   void openExternal(
                     `mailto:${COMPANY.email}?subject=${encodeURIComponent(`Vybe · ${currentVenue.name}`)}`,
                   ),
+                show: true,
               },
-            ].map((item) => (
+            ]
+              .filter((item) => item.show)
+              .map((item) => (
               <button
                 key={item.label}
                 type="button"
@@ -887,6 +1003,27 @@ const VenueDashboardPage = () => {
             ) : (
               <p className="py-6 text-center text-body-sm text-party-gray">{t('venue.door.noEvent')}</p>
             ))}
+        </SheetContent>
+      </Sheet>
+
+      {puedeDifundir && <VenueWeeklyReport open={reportOpen} onOpenChange={setReportOpen} />}
+
+      <Sheet open={Boolean(editing)} onOpenChange={(open) => !open && setEditing(null)}>
+        <SheetContent side="bottom" className="max-h-[92vh] overflow-y-auto border-0 bg-transparent p-2 [&>button]:hidden">
+          <SheetHeader className="sr-only">
+            <SheetTitle>{t('venue.events.editEvent')}</SheetTitle>
+          </SheetHeader>
+          {editing && (
+            <CreateEventForm
+              key={editing.id}
+              event={editing}
+              onClose={() => setEditing(null)}
+              onCreated={() => {
+                setEditing(null);
+                void loadAllSummary();
+              }}
+            />
+          )}
         </SheetContent>
       </Sheet>
 

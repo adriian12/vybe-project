@@ -500,3 +500,24 @@ y verificación facial) y no estar en modo invisible.
 **«Estás demasiado lejos del evento»**
 El local necesita coordenadas. Desde el panel del local, en *Eventos*, usa
 «Usar mi ubicación actual».
+
+## Probar en iPhone o iPad sin Mac
+
+El flujo `.github/workflows/ios-unsigned.yml` compila la app en un Mac de GitHub
+y deja un `.ipa` **sin firmar**. Se firma e instala desde Windows:
+
+1. Una sola vez, en GitHub → Settings → Secrets and variables → Actions, crea
+   `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY` (y, si los usas,
+   `VITE_CARTO_API_KEY` y `VITE_SENTRY_DSN`).
+2. Actions → «iOS sin firmar» → Run workflow. Tarda unos 10-15 minutos.
+3. Descarga el artefacto `Vybe-ios-sin-firmar` y descomprímelo.
+4. Instala **Sideloadly** (sideloadly.io) e iTunes para Windows (la versión de
+   la web de Apple, no la de Microsoft Store). Conecta el iPhone por cable.
+5. Arrastra el `.ipa` a Sideloadly, pon tu Apple ID y pulsa Start.
+6. En el iPhone: Ajustes → General → VPN y gestión de dispositivos → confía en
+   tu Apple ID. En iOS 16 o posterior activa además Ajustes → Privacidad y
+   seguridad → Modo de desarrollador.
+
+Con un Apple ID gratuito la app **caduca a los 7 días** (se reinstala igual),
+caben 3 apps así por dispositivo, y **no llegan avisos push ni abren los
+enlaces de vybes.es**: esas dos capacidades exigen el Apple Developer Program.

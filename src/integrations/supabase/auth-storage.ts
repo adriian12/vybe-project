@@ -20,7 +20,15 @@ type AuthStorage = {
   removeItem: (key: string) => Promise<void>;
 };
 
-const preferences = () => import('@capacitor/preferences').then((m) => m.Preferences);
+/**
+ * El módulo, nunca el plugin: un plugin de Capacitor es un Proxy que trata
+ * cualquier propiedad como método nativo. Si se devuelve dentro de una promesa,
+ * JavaScript le pregunta si tiene `.then`, Capacitor responde con
+ * «"Preferences.then()" is not implemented» y la promesa no se resuelve nunca:
+ * la app se quedaba en el cargador al arrancar. Por eso se importa el módulo y
+ * se saca `Preferences` con `await` justo donde se usa.
+ */
+const preferencesModule = () => import('@capacitor/preferences');
 
 const localValue = (key: string): string | null => {
   try {
@@ -32,7 +40,7 @@ const localValue = (key: string): string | null => {
 
 const nativeStorage: AuthStorage = {
   getItem: async (key) => {
-    const store = await preferences();
+    const { Preferences: store } = await preferencesModule();
     const { value } = await store.get({ key });
     if (value !== null) return value;
 
@@ -41,11 +49,11 @@ const nativeStorage: AuthStorage = {
     return legacy;
   },
   setItem: async (key, value) => {
-    const store = await preferences();
+    const { Preferences: store } = await preferencesModule();
     await store.set({ key, value });
   },
   removeItem: async (key) => {
-    const store = await preferences();
+    const { Preferences: store } = await preferencesModule();
     await store.remove({ key });
     try {
       window.localStorage.removeItem(key);

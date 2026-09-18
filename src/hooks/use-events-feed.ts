@@ -3,11 +3,11 @@ import { useTranslation } from 'react-i18next';
 import { useAppContext } from '@/context/app-context';
 import { useToast } from '@/components/ui/use-toast';
 import { calculateDistance, Coordinates, getCurrentPosition } from '@/services/geo';
-import { socialService } from '@/services/social';
+import { EMPTY_ACTIVITY, EventActivity, socialService } from '@/services/social';
 import { track } from '@/lib/observability';
 import { Event } from '@/types/venue';
 
-export type Activity = Record<string, { going: number; inside: number }>;
+export type Activity = Record<string, EventActivity>;
 
 export interface EventWithDistance {
   event: Event;
@@ -101,8 +101,9 @@ export const useEventsFeed = () => {
         setActivity((prev) => ({
           ...prev,
           [eventId]: {
+            ...EMPTY_ACTIVITY,
+            ...prev[eventId],
             going: Math.max((prev[eventId]?.going ?? 0) + (going ? 1 : -1), 0),
-            inside: prev[eventId]?.inside ?? 0,
           },
         }));
 

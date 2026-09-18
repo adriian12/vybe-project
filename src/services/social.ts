@@ -1,6 +1,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { ApiError } from '@/services/api';
 import { User } from '@/types/user';
+import { isVibeLevel, VibeLevel } from '@/lib/vibe';
 
 export interface Interest {
   id: string;
@@ -19,6 +20,43 @@ export interface LikeReceived {
   eventName?: string;
   likedAt: string;
 }
+
+/** Lo que se sabe de un evento en este momento, sin datos privados del local. */
+export interface EventActivity {
+  /** Gente con Vybe que ha marcado «voy a ir». */
+  going: number;
+  /** Gente con Vybe dentro ahora. */
+  inside: number;
+  /** Ambiente según el total del local; null si no cuenta o el dato es viejo. */
+  vibeLevel: VibeLevel | null;
+  /** Cuándo actualizó el local su total. */
+  vibeAt: string | null;
+  /** Conexiones guardadas de quien pregunta que van a ir. */
+  friendsGoing: number;
+  /** Termómetro: si la sala se llena o se vacía (null si no se sabe). */
+  trend: 'up' | 'down' | 'steady' | null;
+  /** % de mujeres entre la gente con Vybe dentro, en decenas (null con menos de 10). */
+  womenShare: number | null;
+  /** Cola en la puerta según el local (de los últimos 45 min). */
+  queueLevel: 'none' | 'short' | 'long' | null;
+  /** Lo que suena, según el local (de la última media hora). */
+  nowPlaying: string | null;
+  /** La puerta está cerrada: ya no entra nadie nuevo. */
+  entryClosed: boolean;
+}
+
+export const EMPTY_ACTIVITY: EventActivity = {
+  going: 0,
+  inside: 0,
+  vibeLevel: null,
+  vibeAt: null,
+  friendsGoing: 0,
+  trend: null,
+  womenShare: null,
+  queueLevel: null,
+  nowPlaying: null,
+  entryClosed: false,
+};
 
 export interface Reputation {
   eventsAttended: number;
@@ -66,7 +104,7 @@ export interface EventOffer {
   id: string;
   title: string;
   description: string | null;
-  kind: 'offer' | 'voucher' | 'ticket';
+  kind: 'offer' | 'voucher' | 'ticket' | 'prize' | 'challenge';
   endsAt: string | null;
   premiumOnly: boolean;
 }
@@ -273,9 +311,11 @@ export const socialService = {
   // INTENCIÓN DE ASISTIR (problema de la sala vacía)
   // ==========================================================================
 
-  getEventsActivity: async (
-    eventIds: string[],
-  ): Promise<Record<string, { going: number; inside: number }>> => {
+  /**
+   * Cuánta gente con Vybe va y está dentro, y el ambiente que da el local.
+   * El total real del local no llega nunca: sólo el nivel (`vibeLevel`).
+   */
+  getEventsActivity: async (eventIds: string[]): Promise<Record<string, EventActivity>> => {
     if (eventIds.length === 0) return {};
 
     const { data, error } = await supabase.rpc('get_events_activity', {
@@ -284,8 +324,22 @@ export const socialService = {
 
     if (error || !data) return {};
 
-    return data.reduce<Record<string, { going: number; inside: number }>>((acc, row) => {
-      acc[row.event_id] = { going: Number(row.going), inside: Number(row.inside) };
+    return data.reduce<Record<string, EventActivity>>((acc, row) => {
+      acc[row.event_id] = {
+        going: Number(row.going),
+        inside: Number(row.inside),
+        vibeLevel: isVibeLevel(row.vibe_level) ? row.vibe_level : null,
+        vibeAt: row.vibe_at ?? null,
+        friendsGoing: Number(row.friends_going ?? 0),
+        trend: row.trend === 'up' || row.trend === 'down' || row.trend === 'steady' ? row.trend : null,
+        womenShare: row.women_share ?? null,
+        queueLevel:
+          row.queue_level === 'none' || row.queue_level === 'short' || row.queue_level === 'long'
+            ? row.queue_level
+            : null,
+        nowPlaying: row.now_playing ?? null,
+        entryClosed: Boolean(row.entry_closed),
+      };
       return acc;
     }, {});
   },

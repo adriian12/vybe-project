@@ -150,6 +150,8 @@ const REDEEM_ERRORS: Record<string, string> = {
   NO_ACTIVE_EVENT: 'Este local no tiene ningún evento activo ahora mismo.',
   EVENT_ENDED: 'El evento ya ha terminado.',
   TOO_FAR: 'Estás demasiado lejos del evento. Acércate para poder entrar.',
+  ENTRY_CLOSED: 'El local ha cerrado la entrada: ya no entra nadie más esta noche.',
+  CODE_EXHAUSTED: 'Esta lista ya está completa.',
 };
 
 const parseRedeemError = (message: string): ApiError => {
@@ -947,10 +949,12 @@ export const api = {
     const userId = await authUserId();
     if (!userId) throw new ApiError('NOT_AUTHENTICATED', 'Debes iniciar sesión');
 
+    // Por el id del local y no por la cuenta: así también crea eventos el
+    // equipo del local, que entra con su propia cuenta.
     const { data: venue } = await supabase
       .from('venues')
       .select('*')
-      .eq('venue_id', userId)
+      .eq('id', eventData.venueId)
       .maybeSingle();
 
     if (!venue) throw new ApiError('VENUE_NOT_FOUND', 'No se encontró tu local');
@@ -986,30 +990,6 @@ export const api = {
     return dbEventToEvent(data, venue);
   },
 
-  updateEvent: async (eventId: string, updates: Partial<Omit<Event, 'id'>>): Promise<void> => {
-    const { error } = await supabase
-      .from('events')
-      .update({
-        ...(updates.name !== undefined && { name: updates.name }),
-        ...(updates.description !== undefined && { description: updates.description }),
-        ...(updates.startDate !== undefined && { start_date: updates.startDate }),
-        ...(updates.endDate !== undefined && { end_date: updates.endDate }),
-        ...(updates.theme !== undefined && { theme: updates.theme }),
-        ...(updates.dressCode !== undefined && { dress_code: updates.dressCode }),
-        ...(updates.minAge !== undefined && { min_age: updates.minAge }),
-        ...(updates.price !== undefined && { price: updates.price }),
-        ...(updates.bookingUrl !== undefined && { booking_url: updates.bookingUrl }),
-        ...(updates.posterUrl !== undefined && { poster_url: updates.posterUrl }),
-        ...(updates.location !== undefined && {
-          latitude: updates.location?.latitude,
-          longitude: updates.location?.longitude,
-        }),
-      })
-      .eq('id', eventId);
-
-    if (error) throw new ApiError('UPDATE_EVENT_FAILED', 'No se pudo actualizar el evento');
-  },
-
   deleteEvent: async (eventId: string): Promise<void> => {
     const { error } = await supabase.from('events').delete().eq('id', eventId);
     if (error) throw new ApiError('DELETE_EVENT_FAILED', 'No se pudo eliminar el evento');
@@ -1030,6 +1010,21 @@ export const api = {
       .maybeSingle();
 
     return venue ? venueRowToVenue(venue) : null;
+  },
+
+  /**
+   * El local del que esta cuenta forma parte como equipo (personal o
+   * marketing), con su rol. La RLS de `venues` sólo deja leer la fila al
+   * propietario, así que va por una función.
+   */
+  getMyVenueMembership: async (): Promise<{ role: 'owner' | 'staff' | 'marketing'; venue: Venue } | null> => {
+    const { data, error } = await supabase.rpc('get_my_venue_membership');
+    const row = data?.[0];
+    if (error || !row?.venue) return null;
+    return {
+      role: row.role as 'owner' | 'staff' | 'marketing',
+      venue: venueRowToVenue(row.venue as unknown as VenueRow),
+    };
   },
 
   updateVenueLocation: async (latitude: number, longitude: number): Promise<boolean> => {
@@ -1053,8 +1048,14 @@ export const api = {
     const userId = await authUserId();
     if (!userId) throw new ApiError('NOT_AUTHENTICATED', 'Debes iniciar sesión');
 
-    // Desactiva los códigos anteriores del mismo evento para que sólo haya uno vivo.
-    const previous = supabase.from('event_codes').update({ active: false }).eq('venue_id', venueId);
+    // Desactiva el código general anterior del mismo evento para que sólo haya
+    // uno vivo. Los de relaciones públicas y listas no se tocan: antes se
+    // desactivaban también y el RRPP se quedaba sin código a mitad de noche.
+    const previous = supabase
+      .from('event_codes')
+      .update({ active: false })
+      .eq('venue_id', venueId)
+      .eq('kind', 'general');
     await (eventId ? previous.eq('event_id', eventId) : previous.is('event_id', null));
 
     // 6 dígitos, con reintento si colisiona con un código ya existente.
@@ -1087,18 +1088,48 @@ export const api = {
   },
 
   /** Código activo del local, si lo hay, para no regenerarlo en cada visita. */
+  /** El código general vigente de un evento (o del local, si no se dice evento). */
+  /** Cambia un evento: horario, cartel, ubicación y el resto de datos. */
+  updateEvent: async (eventId: string, eventData: Omit<Event, 'id'>): Promise<void> => {
+    const { error } = await supabase
+      .from('events')
+      .update({
+        name: eventData.name,
+        description: eventData.description ?? null,
+        start_date: eventData.startDate,
+        end_date: eventData.endDate,
+        latitude: eventData.location?.latitude ?? null,
+        longitude: eventData.location?.longitude ?? null,
+        theme: eventData.theme ?? null,
+        dress_code: eventData.dressCode ?? null,
+        min_age: eventData.minAge ?? null,
+        price: eventData.price ?? null,
+        booking_url: eventData.bookingUrl ?? null,
+        poster_url: eventData.posterUrl ?? null,
+        max_capacity: eventData.maxCapacity ?? null,
+      })
+      .eq('id', eventId);
+
+    if (error) {
+      console.error('Error updating event:', error);
+      throw new ApiError('UPDATE_EVENT_FAILED', 'errors.generic');
+    }
+  },
+
   getActiveEventCode: async (
     venueId: string,
+    eventId?: string | null,
   ): Promise<{ manualCode: string; expiresAt: string; eventId: string | null } | null> => {
-    const { data } = await supabase
+    let query = supabase
       .from('event_codes')
       .select('code, expires_at, event_id')
       .eq('venue_id', venueId)
+      .eq('kind', 'general')
       .eq('active', true)
-      .gt('expires_at', new Date().toISOString())
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
+      .gt('expires_at', new Date().toISOString());
+    if (eventId) query = query.eq('event_id', eventId);
+
+    const { data } = await query.order('created_at', { ascending: false }).limit(1).maybeSingle();
 
     return data
       ? { manualCode: data.code, expiresAt: data.expires_at, eventId: data.event_id }

@@ -380,7 +380,7 @@ const ProfilePage = () => {
 
   if (captureTarget) {
     return (
-      <div className="min-h-screen pb-24 pt-16">
+      <div className="min-h-screen pb-[calc(var(--nav-h)+2rem)] pt-[var(--header-h)]">
         <Header />
         <main className="mx-auto w-full max-w-sm px-margin pt-5">
           <h1 className="mb-4 text-center font-display text-headline-lg">
@@ -420,7 +420,7 @@ const ProfilePage = () => {
 
   if (showFaceVerification) {
     return (
-      <div className="min-h-screen pb-24 pt-16">
+      <div className="min-h-screen pb-[calc(var(--nav-h)+2rem)] pt-[var(--header-h)]">
         <Header />
         <main className="mx-auto w-full max-w-sm px-margin pt-5">
           <FaceVerification
@@ -451,7 +451,7 @@ const ProfilePage = () => {
         : t('profile.planLifetime');
 
   return (
-    <div className="min-h-screen pb-24 pt-16">
+    <div className="min-h-screen pb-[calc(var(--nav-h)+2rem)] pt-[var(--header-h)]">
       <Header />
 
       <main className="mx-auto max-w-md">

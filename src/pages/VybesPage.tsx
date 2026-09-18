@@ -127,7 +127,7 @@ const VybesPage = () => {
   const bloqueados = likesLocked || !isPremium;
 
   return (
-    <div className="min-h-screen pb-28 pt-16">
+    <div className="min-h-screen pb-[calc(var(--nav-h)+3rem)] pt-[var(--header-h)]">
       <Header />
 
       <main className="mx-auto max-w-md space-y-6 px-margin pt-4">
@@ -342,7 +342,7 @@ const VybesPage = () => {
       <button
         type="button"
         onClick={() => navigate(activeEvent ? `/event/${activeEvent.eventId}/live` : '/home')}
-        className="press fixed bottom-20 right-margin z-20 flex h-14 items-center gap-2 rounded-full bg-party-primary px-6 font-display text-title-card text-ink shadow-[0_8px_24px_rgba(0,0,0,0.5)]"
+        className="press fixed bottom-[calc(var(--nav-h)+1rem)] right-margin z-20 flex h-14 items-center gap-2 rounded-full bg-party-primary px-6 font-display text-title-card text-ink shadow-[0_8px_24px_rgba(0,0,0,0.5)]"
       >
         <AtSign size={20} />
         {t('vybes.backToExplore')}

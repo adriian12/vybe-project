@@ -3,14 +3,16 @@ import webpush from 'https://esm.sh/web-push@3.6.7';
 import { json, preflight } from '../_shared/cors.ts';
 import { adminClient } from '../_shared/supabase.ts';
 import { sendFcm, FcmNotConfiguredError, isFcmConfigured } from '../_shared/fcm.ts';
+import { pushTexts } from '../_shared/push-texts.ts';
 
 /**
  * Envía notificaciones push.
  *
- * Pensada para llamarse desde un Database Webhook de Supabase sobre INSERT en
- * `connections` y `messages`, de modo que el aviso salga aunque quien lo recibe
- * tenga la app cerrada. Ese es justo el caso que rompía el producto: un match
- * del que te enteras al día siguiente no sirve de nada.
+ * La llaman los disparadores `push_on_message` y `push_on_connection` (migración
+ * 039) al insertar en `messages` y `connections`, de modo que el aviso salga
+ * aunque quien lo recibe tenga la app cerrada. Ese es justo el caso que rompía
+ * el producto: un match del que te enteras al día siguiente no sirve de nada.
+ * También `notify-events`, con los avisos de evento ya redactados.
  *
  * Variables: VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, VAPID_SUBJECT, PUSH_HOOK_SECRET
  */
@@ -26,15 +28,87 @@ interface PushRequest {
 }
 
 interface WebhookPayload {
-  type: 'INSERT';
-  table: 'connections' | 'messages';
+  type: 'INSERT' | 'RAFFLE_CREATED' | 'RAFFLE_DRAWN';
+  table: 'connections' | 'messages' | 'raffles';
   record: Record<string, unknown>;
 }
+
+/** «02:30» en hora de Mallorca, que es donde están las fiestas. */
+const horaLocal = (iso: string, locale: string | null): string =>
+  new Date(iso).toLocaleTimeString(locale ?? 'es', {
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'Europe/Madrid',
+  });
+
+/**
+ * Avisos de un sorteo: al crearlo, a quien está dentro (para participar hay que
+ * seguir dentro); al sortearlo, a quien ha ganado.
+ */
+const fromRaffle = async (
+  supabase: ReturnType<typeof adminClient>,
+  payload: WebhookPayload,
+): Promise<PushRequest[]> => {
+  const raffleId = (payload.record as { id?: string }).id;
+  if (!raffleId) return [];
+
+  const { data: raffle } = await supabase
+    .from('event_raffles')
+    .select('id, prize, draw_at, event_id, winner_profile_id, events(name)')
+    .eq('id', raffleId)
+    .maybeSingle();
+
+  if (!raffle) return [];
+  const eventName = (raffle.events as { name?: string } | null)?.name ?? 'Vybe';
+
+  if (payload.type === 'RAFFLE_DRAWN') {
+    if (!raffle.winner_profile_id) return [];
+    const { data: winner } = await supabase
+      .from('profiles')
+      .select('locale')
+      .eq('id', raffle.winner_profile_id)
+      .maybeSingle();
+
+    return [
+      {
+        profileId: raffle.winner_profile_id,
+        kind: 'event',
+        ...pushTexts(winner?.locale).raffleWon(eventName, raffle.prize),
+        url: '/tickets',
+        tag: `raffle-${raffle.id}`,
+      },
+    ];
+  }
+
+  // Quien sigue dentro: señales en la última hora y media.
+  const desde = new Date(Date.now() - 90 * 60_000).toISOString();
+  const { data: dentro } = await supabase
+    .from('event_attendance')
+    .select('profile_id, profiles(locale)')
+    .eq('event_id', raffle.event_id)
+    .gt('last_seen_at', desde)
+    .limit(2000);
+
+  return (dentro ?? []).map((row) => {
+    const locale = (row.profiles as { locale?: string | null } | null)?.locale ?? null;
+    return {
+      profileId: row.profile_id as string,
+      kind: 'event' as const,
+      ...pushTexts(locale).raffleCreated(
+        eventName,
+        raffle.prize,
+        raffle.draw_at ? horaLocal(raffle.draw_at, locale) : null,
+      ),
+      url: `/event/${raffle.event_id}/live`,
+      tag: `raffle-${raffle.id}`,
+    };
+  });
+};
 
 const configureVapid = (): boolean => {
   const publicKey = Deno.env.get('VAPID_PUBLIC_KEY');
   const privateKey = Deno.env.get('VAPID_PRIVATE_KEY');
-  const subject = Deno.env.get('VAPID_SUBJECT') ?? 'mailto:soporte@vybe.app';
+  const subject = Deno.env.get('VAPID_SUBJECT') ?? 'mailto:soporte@vybes.es';
 
   if (!publicKey || !privateKey) return false;
 
@@ -153,30 +227,45 @@ const fromWebhook = async (
         profileId: record.receiver_id,
         kind: 'message',
         title: sender?.name ?? 'Vybe',
-        body: record.content.slice(0, 120),
+        body: (record.content ?? '').slice(0, 120),
         url: `/chat/${record.sender_id}`,
+        // Mismo `tag` por conversación: el aviso nuevo sustituye al anterior
+        // en vez de apilar diez avisos de la misma persona.
         tag: `chat-${record.sender_id}`,
       },
     ];
   }
 
-  const record = payload.record as { user_id_1: string; user_id_2: string };
+  const record = payload.record as {
+    user_id_1: string;
+    user_id_2: string;
+    connection_type?: string;
+  };
 
   const { data: profiles } = await supabase
     .from('profiles')
-    .select('id, name')
+    .select('id, name, locale')
     .in('id', [record.user_id_1, record.user_id_2]);
 
-  const nameOf = (id: string) => profiles?.find((p) => p.id === id)?.name ?? 'Vybe';
+  const profileOf = (id: string) => profiles?.find((p) => p.id === id);
 
-  return [record.user_id_1, record.user_id_2].map((id) => ({
-    profileId: id,
-    kind: 'match' as const,
-    title: '¡Nueva conexión!',
-    body: `Has conectado con ${nameOf(id === record.user_id_1 ? record.user_id_2 : record.user_id_1)}`,
-    url: '/matches',
-    tag: 'match',
-  }));
+  return [record.user_id_1, record.user_id_2].map((id) => {
+    const otherId = id === record.user_id_1 ? record.user_id_2 : record.user_id_1;
+    const texts = pushTexts(profileOf(id)?.locale);
+    const name = profileOf(otherId)?.name ?? 'Vybe';
+    const { title, body } =
+      record.connection_type === 'vybe_check' ? texts.vybeCheck(name) : texts.match(name);
+
+    return {
+      profileId: id,
+      kind: 'match' as const,
+      title,
+      body,
+      // Directo a la conversación: lo siguiente que hay que hacer es escribir.
+      url: `/chat/${otherId}`,
+      tag: `match-${otherId}`,
+    };
+  });
 };
 
 serve(async (req: Request): Promise<Response> => {
@@ -203,11 +292,18 @@ serve(async (req: Request): Promise<Response> => {
     const body = (await req.json()) as WebhookPayload | PushRequest;
 
     const requests =
-      'table' in body ? await fromWebhook(supabase, body) : [body as PushRequest];
+      'table' in body
+        ? body.table === 'raffles'
+          ? await fromRaffle(supabase, body)
+          : await fromWebhook(supabase, body)
+        : [body as PushRequest];
 
+    // De veinte en veinte: un sorteo avisa a toda la sala y, uno a uno, se
+    // comería el tiempo de la función.
     let sent = 0;
-    for (const request of requests) {
-      sent += await deliver(supabase, request);
+    for (let i = 0; i < requests.length; i += 20) {
+      const lote = await Promise.all(requests.slice(i, i + 20).map((request) => deliver(supabase, request)));
+      sent += lote.reduce((total, n) => total + n, 0);
     }
 
     return json({ sent });

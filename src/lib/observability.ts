@@ -101,6 +101,7 @@ export type AnalyticsEvent =
   | 'report_submitted'
   | 'sos_triggered'
   | 'venue_event_created'
+  | 'venue_event_updated'
   | 'venue_code_generated'
   | 'account_deleted';
 

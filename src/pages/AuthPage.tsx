@@ -40,7 +40,7 @@ import {
 import { api } from '@/services/api';
 import { isValidNif, normalizeNif } from '@/lib/nif';
 import { track } from '@/lib/observability';
-import { landingHref, siteMode } from '@/lib/hosts';
+import { DOWNLOAD_PATH, DownloadReason, landingHref, siteMode } from '@/lib/hosts';
 import { VENUE_RADIUS, VenueType } from '@/types/venue';
 
 const VENUE_TYPES: VenueType[] = [
@@ -309,6 +309,20 @@ const UserLoginForm = () => {
       if (!profile) {
         const venue = await api.getCurrentVenue();
         navigate(venue ? '/venue/dashboard' : '/home', { replace: true });
+        return;
+      }
+
+      // En app.vybes.es este formulario es el acceso de administración: una
+      // cuenta de clubber no tiene aquí nada que usar y se le indica la app.
+      if (siteMode() === 'app' && profile.role !== 'admin') {
+        // Alguien del equipo de un local que ha entrado por aquí: a su panel.
+        if (await api.getMyVenueMembership()) {
+          navigate('/venue/dashboard', { replace: true });
+          return;
+        }
+        await supabase.auth.signOut();
+        const state: { motivo: DownloadReason } = { motivo: 'clubber' };
+        navigate(DOWNLOAD_PATH, { replace: true, state });
         return;
       }
 
@@ -643,8 +657,11 @@ const VenueLoginForm = () => {
       // Igual que en el acceso de usuario: primero el contexto, después navegar.
       await refreshSession();
 
+      // La cuenta del local o, en app.vybes.es, alguien de su equipo (personal,
+      // marketing) con su propia cuenta de Vybe.
       const venue = await api.getCurrentVenue();
-      if (!venue) {
+      const equipo = !venue && siteMode() === 'app' ? await api.getMyVenueMembership() : null;
+      if (!venue && !equipo) {
         await supabase.auth.signOut();
         toast({ title: t('auth.errors.notVenueAccount'), variant: 'destructive' });
         return;

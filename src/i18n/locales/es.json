@@ -12,6 +12,7 @@
         "back": "Atrás",
         "next": "Siguiente",
         "close": "Cerrar",
+        "open": "Ver",
         "retry": "Reintentar",
         "delete": "Eliminar",
         "edit": "Editar",
@@ -185,7 +186,7 @@
         "inEvent": "Estás en {{name}}",
         "inEventBody": "{{venue}} · Toca para seguir descubriendo gente",
         "going": "{{count}} van",
-        "inside": "{{count}} dentro ahora",
+        "inside": "{{count}} con Vybe dentro",
         "beFirst": "Sé el primero en entrar",
         "imGoing": "Voy a ir",
         "notGoing": "Ya no voy a ir",
@@ -202,7 +203,7 @@
         "statEvents": "fiestas\nesta noche",
         "statInside": "personas\ndentro ahora",
         "statGoing": "han dicho\nque van",
-        "goingPlus": "+{{count}} van a ir",
+        "goingPlus": "{{count}} con Vybe van a ir",
         "buy": "Entradas",
         "greetingDay": "¿Qué haces este finde?",
         "greetingNight": "¿Qué haces esta noche?",
@@ -210,7 +211,7 @@
         "seeAll": "Ver todo",
         "statNearby": "eventos cerca de ti",
         "statEventsShort": "eventos",
-        "statInsideShort": "personas dentro",
+        "statInsideShort": "con Vybe dentro",
         "statTonight": "eventos esta noche",
         "featured": "Destacados",
         "upcoming": "Próximos eventos"
@@ -807,7 +808,14 @@
                 "biweekly": "Cada dos semanas"
             },
             "recurrentHelp": "Crearemos la siguiente edición sola, con los mismos datos.",
-            "publish": "Publicar evento"
+            "publish": "Publicar evento",
+            "editEvent": "Editar evento",
+            "saveChanges": "Guardar cambios",
+            "saved": "Evento guardado",
+            "location": "Ubicación del evento",
+            "locationSearch": "Busca la dirección del local",
+            "locationMissing": "Falta la ubicación del evento",
+            "locationHelp": "Arrastra el punto o toca el mapa para ajustarlo. Con esta ubicación se comprueba que la gente está dentro."
         },
         "team": {
             "title": "Equipo",
@@ -861,8 +869,8 @@
             "noEvent": "Crea un evento para usar esta pantalla.",
             "capacitySaved": "Aforo guardado",
             "capacityPlaceholder": "Aforo máximo",
-            "closed": "Entrada cerrada",
-            "closedBody": "Ningún código abre ya la puerta. Para reabrir, genera uno nuevo desde «Código QR».",
+            "closed": "Puerta cerrada",
+            "closedBody": "Ningún código deja entrar a nadie nuevo. Quien ya está dentro sigue.",
             "activeCodes": "Códigos activos",
             "activeCodesTitle": "Códigos activos",
             "activeLists_one": "{{count}} activo",
@@ -873,9 +881,17 @@
             "createCode": "Crear código nuevo",
             "priority": "Prioridad",
             "revokeAccess": "Retirar acceso",
-            "closeEntry": "Cerrar la entrada",
-            "closeEntryTitle": "¿Cerrar la entrada?",
-            "closeEntryBody": "Se desactivarán los {{count}} códigos activos. Quien ya está dentro sigue dentro."
+            "closeEntry": "Cerrar puerta",
+            "closeEntryTitle": "¿Cerrar la puerta?",
+            "closeEntryBody": "Nadie más podrá entrar con la app: ningún código funcionará. Quien ya está dentro sigue dentro y puedes reabrir cuando quieras.",
+            "insideReal": "Dentro (puerta)",
+            "insideVybe": "Con Vybe ahora",
+            "ofCapacityShort": "de {{capacity}}",
+            "insideNow": "Dentro ahora",
+            "reopened": "Puerta abierta de nuevo",
+            "closedNow": "Puerta cerrada: no entra nadie nuevo con la app",
+            "openNow": "La puerta está abierta",
+            "reopen": "Reabrir puerta"
         },
         "codes": {
             "title": "Códigos y quién trae gente",
@@ -975,7 +991,13 @@
             "dropoffSubtitle": "Gente dentro por hora, y cuántos se fueron.",
             "dropoffEmpty": "Sin datos todavía para este evento.",
             "peak": "El lleno fue a las {{time}}, con {{count}} personas dentro.",
-            "privacyNote": "Los datos de público van siempre agrupados. Los grupos con muy poca gente no se muestran, porque señalarían a personas concretas."
+            "privacyNote": "Los datos de público van siempre agrupados. Los grupos con muy poca gente no se muestran, porque señalarían a personas concretas.",
+            "headcountTitle": "Aforo real frente a Vybe",
+            "headcountSubtitle": "Lo que cuenta la puerta, tramo a tramo, y cuánto de ese público usa Vybe.",
+            "headcountNeedsPlan": "La curva de aforo es de los planes Pro y Business",
+            "headcountEmpty": "Esta noche aún no se ha contado en la puerta.",
+            "headcountPeak": "Pico de {{count}} personas a las {{time}}.",
+            "headcountShare": "De media, el {{percent}} % usaba Vybe."
         },
         "plan": {
             "current": "Tu plan",
@@ -997,7 +1019,8 @@
                 "promoterCodes": "Códigos por RRPP",
                 "promotions": "Promociones y vales",
                 "csvExport": "Exportar a CSV",
-                "demographics": "Detalle de público"
+                "demographics": "Detalle de público",
+                "headcountCurve": "Curva de aforo y % con Vybe"
             },
             "yourPlan": "Tu plan actual",
             "choose": "Elegir",
@@ -1031,7 +1054,12 @@
         },
         "tv": {
             "open": "Ver en pantalla grande",
-            "insideNow": "{{count}} personas dentro ahora"
+            "insideNow": "{{count}} personas dentro ahora",
+            "vybeCount_one": "{{count}} persona ya está en Vybe · escanea y únete",
+            "vybeCount_other": "{{count}} personas ya están en Vybe · escanea y únete",
+            "raffleWinner": "¡Ha ganado {{name}}! {{prize}}",
+            "raffleAt": "Sorteo a las {{time}}: {{prize}}",
+            "raffleSoon": "Sorteo esta noche: {{prize}}"
         },
         "broadcast": {
             "title": "Avisar a quien está dentro",
@@ -1060,7 +1088,7 @@
             "door": "Control de puerta",
             "events": "Eventos",
             "stats": "Estadísticas",
-            "promos": "Promociones y equipo",
+            "promos": "Promociones",
             "plan": "Plan y facturación"
         },
         "live": "en directo",
@@ -1075,6 +1103,179 @@
             "billing": "Facturación",
             "broadcast": "Avisos a asistentes",
             "help": "Ayuda"
+        },
+        "counter": {
+            "title": "Gente dentro (total real)",
+            "publicNote": "El público solo ve el ambiente (Tranquilo, Animado, Casi lleno, Lleno), nunca la cifra.",
+            "needCapacity": "Pon el aforo del evento para usar el contador de puerta y para que el público vea el ambiente.",
+            "linksTitle": "Enlaces para el portero",
+            "linksBody": "Cuenta desde cualquier móvil, sin cuenta de Vybe. Caduca al acabar la noche.",
+            "createdOnce": "Guarda o envía el enlace ahora: por seguridad no se vuelve a enseñar.",
+            "copy": "Copiar",
+            "copied": "Enlace copiado",
+            "whatsappText": "Contador de puerta de Vybe para esta noche: {{url}}",
+            "done": "Hecho",
+            "labelPlaceholder": "Nombre (p. ej. Puerta principal)",
+            "create": "Crear enlace",
+            "noLabel": "Enlace sin nombre",
+            "statusRevoked": "Revocado",
+            "statusExpired": "Caducado",
+            "lastUsed": "Último uso a las {{time}}",
+            "notUsed": "Aún sin usar",
+            "revoke": "Revocar",
+            "revoked": "Enlace revocado",
+            "errors": {
+                "capacityRequired": "Pon primero el aforo del evento.",
+                "notLive": "Solo se puede contar con el evento en marcha.",
+                "invalid": "Ese número no es válido.",
+                "tooManyLinks": "Hay demasiados enlaces activos. Revoca alguno."
+            }
+        },
+        "liveInfo": {
+            "title": "Termómetro",
+            "subtitle": "Lo que ve la gente en la app antes de venir.",
+            "queue": "Cola en la puerta",
+            "nowPlaying": "Suena ahora",
+            "nowPlayingPlaceholder": "Canción, artista o DJ"
+        },
+        "intentList": {
+            "title": "Lista Vybe",
+            "paid": "Este evento es con entrada: tu previsión son las ventas. Con Vybe, {{count}} personas han dicho que vienen.",
+            "empty": "Todavía nadie ha marcado que viene.",
+            "summary": "{{arrived}} ya han llegado · {{women}} chicas · {{men}} chicos",
+            "arrived": "Ya está dentro",
+            "pending": "Aún no ha llegado",
+            "showLess": "Ver menos",
+            "showAll": "Ver los {{count}}"
+        },
+        "songs": {
+            "title": "Peticiones de canciones",
+            "subtitle": "La sala pide y vota; tú marcas lo que ya ha sonado.",
+            "empty": "Todavía no hay peticiones.",
+            "votes_one": "{{count}} voto",
+            "votes_other": "{{count}} votos",
+            "played": "Puesta"
+        },
+        "templates": {
+            "promosTitle": "Promociones listas",
+            "promosSubtitle": "Actívalas ya o prográmalas a una hora. Solo las ve quien está dentro.",
+            "challengesTitle": "Retos de la noche",
+            "challengesSubtitle": "La app comprueba que se cumplen y da un vale para la barra.",
+            "schedule": "Programar a una hora",
+            "scheduledAt": "Empieza a las {{time}}",
+            "welcomeShot": {
+                "title": "Chupito de bienvenida",
+                "description": "Un chupito gratis al entrar. Enseña el código en la barra.",
+                "how": "Cada persona que entra lo pide en la app y lo enseña en la barra."
+            },
+            "happyHour": {
+                "title": "2x1 durante una hora",
+                "description": "2x1 en copas durante una hora. Enseña el código en la barra.",
+                "how": "Dura {{minutes}} minutos desde que empieza. Ideal para llenar la primera hora."
+            },
+            "groupBottle": {
+                "title": "Descuento en botella para grupos",
+                "description": "Descuento en botella para grupos. Enseña el código en la barra.",
+                "how": "Pensado para mesas y reservados: un vale por persona que lo pide."
+            },
+            "birthday": {
+                "title": "Copa de cumpleaños",
+                "description": "Si es tu cumpleaños, una copa gratis. Enseña el código y el DNI en la barra.",
+                "how": "Quien cumple años lo pide; en la barra se comprueba el DNI."
+            },
+            "earlyBird": {
+                "title": "Llega pronto",
+                "description": "Entra antes de la hora y llévate un chupito.",
+                "how": "Para quien entra antes de las {{time}}. Llena la primera hora."
+            },
+            "firstVybe": {
+                "title": "Tu primer vybe",
+                "description": "Consigue tu primer vybe esta noche y llévate un chupito.",
+                "how": "Se cumple con {{count}} vybe (match) en esta fiesta."
+            },
+            "threeVybes": {
+                "title": "Tres vybes",
+                "description": "Consigue tres vybes esta noche y llévate una copa.",
+                "how": "Se cumple con {{count}} vybes en esta fiesta."
+            },
+            "squad": {
+                "title": "Ven con tu grupo",
+                "description": "Entrad cuatro de tu grupo y llevaos un descuento.",
+                "how": "Se cumple cuando {{count}} personas de un mismo grupo de la app han entrado."
+            },
+            "lastOneStanding": {
+                "title": "Hasta el final",
+                "description": "Sigue dentro a la hora indicada y llévate un chupito.",
+                "how": "Para quien sigue dentro a las {{time}}. Retiene a la gente hasta el cierre."
+            },
+            "firstVisit": {
+                "title": "Primera vez aquí",
+                "description": "Tu primera vez en este local tiene premio.",
+                "how": "Para quien nunca había entrado en un evento del local con Vybe."
+            }
+        },
+        "raffles": {
+            "title": "Sorteos en directo",
+            "subtitle": "Participa todo el que sigue dentro a la hora del sorteo. Se avisa a la sala al crearlo.",
+            "created": "Sorteo anunciado a quien está dentro",
+            "winner": "¡Ha ganado {{name}}!",
+            "nobody": "No había nadie dentro para sortear",
+            "wonBy": "Ganó {{name}}",
+            "cancelled": "Cancelado",
+            "at": "Se sortea a las {{time}}",
+            "manual": "Sin hora: sortéalo cuando quieras",
+            "drawNow": "Sortear",
+            "prize": "Premio",
+            "prizePlaceholder": "Botella de cava, entrada VIP…",
+            "details": "Detalles (opcional)",
+            "detailsPlaceholder": "Se recoge en la barra antes de las 5:00",
+            "time": "Hora del sorteo (opcional)",
+            "timeHelp": "Sin hora, lo lanzas tú con «Sortear».",
+            "create": "Anunciar sorteo",
+            "new": "Nuevo sorteo"
+        },
+        "stamps": {
+            "title": "Tarjeta de sellos",
+            "subtitle": "Un sello por cada noche que alguien entra con Vybe. Con la tarjeta llena, un premio.",
+            "invalid": "Pon entre 2 y 20 sellos y un premio.",
+            "saved": "Tarjeta de sellos guardada",
+            "disabled": "Tarjeta de sellos desactivada",
+            "required": "Sellos",
+            "reward": "Premio",
+            "rewardPlaceholder": "Copa gratis",
+            "rewardDetails": "Detalles del premio (opcional)",
+            "rewardDetailsPlaceholder": "Cualquier combinado de la carta",
+            "enable": "Activar la tarjeta",
+            "thisEvent": "Este evento da sello",
+            "thisEventHelp": "Puedes dejar fuera eventos especiales.",
+            "stats": "{{collectors}} personas con sellos · {{completed}} tarjetas completadas"
+        },
+        "report": {
+            "title": "Informe semanal",
+            "empty": "Todavía no hay informes.",
+            "checkIns": "Entradas con Vybe",
+            "vsPrev": "{{percent}} % frente a la semana anterior",
+            "uniquePeople": "Personas distintas",
+            "returning": "Repiten",
+            "ofPeople": "{{percent}} % del público",
+            "intents": "Dijeron que venían",
+            "arrived": "{{count}} vinieron ({{percent}} %)",
+            "matches": "Vybes (matches)",
+            "events": "Eventos",
+            "headcountPeak": "Máximo contado en puerta",
+            "promos": "Promos pedidas",
+            "promosUsed": "{{count}} usadas en barra",
+            "raffles": "Sorteos",
+            "stampCards": "Tarjetas de sellos completadas",
+            "songs": "Canciones pedidas",
+            "readyTitle": "Ya disponible el informe semanal",
+            "readyBody": "El resumen de tu semana ({{range}}): quién vino, quién repite y cómo te fue frente a locales como el tuyo.",
+            "view": "Ver informe",
+            "bestEvent": "Mejor noche: {{name}} ({{count}} entradas con Vybe).",
+            "peakHour": "La gente llegó sobre todo a las {{hour}}:00.",
+            "topCode": "El relaciones públicas que más trajo: {{name}} ({{count}}).",
+            "benchmark": "Media por evento: tú {{mine}} entradas con Vybe; locales como el tuyo, {{others}}.",
+            "noBenchmark": "Todavía no hay suficientes locales parecidos para comparar."
         }
     },
     "admin": {
@@ -1316,7 +1517,7 @@
         "lockedBody": "Con Premium ves quiénes son antes de salir de casa.",
         "noneForYou": "De momento no va nadie que encaje con lo que quieres ver.",
         "heading": "Quién va",
-        "confirmed": "+{{count}} personas confirmadas"
+        "confirmed": "{{count}} con Vybe van a ir"
     },
     "nav": {
         "home": "Inicio",
@@ -1355,7 +1556,8 @@
         "share": "Compartir evento",
         "ended": "Este evento ya ha terminado",
         "enterNow": "Entrar ahora",
-        "confirmed": "¡Confirmado!"
+        "confirmed": "¡Confirmado!",
+        "intentNote": "Al marcar «voy a ir», el local te verá en su Lista Vybe (nombre, edad y foto)."
     },
     "venueTypes": {
         "discoteca": "Discoteca",
@@ -1382,7 +1584,8 @@
         "empty": "No hay eventos que encajen con la búsqueda.",
         "today": "Hoy",
         "going": "+{{count}} van",
-        "view": "Ver"
+        "view": "Ver",
+        "openAfter": "Abiertas después de las {{time}}"
     },
     "tickets": {
         "title": "Mis entradas",
@@ -1470,7 +1673,7 @@
     },
     "landing": {
         "nav": {
-            "users": "Para clubbers",
+            "users": "Para vybers",
             "venues": "Para locales",
             "how": "Cómo funciona",
             "plans": "Planes",
@@ -1485,7 +1688,7 @@
             "pill": "La app de la noche en Mallorca",
             "titleStart": "La noche se vive en la pista.",
             "titleBrand": "Vybe",
-            "titleEnd": "conecta clubbers y salas en tiempo real.",
+            "titleEnd": "conecta vybers y salas en tiempo real.",
             "body": "Descubre las fiestas de tu zona, entra con el QR del local y haz Vybe Check sólo con quien está dentro contigo. Y si tienes un local: aforo en directo, códigos para tus RRPP y promociones para quien ya está en la pista.",
             "ctaUser": "Descargar la app",
             "ctaVenue": "Vybe para locales",
@@ -1525,11 +1728,11 @@
             "title": "Pensado para la fiesta y para quien la organiza",
             "body": "Lo que busca quien sale de fiesta y lo que necesita quien llena la sala, en la misma app.",
             "tabs": {
-                "users": "Clubbers",
+                "users": "Vybers",
                 "venues": "Locales"
             },
             "users": {
-                "eyebrow": "Para clubbers",
+                "eyebrow": "Para vybers",
                 "title": "Vive la noche sin perder el tiempo",
                 "cta": "Descargar la app",
                 "items": {
@@ -1719,7 +1922,7 @@
         },
         "footer": {
             "tagline": "La app que conecta a la gente que está en la misma fiesta y ayuda a los locales a llenar su sala.",
-            "users": "Clubbers",
+            "users": "Vybers",
             "venues": "Locales",
             "legal": "Legal",
             "signup": "Descargar la app",
@@ -1742,7 +1945,143 @@
     "mobileOnly": {
         "title": "Vybe se vive desde el móvil",
         "body": "Esta web es para locales y administración. Para descubrir fiestas, entrar con el QR y hacer Vybe Check, descarga la app.",
-        "logout": "Cerrar sesión",
-        "venueAccess": "¿Tienes un local? Accede aquí"
+        "venueAccess": "¿Tienes un local? Accede aquí",
+        "reason": {
+            "clubber": "Esta web es sólo para locales y administración. Tu cuenta de Vybe se usa desde la app, en el local.",
+            "verified": "Email verificado. Ya puedes entrar desde la app.",
+            "password": "Contraseña cambiada. Entra con ella desde la app."
+        }
+    },
+    "vibe": {
+        "levels": {
+            "quiet": "Tranquilo",
+            "lively": "Animado",
+            "almostFull": "Casi lleno",
+            "full": "Lleno"
+        },
+        "withVybe": "{{level}} · {{count}} con Vybe",
+        "source": "Según el local · hace {{minutes}} min",
+        "sourceNow": "Según el local · ahora",
+        "friendsGoing_one": "{{count}} de tus vybes va a ir",
+        "friendsGoing_other": "{{count}} de tus vybes van a ir"
+    },
+    "counter": {
+        "title": "Contador de puerta",
+        "hint": "Pulsa +1 por cada persona que entra y −1 por cada una que sale.",
+        "askVenue": "Pide al local un enlace nuevo.",
+        "ofCapacity": "de {{capacity}}",
+        "percent": "{{percent}} % del aforo",
+        "withVybe": "{{count}} con Vybe ({{percent}} %)",
+        "withVybeNoPct": "{{count}} con Vybe",
+        "add": "Sumar una persona",
+        "remove": "Restar una persona",
+        "addFive": "Sumar cinco personas",
+        "correct": "Corregir total",
+        "correctPlaceholder": "Total real ahora",
+        "sending": "Enviando…",
+        "synced": "Al día",
+        "syncedAgo": "Actualizado hace {{minutes}} min",
+        "notStarted": "Aún no se ha contado nadie",
+        "offline_one": "Sin conexión · {{count}} pulsación pendiente",
+        "offline_other": "Sin conexión · {{count}} pulsaciones pendientes",
+        "errors": {
+            "INVALID_LINK": "Este enlace ya no vale",
+            "EVENT_NOT_LIVE": "El evento no está en marcha",
+            "CAPACITY_REQUIRED": "El local tiene que poner el aforo antes de contar",
+            "INVALID_TOTAL": "Ese total no es válido",
+            "INVALID_DELTA": "No se pudo contar. Prueba otra vez.",
+            "generic": "No se pudo contar. Prueba otra vez."
+        },
+        "belowVybe": "Hay {{count}} personas con Vybe dentro: el total real no puede ser menor. Pulsa «Corregir total»."
+    },
+    "night": {
+        "title": "La noche",
+        "short": "Noche",
+        "subtitle": "Ofertas, retos, sorteos y más de este local. Solo para quien está dentro.",
+        "tabs": {
+            "offers": "Ofertas",
+            "challenges": "Retos",
+            "raffles": "Sorteos",
+            "stamps": "Sellos",
+            "songs": "Música"
+        },
+        "errors": {
+            "notAtEvent": "Tienes que estar dentro del evento.",
+            "eventEnded": "El evento ya ha terminado.",
+            "drawAfterEnd": "La hora del sorteo es después del final del evento.",
+            "songsDisabled": "El local no ha abierto las peticiones de canciones.",
+            "tooManySongs": "Ya has pedido tres canciones esta noche. Vota las que ya están.",
+            "invalidSong": "Escribe el nombre de la canción.",
+            "stampsDisabled": "Este local no tiene tarjeta de sellos.",
+            "notEnoughStamps": "Aún no tienes la tarjeta completa.",
+            "challengeNotDone": "Aún no has completado el reto.",
+            "alreadyClaimed": "Ya lo has pedido.",
+            "promotionEnded": "Esta promoción ya ha terminado.",
+            "promotionNotStarted": "Esta promoción todavía no ha empezado."
+        },
+        "challenges": {
+            "empty": "Esta noche no hay retos.",
+            "claim": "Recoger premio",
+            "hints": {
+                "early_bird": "Entra antes de las {{time}}.",
+                "matches": "Consigue {{count}} vybes esta noche.",
+                "group": "Entrad {{count}} de tu grupo.",
+                "stay_until": "Sigue dentro a las {{time}}.",
+                "first_visit": "Tu primera vez en este local."
+            }
+        },
+        "raffles": {
+            "empty": "Esta noche no hay sorteos.",
+            "at": "Sorteo a las {{time}}",
+            "live": "Sorteo en directo: el local lo lanza durante la noche",
+            "stayInside": "Participas solo por seguir dentro a la hora del sorteo.",
+            "youWon": "¡Has ganado!",
+            "wonBy": "Ha ganado {{name}}"
+        },
+        "stamps": {
+            "title": "Tarjeta de {{venue}}",
+            "progress": "{{stamps}} de {{total}} sellos",
+            "notThisEvent": "Esta fiesta no suma sellos.",
+            "claim": "Canjear el premio",
+            "missing_one": "Te falta {{count}} noche para el premio.",
+            "missing_other": "Te faltan {{count}} noches para el premio.",
+            "gotOne": "+1 sello en {{venue}}",
+            "full": "Tarjeta completa: {{reward}}. Canjéala en «La noche»."
+        },
+        "songs": {
+            "search": "Busca una canción o artista",
+            "requested": "Canción pedida",
+            "requestAsTyped": "Pedir «{{text}}» tal cual",
+            "queue": "Lo que pide la sala",
+            "empty": "Nadie ha pedido nada todavía. Sé el primero.",
+            "vote": "Votar",
+            "played": "Ya sonaron"
+        }
+    },
+    "thermometer": {
+        "title": "Termómetro en vivo",
+        "entryClosed": "Puerta cerrada: ya no entra nadie nuevo",
+        "trend": {
+            "up": "Se está llenando",
+            "down": "Se está vaciando",
+            "steady": "Estable"
+        },
+        "queue": {
+            "none": "Sin cola",
+            "short": "Poca cola",
+            "long": "Mucha cola"
+        },
+        "nowPlaying": "Suena: {{song}}",
+        "mix": "{{women}} % chicas · {{men}} % chicos (con Vybe)"
+    },
+    "whereNext": {
+        "title": "La fiesta se está acabando",
+        "body": "{{event}} termina en media hora. ¿Quieres seguir de fiesta?",
+        "afterTitle": "¿Seguimos de after?",
+        "afterBody": "{{event}} cierra en media hora. Mira qué sigue abierto.",
+        "seeParties": "Ver fiestas cerca",
+        "notNow": "Ahora no",
+        "seeMap": "Ver todas en el mapa",
+        "until": "hasta las {{time}}"
     }
 }

@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { Check, ImagePlus, MapPin, X } from 'lucide-react';
+import { ImagePlus, X } from 'lucide-react';
 import { useAppContext } from '@/context/app-context';
 import { useToast } from '@/components/ui/use-toast';
 import { api } from '@/services/api';
 import { venueService } from '@/services/venue-service';
-import { getCurrentPosition, GeolocationError } from '@/services/geo';
+import LocationPicker, { PickedLocation } from '@/components/venue/location-picker';
 import { track } from '@/lib/observability';
 import { cn } from '@/lib/utils';
 import { Event } from '@/types/venue';
@@ -35,7 +35,16 @@ interface CreateEventFormProps {
   /** Se llama al publicar, para cerrar el panel que lo contiene. */
   onCreated?: () => void;
   onClose?: () => void;
+  /** Con un evento, el formulario lo edita en vez de crear uno nuevo. */
+  event?: Event;
 }
+
+/** «2026-09-20» y «23:30» en la hora del dispositivo. */
+const fechaLocal = (iso: string) => {
+  const d = new Date(iso);
+  const dos = (n: number) => String(n).padStart(2, '0');
+  return { date: `${d.getFullYear()}-${dos(d.getMonth() + 1)}-${dos(d.getDate())}`, time: `${dos(d.getHours())}:${dos(d.getMinutes())}` };
+};
 
 /** Combina la fecha y la hora del formulario; si el fin es antes que el inicio, es de madrugada. */
 const combinar = (date: string, start: string, end: string) => {
@@ -56,30 +65,49 @@ const combinar = (date: string, start: string, end: string) => {
  * de inicio: una fiesta de 23:30 a 06:00 es lo normal, y pedir dos fechas
  * completas hacía que media lista de eventos acabara antes de empezar.
  */
-const CreateEventForm: React.FC<CreateEventFormProps> = ({ onCreated, onClose }) => {
+const CreateEventForm: React.FC<CreateEventFormProps> = ({ onCreated, onClose, event }) => {
   const { t } = useTranslation();
   const { currentVenue, createEvent, refreshEvents } = useAppContext();
   const { toast } = useToast();
+  const editando = Boolean(event);
 
   const [isLoading, setIsLoading] = useState(false);
-  const [isLocating, setIsLocating] = useState(false);
   const [recurrence, setRecurrence] = useState<'none' | 'weekly' | 'biweekly'>('none');
 
   // El cartel se guarda aparte del formulario: el fichero no viaja por
   // react-hook-form, sólo la vista previa para enseñarlo antes de crear.
   const [posterFile, setPosterFile] = useState<File | null>(null);
-  const [posterPreview, setPosterPreview] = useState<string | null>(null);
+  const [posterPreview, setPosterPreview] = useState<string | null>(event?.posterUrl ?? null);
+
+  // Dónde es: la del evento al editar; al crear, la del local si la tiene.
+  const [ubicacion, setUbicacion] = useState<PickedLocation | null>(
+    event?.location ?? currentVenue?.location ?? null,
+  );
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm<EventFormData>({ defaultValues: { minAge: '18', startTime: '23:30', endTime: '06:00' } });
+  } = useForm<EventFormData>({
+    defaultValues: event
+      ? {
+          name: event.name,
+          description: event.description ?? '',
+          date: fechaLocal(event.startDate).date,
+          startTime: fechaLocal(event.startDate).time,
+          endTime: fechaLocal(event.endDate).time,
+          capacity: event.maxCapacity ? String(event.maxCapacity) : '',
+          price: event.price !== undefined && event.price !== null ? String(event.price) : '',
+          minAge: String(event.minAge ?? 18),
+          theme: event.theme ?? '',
+          dressCode: event.dressCode ?? '',
+          bookingUrl: event.bookingUrl ?? '',
+        }
+      : { minAge: '18', startTime: '23:30', endTime: '06:00' },
+  });
 
   if (!currentVenue) return null;
-
-  const hasLocation = Boolean(currentVenue.location);
 
   const campo =
     'w-full rounded-xl border-0 bg-white px-3.5 py-2.5 text-body-md text-ink shadow-sm ' +
@@ -100,36 +128,17 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onCreated, onClose })
     setPosterPreview(URL.createObjectURL(file));
   };
 
-  /**
-   * Guarda las coordenadas del local. Sin ellas la geocerca no puede validar
-   * nada, así que el evento sería accesible desde cualquier sitio.
-   */
-  const captureVenueLocation = async () => {
-    setIsLocating(true);
-    try {
-      const coords = await getCurrentPosition();
-      const saved = await api.updateVenueLocation(coords.latitude, coords.longitude);
-      toast(
-        saved
-          ? { title: t('venue.events.locationSaved'), description: t('venue.events.locationSavedBody') }
-          : { title: t('common.error'), variant: 'destructive' },
-      );
-    } catch (error) {
-      toast({
-        title: t('common.error'),
-        description: error instanceof GeolocationError ? error.message : t('errors.generic'),
-        variant: 'destructive',
-      });
-    } finally {
-      setIsLocating(false);
-    }
-  };
-
   const onSubmit = async (data: EventFormData) => {
     const { inicio, fin } = combinar(data.date, data.startTime, data.endTime);
 
     if (Number.isNaN(inicio.getTime()) || Number.isNaN(fin.getTime())) {
       toast({ title: t('venue.events.badDates'), description: t('venue.events.badDatesBody'), variant: 'destructive' });
+      return;
+    }
+
+    // Sin ubicación la geocerca no puede comprobar que la gente está dentro.
+    if (!ubicacion) {
+      toast({ title: t('venue.events.locationMissing'), variant: 'destructive' });
       return;
     }
 
@@ -140,7 +149,7 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onCreated, onClose })
 
       // El cartel se sube ahora, cuando ya se sabe que el evento va a existir.
       // Si falla, el evento se crea igual y el cartel se puede añadir después.
-      let posterUrl: string | undefined;
+      let posterUrl: string | undefined = posterPreview && !posterFile ? posterPreview : undefined;
       if (posterFile) {
         try {
           posterUrl = (await api.uploadFile('event-photos', posterFile, posterFile.name)).url;
@@ -164,8 +173,26 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onCreated, onClose })
         maxCapacity: capacity && capacity > 0 ? capacity : undefined,
         recurrence,
         posterUrl,
-        location: currentVenue.location,
+        location: { latitude: ubicacion.latitude, longitude: ubicacion.longitude },
       };
+
+      // El local sin coordenadas toma las de su primer evento: la geocerca las
+      // usa cuando un evento no tiene las suyas.
+      if (!currentVenue.location) {
+        void api.updateVenueLocation(ubicacion.latitude, ubicacion.longitude).catch(() => undefined);
+      }
+
+      if (event) {
+        await api.updateEvent(event.id, eventData);
+        await venueService
+          .setCapacity(event.id, eventData.maxCapacity ?? null, 0.9)
+          .catch(() => undefined);
+        track('venue_event_updated', { eventId: event.id });
+        toast({ title: t('venue.events.saved') });
+        await refreshEvents();
+        onCreated?.();
+        return;
+      }
 
       const newEvent = await createEvent(eventData);
 
@@ -191,7 +218,7 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onCreated, onClose })
   return (
     <div className="rounded-[20px] bg-party-primary p-5 text-ink">
       <div className="mb-5 flex items-center justify-between gap-3">
-        <h2 className="font-display text-headline-lg">{t('venue.events.newEvent')}</h2>
+        <h2 className="font-display text-headline-lg">{t(editando ? 'venue.events.editEvent' : 'venue.events.newEvent')}</h2>
         {onClose && (
           <button
             type="button"
@@ -203,26 +230,6 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onCreated, onClose })
           </button>
         )}
       </div>
-
-      {hasLocation ? (
-        <p className="mb-4 flex items-center gap-2 text-caption font-semibold">
-          <Check size={14} />
-          {t('venue.events.locationOk', { radius: currentVenue.eventRadius })}
-        </p>
-      ) : (
-        <div className="mb-5 rounded-xl bg-ink/10 p-4">
-          <p className="mb-3 text-body-sm">{t('venue.events.noLocation')}</p>
-          <button
-            type="button"
-            onClick={() => void captureVenueLocation()}
-            disabled={isLocating}
-            className="press inline-flex h-9 items-center gap-2 rounded-xl bg-ink px-3 text-sm font-bold text-white disabled:opacity-50"
-          >
-            <MapPin size={14} />
-            {isLocating ? t('venue.events.locating') : t('venue.events.useMyLocation')}
-          </button>
-        </div>
-      )}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
@@ -251,6 +258,11 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onCreated, onClose })
             placeholder={t('venue.events.descriptionPlaceholder')}
             maxLength={1000}
           />
+        </div>
+
+        <div>
+          <span className={etiqueta}>{t('venue.events.location')} *</span>
+          <LocationPicker value={ubicacion} onChange={setUbicacion} />
         </div>
 
         <div>
@@ -390,6 +402,7 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onCreated, onClose })
           )}
         </div>
 
+        {!editando && (
         <div className="space-y-3 rounded-xl bg-white p-3.5">
           <div className="flex items-center justify-between gap-3">
             <label htmlFor="ev-recurrent" className="font-display text-title-card">
@@ -436,6 +449,7 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onCreated, onClose })
           )}
           <p className="text-caption text-ink/60">{t('venue.events.recurrentHelp')}</p>
         </div>
+        )}
 
         <div>
           <label htmlFor="ev-booking" className={etiqueta}>
@@ -450,7 +464,7 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onCreated, onClose })
           disabled={isLoading}
           className="press flex h-12 w-full items-center justify-center rounded-xl bg-white font-display text-title-card font-extrabold text-ink shadow-md disabled:opacity-60"
         >
-          {isLoading ? t('venue.events.creating') : t('venue.events.publish')}
+          {isLoading ? t('venue.events.creating') : t(editando ? 'venue.events.saveChanges' : 'venue.events.publish')}
         </button>
       </form>
     </div>

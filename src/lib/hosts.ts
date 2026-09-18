@@ -47,5 +47,14 @@ export const appHref = (path = '/'): string => (siteMode() === 'landing' ? `${AP
 /** Ruta de la landing: absoluta desde la aplicación, relativa en el resto. */
 export const landingHref = (path = '/'): string => (siteMode() === 'app' ? `${LANDING_URL}${path}` : path);
 
+/** Página de «descarga la app» de `app.vybes.es` (`MobileOnlyPage`). */
+export const DOWNLOAD_PATH = '/descargar';
+
+/**
+ * Por qué se llega a la página de descarga; cambia la línea de aviso. Se pasa
+ * en `location.state.motivo`.
+ */
+export type DownloadReason = 'clubber' | 'verified' | 'password';
+
 /** ¿Hay que salir de este dominio para abrir `href`? */
 export const isExternalHref = (href: string): boolean => /^https?:\/\//.test(href);

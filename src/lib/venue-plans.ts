@@ -6,7 +6,7 @@
  * a propósito para que el panel del local y la landing pinten la comparativa
  * sin una llamada más, pero conviene no perderlo de vista.
  */
-export const PLAN_FEATURES = ['promoterCodes', 'promotions', 'csvExport', 'demographics'] as const;
+export const PLAN_FEATURES = ['promoterCodes', 'promotions', 'csvExport', 'headcountCurve', 'demographics'] as const;
 
 export type PlanId = 'free' | 'pro' | 'business';
 export type PlanFeature = (typeof PLAN_FEATURES)[number];
@@ -15,16 +15,16 @@ export const PLANS: Record<PlanId, { events: number; team: number; features: Rec
   free: {
     events: 1,
     team: 2,
-    features: { promoterCodes: false, promotions: false, csvExport: false, demographics: false },
+    features: { promoterCodes: false, promotions: false, csvExport: false, headcountCurve: false, demographics: false },
   },
   pro: {
     events: 5,
     team: 8,
-    features: { promoterCodes: true, promotions: true, csvExport: true, demographics: false },
+    features: { promoterCodes: true, promotions: true, csvExport: true, headcountCurve: true, demographics: false },
   },
   business: {
     events: 50,
     team: 40,
-    features: { promoterCodes: true, promotions: true, csvExport: true, demographics: true },
+    features: { promoterCodes: true, promotions: true, csvExport: true, headcountCurve: true, demographics: true },
   },
 };

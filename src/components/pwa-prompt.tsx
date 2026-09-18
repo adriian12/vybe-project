@@ -17,7 +17,7 @@ const PwaPrompt = () => {
     return (
       <div
         role="status"
-        className="fixed top-0 inset-x-0 z-50 bg-destructive text-destructive-foreground text-sm text-center py-2 px-4 flex items-center justify-center gap-2"
+        className="fixed top-0 inset-x-0 z-50 bg-destructive text-destructive-foreground text-sm text-center pb-2 pt-[calc(0.5rem+var(--safe-top))] px-4 flex items-center justify-center gap-2"
       >
         <WifiOff size={14} />
         {t('pwa.offline')}
@@ -27,7 +27,7 @@ const PwaPrompt = () => {
 
   if (needRefresh) {
     return (
-      <div className="fixed bottom-20 inset-x-4 z-50 max-w-sm mx-auto rounded-xl border border-border bg-card p-4 shadow-lg">
+      <div className="fixed bottom-[calc(var(--nav-h)+1rem)] inset-x-4 z-50 max-w-sm mx-auto rounded-xl border border-border bg-card p-4 shadow-lg">
         <p className="font-medium mb-1">{t('pwa.updateTitle')}</p>
         <p className="text-sm text-party-gray mb-3">{t('pwa.updateBody')}</p>
         <PartyButton variant="gradient" size="sm" className="w-full" onClick={update}>
@@ -40,7 +40,7 @@ const PwaPrompt = () => {
 
   if (canInstall) {
     return (
-      <div className="fixed bottom-20 inset-x-4 z-50 max-w-sm mx-auto rounded-xl border border-border bg-card p-4 shadow-lg">
+      <div className="fixed bottom-[calc(var(--nav-h)+1rem)] inset-x-4 z-50 max-w-sm mx-auto rounded-xl border border-border bg-card p-4 shadow-lg">
         <button
           type="button"
           onClick={dismissInstall}

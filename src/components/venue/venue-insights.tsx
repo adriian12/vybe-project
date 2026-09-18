@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { BarChart3, TrendingDown, CalendarDays, Loader2, Crown, Users } from 'lucide-react';
+import { BarChart3, TrendingDown, CalendarDays, Loader2, Crown, Users, DoorOpen } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ApiError } from '@/services/api';
@@ -9,6 +9,7 @@ import {
   DemographicBucket,
   WeekdayStats,
   DropoffPoint,
+  HeadcountPoint,
   VenuePlanStatus,
 } from '@/services/venue-service';
 
@@ -55,6 +56,8 @@ const VenueInsights = ({ eventId, venueId, plan, onUpgrade }: VenueInsightsProps
   const [demographicsBlocked, setDemographicsBlocked] = useState(false);
   const [weekdays, setWeekdays] = useState<WeekdayStats[]>([]);
   const [dropoff, setDropoff] = useState<DropoffPoint[]>([]);
+  const [headcount, setHeadcount] = useState<HeadcountPoint[]>([]);
+  const [headcountBlocked, setHeadcountBlocked] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   const load = useCallback(async () => {
@@ -74,6 +77,14 @@ const VenueInsights = ({ eventId, venueId, plan, onUpgrade }: VenueInsightsProps
         error instanceof ApiError && error.code === 'PLAN_UPGRADE_REQUIRED',
       );
       setDemographics([]);
+    }
+
+    try {
+      setHeadcount(await venueService.getHeadcountCurve(eventId));
+      setHeadcountBlocked(false);
+    } catch (error) {
+      setHeadcountBlocked(error instanceof ApiError && error.code === 'PLAN_REQUIRED');
+      setHeadcount([]);
     }
 
     setIsLoading(false);
@@ -98,6 +109,21 @@ const VenueInsights = ({ eventId, venueId, plan, onUpgrade }: VenueInsightsProps
     (best, point) => (!best || point.present > best.present ? point : best),
     null,
   );
+
+  // Curva de la puerta: sólo los tramos en los que ya se contaba.
+  const tramos = headcount.filter((point) => point.total !== null);
+  const maxTotal = Math.max(...tramos.map((point) => point.total ?? 0), 1);
+  const picoPuerta = tramos.reduce<HeadcountPoint | null>(
+    (best, point) => (!best || (point.total ?? 0) > (best.total ?? 0) ? point : best),
+    null,
+  );
+  const cuota = (point: HeadcountPoint) =>
+    point.total ? Math.round((Math.min(point.vybe, point.total) / point.total) * 100) : 0;
+  const cuotaMedia = tramos.length
+    ? Math.round(tramos.reduce((sum, point) => sum + cuota(point), 0) / tramos.length)
+    : null;
+  const horaDe = (iso: string) =>
+    new Date(iso).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
 
   // Tres tarjetas blancas: en el móvil una debajo de otra y en escritorio en
   // fila, como la cuadrícula de «Estadísticas y Métricas» de Stitch.
@@ -243,6 +269,69 @@ const VenueInsights = ({ eventId, venueId, plan, onUpgrade }: VenueInsightsProps
                       {point.left > 0 && (
                         <span className="text-destructive"> −{point.left}</span>
                       )}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* ---------------------------------------------------------------- */}
+      {/* Aforo real frente a Vybe (Pro y Business)                        */}
+      {/* ---------------------------------------------------------------- */}
+      <Card className="lg:col-span-3">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-title-card uppercase tracking-wide">
+            <DoorOpen size={16} className="text-party-primary" />
+            {t('venue.insights.headcountTitle')}
+          </CardTitle>
+          <p className="text-xs text-muted-foreground">{t('venue.insights.headcountSubtitle')}</p>
+        </CardHeader>
+
+        <CardContent>
+          {headcountBlocked ? (
+            <button
+              type="button"
+              onClick={onUpgrade}
+              className="press flex w-full items-center justify-center gap-2 rounded-lg bg-party-primary py-3 text-caption font-bold text-ink"
+            >
+              <Crown size={14} />
+              {t('venue.insights.headcountNeedsPlan')}
+            </button>
+          ) : tramos.length === 0 ? (
+            <p className="text-sm text-muted-foreground">{t('venue.insights.headcountEmpty')}</p>
+          ) : (
+            <>
+              <p className="mb-3 text-sm">
+                {picoPuerta &&
+                  t('venue.insights.headcountPeak', {
+                    time: horaDe(picoPuerta.bucket),
+                    count: picoPuerta.total ?? 0,
+                  })}
+                {cuotaMedia !== null && ` ${t('venue.insights.headcountShare', { percent: cuotaMedia })}`}
+              </p>
+              <ul className="grid gap-x-6 gap-y-2 lg:grid-cols-2">
+                {tramos.map((point) => (
+                  <li key={point.bucket} className="flex items-center gap-3">
+                    <span className="w-12 shrink-0 text-xs tabular-nums text-muted-foreground">
+                      {horaDe(point.bucket)}
+                    </span>
+                    {/* Barra del total de la puerta y, dentro, la parte con Vybe. */}
+                    <div className="relative h-2.5 flex-1 overflow-hidden rounded-full bg-black/[0.06]">
+                      <div
+                        className="absolute inset-y-0 left-0 rounded-full bg-party-primary"
+                        style={{ width: `${Math.round(((point.total ?? 0) / maxTotal) * 100)}%` }}
+                      />
+                      <div
+                        className="absolute inset-y-0 left-0 rounded-full bg-ink/70"
+                        style={{ width: `${Math.round((Math.min(point.vybe, point.total ?? 0) / maxTotal) * 100)}%` }}
+                      />
+                    </div>
+                    <span className="w-24 shrink-0 text-right text-xs tabular-nums">
+                      <strong>{point.total}</strong>
+                      <span className="text-muted-foreground"> · {point.vybe} Vybe</span>
                     </span>
                   </li>
                 ))}

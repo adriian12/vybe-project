@@ -5,6 +5,19 @@
 
 @layer base {
   :root {
+    /* Zona segura del teléfono (hora arriba, barra de gestos abajo). Dentro de
+       la app de Android la inyecta Capacitor como `--safe-area-inset-*`; en el
+       navegador y en iOS sale de `env()`. */
+    --safe-top: var(--safe-area-inset-top, env(safe-area-inset-top, 0px));
+    --safe-bottom: var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px));
+
+    /* Lo que ocupan la cabecera y el menú fijos, zona segura incluida. El
+       contenido empieza y acaba con esto, no con un `pt-16` a secas: en Android
+       15+ la app se dibuja bajo la barra de estado y la cabecera crece con
+       ella, así que un margen fijo dejaba la primera fila tapada. */
+    --header-h: calc(4rem + var(--safe-top));
+    --nav-h: calc(4rem + var(--safe-bottom));
+
     /* Negro y amarillo, tomados del diseño `diseños/home_usuario.png`: el
        amarillo medido en la imagen es #F8D000 y la superficie oscura #1C1C1C.
 
@@ -145,11 +158,11 @@
 
   /* Márgenes de la zona segura del teléfono (muesca y barra de gestos). */
   .pt-safe {
-    padding-top: var(--safe-area-inset-top, env(safe-area-inset-top, 0px));
+    padding-top: var(--safe-top);
   }
 
   .pb-safe {
-    padding-bottom: var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px));
+    padding-bottom: var(--safe-bottom);
   }
 
   /* El diseño es de color plano; el degradado se reserva para el logotipo y

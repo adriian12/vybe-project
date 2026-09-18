@@ -111,7 +111,7 @@ const LegalPage = () => {
   const version = isPrivacy ? LEGAL_VERSIONS.privacy : LEGAL_VERSIONS.terms;
 
   return (
-    <div className="min-h-screen p-6">
+    <div className="min-h-screen px-6 pt-[calc(1.5rem+var(--safe-top))] pb-[calc(1.5rem+var(--safe-bottom))]">
       <div className="max-w-2xl mx-auto">
         <Link to="/" className="inline-flex items-center gap-2 text-sm text-party-primary mb-6">
           <ArrowLeft size={16} />

@@ -289,7 +289,7 @@ const EventSwipingPage = () => {
   // -------------------------------------------------------------------------
   if (step === 'take_photos') {
     return (
-      <div className="min-h-screen pb-24 pt-16">
+      <div className="min-h-screen pb-[calc(var(--nav-h)+2rem)] pt-[var(--header-h)]">
         <Header />
         <main className="mx-auto w-full max-w-md px-margin pt-5">
           <PasoCabecera
@@ -366,7 +366,7 @@ const EventSwipingPage = () => {
   // -------------------------------------------------------------------------
   if (step === 'event_photo') {
     return (
-      <div className="min-h-screen pb-24 pt-16">
+      <div className="min-h-screen pb-[calc(var(--nav-h)+2rem)] pt-[var(--header-h)]">
         <Header />
         <main className="mx-auto w-full max-w-md px-margin pt-5">
           <PasoCabecera title={t('swiping.eventPhotoTitle')} body={t('swiping.eventPhotoBody')} />
@@ -471,7 +471,7 @@ const EventSwipingPage = () => {
   const siguientes = nearbyProfiles.filter((p) => p.id !== currentProfile?.id).slice(0, 2);
 
   return (
-    <div className="flex h-[100dvh] flex-col overflow-hidden pb-16 pt-16">
+    <div className="flex h-[100dvh] flex-col overflow-hidden pb-[var(--nav-h)] pt-[var(--header-h)]">
       <Header />
 
       <div className="mx-auto flex w-full max-w-md flex-1 flex-col overflow-hidden">

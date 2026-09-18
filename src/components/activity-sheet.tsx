@@ -108,7 +108,7 @@ const ActivitySheet: React.FC<ActivitySheetProps> = ({ open, onOpenChange, inten
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="max-h-[80vh] overflow-y-auto pb-safe">
+      <SheetContent side="bottom" className="max-h-[80vh] overflow-y-auto">
         <div className="mx-auto mb-2 h-1 w-10 rounded-full bg-surface-highest" aria-hidden />
         <SheetHeader className="text-left">
           <SheetTitle>{t('activity.title')}</SheetTitle>

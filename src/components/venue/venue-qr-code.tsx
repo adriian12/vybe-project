@@ -23,12 +23,14 @@ import VenueTvView from '@/components/venue/venue-tv-view';
 
 interface VenueQRCodeProps {
   onCodeGenerated?: () => void;
+  /** El evento cuyo QR se gestiona. Sin él, el que está en marcha o el próximo. */
+  eventId?: string | null;
 }
 
 const QR_CANVAS_ID = 'vybe-venue-qr';
 const ROTATION_OPTIONS = [0, 15, 30, 60, 120];
 
-const VenueQRCode: React.FC<VenueQRCodeProps> = ({ onCodeGenerated }) => {
+const VenueQRCode: React.FC<VenueQRCodeProps> = ({ onCodeGenerated, eventId }) => {
   const { t } = useTranslation();
   const { currentVenue, events } = useAppContext();
   const { toast } = useToast();
@@ -53,14 +55,19 @@ const VenueQRCode: React.FC<VenueQRCodeProps> = ({ onCodeGenerated }) => {
     });
   }, [events, currentVenue]);
 
-  const currentEvent: Event | undefined = activeEvents[0];
+  const currentEvent: Event | undefined =
+    (eventId ? events.find((event) => event.id === eventId) : undefined) ?? activeEvents[0];
 
-  // Recupera el código vigente en vez de generar uno nuevo en cada visita.
+  // Recupera el código vigente de este evento en vez de generar uno nuevo en
+  // cada visita. Al cambiar de evento se limpia el anterior.
   useEffect(() => {
     if (!currentVenue) return;
     let cancelled = false;
+    setManualCode(null);
+    setExpiresAt(null);
+    setCodeEventId(null);
 
-    void api.getActiveEventCode(currentVenue.id).then((existing) => {
+    void api.getActiveEventCode(currentVenue.id, currentEvent?.id ?? null).then((existing) => {
       if (cancelled || !existing) return;
       setManualCode(existing.manualCode);
       setExpiresAt(new Date(existing.expiresAt));
@@ -70,7 +77,7 @@ const VenueQRCode: React.FC<VenueQRCodeProps> = ({ onCodeGenerated }) => {
     return () => {
       cancelled = true;
     };
-  }, [currentVenue]);
+  }, [currentVenue, currentEvent?.id]);
 
   useEffect(() => {
     const interval = setInterval(() => setNow(Date.now()), 1000);
