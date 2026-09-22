@@ -494,7 +494,8 @@
         "cancelTitle": "Vybes Premium kündigen?",
         "cancelBody": "Premium bleibt bis zum Ende des bereits bezahlten Zeitraums aktiv.",
         "tagline": "Vybes · Nachtleben in Spanien",
-        "cancelledUntil": "Gekündigt · aktiv bis {{date}}"
+        "cancelledUntil": "Gekündigt · aktiv bis {{date}}",
+        "editName": "Namen ändern"
     },
     "faceVerification": {
         "title": "Identitätsprüfung",

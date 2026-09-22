@@ -494,7 +494,8 @@
         "cancelTitle": "Cancel·lar Vybes Premium?",
         "cancelBody": "Continuaràs tenint Premium fins que acabi el període que ja has pagat.",
         "tagline": "Vybes · La nit a Espanya",
-        "cancelledUntil": "Cancel·lada · activa fins al {{date}}"
+        "cancelledUntil": "Cancel·lada · activa fins al {{date}}",
+        "editName": "Canviar el nom"
     },
     "faceVerification": {
         "title": "Verificació d'identitat",
