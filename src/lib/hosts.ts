@@ -16,8 +16,8 @@ import { isNative } from '@/services/native';
 
 const clean = (value: string | undefined, fallback: string): string => (value || fallback).replace(/\/+$/, '');
 
-const PROD_LANDING = 'https://vybes.es';
-const PROD_APP = 'https://app.vybes.es';
+const PROD_LANDING = 'https://fiestea.es';
+const PROD_APP = 'https://app.fiestea.es';
 
 /**
  * En los dominios de producción mandan siempre `vybes.es` y `app.vybes.es`.
@@ -26,7 +26,7 @@ const PROD_APP = 'https://app.vybes.es';
  * la landing.
  */
 const enProduccion =
-  typeof window !== 'undefined' && /(^|\.)vybes\.es$/.test(window.location.hostname);
+  typeof window !== 'undefined' && /(^|\.)fiestea\.es$/.test(window.location.hostname);
 
 export const LANDING_URL = enProduccion
   ? PROD_LANDING
