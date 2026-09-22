@@ -494,7 +494,8 @@
         "cancelTitle": "Cancel Fiestea Premium?",
         "cancelBody": "You'll keep Premium until the end of the period you've already paid for.",
         "tagline": "Fiestea · Nightlife in Spain",
-        "cancelledUntil": "Cancelled · active until {{date}}"
+        "cancelledUntil": "Cancelled · active until {{date}}",
+        "editName": "Change your name"
     },
     "faceVerification": {
         "title": "Identity verification",

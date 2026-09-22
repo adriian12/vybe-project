@@ -494,7 +494,8 @@
         "cancelTitle": "¿Cancelar Fiestea Premium?",
         "cancelBody": "Seguirás teniendo Premium hasta que acabe el periodo que ya has pagado.",
         "tagline": "Fiestea · La noche en España",
-        "cancelledUntil": "Cancelada · activa hasta el {{date}}"
+        "cancelledUntil": "Cancelada · activa hasta el {{date}}",
+        "editName": "Cambiar el nombre"
     },
     "faceVerification": {
         "title": "Verificación de identidad",

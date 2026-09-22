@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -166,6 +166,7 @@ const ProfilePage = () => {
   const [isInvisible, setIsInvisible] = useState(false);
   const [wants, setWants] = useState<'men' | 'women' | 'all'>('all');
 
+  const sobreMi = useRef<HTMLElement>(null);
   const [allInterests, setAllInterests] = useState<Interest[]>([]);
   const [myInterestIds, setMyInterestIds] = useState<string[]>([]);
   const [editingInterests, setEditingInterests] = useState(false);
@@ -506,9 +507,24 @@ const ProfilePage = () => {
             </button>
           </div>
 
-          <h1 className="mt-3 text-center font-display text-headline-lg">
-            {currentUser.name}, {currentUser.age}
-          </h1>
+          <div className="mt-3 flex items-center gap-2">
+            <h1 className="text-center font-display text-headline-lg">
+              {currentUser.name}, {currentUser.age}
+            </h1>
+            {/* Cambiar el nombre estaba escondido dentro de «Sobre mí»: este
+                lápiz abre ese formulario y lleva hasta él. */}
+            <button
+              type="button"
+              onClick={() => {
+                setIsEditing(true);
+                setTimeout(() => sobreMi.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 60);
+              }}
+              aria-label={t('profile.editName')}
+              className="press flex h-8 w-8 items-center justify-center rounded-full bg-surface-high text-party-gray"
+            >
+              <Pencil size={15} />
+            </button>
+          </div>
           {/* Supercrush que le quedan: valen en cualquier evento. Tocar abre
               la compra. */}
           <button
@@ -698,7 +714,7 @@ const ProfilePage = () => {
           </section>
 
           {/* ---------------------------------------------------- sobre mí */}
-          <section className="rounded-2xl bg-white p-4 text-ink shadow-2xl">
+          <section ref={sobreMi} className="rounded-2xl bg-white p-4 text-ink shadow-2xl">
             <div className="mb-2 flex items-center justify-between">
               <h2 className="flex items-center gap-2 font-display text-headline-md">
                 <IdCard size={20} />
@@ -783,53 +799,10 @@ const ProfilePage = () => {
             )}
           </section>
 
-          {/* --------------------------------------------------- intereses */}
-          <section
-            className={cn(
-              'rounded-2xl p-4 shadow-2xl',
-              editingInterests ? 'bg-card text-foreground' : 'bg-white text-ink',
-            )}
-          >
-            <div className="mb-3 flex items-center justify-between">
-              <h2 className="flex items-center gap-2 font-display text-headline-md">
-                <Sparkles size={20} />
-                {t('profile.partyInterests')}
-              </h2>
-              <button
-                type="button"
-                onClick={() => setEditingInterests((prev) => !prev)}
-                className={cn('press text-title-card font-bold', editingInterests ? 'text-party-gray' : 'text-ink/60')}
-              >
-                {editingInterests ? t('common.cancel') : t('common.edit')}
-              </button>
-            </div>
-
-            {editingInterests ? (
-              <div className="space-y-4">
-                <p className="text-body-sm text-party-gray">{t('profile.interestsHelp')}</p>
-                <InterestPicker value={myInterestIds} onChange={setMyInterestIds} />
-                <PartyButton className="w-full" onClick={() => void saveInterests()} disabled={isSaving}>
-                  {isSaving ? t('common.saving') : t('common.save')}
-                </PartyButton>
-              </div>
-            ) : myInterestSlugs.length > 0 ? (
-              <div className="flex flex-wrap gap-2">
-                {myInterestSlugs.map((slug) => (
-                  <span key={slug} className="rounded-full bg-party-primary px-3 py-1.5 text-body-sm font-bold text-ink">
-                    {interestLabel(slug)}
-                  </span>
-                ))}
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={() => setEditingInterests(true)}
-                className="press rounded-full bg-[#F5F5F7] px-3 py-1.5 text-body-sm text-ink/60"
-              >
-                + {t('profile.interestsHelp')}
-              </button>
-            )}
-          </section>
+          {/* Intereses de fiesta: ocultos. El alta no los pide y en los filtros
+              del tablón tampoco están, así que aquí sólo eran ruido. El código
+              (InterestPicker, saveInterests) se queda para volver a
+              enseñarlos. */}
 
           {/* ------------------------------------------------------ ajustes */}
           <AccountTypeCard />
@@ -858,18 +831,7 @@ const ProfilePage = () => {
               }
             />
 
-            <Fila
-              icon={Users}
-              title={t('profile.groups')}
-              subtitle={
-                activeEvent ? (
-                  <span className="text-party-primary">{t('profile.groupsActive', { name: activeEvent.eventName })}</span>
-                ) : (
-                  t('profile.groupsHelp')
-                )
-              }
-              onClick={activeEvent ? () => navigate(`/event/${activeEvent.eventId}/live`) : undefined}
-            />
+            {/* Grupos: oculto. */}
 
             <Fila
               icon={Bell}
