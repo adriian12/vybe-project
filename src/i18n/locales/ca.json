@@ -493,7 +493,8 @@
         "safetyHelp": "Contactes de confiança i botó d'ajuda",
         "cancelTitle": "Cancel·lar Fiestea Premium?",
         "cancelBody": "Continuaràs tenint Premium fins que acabi el període que ja has pagat.",
-        "tagline": "Fiestea · La nit a Espanya"
+        "tagline": "Fiestea · La nit a Espanya",
+        "cancelledUntil": "Cancel·lada · activa fins al {{date}}"
     },
     "faceVerification": {
         "title": "Verificació d'identitat",
@@ -632,8 +633,8 @@
         "activatedEvent": "Tens Premium durant aquest esdeveniment.",
         "redirecting": "Et portem al pagament…",
         "features": {
-            "superLikes": "Super Likes",
-            "superLikesBody": "Destaca sobre la resta i multiplica les possibilitats de match.",
+            "superLikes": "Un supercrush per festa",
+            "superLikesBody": "Destaca sobre la resta. En vols més? Es compren solts i valen a qualsevol festa.",
             "seeWhoLiked": "Veure qui t'ha donat like",
             "seeWhoLikedBody": "Descobreix a qui li has agradat abans de lliscar.",
             "keepAlone": "Rescatar la connexió",
@@ -661,7 +662,16 @@
             "recover": "Recuperar",
             "recovered": "{{name}} torna al tauler."
         },
-        "badge": "Premium"
+        "badge": "Premium",
+        "monthlyPrice": "Mensual · {{price}}/mes",
+        "forEventPrice": "Només aquesta festa · {{price}}",
+        "eventOnlyNote": "El passi d'una festa només val en aquella festa mentre duri.",
+        "cancelledBody": "No es renovarà. Continues amb Premium fins a final de mes.",
+        "errors": {
+            "already": "Ja tens Premium actiu aquí.",
+            "notAtEvent": "Has d'estar dins la festa per comprar-ne el passi.",
+            "unavailable": "Els pagaments no estan disponibles ara mateix."
+        }
     },
     "likes": {
         "title": "Els agrades",
@@ -756,7 +766,11 @@
             "period": "Període:",
             "empty": "Encara no hi ha esdeveniments amb dades en aquest període.",
             "conversionNote": "El {{value}} % de qui diu que hi va acaba entrant.",
-            "peak": "Pic: {{time}} ({{count}})"
+            "peak": "Pic: {{time}} ({{count}})",
+            "exportPdf": "Exportar PDF",
+            "pdfTitle": "Resum d'esdeveniments",
+            "popupBlocked": "Permet les finestres emergents per exportar el PDF.",
+            "exportBusiness": "Exportar és del pla Business"
         },
         "events": {
             "title": "Gestió d'esdeveniments",
@@ -1048,7 +1062,8 @@
                 "promotions": "Promocions i vals",
                 "csvExport": "Exportar a CSV",
                 "demographics": "Detall de públic",
-                "headcountCurve": "Corba d'aforament i % amb Fiestea"
+                "headcountCurve": "Corba d'aforament i % amb Fiestea",
+                "pdfExport": "Exportar a PDF"
             },
             "yourPlan": "El teu pla actual",
             "choose": "Triar",
@@ -2370,5 +2385,24 @@
                 "premium": "Premium"
             }
         }
+    },
+    "supercrush": {
+        "buyTitle": "Supercrush",
+        "buyBody": "Arriben destacats i amb el teu nom. Valen a qualsevol festa i no caduquen.",
+        "howMany": "Quants supercrush vols comprar?",
+        "less": "Un menys",
+        "more": "Un més",
+        "priceLine_one": "{{count}} supercrush × {{unit}} = {{total}}",
+        "priceLine_other": "{{count}} supercrush × {{unit}} = {{total}}",
+        "pay": "Pagar {{total}}",
+        "youHave_one": "Ara tens {{count}} supercrush",
+        "youHave_other": "Ara tens {{count}} supercrush",
+        "available_one": "{{count}} supercrush disponible",
+        "available_other": "{{count}} supercrush disponibles",
+        "send": "Enviar supercrush ({{count}})",
+        "bought": "Supercrush comprats",
+        "boughtBody": "Ja els tens al compte. Fes-los servir a qualsevol festa.",
+        "buyCta": "Comprar supercrush",
+        "none": "No et queden supercrush"
     }
 }

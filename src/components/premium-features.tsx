@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Crown, Star, Bookmark, Users, RotateCcw, Rocket, Eye, Check } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { PartyButton } from './ui-custom/party-button';
-import { usePremium } from '@/context/premium-context';
+import { PREMIUM_PRICES, usePremium } from '@/context/premium-context';
 import { useAppContext } from '@/context/app-context';
 
 /**
@@ -42,7 +42,10 @@ const PremiumFeatures: React.FC = () => {
     upgradeToPremium,
     getPremiumForEvent,
     isPremium,
+    setShowSupercrushDialog,
   } = usePremium();
+  const precio = (value: number) =>
+    value.toLocaleString(undefined, { style: 'currency', currency: 'EUR', minimumFractionDigits: 2 });
   const { activeEvent } = useAppContext();
 
   const [isProcessing, setIsProcessing] = React.useState(false);
@@ -98,7 +101,7 @@ const PremiumFeatures: React.FC = () => {
                 disabled={isProcessing}
                 onClick={() => void run(upgradeToPremium)}
               >
-                {isProcessing ? t('premium.redirecting') : t('premium.monthly')}
+                {isProcessing ? t('premium.redirecting') : t('premium.monthlyPrice', { price: precio(PREMIUM_PRICES.monthly) })}
               </PartyButton>
 
               <PartyButton
@@ -108,11 +111,23 @@ const PremiumFeatures: React.FC = () => {
                 onClick={() => void run(getPremiumForEvent)}
               >
                 {activeEvent
-                  ? t('premium.forEvent', { name: activeEvent.eventName })
+                  ? t('premium.forEventPrice', { name: activeEvent.eventName, price: precio(PREMIUM_PRICES.event) })
                   : t('premium.needEvent')}
               </PartyButton>
+              <p className="text-center text-caption text-party-gray">{t('premium.eventOnlyNote')}</p>
             </>
           )}
+
+          <PartyButton
+            variant="outline"
+            className="w-full"
+            onClick={() => {
+              setShowPremiumDialog(false);
+              setShowSupercrushDialog(true);
+            }}
+          >
+            {t('supercrush.buyCta')}
+          </PartyButton>
 
           <button
             type="button"

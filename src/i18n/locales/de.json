@@ -493,7 +493,8 @@
         "safetyHelp": "Vertrauenskontakte und Hilfe-Button",
         "cancelTitle": "Fiestea Premium kündigen?",
         "cancelBody": "Premium bleibt bis zum Ende des bereits bezahlten Zeitraums aktiv.",
-        "tagline": "Fiestea · Nachtleben in Spanien"
+        "tagline": "Fiestea · Nachtleben in Spanien",
+        "cancelledUntil": "Gekündigt · aktiv bis {{date}}"
     },
     "faceVerification": {
         "title": "Identitätsprüfung",
@@ -632,8 +633,8 @@
         "activatedEvent": "Du hast Premium für dieses Event.",
         "redirecting": "Wir bringen dich zur Zahlung…",
         "features": {
-            "superLikes": "Super Likes",
-            "superLikesBody": "Heb dich ab und erhöhe deine Match-Chancen.",
+            "superLikes": "Ein Supercrush pro Party",
+            "superLikesBody": "Fall auf. Mehr gefällig? Einzeln kaufen und auf jeder Party nutzen.",
             "seeWhoLiked": "Sieh, wer dich geliked hat",
             "seeWhoLikedBody": "Finde heraus, wem du gefällst, bevor du swipest.",
             "keepAlone": "Verbindung retten",
@@ -661,7 +662,16 @@
             "recover": "Zurückholen",
             "recovered": "{{name}} ist wieder dabei."
         },
-        "badge": "Premium"
+        "badge": "Premium",
+        "monthlyPrice": "Monatlich · {{price}}/Monat",
+        "forEventPrice": "Nur diese Party · {{price}}",
+        "eventOnlyNote": "Der Party-Pass gilt nur auf dieser Party, solange sie läuft.",
+        "cancelledBody": "Es wird nicht verlängert. Premium bleibt bis Monatsende aktiv.",
+        "errors": {
+            "already": "Du hast hier schon Premium.",
+            "notAtEvent": "Du musst auf der Party sein, um ihren Pass zu kaufen.",
+            "unavailable": "Zahlungen sind gerade nicht verfügbar."
+        }
     },
     "likes": {
         "title": "Du gefällst ihnen",
@@ -756,7 +766,11 @@
             "period": "Zeitraum:",
             "empty": "In diesem Zeitraum gibt es noch keine Events mit Daten.",
             "conversionNote": "{{value}} % derer, die zusagen, kommen auch rein.",
-            "peak": "Spitze: {{time}} ({{count}})"
+            "peak": "Spitze: {{time}} ({{count}})",
+            "exportPdf": "PDF exportieren",
+            "pdfTitle": "Eventübersicht",
+            "popupBlocked": "Erlaube Pop-ups, um das PDF zu exportieren.",
+            "exportBusiness": "Exportieren ist im Business-Plan enthalten"
         },
         "events": {
             "title": "Event-Verwaltung",
@@ -1048,7 +1062,8 @@
                 "promotions": "Aktionen und Gutscheine",
                 "csvExport": "CSV-Export",
                 "demographics": "Publikumsdetails",
-                "headcountCurve": "Auslastungskurve und % mit Fiestea"
+                "headcountCurve": "Auslastungskurve und % mit Fiestea",
+                "pdfExport": "PDF-Export"
             },
             "yourPlan": "Dein aktueller Tarif",
             "choose": "Wählen",
@@ -2370,5 +2385,24 @@
                 "premium": "Premium"
             }
         }
+    },
+    "supercrush": {
+        "buyTitle": "Supercrush",
+        "buyBody": "Sie kommen hervorgehoben und mit deinem Namen an. Auf jeder Party nutzbar, ohne Ablaufdatum.",
+        "howMany": "Wie viele Supercrushes möchtest du kaufen?",
+        "less": "Einer weniger",
+        "more": "Einer mehr",
+        "priceLine_one": "{{count}} Supercrush × {{unit}} = {{total}}",
+        "priceLine_other": "{{count}} Supercrushes × {{unit}} = {{total}}",
+        "pay": "{{total}} bezahlen",
+        "youHave_one": "Du hast {{count}} Supercrush",
+        "youHave_other": "Du hast {{count}} Supercrushes",
+        "available_one": "{{count}} Supercrush verfügbar",
+        "available_other": "{{count}} Supercrushes verfügbar",
+        "send": "Supercrush senden ({{count}})",
+        "bought": "Supercrushes gekauft",
+        "boughtBody": "Sie sind in deinem Konto. Nutze sie auf jeder Party.",
+        "buyCta": "Supercrushes kaufen",
+        "none": "Du hast keine Supercrushes mehr"
     }
 }

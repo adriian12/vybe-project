@@ -493,7 +493,8 @@
         "safetyHelp": "Contactos de confianza y botón de ayuda",
         "cancelTitle": "¿Cancelar Fiestea Premium?",
         "cancelBody": "Seguirás teniendo Premium hasta que acabe el periodo que ya has pagado.",
-        "tagline": "Fiestea · La noche en España"
+        "tagline": "Fiestea · La noche en España",
+        "cancelledUntil": "Cancelada · activa hasta el {{date}}"
     },
     "faceVerification": {
         "title": "Verificación de identidad",
@@ -632,8 +633,8 @@
         "activatedEvent": "Tienes Premium durante este evento.",
         "redirecting": "Te llevamos al pago…",
         "features": {
-            "superLikes": "Super Likes",
-            "superLikesBody": "Destaca sobre el resto y multiplica tus posibilidades de match.",
+            "superLikes": "Un supercrush por fiesta",
+            "superLikesBody": "Destaca sobre el resto. ¿Quieres más? Se compran sueltos y valen en cualquier fiesta.",
             "seeWhoLiked": "Ver quién te ha dado like",
             "seeWhoLikedBody": "Descubre a quién le has gustado antes de deslizar.",
             "keepAlone": "Rescatar la conexión",
@@ -661,7 +662,16 @@
             "recover": "Recuperar",
             "recovered": "{{name}} vuelve al tablón."
         },
-        "badge": "Premium"
+        "badge": "Premium",
+        "monthlyPrice": "Mensual · {{price}}/mes",
+        "forEventPrice": "Sólo esta fiesta · {{price}}",
+        "eventOnlyNote": "El pase de una fiesta sólo vale en esa fiesta mientras dure.",
+        "cancelledBody": "No se renovará. Sigues con Premium hasta final de mes.",
+        "errors": {
+            "already": "Ya tienes Premium activo aquí.",
+            "notAtEvent": "Tienes que estar dentro de la fiesta para comprar su pase.",
+            "unavailable": "Los pagos no están disponibles ahora mismo."
+        }
     },
     "likes": {
         "title": "Les gustas",
@@ -756,7 +766,11 @@
             "period": "Periodo:",
             "empty": "Todavía no hay eventos con datos en este periodo.",
             "conversionNote": "El {{value}} % de quien dice que va acaba entrando.",
-            "peak": "Pico: {{time}} ({{count}})"
+            "peak": "Pico: {{time}} ({{count}})",
+            "exportPdf": "Exportar PDF",
+            "pdfTitle": "Resumen de eventos",
+            "popupBlocked": "Permite las ventanas emergentes para exportar el PDF.",
+            "exportBusiness": "Exportar es del plan Business"
         },
         "events": {
             "title": "Gestión de eventos",
@@ -1048,7 +1062,8 @@
                 "promotions": "Promociones y vales",
                 "csvExport": "Exportar a CSV",
                 "demographics": "Detalle de público",
-                "headcountCurve": "Curva de aforo y % con Fiestea"
+                "headcountCurve": "Curva de aforo y % con Fiestea",
+                "pdfExport": "Exportar a PDF"
             },
             "yourPlan": "Tu plan actual",
             "choose": "Elegir",
@@ -2370,5 +2385,24 @@
                 "premium": "Premium"
             }
         }
+    },
+    "supercrush": {
+        "buyTitle": "Supercrush",
+        "buyBody": "Llegan destacados y con tu nombre. Valen en cualquier fiesta y no caducan.",
+        "howMany": "¿Cuántos supercrush quieres comprar?",
+        "less": "Uno menos",
+        "more": "Uno más",
+        "priceLine_one": "{{count}} supercrush × {{unit}} = {{total}}",
+        "priceLine_other": "{{count}} supercrush × {{unit}} = {{total}}",
+        "pay": "Pagar {{total}}",
+        "youHave_one": "Ahora tienes {{count}} supercrush",
+        "youHave_other": "Ahora tienes {{count}} supercrush",
+        "available_one": "{{count}} supercrush disponible",
+        "available_other": "{{count}} supercrush disponibles",
+        "send": "Enviar supercrush ({{count}})",
+        "bought": "Supercrush comprados",
+        "boughtBody": "Ya los tienes en tu cuenta. Úsalos en cualquier fiesta.",
+        "buyCta": "Comprar supercrush",
+        "none": "No te quedan supercrush"
     }
 }

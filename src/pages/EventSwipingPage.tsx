@@ -80,7 +80,11 @@ const EventSwipingPage = () => {
     refreshActiveEvent,
     leaveEvent,
   } = useAppContext();
-  const { isPremium, setShowPremiumDialog } = usePremium();
+  const { supercrushBalance, supercrushIncluded, setShowSupercrushDialog, refreshSupercrush } =
+    usePremium();
+  // Supercrush que puede mandar ahora: el incluido de Premium en esta fiesta
+  // más los comprados o regalados.
+  const supercrushDisponibles = supercrushBalance + (supercrushIncluded ? 1 : 0);
 
   const [fallidas, setFallidas] = useState<{ items: FailedPhoto[]; total: number; kind: 'profile' | 'event' }>({
     items: [],
@@ -188,7 +192,9 @@ const EventSwipingPage = () => {
       }
 
       const isMatch =
-        direction === 'super' ? await handleSuperLike(userId) : await handleSwipeRight(userId);
+        direction === 'super'
+          ? await handleSuperLike(userId).finally(() => void refreshSupercrush())
+          : await handleSwipeRight(userId);
 
       if (isMatch && swiped) {
         track('match', { eventId: activeEvent?.eventId });
@@ -196,7 +202,7 @@ const EventSwipingPage = () => {
         setShowMatchDialog(true);
       }
     },
-    [nearbyProfiles, handleSwipeLeft, handleSwipeRight, handleSuperLike, activeEvent?.eventId],
+    [nearbyProfiles, handleSwipeLeft, handleSwipeRight, handleSuperLike, refreshSupercrush, activeEvent?.eventId],
   );
 
   const handleExit = () => {
@@ -434,12 +440,15 @@ const EventSwipingPage = () => {
             type="button"
             disabled={!currentProfile}
             onClick={() =>
-              isPremium ? tarjeta.current?.swipe('super') : setShowPremiumDialog(true)
+              supercrushDisponibles > 0 ? tarjeta.current?.swipe('super') : setShowSupercrushDialog(true)
             }
-            aria-label={t('premium.features.superLikes')}
-            className="press flex h-12 w-12 items-center justify-center rounded-full bg-card text-party-primary shadow-lg disabled:opacity-40"
+            aria-label={t('supercrush.send', { count: supercrushDisponibles })}
+            className="press relative flex h-12 w-12 items-center justify-center rounded-full bg-card text-party-primary shadow-lg disabled:opacity-40"
           >
             <Star size={21} className="fill-party-primary" />
+            <span className="absolute -right-1 -top-1 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-party-primary px-1 text-[11px] font-bold text-ink">
+              {supercrushDisponibles > 0 ? supercrushDisponibles : '+'}
+            </span>
           </button>
           <button
             type="button"

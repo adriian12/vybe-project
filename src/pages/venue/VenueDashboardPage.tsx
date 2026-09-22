@@ -11,6 +11,7 @@ import {
   CalendarDays,
   CreditCard,
   Download,
+  Lock,
   ExternalLink,
   FileText,
   HelpCircle,
@@ -327,7 +328,40 @@ const VenueDashboardPage = () => {
     }
   };
 
+  // Exportar: CSV y PDF son de Business. En los demás planes el botón lleva
+  // a la comparativa de planes.
+  const puedeExportar = plan?.plan === 'business';
+
+  const cabecerasResumen = () => ({
+    eventId: 'id',
+    eventName: t('venue.events.name'),
+    startDate: t('venue.events.startDate'),
+    endDate: t('venue.events.endDate'),
+    intents: t('venue.stats.funnelIntents'),
+    checkIns: t('venue.stats.funnelCheckIns'),
+    swipes: t('venue.stats.funnelSwipers'),
+    matches: t('venue.stats.funnelMatches'),
+    bookingClicks: t('venue.stats.funnelBookings'),
+  });
+
+  const exportPdf = () => {
+    if (!puedeExportar) {
+      goTo('plan');
+      return;
+    }
+    const ok = venueService.exportSummaryPdf(summary, cabecerasResumen(), {
+      title: t('venue.stats.pdfTitle'),
+      venueName: currentVenue?.name ?? '',
+      brand: t('common.appName'),
+    });
+    if (!ok) toast({ title: t('venue.stats.popupBlocked'), variant: 'destructive' });
+  };
+
   const exportCsv = () => {
+    if (!puedeExportar) {
+      goTo('plan');
+      return;
+    }
     venueService.exportSummaryCsv(summary, {
       eventId: 'id',
       eventName: t('venue.events.name'),
@@ -497,9 +531,14 @@ const VenueDashboardPage = () => {
         </SelectContent>
       </Select>
       <PartyButton variant="outline" size="sm" onClick={exportCsv} className="h-10">
-        <Download size={14} />
+        {puedeExportar ? <Download size={14} /> : <Lock size={14} />}
         {t('venue.stats.exportCsv')}
       </PartyButton>
+      <PartyButton variant="outline" size="sm" onClick={exportPdf} className="h-10">
+        {puedeExportar ? <FileText size={14} /> : <Lock size={14} />}
+        {t('venue.stats.exportPdf')}
+      </PartyButton>
+      {!puedeExportar && <span className="text-caption text-party-gray">{t('venue.stats.exportBusiness')}</span>}
     </div>
   );
 

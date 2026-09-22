@@ -9,6 +9,7 @@ import { AppProvider } from '@/context/app-context';
 import { PremiumProvider } from '@/context/premium-context';
 import ProtectedRoute from '@/components/protected-route';
 import PremiumFeatures from '@/components/premium-features';
+import SupercrushDialog from '@/components/supercrush-dialog';
 import PwaPrompt from '@/components/pwa-prompt';
 import ConsentGate from '@/components/consent-gate';
 import ErrorBoundary from '@/components/error-boundary';
@@ -150,6 +151,7 @@ const App = () => (
             <Sonner />
             <PwaPrompt />
             <PremiumFeatures />
+            <SupercrushDialog />
             <DevSentryCheck />
             <DeepLinks />
             <NativePushBridge />

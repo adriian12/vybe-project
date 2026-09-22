@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex" />
+  <title>Pago</title>
+  <!--
+    Vuelta de Stripe cuando el pago se hizo desde la app instalada.
+    Stripe sólo acepta direcciones https, así que vuelve aquí y esta página
+    reabre la app con el esquema propio `vybe://`, con los mismos parámetros
+    (?checkout=success, ?supercrush=success…).
+  -->
+  <style>
+    :root { color-scheme: dark; }
+    body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #111114; color: #fff;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; text-align: center; padding: 24px; box-sizing: border-box; }
+    .card { max-width: 340px; }
+    h1 { font-size: 22px; margin: 0 0 8px; }
+    p { color: #b8b8bd; margin: 0 0 24px; line-height: 1.45; }
+    a { display: inline-block; background: #f8d000; color: #1c1c1c; font-weight: 700; text-decoration: none;
+      padding: 14px 24px; border-radius: 14px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1 id="titulo">Volviendo a la app…</h1>
+    <p id="texto">Si no se abre sola, toca el botón.</p>
+    <a id="volver" href="vybe:///profile">Volver a la app</a>
+  </div>
+  <script>
+    (function () {
+      var q = location.search || '';
+      var ok = /(checkout|supercrush)=success/.test(q);
+      if (!ok) {
+        document.getElementById('titulo').textContent = 'Pago cancelado';
+        document.getElementById('texto').textContent = 'No se ha cobrado nada. Puedes volver a la app.';
+      }
+      var destino = 'vybe:///profile' + q;
+      document.getElementById('volver').setAttribute('href', destino);
+      setTimeout(function () { location.href = destino; }, 300);
+    })();
+  </script>
+</body>
+</html>
