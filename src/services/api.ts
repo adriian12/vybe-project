@@ -42,6 +42,7 @@ const profileToUser = (profile: ProfileRow, distance?: number): User => ({
   planTonight: profile.plan_tonight ?? undefined,
   gender: (profile.gender as User['gender']) ?? undefined,
   wants: (profile.wants as User['wants']) ?? 'all',
+  accountType: (profile.account_type as User['accountType']) ?? 'vyber',
   status: profile.status as User['status'],
   notifyMatches: profile.notify_matches,
   notifyMessages: profile.notify_messages,
@@ -95,6 +96,8 @@ const dbEventToEvent = (dbEvent: EventRow, venue?: VenueRow): Event => ({
   qrCode: dbEvent.qr_code ?? undefined,
   description: dbEvent.description ?? undefined,
   maxCapacity: dbEvent.max_capacity ?? undefined,
+  featuredUntil: dbEvent.featured_until ?? undefined,
+  requiresLocation: dbEvent.requires_location ?? true,
   recurrence: (dbEvent.recurrence as Event['recurrence']) ?? 'none',
   // La dirección es la del local: el evento no tiene columna propia, y la
   // tarjeta de «Cómo llegar» la necesita escrita, no sólo el punto del mapa.
@@ -118,6 +121,36 @@ const dbMessageToMessage = (dbMessage: MessageRow): Message => ({
   read: dbMessage.read,
   createdAt: dbMessage.created_at,
 });
+
+/**
+ * Pide la revisión automática de una foto de la cola. Un fallo de red cuenta
+ * como «no disponible»: la foto no se publica sin revisar.
+ */
+const moderate = async (
+  itemId: string,
+  url: string,
+): Promise<{ decision: 'approved' | 'rejected' | 'unavailable'; reason?: string }> => {
+  try {
+    const { data } = await supabase.functions.invoke('moderate-photo', { body: { itemId, url } });
+    const result = data as { decision?: string; reason?: string | null } | null;
+    if (result?.decision === 'approved') return { decision: 'approved' };
+    if (result?.decision === 'rejected') return { decision: 'rejected', reason: result.reason ?? undefined };
+  } catch (error) {
+    console.error('Automatic moderation unavailable:', error);
+  }
+  return { decision: 'unavailable', reason: 'unavailable' };
+};
+
+/** Tipo de cuenta y cuántos cambios quedan este mes. */
+export interface AccountTypeStatus {
+  accountType: 'vyber' | 'guest';
+  changesUsed: number;
+  maxChanges: number;
+  /** Cuándo podrá volver a ser vyber, si ahora no puede. */
+  nextAllowedAt: string | null;
+  /** Le faltan los datos que el registro de invitado no pide. */
+  needsProfile: boolean;
+}
 
 /** Id de auth del usuario con sesión activa, o null. */
 const authUserId = async (): Promise<string | null> => {
@@ -196,10 +229,73 @@ export const api = {
       endDate: row.end_date,
       distanceMeters: null,
       photoUrl: row.photo_url,
+      mode: (row.mode as 'vyber' | 'guest' | null) ?? null,
     };
   },
 
+  /** Tipo de cuenta, cambios usados y cuándo se podrá volver a cambiar. */
+  getAccountTypeStatus: async (): Promise<AccountTypeStatus | null> => {
+    const { data, error } = await supabase.rpc('my_account_type_status');
+    const row = data?.[0];
+    if (error || !row) return null;
+    return {
+      accountType: row.account_type === 'guest' ? 'guest' : 'vyber',
+      changesUsed: Number(row.changes_used),
+      maxChanges: Number(row.max_changes),
+      nextAllowedAt: row.next_allowed_at,
+      needsProfile: row.needs_profile,
+    };
+  },
+
+  /**
+   * Cambia el tipo de cuenta. A invitado siempre; a vyber, con el límite del
+   * plan y con el perfil completo (género y a quién quiere ver).
+   */
+  setAccountType: async (type: 'vyber' | 'guest'): Promise<void> => {
+    const { error } = await supabase.rpc('set_account_type', { p_type: type });
+    if (!error) return;
+
+    const code = ['SWITCH_LIMIT', 'PROFILE_INCOMPLETE'].find((k) => error.message.includes(k));
+    throw new ApiError(code ?? 'ACCOUNT_TYPE_FAILED', 'errors.generic');
+  },
+
+  /** Rellena el género cuando falta. No se puede cambiar una vez puesto. */
+  setMyGender: async (gender: 'man' | 'woman'): Promise<void> => {
+    const { error } = await supabase.rpc('set_my_gender', { p_gender: gender });
+    if (error) throw new ApiError('GENDER_FAILED', 'errors.generic');
+  },
+
+  /**
+   * Cambia entre vyber e invitado. Al pasar a invitado se borra la foto de
+   * esta noche (fichero incluido) y los likes que no llegaron a match.
+   */
+  setEventMode: async (
+    eventId: string,
+    mode: 'vyber' | 'guest',
+    photoUrl?: string | null,
+  ): Promise<void> => {
+    const { error } = await supabase.rpc('set_event_mode', { p_event_id: eventId, p_mode: mode });
+    if (error) throw new ApiError('MODE_FAILED', 'errors.generic');
+
+    if (mode === 'guest') {
+      const path = photoUrl?.split('/event-photos/')[1];
+      if (path) await api.deleteFile('event-photos', path);
+    }
+  },
+
   /** Guarda la foto que la persona se hace al entrar al evento. */
+  /**
+   * Sale del evento: deja de salir en el tablón y se borra la foto de esa
+   * noche, fichero incluido. Los chats con los matches siguen.
+   */
+  leaveEvent: async (eventId: string, photoUrl?: string | null): Promise<void> => {
+    const { error } = await supabase.rpc('leave_event', { p_event_id: eventId });
+    if (error) console.error('Error leaving event:', error);
+
+    const path = photoUrl?.split('/event-photos/')[1];
+    if (path) await api.deleteFile('event-photos', path);
+  },
+
   setEventPhoto: async (eventId: string, photoUrl: string): Promise<void> => {
     const { error } = await supabase.rpc('set_event_photo', {
       p_event_id: eventId,
@@ -680,7 +776,7 @@ export const api = {
 
     const { data: item, error } = await supabase
       .from('moderation_queue')
-      .insert({ profile_id: profileId, bucket: 'event-photos', path, url, kind: 'event_photo' })
+      .insert({ profile_id: profileId, bucket: 'event-photos', path, url, kind: 'event_photo', event_id: eventId })
       .select('id')
       .single();
 
@@ -689,22 +785,41 @@ export const api = {
       throw new ApiError('MODERATION_FAILED', 'errors.generic');
     }
 
-    try {
-      const { data } = await supabase.functions.invoke('moderate-photo', {
-        body: { itemId: item.id, url },
-      });
-      const result = data as { decision?: 'approved' | 'rejected'; reason?: string } | null;
-
-      if (result?.decision === 'rejected') {
-        await api.deleteFile('event-photos', path);
-        return { published: false, reason: result.reason };
-      }
-    } catch (moderationError) {
-      console.error('Automatic moderation unavailable:', moderationError);
+    // Sólo se publica lo que la revisión automática aprueba. Si no responde,
+    // se rechaza en ese momento y se pide repetir: antes se publicaba igual.
+    const result = await moderate(item.id, url);
+    if (result.decision !== 'approved') {
+      // Si la revisión no respondió, el fichero se queda para la revisión
+      // manual (los admins reciben aviso); si la rechazó, se borra.
+      if (result.decision === 'rejected') await api.deleteFile('event-photos', path);
+      return { published: false, reason: result.reason ?? 'unavailable' };
     }
 
     await api.setEventPhoto(eventId, url);
     return { published: true };
+  },
+
+  /** Avatar: la misma revisión automática; si pasa, lo pone el servidor. */
+  submitAvatarForReview: async (file: Blob): Promise<{ published: boolean; reason?: string }> => {
+    const profileId = await requireProfileId();
+    const { path, url } = await api.uploadFile('avatars', file, 'avatar.jpg');
+
+    const { data: item, error } = await supabase
+      .from('moderation_queue')
+      .insert({ profile_id: profileId, bucket: 'avatars', path, url, kind: 'avatar' })
+      .select('id')
+      .single();
+
+    if (error || !item) {
+      await api.deleteFile('avatars', path);
+      throw new ApiError('MODERATION_FAILED', 'errors.generic');
+    }
+
+    const result = await moderate(item.id, url);
+    if (result.decision === 'approved') return { published: true };
+
+    if (result.decision === 'rejected') await api.deleteFile('avatars', path);
+    return { published: false, reason: result.reason ?? 'unavailable' };
   },
 
   submitPhotoForReview: async (
@@ -725,31 +840,14 @@ export const api = {
       throw new ApiError('MODERATION_FAILED', 'No se pudo enviar la foto a revisión');
     }
 
-    // Moderación automática. Si está configurada decide al momento.
-    //
-    // Cuando no responde, la foto se queda pendiente de revisión manual y no se
-    // publica. Antes se publicaba igual «para no bloquear al usuario en la
-    // puerta de la discoteca», y eso convertía cualquier caída de Sightengine
-    // en barra libre: bastaba con provocar un fallo para publicar lo que fuera.
-    // La pantalla ya cuenta cuántas fotos están pendientes.
-    try {
-      const { data } = await supabase.functions.invoke('moderate-photo', {
-        body: { itemId: item.id, url },
-      });
+    // La revisión es automática y decide al momento: nadie puede revisar a
+    // mano a todo el mundo en tiempo real. Si no responde, la foto no se
+    // publica y se pide repetirla (antes se quedaba pendiente sin aviso).
+    const result = await moderate(item.id, url);
+    if (result.decision === 'approved') return { published: true };
 
-      const result = data as { decision?: 'approved' | 'rejected'; reason?: string } | null;
-
-      if (result?.decision === 'rejected') {
-        await api.deleteFile('event-photos', path);
-        return { published: false, reason: result.reason };
-      }
-
-      if (result?.decision === 'approved') return { published: true };
-    } catch (moderationError) {
-      console.error('Automatic moderation unavailable:', moderationError);
-    }
-
-    return { published: false, reason: 'pending_review' };
+    if (result.decision === 'rejected') await api.deleteFile('event-photos', path);
+    return { published: false, reason: result.reason ?? 'unavailable' };
   },
 
   /** Fotos del usuario pendientes de aprobación. */

@@ -24,9 +24,9 @@ import { adminClient, getUser, getProfileId } from '../_shared/supabase.ts';
 
 type UserPlan = 'monthly' | 'event' | 'lifetime';
 type VenuePlan = 'venue_pro' | 'venue_business';
-type Plan = UserPlan | VenuePlan;
+type Plan = UserPlan | VenuePlan | 'event_boost';
 
-const PRICE_ENV: Record<Plan, string> = {
+const PRICE_ENV: Record<Exclude<Plan, 'event_boost'>, string> = {
   monthly: 'STRIPE_PRICE_MONTHLY',
   event: 'STRIPE_PRICE_EVENT',
   lifetime: 'STRIPE_PRICE_LIFETIME',
@@ -34,7 +34,29 @@ const PRICE_ENV: Record<Plan, string> = {
   venue_business: 'STRIPE_PRICE_VENUE_BUSINESS',
 };
 
+/**
+ * Precios de los locales, en céntimos, para cuando no hay un precio creado en
+ * Stripe (variable STRIPE_PRICE_VENUE_*): la sesión lleva el importe dentro.
+ * Son los de la landing y `src/lib/venue-plans.ts`: si cambias uno, cambia los
+ * otros.
+ */
+const VENUE_PRICE_CENTS: Record<VenuePlan, number> = { venue_pro: 4900, venue_business: 12900 };
+const BOOST_PRICE_CENTS = 1900;
+
 const esPlanDeLocal = (plan: Plan): plan is VenuePlan => plan.startsWith('venue_');
+
+/** El local de quien pulsa: el suyo o aquel en cuyo equipo está. */
+const localDe = async (supabase: ReturnType<typeof adminClient>, userId: string) => {
+  const { data: propio } = await supabase.from('venues').select('id, email').eq('venue_id', userId).maybeSingle();
+  if (propio) return propio;
+  const { data: miembro } = await supabase
+    .from('venue_members')
+    .select('venues(id, email)')
+    .eq('user_id', userId)
+    .limit(1)
+    .maybeSingle();
+  return (miembro?.venues as { id: string; email: string | null } | null) ?? null;
+};
 
 serve(async (req: Request): Promise<Response> => {
   const early = preflight(req);
@@ -56,21 +78,80 @@ serve(async (req: Request): Promise<Response> => {
       returnUrl?: string;
     };
 
-    if (!plan || !(plan in PRICE_ENV)) return json({ error: 'Plan no válido' }, 400);
-
-    const priceId = Deno.env.get(PRICE_ENV[plan]);
-    if (!priceId) return json({ error: 'STRIPE_NOT_CONFIGURED' }, 200);
-
     const base = returnUrl ?? Deno.env.get('APP_URL') ?? '';
 
+    // Destacar un evento: pago único por noche. El evento tiene que ser del
+    // local de quien paga y no haber terminado.
+    if (plan === 'event_boost') {
+      if (!eventId) return json({ error: 'Falta el evento' }, 400);
+      const venue = await localDe(supabase, user.id);
+      if (!venue) return json({ error: 'No es una cuenta de local' }, 403);
+
+      const { data: evento } = await supabase
+        .from('events')
+        .select('id, name, venue_id, end_date')
+        .eq('id', eventId)
+        .maybeSingle();
+      if (!evento || evento.venue_id !== venue.id) return json({ error: 'Evento no válido' }, 403);
+      if (new Date(evento.end_date).getTime() <= Date.now()) return json({ error: 'EVENT_ENDED' }, 400);
+
+      const boost = new URLSearchParams({
+        mode: 'payment',
+        'line_items[0][quantity]': '1',
+        'line_items[0][price_data][currency]': 'eur',
+        'line_items[0][price_data][unit_amount]': String(BOOST_PRICE_CENTS),
+        'line_items[0][price_data][product_data][name]': `Destacar «${evento.name}» en Vybe`,
+        success_url: `${base}?boost=success`,
+        cancel_url: `${base}?boost=cancelled`,
+        client_reference_id: venue.id,
+        'metadata[kind]': 'event_boost',
+        'metadata[event_id]': evento.id,
+        'metadata[venue_id]': venue.id,
+        'tax_id_collection[enabled]': 'true',
+        billing_address_collection: 'required',
+        locale: 'auto',
+      });
+      if (venue.email) boost.set('customer_email', venue.email);
+
+      const respuesta = await fetch('https://api.stripe.com/v1/checkout/sessions', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${secretKey}`, 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: boost,
+      });
+      if (!respuesta.ok) {
+        console.error('Stripe error:', await respuesta.text());
+        return json({ error: 'CHECKOUT_FAILED' }, 502);
+      }
+      const sesion = (await respuesta.json()) as { url?: string };
+      return json({ url: sesion.url });
+    }
+
+    if (!plan || !(plan in PRICE_ENV)) return json({ error: 'Plan no válido' }, 400);
+
+    const priceId = Deno.env.get(PRICE_ENV[plan as Exclude<Plan, 'event_boost'>]);
+    // Los planes de local pueden cobrarse sin precio creado en Stripe; el
+    // Premium de usuario, no.
+    if (!priceId && !esPlanDeLocal(plan)) return json({ error: 'STRIPE_NOT_CONFIGURED' }, 200);
+
     const params = new URLSearchParams({
-      'line_items[0][price]': priceId,
       'line_items[0][quantity]': '1',
       success_url: `${base}?checkout=success`,
       cancel_url: `${base}?checkout=cancelled`,
       'metadata[plan]': plan,
       locale: 'auto',
     });
+
+    if (priceId) {
+      params.set('line_items[0][price]', priceId);
+    } else if (esPlanDeLocal(plan)) {
+      params.set('line_items[0][price_data][currency]', 'eur');
+      params.set('line_items[0][price_data][unit_amount]', String(VENUE_PRICE_CENTS[plan]));
+      params.set('line_items[0][price_data][recurring][interval]', 'month');
+      params.set(
+        'line_items[0][price_data][product_data][name]',
+        plan === 'venue_pro' ? 'Vybe Pro para locales' : 'Vybe Business para locales',
+      );
+    }
 
     if (esPlanDeLocal(plan)) {
       // El plan lo paga el local, así que el cobro va contra su fila y no

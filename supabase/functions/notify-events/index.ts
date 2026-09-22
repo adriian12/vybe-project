@@ -117,10 +117,12 @@ serve(async (req: Request): Promise<Response> => {
     }
 
     // ------------------------------------------------------------- generales
+    // Los programados esperan a su hora; los inmediatos salen en esta pasada.
     const { data: broadcasts } = await supabase
       .from('broadcasts')
       .select('id, title, body, url')
       .eq('status', 'pending')
+      .or(`scheduled_at.is.null,scheduled_at.lte.${new Date().toISOString()}`)
       .order('created_at')
       .limit(10);
 
@@ -148,7 +150,17 @@ serve(async (req: Request): Promise<Response> => {
       });
     }
 
-    return json({ eventPushes, broadcastPushes });
+    // Las fotos de las fiestas terminadas se borran: son de esa noche.
+    let deletedPhotos = 0;
+    const { data: paths } = await supabase.rpc('purge_ended_event_photos', { p_limit: 200 });
+    const rutas = ((paths ?? []) as { path: string }[]).map((row) => row.path).filter(Boolean);
+    if (rutas.length > 0) {
+      const { error } = await supabase.storage.from('event-photos').remove(rutas);
+      if (error) console.error('purge event photos:', error.message);
+      else deletedPhotos = rutas.length;
+    }
+
+    return json({ eventPushes, broadcastPushes, deletedPhotos });
   } catch (error) {
     console.error('notify-events error:', error);
     return json({ error: 'Error interno del servidor' }, 500);

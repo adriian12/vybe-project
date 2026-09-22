@@ -26,6 +26,8 @@ interface Texts {
   endingSoon: (event: string, vybes: number) => { title: string; body: string };
   raffleCreated: (event: string, prize: string, time: string | null) => { title: string; body: string };
   raffleWon: (event: string, prize: string) => { title: string; body: string };
+  newEvent: (venue: string, event: string, when: string) => { title: string; body: string };
+  photosPending: (count: number) => { title: string; body: string };
 }
 
 const TEXTS: Record<Locale, Texts> = {
@@ -75,6 +77,14 @@ const TEXTS: Record<Locale, Texts> = {
       title: '¡Te ha tocado!',
       body: `Has ganado ${prize} en ${event}. Enseña el vale de «Entradas» en la barra.`,
     }),
+    newEvent: (venue, event, when) => ({
+      title: `${venue} tiene nueva fiesta`,
+      body: `${event} · ${when}. Márcala con «voy a ir» para no perdértela.`,
+    }),
+    photosPending: (count) => ({
+      title: 'Tienes imágenes por revisar',
+      body: `${count} foto(s) esperan revisión manual: la revisión automática no ha respondido.`,
+    }),
   },
   en: {
     match: (name) => ({
@@ -119,6 +129,14 @@ const TEXTS: Record<Locale, Texts> = {
     raffleWon: (event, prize) => ({
       title: 'You won!',
       body: `You won ${prize} at ${event}. Show the voucher in "Tickets" at the bar.`,
+    }),
+    newEvent: (venue, event, when) => ({
+      title: `New party at ${venue}`,
+      body: `${event} · ${when}. Tap "I'm going" so you don't miss it.`,
+    }),
+    photosPending: (count) => ({
+      title: 'You have images to review',
+      body: `${count} photo(s) are waiting for manual review: the automatic check didn't respond.`,
     }),
   },
   de: {
@@ -167,6 +185,14 @@ const TEXTS: Record<Locale, Texts> = {
       title: 'Du hast gewonnen!',
       body: `Du hast ${prize} bei ${event} gewonnen. Zeig den Gutschein unter „Tickets" an der Bar.`,
     }),
+    newEvent: (venue, event, when) => ({
+      title: `Neue Party bei ${venue}`,
+      body: `${event} · ${when}. Markier „Ich gehe hin“, damit du sie nicht verpasst.`,
+    }),
+    photosPending: (count) => ({
+      title: 'Du hast Bilder zu prüfen',
+      body: `${count} Foto(s) warten auf manuelle Prüfung: Die automatische Prüfung hat nicht geantwortet.`,
+    }),
   },
   ca: {
     match: (name) => ({
@@ -213,6 +239,14 @@ const TEXTS: Record<Locale, Texts> = {
     raffleWon: (event, prize) => ({
       title: "T'ha tocat!",
       body: `Has guanyat ${prize} a ${event}. Ensenya el val d'«Entrades» a la barra.`,
+    }),
+    newEvent: (venue, event, when) => ({
+      title: `${venue} té festa nova`,
+      body: `${event} · ${when}. Marca «hi vaig» per no perdre-te-la.`,
+    }),
+    photosPending: (count) => ({
+      title: 'Tens imatges per revisar',
+      body: `${count} foto(s) esperen revisió manual: la revisió automàtica no ha respost.`,
     }),
   },
 };

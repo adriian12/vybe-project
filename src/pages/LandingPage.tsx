@@ -27,6 +27,9 @@ import {
   LockKeyhole,
   MapPinned,
   Megaphone,
+  Heart,
+  Gift,
+  Euro,
   type LucideIcon,
 } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -40,7 +43,7 @@ import StoreButtons from '@/components/store-buttons';
 import { COMPANY } from '@/lib/company';
 import { appHref, isExternalHref } from '@/lib/hosts';
 import { cn } from '@/lib/utils';
-import { PLAN_FEATURES, PLANS, PlanId } from '@/lib/venue-plans';
+import { BOOST_PRICE, PLAN_FEATURES, PLAN_PRICES, PLANS, PlanId, TRIAL_DAYS } from '@/lib/venue-plans';
 
 /**
  * Landing pública de Vybe, según «Landing Page Oficial Vybes» de Stitch
@@ -147,6 +150,10 @@ const LandingPage = () => {
     { key: 'promotions', icon: Megaphone },
     { key: 'stats', icon: BarChart3 },
     { key: 'team', icon: BadgeCheck },
+    { key: 'followers', icon: Heart },
+    { key: 'night', icon: Gift },
+    { key: 'report', icon: Euro },
+    { key: 'boost', icon: Sparkles },
   ];
 
   const trust: { key: string; icon: LucideIcon }[] = [
@@ -536,9 +543,20 @@ const LandingPage = () => {
                     <p className={cn('mt-1 text-body-sm', destacado ? 'text-ink/70' : 'text-party-gray')}>
                       {t(`venue.plan.taglines.${id}`)}
                     </p>
-                    <p className="mt-5 font-display text-[32px] font-extrabold leading-none">
-                      {id === 'free' ? t('landing.plans.free') : t('landing.plans.custom')}
+                    <p className="mt-5 flex items-baseline gap-1.5 font-display text-[32px] font-extrabold leading-none">
+                      {PLAN_PRICES[id] === 0 ? t('landing.plans.free') : `${PLAN_PRICES[id]} €`}
+                      {PLAN_PRICES[id] > 0 && (
+                        <span className={cn('text-body-sm font-semibold', destacado ? 'text-ink/60' : 'text-party-gray')}>
+                          {t('landing.plans.perMonth')}
+                        </span>
+                      )}
                     </p>
+                    {destacado && (
+                      <p className="mt-2 inline-flex w-fit items-center gap-1.5 rounded-full bg-ink px-3 py-1 text-caption font-bold text-party-primary">
+                        <Gift size={13} />
+                        {t('landing.plans.trial', { count: TRIAL_DAYS })}
+                      </p>
+                    )}
                     <ul className="mt-5 flex-1 space-y-2.5 text-body-md">
                       <li className="flex items-center gap-2">
                         <Check size={16} className="shrink-0" />
@@ -568,13 +586,17 @@ const LandingPage = () => {
                       >
                         {t('landing.plans.ctaFree')}
                       </AppLink>
+                    ) : destacado ? (
+                      <AppLink
+                        to={VENUE_SIGNUP}
+                        className="press mt-6 flex h-12 items-center justify-center rounded-xl bg-ink font-display text-title-card text-white hover:bg-ink/90"
+                      >
+                        {t('landing.plans.ctaTrial')}
+                      </AppLink>
                     ) : (
                       <a
                         href="#contacto"
-                        className={cn(
-                          'press mt-6 flex h-12 items-center justify-center rounded-xl font-display text-title-card',
-                          destacado ? 'bg-ink text-white hover:bg-ink/90' : 'bg-white text-ink hover:bg-white/90',
-                        )}
+                        className="press mt-6 flex h-12 items-center justify-center rounded-xl bg-white font-display text-title-card text-ink hover:bg-white/90"
                       >
                         {t('landing.plans.ctaPaid')}
                       </a>
@@ -583,7 +605,17 @@ const LandingPage = () => {
                 );
               })}
             </div>
+            <div className="mx-auto mt-6 flex max-w-5xl flex-col items-center gap-3 rounded-2xl bg-surface-low p-5 text-center md:flex-row md:text-left">
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-party-accent text-white">
+                <Sparkles size={20} />
+              </span>
+              <div className="flex-1">
+                <p className="font-display text-title-card">{t('landing.plans.boostTitle', { price: BOOST_PRICE })}</p>
+                <p className="text-body-sm text-party-gray">{t('landing.plans.boostBody')}</p>
+              </div>
+            </div>
             <p className="mt-6 text-center text-body-sm text-party-gray">{t('landing.plans.base')}</p>
+            <p className="mt-1 text-center text-caption text-party-gray">{t('landing.plans.vat')}</p>
           </div>
         </section>
 

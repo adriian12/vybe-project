@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Camera, RefreshCw, X } from 'lucide-react';
+import { Camera, RefreshCw, SwitchCamera, X } from 'lucide-react';
 import { PartyButton } from './ui-custom/party-button';
 
 interface CameraCaptureProps {
@@ -17,6 +17,10 @@ interface CameraCaptureProps {
  * Vybe exige fotos tomadas en el momento dentro del evento; antes se generaban
  * avatares aleatorios de un servicio externo, lo que vaciaba de sentido la
  * verificación de presencia.
+ *
+ * Se puede cambiar a la cámara de atrás, porque muchas veces la foto te la hace
+ * alguien. La vista previa **no** va en espejo: se veía al revés que la foto
+ * que se enviaba, y quien se ponía de perfil acababa volteado.
  */
 const CameraCapture: React.FC<CameraCaptureProps> = ({
   onCapture,
@@ -32,6 +36,7 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({
 
   const [isReady, setIsReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [camara, setCamara] = useState<'user' | 'environment'>(facingMode);
 
   const stopCamera = useCallback(() => {
     streamRef.current?.getTracks().forEach((track) => track.stop());
@@ -45,7 +50,7 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode, width: { ideal: 1280 }, height: { ideal: 1280 } },
+        video: { facingMode: camara, width: { ideal: 1280 }, height: { ideal: 1280 } },
         audio: false,
       });
 
@@ -59,7 +64,7 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({
       console.error('Error accessing camera:', cameraError);
       setError(t('scanner.cameraError'));
     }
-  }, [facingMode]);
+  }, [camara, t]);
 
   useEffect(() => {
     void startCamera();
@@ -103,8 +108,20 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({
           playsInline
           muted
           className="w-full h-full object-cover"
-          style={{ transform: facingMode === 'user' ? 'scaleX(-1)' : undefined }}
         />
+        {isReady && !error && (
+          <button
+            type="button"
+            onClick={() => {
+              stopCamera();
+              setCamara((actual) => (actual === 'user' ? 'environment' : 'user'));
+            }}
+            aria-label={t('camera.switch')}
+            className="press absolute right-3 top-3 flex h-11 w-11 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur"
+          >
+            <SwitchCamera size={20} />
+          </button>
+        )}
         {!isReady && !error && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/60">
             <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin" />

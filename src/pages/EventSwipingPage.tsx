@@ -4,9 +4,7 @@ import { useTranslation } from 'react-i18next';
 import {
   ArrowLeft,
   Camera,
-  Crown,
   Heart,
-  Image as ImageIcon,
   Loader2,
   LogOut,
   Radar,
@@ -25,7 +23,6 @@ import ProfileCard, { ProfileCardHandle, SwipeDirection } from '@/components/pro
 import MatchDialog from '@/components/match-dialog';
 import CameraCapture from '@/components/camera-capture';
 import DiscoveryFiltersSheet from '@/components/discovery-filters';
-import GroupsSheet from '@/components/groups-sheet';
 import SafetySheet from '@/components/safety-sheet';
 import EventOffers from '@/components/event-offers';
 import { useNightExtras } from '@/components/night-extras';
@@ -37,9 +34,10 @@ import { api } from '@/services/api';
 import { socialService } from '@/services/social';
 import { track } from '@/lib/observability';
 import { cn } from '@/lib/utils';
+import FollowVenuePrompt from '@/components/follow-venue-prompt';
+import GuestEventPage from '@/pages/GuestEventPage';
+import PhotoRequirementsDialog, { FailedPhoto } from '@/components/photo-requirements-dialog';
 import { User } from '@/types/user';
-
-const REQUIRED_PHOTOS = 3;
 
 /** Cabecera común de los pasos previos al tablón. */
 const PasoCabecera: React.FC<{ title: string; body: string }> = ({ title, body }) => {
@@ -84,7 +82,11 @@ const EventSwipingPage = () => {
   } = useAppContext();
   const { isPremium, setShowPremiumDialog } = usePremium();
 
-  const [photos, setPhotos] = useState<string[]>([]);
+  const [fallidas, setFallidas] = useState<{ items: FailedPhoto[]; total: number; kind: 'profile' | 'event' }>({
+    items: [],
+    total: 1,
+    kind: 'profile',
+  });
   const [isUploading, setIsUploading] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
   const [showMatchDialog, setShowMatchDialog] = useState(false);
@@ -97,20 +99,22 @@ const EventSwipingPage = () => {
 
   const extras = useNightExtras(activeEvent?.eventId ?? eventId ?? '', loadProfiles);
 
-  // Dos cosas distintas: las fotos del perfil se piden una vez para verificar
-  // la cuenta, y la foto del evento se pide en cada fiesta porque es la que se
-  // ve al deslizar. Sin ella no se sale en el tablón de nadie.
-  const needsPhotos = !currentUser?.isVerified || (currentUser?.photos.length ?? 0) === 0;
-  const needsEventPhoto = !needsPhotos && !activeEvent?.photoUrl;
+  // Cómo se entra a la fiesta lo dice el tipo de cuenta; un vyber puede pasar
+  // esa noche suelta a invitado con el botón de la barra de acciones.
+  const modo: 'vyber' | 'guest' =
+    activeEvent?.mode ?? (currentUser?.accountType === 'guest' ? 'guest' : 'vyber');
 
-  const [step, setStep] = useState<'take_photos' | 'event_photo' | 'swipe'>(() =>
-    needsPhotos ? 'take_photos' : 'swipe',
+  // Una sola foto al entrar: la de esta noche, hecha con la cámara (cara o
+  // cuerpo entero). La revisión automática la aprueba y, si la cuenta aún no
+  // estaba verificada, la verifica con ella. Antes se pedían tres fotos de
+  // perfil y luego otra más para el evento.
+  const [step, setStep] = useState<'event_photo' | 'swipe'>(() =>
+    activeEvent?.photoUrl ? 'swipe' : 'event_photo',
   );
 
   useEffect(() => {
-    if (needsPhotos) return;
-    setStep(needsEventPhoto ? 'event_photo' : 'swipe');
-  }, [needsPhotos, needsEventPhoto]);
+    setStep(activeEvent?.photoUrl ? 'swipe' : 'event_photo');
+  }, [activeEvent?.photoUrl]);
 
   const [eventPhoto, setEventPhoto] = useState<string | null>(null);
 
@@ -135,30 +139,6 @@ const EventSwipingPage = () => {
     void socialService.getMyInterests().then(setMisIntereses);
   }, []);
 
-  /**
-   * Carga una foto de la galería en la vista previa.
-   *
-   * Se convierte a data URL para que el resto del paso no tenga que distinguir
-   * de dónde salió: la vista previa, el «repetir» y la subida funcionan igual
-   * viniendo de la cámara o del carrete.
-   */
-  const pickEventPhotoFromGallery = useCallback(
-    async (file: File) => {
-      try {
-        const dataUrl = await new Promise<string>((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(String(reader.result));
-          reader.onerror = () => reject(reader.error);
-          reader.readAsDataURL(file);
-        });
-        setEventPhoto(dataUrl);
-      } catch {
-        toast({ title: t('common.error'), description: t('errors.generic'), variant: 'destructive' });
-      }
-    },
-    [toast, t],
-  );
-
   /** Sube la foto de esta noche y entra al tablón. */
   const submitEventPhoto = useCallback(async () => {
     if (!eventPhoto || !activeEvent) return;
@@ -169,23 +149,14 @@ const EventSwipingPage = () => {
       const result = await api.submitEventPhoto(activeEvent.eventId, blob);
 
       if (!result.published) {
-        // La moderación devuelve un código, no una frase: `no_face`,
-        // `many_faces`, `nudity`… Se traduce aquí para no mostrar jerga.
-        const motivos: Record<string, string> = {
-          no_face: t('swiping.rejectNoFace'),
-          many_faces: t('swiping.rejectManyFaces'),
-        };
-
-        toast({
-          title: t('common.error'),
-          description: (result.reason && motivos[result.reason]) ?? t('swiping.eventPhotoRejected'),
-          variant: 'destructive',
-        });
+        setFallidas({ items: [{ index: 1, reason: result.reason }], total: 1, kind: 'event' });
         setEventPhoto(null);
         return;
       }
 
       track('photos_uploaded', { count: 1, kind: 'event' });
+      await api.refreshVerificationStatus();
+      await refreshProfile();
       await refreshActiveEvent();
       await loadProfiles();
       setStep('swipe');
@@ -195,7 +166,7 @@ const EventSwipingPage = () => {
     } finally {
       setIsUploading(false);
     }
-  }, [eventPhoto, activeEvent, refreshActiveEvent, loadProfiles, toast, t]);
+  }, [eventPhoto, activeEvent, refreshActiveEvent, refreshProfile, loadProfiles, toast, t]);
 
   // El acceso lo garantiza ProtectedRoute; aquí sólo se comprueba que el evento
   // de la URL sea el que se ha canjeado.
@@ -205,49 +176,6 @@ const EventSwipingPage = () => {
     }
   }, [activeEvent, eventId, navigate]);
 
-  const handleCapture = useCallback((dataUrl: string) => {
-    setPhotos((prev) => [...prev, dataUrl].slice(0, REQUIRED_PHOTOS));
-    setShowCamera(false);
-  }, []);
-
-  const startSwiping = useCallback(async () => {
-    if (photos.length < REQUIRED_PHOTOS) return;
-
-    setIsUploading(true);
-    try {
-      // Las fotos van a Storage y pasan por moderación.
-      const results = await Promise.all(
-        photos.map(async (dataUrl, index) => {
-          const blob = await api.dataUrlToBlob(dataUrl);
-          return api.submitPhotoForReview(blob, `event-photo-${index + 1}.jpg`);
-        }),
-      );
-
-      const rejected = results.find((r) => !r.published);
-      if (rejected) {
-        toast({
-          title: t('common.error'),
-          description: rejected.reason ?? t('errors.generic'),
-          variant: 'destructive',
-        });
-        setPhotos([]);
-        return;
-      }
-
-      track('photos_uploaded', { count: results.length });
-
-      await api.refreshVerificationStatus();
-      await refreshProfile();
-      await loadProfiles();
-
-      setStep('swipe');
-    } catch (error) {
-      console.error('Error uploading event photos:', error);
-      toast({ title: t('common.error'), description: t('errors.generic'), variant: 'destructive' });
-    } finally {
-      setIsUploading(false);
-    }
-  }, [photos, refreshProfile, loadProfiles, toast, t]);
 
   const onSwipe = useCallback(
     async (direction: SwipeDirection, userId: string) => {
@@ -285,85 +213,12 @@ const EventSwipingPage = () => {
   }
 
   // -------------------------------------------------------------------------
-  // Paso 1: fotos tomadas en el momento
+  // Antes del tablón: la foto de esta noche
   // -------------------------------------------------------------------------
-  if (step === 'take_photos') {
-    return (
-      <div className="min-h-screen pb-[calc(var(--nav-h)+2rem)] pt-[var(--header-h)]">
-        <Header />
-        <main className="mx-auto w-full max-w-md px-margin pt-5">
-          <PasoCabecera
-            title={t('swiping.photosTitle', { name: activeEvent.eventName })}
-            body={t('swiping.photosBody', { count: REQUIRED_PHOTOS })}
-          />
-
-          {showCamera ? (
-            <CameraCapture
-              onCapture={handleCapture}
-              onCancel={() => setShowCamera(false)}
-              facingMode="user"
-              captureLabel={t('swiping.photoOf', { current: photos.length + 1, total: REQUIRED_PHOTOS })}
-            />
-          ) : (
-            <>
-              <div className="mb-5 grid grid-cols-3 gap-2">
-                {Array.from({ length: REQUIRED_PHOTOS }).map((_, index) =>
-                  photos[index] ? (
-                    <img
-                      key={index}
-                      src={photos[index]}
-                      alt=""
-                      className="aspect-square w-full rounded-xl object-cover"
-                    />
-                  ) : (
-                    <button
-                      key={index}
-                      type="button"
-                      onClick={() => setShowCamera(true)}
-                      className="press flex aspect-square flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed border-surface-highest bg-card text-party-gray"
-                    >
-                      <Camera size={22} />
-                      <span className="text-caption">{t('swiping.takePhoto')}</span>
-                    </button>
-                  ),
-                )}
-              </div>
-
-              {photos.length > 0 && (
-                <button
-                  type="button"
-                  className="press mb-4 text-caption text-party-gray underline"
-                  onClick={() => setPhotos([])}
-                >
-                  {t('swiping.startOver')}
-                </button>
-              )}
-
-              {photos.length < REQUIRED_PHOTOS ? (
-                <p className="text-body-sm text-party-gray">
-                  {t('swiping.missingPhotos', { count: REQUIRED_PHOTOS - photos.length })}
-                </p>
-              ) : (
-                <PartyButton
-                  size="lg"
-                  onClick={() => void startSwiping()}
-                  className="w-full"
-                  disabled={isUploading}
-                >
-                  {isUploading ? t('swiping.uploading') : t('swiping.startSwiping')}
-                </PartyButton>
-              )}
-            </>
-          )}
-        </main>
-        <Footer />
-      </div>
-    );
+  if (modo === 'guest') {
+    return <GuestEventPage />;
   }
 
-  // -------------------------------------------------------------------------
-  // Paso 2: la foto de esta noche
-  // -------------------------------------------------------------------------
   if (step === 'event_photo') {
     return (
       <div className="min-h-screen pb-[calc(var(--nav-h)+2rem)] pt-[var(--header-h)]">
@@ -422,44 +277,22 @@ const EventSwipingPage = () => {
                 <div className="space-y-3">
                   <p className="text-caption text-party-gray">{t('swiping.eventPhotoWhy')}</p>
 
-                  {/* La foto de esta noche se hace con la cámara: es lo que la
-                      hace valer algo. La galería es la excepción de pago, y
-                      pasa por la misma moderación. */}
-                  {isPremium ? (
-                    <>
-                      <input
-                        id="event-photo-gallery"
-                        type="file"
-                        accept="image/jpeg,image/png,image/webp"
-                        className="sr-only"
-                        onChange={(event) => {
-                          const file = event.target.files?.[0];
-                          event.target.value = '';
-                          if (file) void pickEventPhotoFromGallery(file);
-                        }}
-                      />
-                      <PartyButton asChild variant="outline" size="sm" className="cursor-pointer">
-                        <label htmlFor="event-photo-gallery">
-                          <ImageIcon size={14} />
-                          {t('profile.fromGallery')}
-                        </label>
-                      </PartyButton>
-                    </>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => setShowPremiumDialog(true)}
-                      className="press mx-auto flex items-center justify-center gap-2 rounded-xl border border-dashed border-surface-highest px-4 py-2 text-caption text-party-gray"
-                    >
-                      <Crown size={14} className="text-party-accent" />
-                      {t('profile.fromGalleryPremium')}
-                    </button>
-                  )}
+                  {/* La foto de esta noche se hace con la cámara, siempre: es lo
+                      que la hace valer algo. La galería sólo sirve para el
+                      perfil. */}
+                  <p className="text-caption text-party-gray">{t('swiping.cameraOnly')}</p>
                 </div>
               )}
             </div>
           )}
         </main>
+        <PhotoRequirementsDialog
+          open={fallidas.items.length > 0}
+          onOpenChange={(open) => !open && setFallidas((f) => ({ ...f, items: [] }))}
+          failed={fallidas.items}
+          total={fallidas.total}
+          kind={fallidas.kind}
+        />
         <Footer />
       </div>
     );
@@ -486,11 +319,11 @@ const EventSwipingPage = () => {
             <ArrowLeft size={20} />
           </button>
           <div className="flex min-w-0 flex-1 justify-center">
-            <span className="flex min-w-0 items-center gap-1.5 rounded-full bg-party-primary px-3 py-1.5 text-label-pill text-ink">
-              <span className="h-2 w-2 shrink-0 animate-pulse rounded-full bg-ink" />
+            <span className="flex min-w-0 items-center gap-2 rounded-full bg-party-primary px-4 py-2.5 font-display text-title-card text-ink">
+              <span className="h-2.5 w-2.5 shrink-0 animate-pulse rounded-full bg-ink" />
               <span className="truncate">{activeEvent.eventName}</span>
               {dentro !== null && dentro > 0 && (
-                <span className="shrink-0">· {t('swiping.insideCount', { count: dentro })}</span>
+                <span className="shrink-0 text-body-sm font-bold">· {t('swiping.insideCount', { count: dentro })}</span>
               )}
             </span>
           </div>
@@ -502,14 +335,26 @@ const EventSwipingPage = () => {
           >
             <ShieldAlert size={19} />
           </button>
+          {/* Salir, siempre a la vista: antes se perdía al final de la fila de
+              acciones, que se desliza. */}
+          <button
+            type="button"
+            onClick={handleExit}
+            aria-label={t('swiping.exitShort')}
+            className="press flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-destructive/15 text-destructive"
+          >
+            <LogOut size={18} />
+          </button>
         </div>
 
         {/* Acciones del evento en una fila que se desliza: son seis y en el
             ancho de un móvil no caben sin encoger hasta ser ilegibles. */}
         <div className="no-scrollbar flex gap-2 overflow-x-auto px-margin py-3">
           <DiscoveryFiltersSheet filters={filters} onApply={setFilters} />
-          <GroupsSheet eventId={activeEvent.eventId} />
           <EventOffers eventId={activeEvent.eventId} />
+          {activeEvent.venueId && (
+            <FollowVenuePrompt venueId={activeEvent.venueId} venueName={activeEvent.venueName ?? activeEvent.eventName} />
+          )}
           <EventActionButton
             icon={Rocket}
             label={
@@ -521,7 +366,6 @@ const EventSwipingPage = () => {
             disabled={extras.boosting || extras.boostMinutes > 0}
             tone={extras.boostMinutes > 0 ? 'active' : 'default'}
           />
-          <EventActionButton icon={LogOut} label={t('swiping.exitShort')} onClick={handleExit} tone="danger" />
         </div>
 
         {/* ----------------------------------------------------------- baraja */}

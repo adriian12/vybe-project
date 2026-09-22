@@ -17,6 +17,9 @@ const VENUE_ERROR_KEYS: Record<string, string> = {
   INVALID_TOTAL: 'venue.counter.errors.invalid',
   TOO_MANY_LINKS: 'venue.counter.errors.tooManyLinks',
   PLAN_REQUIRED: 'venue.plan.errors.upgradeRequired',
+  SCHEDULE_LIMIT: 'venue.broadcast.errors.scheduleLimit',
+  SCHEDULE_IN_PAST: 'venue.broadcast.errors.scheduleInPast',
+  SCHEDULE_AFTER_EVENT: 'venue.broadcast.errors.scheduleAfterEvent',
 };
 
 const venueError = (message: string): ApiError => {
@@ -179,11 +182,13 @@ export interface Broadcast {
   id: string;
   title: string;
   body: string;
-  status: 'pending' | 'sent' | 'failed';
+  status: 'pending' | 'sent' | 'failed' | 'cancelled';
   /** Cuántos avisos salieron de verdad. Nulo mientras está en cola. */
   recipients: number | null;
   createdAt: string;
   sentAt: string | null;
+  /** Hora a la que saldrá. Nulo: sale en la siguiente pasada. */
+  scheduledAt: string | null;
 }
 
 export interface VenuePlanStatus {
@@ -828,22 +833,40 @@ export const venueService = {
    * Sin `eventId` va a toda la aplicación, y eso sólo lo puede hacer
    * administración: el servidor lo comprueba, no se confía en la interfaz.
    */
-  queueBroadcast: async (title: string, body: string, eventId?: string): Promise<string> => {
+  queueBroadcast: async (
+    title: string,
+    body: string,
+    eventId?: string,
+    scheduledAt?: string | null,
+  ): Promise<string> => {
     const { data, error } = await supabase.rpc('queue_broadcast', {
       p_title: title,
       p_body: body,
       p_event_id: eventId ?? null,
       p_url: null,
+      p_scheduled_at: scheduledAt ?? null,
     });
 
     if (error) throw venueError(error.message);
     return data as string;
   },
 
+  /** Anula un aviso programado que todavía no ha salido. */
+  cancelBroadcast: async (broadcastId: string): Promise<void> => {
+    const { error } = await supabase.rpc('cancel_broadcast', { p_broadcast_id: broadcastId });
+    if (error) throw venueError(error.message);
+  },
+
+  /** Cuántos avisos programados puede tener el local a la vez. */
+  getScheduledBroadcastLimit: async (venueId: string): Promise<number> => {
+    const { data } = await supabase.rpc('venue_scheduled_broadcast_limit', { p_venue_id: venueId });
+    return Number(data ?? 1);
+  },
+
   getBroadcasts: async (eventId?: string): Promise<Broadcast[]> => {
     let query = supabase
       .from('broadcasts')
-      .select('id, title, body, status, recipients, created_at, sent_at')
+      .select('id, title, body, status, recipients, created_at, sent_at, scheduled_at')
       .order('created_at', { ascending: false })
       .limit(20);
 
@@ -860,6 +883,7 @@ export const venueService = {
       recipients: row.recipients,
       createdAt: row.created_at,
       sentAt: row.sent_at,
+      scheduledAt: row.scheduled_at,
     }));
   },
 

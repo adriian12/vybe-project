@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Megaphone, Send, Loader2, Check } from 'lucide-react';
+import { Megaphone, Send, Loader2, Check, Clock, X } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -13,7 +13,15 @@ import { venueService, Broadcast } from '@/services/venue-service';
 interface VenueBroadcastProps {
   /** Sin evento, el aviso va a toda la aplicación y sólo puede administración. */
   eventId?: string;
+  /** Para saber cuántos avisos programados caben según el plan. */
+  venueId?: string;
 }
+
+/** «2026-09-20T23:45» para el campo de fecha y hora, en hora local. */
+const paraInput = (fecha: Date): string => {
+  const local = new Date(fecha.getTime() - fecha.getTimezoneOffset() * 60_000);
+  return local.toISOString().slice(0, 16);
+};
 
 /**
  * Avisos a quien está dentro del evento.
@@ -26,7 +34,7 @@ interface VenueBroadcastProps {
  * El envío no es inmediato: la nota se encola y sale en la siguiente pasada del
  * programador, como mucho unos minutos después.
  */
-const VenueBroadcast = ({ eventId }: VenueBroadcastProps) => {
+const VenueBroadcast = ({ eventId, venueId }: VenueBroadcastProps) => {
   const { t } = useTranslation();
   const { toast } = useToast();
 
@@ -35,6 +43,8 @@ const VenueBroadcast = ({ eventId }: VenueBroadcastProps) => {
   const [isBusy, setIsBusy] = useState(false);
   const [sent, setSent] = useState<Broadcast[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [cuando, setCuando] = useState('');
+  const [limite, setLimite] = useState(1);
 
   const load = useCallback(async () => {
     setSent(await venueService.getBroadcasts(eventId));
@@ -45,16 +55,26 @@ const VenueBroadcast = ({ eventId }: VenueBroadcastProps) => {
     void load();
   }, [load]);
 
+  useEffect(() => {
+    if (venueId) void venueService.getScheduledBroadcastLimit(venueId).then(setLimite);
+  }, [venueId]);
+
+  const programados = sent.filter((b) => b.status === 'pending' && b.scheduledAt);
+
   const send = async () => {
     if (!title.trim() || !body.trim()) return;
 
     setIsBusy(true);
     try {
-      await venueService.queueBroadcast(title.trim(), body.trim(), eventId);
+      // Con hora, el aviso espera a esa hora; sin ella, sale en la siguiente
+      // pasada del programador.
+      const programado = cuando ? new Date(cuando).toISOString() : null;
+      await venueService.queueBroadcast(title.trim(), body.trim(), eventId, programado);
       setTitle('');
       setBody('');
+      setCuando('');
       await load();
-      toast({ title: t('venue.broadcast.queued') });
+      toast({ title: t(programado ? 'venue.broadcast.scheduled' : 'venue.broadcast.queued') });
     } catch (error) {
       const key = error instanceof ApiError ? error.message : 'errors.generic';
       toast({ title: t('common.error'), description: t(key), variant: 'destructive' });
@@ -102,14 +122,39 @@ const VenueBroadcast = ({ eventId }: VenueBroadcastProps) => {
           />
         </div>
 
+        <div className="space-y-1.5">
+          <Label htmlFor="broadcast-when" className="flex items-center gap-1.5 text-xs">
+            <Clock size={12} />
+            {t('venue.broadcast.when')}
+          </Label>
+          <div className="flex gap-2">
+            <Input
+              id="broadcast-when"
+              type="datetime-local"
+              value={cuando}
+              min={paraInput(new Date())}
+              onChange={(e) => setCuando(e.target.value)}
+              className="flex-1"
+            />
+            {cuando && (
+              <PartyButton variant="outline" size="sm" onClick={() => setCuando('')}>
+                {t('venue.broadcast.now')}
+              </PartyButton>
+            )}
+          </div>
+          <p className="text-[11px] text-muted-foreground">
+            {t('venue.broadcast.scheduledCount', { count: programados.length, max: limite })}
+          </p>
+        </div>
+
         <PartyButton
           size="sm"
           className="w-full gap-2"
-          disabled={isBusy || !title.trim() || !body.trim()}
+          disabled={isBusy || !title.trim() || !body.trim() || (Boolean(cuando) && programados.length >= limite)}
           onClick={() => void send()}
         >
           <Send size={14} />
-          {t('venue.broadcast.send')}
+          {t(cuando ? 'venue.broadcast.schedule' : 'venue.broadcast.send')}
         </PartyButton>
 
         <p className="text-[11px] text-muted-foreground">{t('venue.broadcast.delayNote')}</p>
@@ -133,6 +178,35 @@ const VenueBroadcast = ({ eventId }: VenueBroadcastProps) => {
                       <Check size={10} />
                       {t('venue.broadcast.reached', { count: broadcast.recipients ?? 0 })}
                     </Badge>
+                  ) : broadcast.status === 'cancelled' ? (
+                    <Badge variant="outline" className="shrink-0 text-[10px]">
+                      {t('venue.broadcast.cancelled')}
+                    </Badge>
+                  ) : broadcast.scheduledAt ? (
+                    <div className="flex shrink-0 items-center gap-1">
+                      <Badge variant="outline" className="gap-1 text-[10px]">
+                        <Clock size={10} />
+                        {new Date(broadcast.scheduledAt).toLocaleString(undefined, {
+                          day: 'numeric',
+                          month: 'short',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </Badge>
+                      <button
+                        type="button"
+                        aria-label={t('common.cancel')}
+                        onClick={() =>
+                          void venueService
+                            .cancelBroadcast(broadcast.id)
+                            .then(load)
+                            .catch(() => toast({ title: t('common.error'), variant: 'destructive' }))
+                        }
+                        className="press flex h-6 w-6 items-center justify-center rounded-full text-muted-foreground hover:bg-black/5"
+                      >
+                        <X size={13} />
+                      </button>
+                    </div>
                   ) : (
                     <Badge variant="outline" className="shrink-0 text-[10px]">
                       {t('venue.broadcast.pending')}

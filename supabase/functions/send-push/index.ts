@@ -20,7 +20,7 @@ import { pushTexts } from '../_shared/push-texts.ts';
 interface PushRequest {
   /** Perfil destinatario. */
   profileId: string;
-  kind: 'match' | 'message' | 'event';
+  kind: 'match' | 'message' | 'event' | 'admin';
   title: string;
   body: string;
   url?: string;
@@ -28,8 +28,8 @@ interface PushRequest {
 }
 
 interface WebhookPayload {
-  type: 'INSERT' | 'RAFFLE_CREATED' | 'RAFFLE_DRAWN';
-  table: 'connections' | 'messages' | 'raffles';
+  type: 'INSERT' | 'RAFFLE_CREATED' | 'RAFFLE_DRAWN' | 'EVENT_PUBLISHED' | 'PHOTOS_PENDING';
+  table: 'connections' | 'messages' | 'raffles' | 'venue_events' | 'moderation_queue';
   record: Record<string, unknown>;
 }
 
@@ -40,6 +40,73 @@ const horaLocal = (iso: string, locale: string | null): string =>
     minute: '2-digit',
     timeZone: 'Europe/Madrid',
   });
+
+/** «sáb 20, 23:30» en hora de Mallorca. */
+const cuandoLocal = (iso: string, locale: string | null): string =>
+  new Date(iso).toLocaleString(locale ?? 'es', {
+    weekday: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'Europe/Madrid',
+  });
+
+/**
+ * Nueva fiesta de un local: aviso a quien le sigue (y tiene activados los avisos
+ * de eventos, que `deliver` ya comprueba).
+ */
+const fromVenueEvent = async (
+  supabase: ReturnType<typeof adminClient>,
+  payload: WebhookPayload,
+): Promise<PushRequest[]> => {
+  const eventId = (payload.record as { id?: string }).id;
+  if (!eventId) return [];
+
+  const { data: evento } = await supabase
+    .from('events')
+    .select('id, name, start_date, venue_id, venues(name)')
+    .eq('id', eventId)
+    .maybeSingle();
+  if (!evento) return [];
+
+  const venueName = (evento.venues as { name?: string } | null)?.name ?? 'Vybe';
+  const { data: seguidores } = await supabase
+    .from('venue_followers')
+    .select('profile_id, profiles(locale)')
+    .eq('venue_id', evento.venue_id)
+    .limit(5000);
+
+  return (seguidores ?? []).map((row) => {
+    const locale = (row.profiles as { locale?: string | null } | null)?.locale ?? null;
+    return {
+      profileId: row.profile_id as string,
+      kind: 'event' as const,
+      ...pushTexts(locale).newEvent(venueName, evento.name, cuandoLocal(evento.start_date, locale)),
+      url: `/event/${evento.id}`,
+      tag: `venue-event-${evento.id}`,
+    };
+  });
+};
+
+/**
+ * Fotos que la revisión automática no ha podido mirar: aviso a los admins
+ * («Tienes imágenes por revisar»). El disparador ya limita a uno cada 10 min.
+ */
+const fromPendingPhotos = async (supabase: ReturnType<typeof adminClient>): Promise<PushRequest[]> => {
+  const { data: count } = await supabase.rpc('count_pending_moderation');
+  const pendientes = Number(count ?? 0);
+  if (pendientes === 0) return [];
+
+  const { data: admins } = await supabase.from('profiles').select('id, locale').eq('role', 'admin').limit(50);
+
+  return (admins ?? []).map((admin) => ({
+    profileId: admin.id as string,
+    kind: 'admin' as const,
+    ...pushTexts(admin.locale).photosPending(pendientes),
+    url: '/admin/dashboard?seccion=photos',
+    tag: 'photos-pending',
+  }));
+};
 
 /**
  * Avisos de un sorteo: al crearlo, a quien está dentro (para participar hay que
@@ -123,12 +190,15 @@ const deliver = async (
   // Respeta las preferencias del usuario. Cada tipo de aviso se puede apagar
   // por separado: quien no quiere que le insistan con los eventos puede seguir
   // queriendo saber que tiene un match.
+  // Los avisos de administración no se pueden apagar.
   const column =
     payload.kind === 'match'
       ? 'notify_matches'
       : payload.kind === 'event'
         ? 'notify_events'
-        : 'notify_messages';
+        : payload.kind === 'admin'
+          ? 'status'
+          : 'notify_messages';
   const { data: profile } = await supabase
     .from('profiles')
     .select(`${column}, status`)
@@ -295,7 +365,11 @@ serve(async (req: Request): Promise<Response> => {
       'table' in body
         ? body.table === 'raffles'
           ? await fromRaffle(supabase, body)
-          : await fromWebhook(supabase, body)
+          : body.table === 'venue_events'
+            ? await fromVenueEvent(supabase, body)
+            : body.table === 'moderation_queue'
+              ? await fromPendingPhotos(supabase)
+              : await fromWebhook(supabase, body)
         : [body as PushRequest];
 
     // De veinte en veinte: un sorteo avisa a toda la sala y, uno a uno, se

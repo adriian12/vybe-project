@@ -9,6 +9,21 @@ export interface Interest {
   category: string;
 }
 
+/** Un like recibido tal como lo ve quien no es premium. */
+export interface LikePreview {
+  key: string;
+  /** PNG de 10 × 12 en `data:`, o null si no había foto. */
+  preview: string | null;
+  /** Sólo en un super like: se ve tal cual, con nombre y foto. */
+  profileId: string | null;
+  name: string | null;
+  age: number | null;
+  photo: string | null;
+  swipeType: 'like' | 'super_like';
+  eventName: string | null;
+  likedAt: string;
+}
+
 export interface LikeReceived {
   id: string;
   name: string;
@@ -247,6 +262,21 @@ export const socialService = {
   // ==========================================================================
   // QUIÉN TE HA DADO LIKE (Premium)
   // ==========================================================================
+
+  /**
+   * «Le gustas» sin premium: miniaturas pixeladas hechas en el servidor, sin
+   * nombre ni id. La foto real no llega nunca al móvil.
+   */
+  getLikesPreview: async (): Promise<LikePreview[]> => {
+    const { data, error } = await supabase.functions.invoke<{ likes?: LikePreview[] }>('likes-preview', {
+      body: {},
+    });
+    if (error) {
+      console.error('Error getting likes preview:', error);
+      return [];
+    }
+    return data?.likes ?? [];
+  },
 
   getLikesReceived: async (): Promise<LikeReceived[]> => {
     const { data, error } = await supabase.rpc('get_likes_received');

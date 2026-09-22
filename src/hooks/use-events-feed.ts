@@ -33,7 +33,8 @@ export const isEventTonight = (event: Event, now = Date.now()): boolean =>
  * su manera, con contadores distintos para el mismo evento.
  */
 export const useEventsFeed = () => {
-  const { events, refreshEvents } = useAppContext();
+  const { events, refreshEvents, currentUser } = useAppContext();
+  const invitado = currentUser?.accountType === 'guest';
   const { t } = useTranslation();
   const { toast } = useToast();
 
@@ -78,7 +79,15 @@ export const useEventsFeed = () => {
 
     const cargar = () =>
       socialService.getEventsActivity(ids).then((data) => {
-        if (!cancelled) setActivity(data);
+        if (cancelled) return;
+        // Cuánta gente hay y el ambiente son de Vyber: al invitado se le quedan
+        // los «voy a ir» y lo práctico (cola, puerta cerrada, qué suena).
+        if (invitado) {
+          for (const id of Object.keys(data)) {
+            data[id] = { ...data[id], inside: 0, vibeLevel: null, vibeAt: null, trend: null, womenShare: null };
+          }
+        }
+        setActivity(data);
       });
 
     void cargar();
@@ -88,7 +97,7 @@ export const useEventsFeed = () => {
       cancelled = true;
       clearInterval(interval);
     };
-  }, [events]);
+  }, [events, invitado]);
 
   const toggleIntent = useCallback(
     async (eventId: string) => {

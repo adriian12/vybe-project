@@ -194,13 +194,18 @@ const EventDetailPage = () => {
         {/* ---------------------------------------------------------- título */}
         <div className="flex flex-col gap-1 px-margin pb-3 pt-1">
           <h1 className="font-display text-headline-xl text-white">{event.name}</h1>
-          <p className="flex items-center gap-1.5 text-body-md text-party-gray">
+          {/* El local lleva a su ficha: horario, más fiestas y seguirlo. */}
+          <button
+            type="button"
+            onClick={() => navigate(`/local/${event.venueId}`)}
+            className="press flex w-fit max-w-full items-center gap-1.5 text-left text-body-md text-party-gray hover:text-foreground"
+          >
             <Martini size={16} className="shrink-0" />
-            <span className="truncate">
+            <span className="truncate underline decoration-white/20 underline-offset-4">
               {event.venueName}
               {event.city ? ` · ${event.city}` : ''}
             </span>
-          </p>
+          </button>
         </div>
 
         <div className="space-y-4 px-margin">

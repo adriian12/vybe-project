@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { BarChart3, FileText, TrendingDown, TrendingUp } from 'lucide-react';
+import { BarChart3, Euro, FileText, Loader2, TrendingDown, TrendingUp } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { useToast } from '@/components/ui/use-toast';
 import {
   Dialog,
   DialogContent,
@@ -23,6 +25,9 @@ const rango = (report: WeeklyReport) => {
 
 const pct = (parte: number, total: number) => (total > 0 ? Math.round((parte / total) * 100) : 0);
 
+const euros = (value: number) =>
+  new Intl.NumberFormat(undefined, { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(value);
+
 /**
  * El informe de la semana del local, que se genera solo cada lunes (y la
  * primera vez que se abre el panel si aún no existe). Si hay uno sin ver, sale
@@ -36,7 +41,10 @@ const VenueWeeklyReport = ({
   onOpenChange: (open: boolean) => void;
 }) => {
   const { t } = useTranslation();
+  const { toast } = useToast();
   const [reports, setReports] = useState<WeeklyReport[]>([]);
+  const [gasto, setGasto] = useState('');
+  const [guardando, setGuardando] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
   const [aviso, setAviso] = useState(false);
 
@@ -58,6 +66,26 @@ const VenueWeeklyReport = ({
     void nightService.markReportSeen(report.id);
     setReports((prev) => prev.map((r) => (r.id === report.id ? { ...r, seenAt: new Date().toISOString() } : r)));
   }, [open, report]);
+
+  // Sin gasto medio no hay euros: se pide aquí mismo y el informe de la
+  // semana pasada se vuelve a calcular con él.
+  const guardarGasto = async () => {
+    const valor = Number(gasto.replace(',', '.'));
+    if (!Number.isFinite(valor) || valor <= 0 || valor > 1000) {
+      toast({ title: t('venue.profileForm.avgSpendInvalid'), variant: 'destructive' });
+      return;
+    }
+    setGuardando(true);
+    try {
+      await nightService.setAvgSpend(valor);
+      await load();
+      setGasto('');
+    } catch {
+      toast({ title: t('common.error'), variant: 'destructive' });
+    } finally {
+      setGuardando(false);
+    }
+  };
 
   const d = report?.data;
   const porEvento = d && d.events > 0 ? Math.round((d.check_ins / d.events) * 10) / 10 : 0;
@@ -98,6 +126,16 @@ const VenueWeeklyReport = ({
         { label: t('venue.report.raffles'), value: d.raffles },
         { label: t('venue.report.stampCards'), value: d.stamp_cards_completed },
         { label: t('venue.report.songs'), value: d.songs_requested },
+        ...(d.followers_total !== undefined
+          ? [
+              {
+                label: t('venue.report.followers'),
+                value: d.followers_total,
+                extra: t('venue.report.followersNew', { count: d.followers_new ?? 0 }),
+              },
+            ]
+          : []),
+        ...(d.boosts ? [{ label: t('venue.report.boosts'), value: d.boosts }] : []),
       ]
     : [];
 
@@ -164,6 +202,52 @@ const VenueWeeklyReport = ({
 
           {d && (
             <div className="space-y-4">
+              {d.brought_people !== undefined && (
+                <section className="rounded-2xl bg-party-primary p-4 text-ink">
+                  <p className="flex items-center gap-1.5 text-caption font-extrabold uppercase tracking-wide">
+                    <Euro size={14} />
+                    {t('venue.report.revenueTitle')}
+                  </p>
+                  {d.estimated_revenue !== null && d.estimated_revenue !== undefined ? (
+                    <p className="mt-1 font-display text-headline-xl tabular">{euros(d.estimated_revenue)}</p>
+                  ) : null}
+                  <p className="text-body-sm font-semibold">
+                    {t('venue.report.brought', { count: d.brought_people })}
+                  </p>
+                  <ul className="mt-2 space-y-0.5 text-caption">
+                    <li>{t('venue.report.broughtIntent', { count: d.brought_by_intent ?? 0 })}</li>
+                    <li>{t('venue.report.broughtCode', { count: d.brought_by_code ?? 0 })}</li>
+                    <li>{t('venue.report.broughtFollow', { count: d.brought_by_follow ?? 0 })}</li>
+                  </ul>
+                  {d.avg_spend ? (
+                    <p className="mt-2 text-caption text-ink/70">
+                      {t('venue.report.revenueHow', { spend: euros(d.avg_spend) })}
+                    </p>
+                  ) : (
+                    <div className="mt-3 rounded-xl bg-ink/10 p-3">
+                      <p className="mb-2 text-caption font-semibold">{t('venue.report.askSpend')}</p>
+                      <div className="flex gap-2">
+                        <Input
+                          inputMode="decimal"
+                          value={gasto}
+                          onChange={(e) => setGasto(e.target.value.replace(/[^\d.,]/g, ''))}
+                          placeholder="25 €"
+                          className="h-10 flex-1 bg-white text-ink"
+                        />
+                        <button
+                          type="button"
+                          disabled={guardando || gasto === ''}
+                          onClick={() => void guardarGasto()}
+                          className="press flex h-10 items-center justify-center rounded-xl bg-ink px-4 text-body-sm font-bold text-party-primary disabled:opacity-50"
+                        >
+                          {guardando ? <Loader2 size={16} className="animate-spin" /> : t('common.save')}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </section>
+              )}
+
               <div className="grid grid-cols-2 gap-2">
                 {tarjetas.map((item) => (
                   <div key={item.label} className="surface-light rounded-2xl p-3">

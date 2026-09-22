@@ -18,6 +18,8 @@ export type AuthEmailError =
   | 'EMAIL_NOT_CONFIGURED'
   | 'EMAIL_SEND_FAILED'
   | 'SIGNUP_FAILED'
+  | 'EMAIL_TAKEN'
+  | 'PHONE_TAKEN'
   | 'NETWORK';
 
 export class AuthEmailFailure extends Error {
@@ -131,6 +133,23 @@ export const authEmailService = {
     return uploaded;
   },
 
+  /**
+   * ¿El correo o el móvil ya tienen cuenta? El formulario de alta lo pregunta
+   * al salir de cada campo para marcarlo en rojo. Si falla la red, se da por
+   * libre: el alta lo vuelve a comprobar en el servidor.
+   */
+  checkAvailability: async (email: string, phone?: string): Promise<{ emailTaken: boolean; phoneTaken: boolean }> => {
+    try {
+      const response = (await call({ action: 'check', email, phone })) as {
+        emailTaken?: boolean;
+        phoneTaken?: boolean;
+      };
+      return { emailTaken: Boolean(response.emailTaken), phoneTaken: Boolean(response.phoneTaken) };
+    } catch {
+      return { emailTaken: false, phoneTaken: false };
+    }
+  },
+
   /** Vuelve a mandar el correo de verificación. */
   resendConfirmation: async (email: string): Promise<void> => {
     await call({ action: 'resend', email });
@@ -153,6 +172,8 @@ export const authEmailMessage = (error: unknown): string => {
     EMAIL_NOT_CONFIGURED: 'auth.errors.emailNotConfigured',
     EMAIL_SEND_FAILED: 'auth.errors.emailSendFailed',
     SIGNUP_FAILED: 'errors.generic',
+    EMAIL_TAKEN: 'auth.errors.emailTaken',
+    PHONE_TAKEN: 'auth.errors.phoneTaken',
     NETWORK: 'errors.generic',
   };
 

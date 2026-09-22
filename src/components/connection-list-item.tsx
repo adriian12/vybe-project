@@ -60,68 +60,64 @@ const ConnectionListItem: React.FC<ConnectionListItemProps> = ({
   const remaining = connection.expiresAt ? remainingLabel(connection.expiresAt) : null;
   const caducada = Boolean(connection.expiresAt) && !remaining;
 
+  // Compacta: con varios matches la lista tiene que caber sin tanto scroll.
   return (
     <Link
       to={`/chat/${user.id}`}
       className={cn(
-        'press flex items-center gap-4 rounded-3xl bg-white px-4 py-4 text-ink',
+        'press flex items-center gap-3 rounded-2xl bg-white px-3 py-2.5 text-ink',
         caducada && 'opacity-70',
       )}
     >
       <img
         src={user.photos[0] || user.avatar || FALLBACK_PHOTO}
         alt=""
-        className="h-14 w-14 shrink-0 rounded-full object-cover"
+        className="h-11 w-11 shrink-0 rounded-full object-cover"
       />
 
       <div className="min-w-0 flex-1">
         <div className="flex items-baseline justify-between gap-2">
-          <h3 className="truncate font-display text-headline-md font-extrabold">
+          <h3 className="truncate font-display text-title-card font-extrabold">
             {user.name}
             {user.age ? `, ${user.age}` : ''}
           </h3>
-          {lastAt && <span className="shrink-0 text-caption text-ink/45">{cuando(lastAt, t('matches.yesterday'))}</span>}
+          <span className="flex shrink-0 items-center gap-1.5">
+            {lastAt && <span className="text-caption text-ink/45">{cuando(lastAt, t('matches.yesterday'))}</span>}
+            {unreadCount > 0 && (
+              <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-party-primary px-1.5 text-[11px] font-bold text-ink">
+                {unreadCount > 99 ? '99+' : unreadCount}
+              </span>
+            )}
+          </span>
         </div>
 
-        <p className={cn('truncate text-body-md', unreadCount > 0 ? 'font-semibold text-ink' : 'text-ink/60')}>
+        <p className={cn('truncate text-body-sm', unreadCount > 0 ? 'font-semibold text-ink' : 'text-ink/60')}>
           {lastMessage || t('matches.noMessages')}
         </p>
 
-        <div className="mt-2 flex flex-wrap items-center gap-2">
-          {remaining ? (
-            <span className="flex items-center gap-1 rounded-full bg-party-primary px-2.5 py-1 text-caption font-bold text-ink">
-              <AlarmClock size={13} />
-              {t('matches.expiresIn', { time: remaining })}
-            </span>
-          ) : caducada ? (
-            <span className="rounded-full bg-black/[0.06] px-2.5 py-1 text-caption text-ink/60">
-              {t('matches.ended')}
-            </span>
-          ) : null}
-          {eventName && (
-            <span className="flex max-w-[10rem] items-center gap-1 truncate rounded-full bg-black/[0.06] px-2.5 py-1 text-caption text-ink/70">
-              <MapPin size={12} className="shrink-0" />
-              <span className="truncate">{eventName}</span>
-            </span>
-          )}
-          {!remaining && !caducada && !eventName && unreadCount === 0 && lastMessage && (
-            <span className="rounded-full bg-black/[0.06] px-2.5 py-1 text-caption text-ink/60">
-              {t('matches.read')}
-            </span>
-          )}
-        </div>
+        {(remaining || caducada || eventName) && (
+          <div className="mt-1 flex items-center gap-1.5 overflow-hidden">
+            {remaining ? (
+              <span className="flex shrink-0 items-center gap-1 rounded-full bg-party-primary px-2 py-0.5 text-[11px] font-bold text-ink">
+                <AlarmClock size={11} />
+                {t('matches.expiresIn', { time: remaining })}
+              </span>
+            ) : caducada ? (
+              <span className="shrink-0 rounded-full bg-black/[0.06] px-2 py-0.5 text-[11px] text-ink/60">
+                {t('matches.ended')}
+              </span>
+            ) : null}
+            {eventName && (
+              <span className="flex min-w-0 items-center gap-1 rounded-full bg-black/[0.06] px-2 py-0.5 text-[11px] text-ink/70">
+                <MapPin size={11} className="shrink-0" />
+                <span className="truncate">{eventName}</span>
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
-      <div className="flex shrink-0 flex-col items-end gap-3 self-stretch">
-        {unreadCount > 0 ? (
-          <span className="flex h-7 min-w-7 items-center justify-center rounded-full bg-party-primary px-2 text-sm font-bold text-ink">
-            {unreadCount > 99 ? '99+' : unreadCount}
-          </span>
-        ) : (
-          <span className="h-7" />
-        )}
-        <ChevronRight size={18} className="text-ink/30" />
-      </div>
+      <ChevronRight size={17} className="shrink-0 text-ink/30" />
     </Link>
   );
 };

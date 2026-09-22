@@ -317,10 +317,13 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const leaveEvent = useCallback(() => {
+    // En la base de datos también: si no, seguías en el tablón de los demás y
+    // el evento volvía a aparecer al abrir la app. Los chats no se tocan.
+    if (activeEvent) void api.leaveEvent(activeEvent.eventId, activeEvent.photoUrl);
     setActiveEvent(null);
     setNearbyProfiles([]);
     setCurrentProfile(null);
-  }, []);
+  }, [activeEvent]);
 
   // Mantiene viva la asistencia mientras la pestaña está abierta.
   useEffect(() => {
@@ -358,34 +361,49 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   // DATOS
   // ==========================================================================
 
+  const cargaPerfiles = useRef(0);
+
   const loadProfiles = useCallback(async () => {
     if (!activeEvent) return;
+
+    // Al entrar se piden dos veces casi a la vez (al cambiar el evento activo y
+    // al terminar la foto). Si la primera —sin foto todavía— tardaba más por el
+    // GPS, llegaba la última y dejaba el tablón vacío hasta salir y volver a
+    // entrar. Sólo cuenta la petición más reciente.
+    const turno = ++cargaPerfiles.current;
 
     try {
       const coords = lastKnownPosition.current ?? (await getCurrentPosition().catch(() => null));
       if (coords) lastKnownPosition.current = coords;
 
-      const origin = coords ?? currentUser?.location;
-      if (!origin) {
+      // Sin ubicación se pregunta igual: en un evento sin ubicación (la sala de
+      // pruebas) la base de datos no filtra por distancia. Si vuelve vacío, sí
+      // hace falta el GPS.
+      const origin = coords ?? currentUser?.location ?? null;
+
+      const profiles = await socialService.getNearbyProfiles(
+        origin?.latitude ?? 0,
+        origin?.longitude ?? 0,
+        activeEvent.eventRadius,
+        activeEvent.eventId,
+        // Los intereses no se ofrecen por ahora: el alta no los pide.
+        { minAge: filters.minAge, maxAge: filters.maxAge },
+      );
+
+      if (turno !== cargaPerfiles.current) return;
+
+      if (!origin && profiles.length === 0) {
         toast({
           title: t('location.title'),
           description: t('location.bodyTwo'),
           variant: 'destructive',
         });
-        return;
       }
-
-      const profiles = await socialService.getNearbyProfiles(
-        origin.latitude,
-        origin.longitude,
-        activeEvent.eventRadius,
-        activeEvent.eventId,
-        filters,
-      );
 
       setNearbyProfiles(profiles);
       setCurrentProfile(profiles[0] ?? null);
     } catch (error) {
+      if (turno !== cargaPerfiles.current) return;
       console.error('Error loading profiles:', error);
       toast({ title: t('common.error'), description: t('errors.generic'), variant: 'destructive' });
     }

@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   AlertTriangle,
+  BellRing,
+  Heart,
+  Sparkles,
   BarChart3,
   Building2,
   CalendarDays,
@@ -37,6 +40,9 @@ import VenueInsights from '@/components/venue/venue-insights';
 import VenuePlan from '@/components/venue/venue-plan';
 import EventPicker from '@/components/venue/event-picker';
 import VenueWeeklyReport from '@/components/venue/venue-weekly-report';
+import VenueProfileForm from '@/components/venue/venue-profile-form';
+import { nightService } from '@/services/night';
+import { BOOST_PRICE } from '@/lib/venue-plans';
 import VenueSosBanner from '@/components/venue/venue-sos-banner';
 import VenueDocuments from '@/components/venue/venue-documents';
 import VenueBroadcast from '@/components/venue/venue-broadcast';
@@ -169,6 +175,9 @@ const VenueDashboardPage = () => {
   const [creating, setCreating] = useState(false);
   const [eventFilter, setEventFilter] = useState<EventFilter>('live');
   const [toDelete, setToDelete] = useState<{ id: string; name: string } | null>(null);
+  const [toBoost, setToBoost] = useState<{ id: string; name: string } | null>(null);
+  const [boosting, setBoosting] = useState(false);
+  const [followers, setFollowers] = useState<{ total: number; lastWeek: number } | null>(null);
 
   // El papel en el local: el contexto lo sabe al entrar; `role` lo confirma la
   // base de datos. Mientras tanto, propietario (la cuenta del local).
@@ -201,7 +210,53 @@ const VenueDashboardPage = () => {
     // El plan decide qué puede hacer cada pestaña, así que se pide una vez al
     // entrar y se pasa a los componentes en lugar de que cada uno lo consulte.
     void venueService.getPlanStatus().then(setPlan);
+    void nightService.getFollowersSummary().then(setFollowers);
   }, []);
+
+  // Vuelta de Stripe tras pagar un destacado: el webhook ya lo ha marcado (o lo
+  // hará en segundos), así que se avisa y se recargan los eventos.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const boost = params.get('boost');
+    if (!boost) return;
+    if (boost === 'success') {
+      toast({ title: t('venue.boost.paid'), description: t('venue.boost.paidBody') });
+      setTimeout(() => void refreshEvents(), 3000);
+    }
+    params.delete('boost');
+    const query = params.toString();
+    window.history.replaceState(null, '', `${window.location.pathname}${query ? `?${query}` : ''}`);
+  }, [refreshEvents, t, toast]);
+
+  const avisarSeguidores = async (eventId: string) => {
+    try {
+      const enviado = await nightService.notifyFollowers(eventId);
+      toast({
+        title: enviado ? t('venue.followers.notified') : t('venue.followers.alreadyNotified'),
+        description: enviado ? t('venue.followers.notifiedBody', { count: followers?.total ?? 0 }) : undefined,
+      });
+    } catch {
+      toast({ title: t('common.error'), variant: 'destructive' });
+    }
+  };
+
+  const destacar = async () => {
+    if (!toBoost) return;
+    setBoosting(true);
+    try {
+      const url = await nightService.startBoostCheckout(toBoost.id);
+      if (!url) {
+        toast({ title: t('venue.plan.notConfigured'), variant: 'destructive' });
+        setToBoost(null);
+        return;
+      }
+      window.location.href = url;
+    } catch {
+      toast({ title: t('common.error'), description: t('venue.plan.checkoutFailed'), variant: 'destructive' });
+    } finally {
+      setBoosting(false);
+    }
+  };
 
   /** Las estadísticas vienen de get_venue_stats(); antes eran Math.random(). */
   const loadStats = useCallback(async () => {
@@ -378,6 +433,7 @@ const VenueDashboardPage = () => {
             endDate: row.endDate,
             posterUrl: undefined as string | undefined,
             bookingUrl: undefined as string | undefined,
+            featured: false,
             count: row.checkIns,
           }))
       : myEvents
@@ -392,6 +448,7 @@ const VenueDashboardPage = () => {
             endDate: event.endDate,
             posterUrl: event.posterUrl,
             bookingUrl: event.bookingUrl,
+            featured: Boolean(event.featuredUntil && new Date(event.featuredUntil).getTime() > ahora),
             count: intencionesDe(event.id)?.intents ?? 0,
           }));
 
@@ -459,7 +516,7 @@ const VenueDashboardPage = () => {
             <span className="truncate font-display text-title-card">{currentVenue.name}</span>
             {nombrePlan && (
               <span className="shrink-0 rounded-full bg-party-primary px-2 py-0.5 text-[10px] font-extrabold uppercase text-ink">
-                {t('venue.planChip', { plan: nombrePlan })}
+                {plan?.status === 'trialing' ? t('venue.planChipTrial', { plan: nombrePlan }) : t('venue.planChip', { plan: nombrePlan })}
               </span>
             )}
           </div>
@@ -508,7 +565,7 @@ const VenueDashboardPage = () => {
               </span>
               {nombrePlan && (
                 <span className="rounded-full bg-party-primary px-2 py-0.5 text-[10px] font-extrabold uppercase text-ink">
-                  {t('venue.planChip', { plan: nombrePlan })}
+                  {plan?.status === 'trialing' ? t('venue.planChipTrial', { plan: nombrePlan }) : t('venue.planChip', { plan: nombrePlan })}
                 </span>
               )}
             </div>
@@ -718,7 +775,15 @@ const VenueDashboardPage = () => {
                           )}
                         </span>
                         <div className="min-w-0 flex-1">
-                          <p className="truncate font-display text-title-card">{event.name}</p>
+                          <p className="flex items-center gap-1.5">
+                            <span className="truncate font-display text-title-card">{event.name}</span>
+                            {event.featured && (
+                              <span className="flex shrink-0 items-center gap-0.5 rounded-md bg-party-accent px-1.5 py-0.5 text-[10px] font-extrabold uppercase text-white">
+                                <Sparkles size={10} />
+                                {t('venue.boost.badge')}
+                              </span>
+                            )}
+                          </p>
                           <p className="truncate text-body-sm text-ink/55">
                             {fecha} · {formatHourRange(event.startDate, event.endDate)}
                           </p>
@@ -752,6 +817,18 @@ const VenueDashboardPage = () => {
                                   <DropdownMenuItem onClick={() => setEditing(editable)}>
                                     <Pencil size={15} className="mr-2" />
                                     {t('common.edit')}
+                                  </DropdownMenuItem>
+                                )}
+                                {puedeDifundir && (
+                                  <DropdownMenuItem onClick={() => void avisarSeguidores(event.id)}>
+                                    <BellRing size={15} className="mr-2" />
+                                    {t('venue.followers.notify')}
+                                  </DropdownMenuItem>
+                                )}
+                                {puedeDifundir && !event.featured && (
+                                  <DropdownMenuItem onClick={() => setToBoost({ id: event.id, name: event.name })}>
+                                    <Sparkles size={15} className="mr-2" />
+                                    {t('venue.boost.action', { price: BOOST_PRICE })}
                                   </DropdownMenuItem>
                                 )}
                                 <DropdownMenuItem onClick={() => goTo('stats')}>
@@ -844,6 +921,26 @@ const VenueDashboardPage = () => {
                     </div>
                   ))}
                 </div>
+
+                {followers && (
+                  <div className="surface-light flex items-center gap-4 rounded-2xl p-4">
+                    <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-party-primary text-ink">
+                      <Heart size={22} />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-caption uppercase tracking-wide text-party-gray">{t('venue.followers.title')}</p>
+                      <p className="font-display text-headline-lg tabular">
+                        {followers.total}
+                        {followers.lastWeek > 0 && (
+                          <span className="ml-2 text-body-sm font-bold text-emerald-600">
+                            {t('venue.followers.thisWeek', { count: followers.lastWeek })}
+                          </span>
+                        )}
+                      </p>
+                      <p className="text-caption text-party-gray">{t('venue.followers.hint')}</p>
+                    </div>
+                  </div>
+                )}
 
                 {summary.length > 0 ? (
                   <>
@@ -993,13 +1090,18 @@ const VenueDashboardPage = () => {
                   : t('venue.broadcast.title')}
             </SheetTitle>
           </SheetHeader>
-          {drawer === 'venue' && <ConfigCard />}
+          {drawer === 'venue' && (
+            <div className="space-y-4">
+              <ConfigCard />
+              <VenueProfileForm venueId={currentVenue.id} />
+            </div>
+          )}
           {drawer === 'documents' && <VenueDocuments />}
           {/* Sin evento el aviso sería global, que sólo puede enviar
               administración: se usa el evento con el que se está trabajando. */}
           {drawer === 'broadcast' &&
             (workingEventId ? (
-              <VenueBroadcast eventId={workingEventId} />
+              <VenueBroadcast eventId={workingEventId} venueId={currentVenue.id} />
             ) : (
               <p className="py-6 text-center text-body-sm text-party-gray">{t('venue.door.noEvent')}</p>
             ))}
@@ -1042,6 +1144,27 @@ const VenueDashboardPage = () => {
           />
         </SheetContent>
       </Sheet>
+
+      <AlertDialog open={Boolean(toBoost)} onOpenChange={(open) => !open && !boosting && setToBoost(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('venue.boost.title', { name: toBoost?.name ?? '' })}</AlertDialogTitle>
+            <AlertDialogDescription>{t('venue.boost.body', { price: BOOST_PRICE })}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={boosting}>{t('common.cancel')}</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={boosting}
+              onClick={(e) => {
+                e.preventDefault();
+                void destacar();
+              }}
+            >
+              {boosting ? t('venue.plan.opening') : t('venue.boost.pay', { price: BOOST_PRICE })}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <AlertDialog open={Boolean(toDelete)} onOpenChange={(open) => !open && setToDelete(null)}>
         <AlertDialogContent>

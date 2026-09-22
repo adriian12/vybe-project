@@ -18,6 +18,7 @@ import {
   Loader2,
   LockKeyhole,
   LogOut,
+  Trash2,
   Pencil,
   Plus,
   Shield,
@@ -61,6 +62,11 @@ import { api } from '@/services/api';
 import { socialService, Interest, Reputation } from '@/services/social';
 import { pushService, PushStatus } from '@/services/push';
 import { cn } from '@/lib/utils';
+import PhotoRequirementsDialog, { FailedPhoto } from '@/components/photo-requirements-dialog';
+import AccountTypeCard from '@/components/account-type-card';
+import { Input } from '@/components/ui/input';
+import { privacyService } from '@/services/privacy';
+import { track } from '@/lib/observability';
 
 const MAX_PHOTOS = 6;
 
@@ -137,6 +143,9 @@ const ProfilePage = () => {
   const [showSafety, setShowSafety] = useState(false);
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [confirmCancel, setConfirmCancel] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleteText, setDeleteText] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
@@ -152,6 +161,7 @@ const ProfilePage = () => {
   const [editingInterests, setEditingInterests] = useState(false);
 
   const [pendingPhotos, setPendingPhotos] = useState(0);
+  const [fotoFallida, setFotoFallida] = useState<FailedPhoto[]>([]);
   const [pushStatus, setPushStatus] = useState<PushStatus>('unsupported');
   const [pushEnabled, setPushEnabled] = useState(false);
   const [reputation, setReputation] = useState<Reputation | null>(null);
@@ -197,23 +207,24 @@ const ProfilePage = () => {
       setIsSaving(true);
       try {
         if (target === 'avatar') {
-          const { url } = await api.uploadFile('avatars', blob, 'avatar.jpg');
-          await api.updateProfile({ avatar: url });
+          // También pasa por la revisión automática: si no la supera se dice
+          // al momento y no se cambia nada.
+          const result = await api.submitAvatarForReview(blob);
+          if (!result.published) {
+            setFotoFallida([{ index: 1, reason: result.reason }]);
+            return;
+          }
           toast({ title: t('profile.photoSaved') });
         } else {
           // Pasa por la misma moderación venga de donde venga: el origen de la
           // foto no cambia lo que se puede publicar.
           const result = await api.submitPhotoForReview(blob, 'photo.jpg');
           if (!result.published) {
-            toast({
-              title: t('common.error'),
-              description: result.reason ?? t('errors.generic'),
-              variant: 'destructive',
-            });
+            setFotoFallida([{ index: 1, reason: result.reason }]);
             return;
           }
           setPendingPhotos(await api.getPendingPhotoCount());
-          toast({ title: t('profile.photoInReview') });
+          toast({ title: t('photoCheck.approved') });
         }
 
         await api.refreshVerificationStatus();
@@ -795,6 +806,8 @@ const ProfilePage = () => {
           </section>
 
           {/* ------------------------------------------------------ ajustes */}
+          <AccountTypeCard />
+
           <section className="divide-y divide-[#2A2A2E] rounded-2xl bg-card">
             {/* Modo invisible: ves quién hay en el evento y a ti no te ve nadie.
                 Es de pago porque desequilibra el tablón, así que sin
@@ -930,8 +943,24 @@ const ProfilePage = () => {
             </div>
           </section>
 
+          {/* Eliminar la cuenta va aparte: no se pulsa por error al cerrar sesión. */}
+          <section className="mt-4 divide-y divide-[#2A2A2E] rounded-2xl bg-card">
+            <div className="p-2">
+              <Fila
+                icon={Trash2}
+                title={t('privacy.deleteTitle')}
+                subtitle={t('privacy.deleteBody')}
+                onClick={() => {
+                  setDeleteText('');
+                  setConfirmDelete(true);
+                }}
+                tone="danger"
+              />
+            </div>
+          </section>
+
           <p className="pb-4 pt-2 text-center text-caption uppercase tracking-widest text-party-gray/70">
-            Vybe · Mallorca
+            {t('profile.tagline')}
           </p>
         </div>
       </main>
@@ -957,6 +986,58 @@ const ProfilePage = () => {
         </AlertDialogContent>
       </AlertDialog>
 
+      {/* Eliminar la cuenta: borra el perfil, las fotos, las conexiones, los
+          mensajes y el usuario (Edge Function `delete-account`). */}
+      <AlertDialog open={confirmDelete} onOpenChange={(open) => !isDeleting && setConfirmDelete(open)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('privacy.deleteConfirmTitle')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('privacy.deleteBody')} {t('privacy.deleteConfirmBody')}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <Input
+            value={deleteText}
+            onChange={(e) => setDeleteText(e.target.value)}
+            placeholder={t('privacy.deleteKeyword')}
+            autoCapitalize="characters"
+            aria-label={t('privacy.deleteKeyword')}
+          />
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>{t('common.cancel')}</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={isDeleting || deleteText.trim().toUpperCase() !== t('privacy.deleteKeyword').toUpperCase()}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={(e) => {
+                e.preventDefault();
+                void (async () => {
+                  setIsDeleting(true);
+                  try {
+                    await privacyService.deleteMyAccount();
+                    track('account_deleted');
+                    toast({ title: t('privacy.deleted'), description: t('privacy.deletedBody') });
+                    setConfirmDelete(false);
+                    await logout();
+                    navigate('/', { replace: true });
+                  } catch {
+                    fail();
+                    setIsDeleting(false);
+                  }
+                })();
+              }}
+            >
+              {isDeleting ? <Loader2 size={16} className="animate-spin" /> : t('privacy.deleteConfirm')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <PhotoRequirementsDialog
+        open={fotoFallida.length > 0}
+        onOpenChange={(open) => !open && setFotoFallida([])}
+        failed={fotoFallida}
+        total={1}
+      />
       <Footer />
     </div>
   );

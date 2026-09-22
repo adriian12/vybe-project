@@ -76,6 +76,10 @@ export interface Event {
   qrCode?: string;
   description?: string;
   maxCapacity?: number;
+  /** Destacado de pago hasta esta hora: sale primero en inicio y en el mapa. */
+  featuredUntil?: string;
+  /** `false`: se entra sin comprobar la ubicación (la sala de pruebas). */
+  requiresLocation?: boolean;
   /**
    * Repetición. Con `weekly` o `biweekly` la base de datos crea la siguiente
    * edición sola (`generate_recurring_events()`).
@@ -106,6 +110,11 @@ export interface EventAccess {
   distanceMeters: number | null;
   /** Foto que la persona se hizo al entrar. Sin ella no sale en el tablón. */
   photoUrl?: string | null;
+  /**
+   * Cómo entró: `vyber` (tablón) o `guest` (sólo ofertas y avisos).
+   * `null` mientras no lo ha elegido.
+   */
+  mode?: 'vyber' | 'guest' | null;
 }
 
 export interface VenueStats {

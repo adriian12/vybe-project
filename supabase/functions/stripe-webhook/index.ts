@@ -104,6 +104,30 @@ serve(async (req: Request): Promise<Response> => {
         const profileId = metadata.profile_id ?? (object.client_reference_id as string | null);
         const plan = metadata.plan ?? 'monthly';
 
+        // Destacar un evento: queda destacado hasta que termina. El pago se
+        // guarda una vez por sesión (Stripe puede repetir el aviso).
+        if (metadata.kind === 'event_boost' && metadata.event_id && metadata.venue_id) {
+          const { data: evento } = await supabase
+            .from('events')
+            .select('end_date')
+            .eq('id', metadata.event_id)
+            .maybeSingle();
+          if (!evento) break;
+
+          await supabase.from('event_boosts').upsert(
+            {
+              event_id: metadata.event_id,
+              venue_id: metadata.venue_id,
+              amount_cents: Number(object.amount_total ?? 0),
+              currency: (object.currency as string | null) ?? 'eur',
+              stripe_session_id: object.id as string,
+            },
+            { onConflict: 'stripe_session_id' },
+          );
+          await supabase.from('events').update({ featured_until: evento.end_date }).eq('id', metadata.event_id);
+          break;
+        }
+
         // El plan de un local va a su propia tabla: no es Premium de nadie, es
         // una suscripción de empresa y la paga el local.
         if (metadata.venue_id) {

@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
-import { ArrowRight, Bookmark, BookmarkCheck, Clock, MapPin, Music, Ticket } from 'lucide-react';
+import { ArrowRight, Bookmark, BookmarkCheck, Clock, MapPin, Music, Sparkles, Ticket } from 'lucide-react';
+import { isFeatured } from '@/lib/featured';
 import { formatDistance } from '@/services/geo';
 import { EventActivity, socialService } from '@/services/social';
 import { Event } from '@/types/venue';
@@ -92,11 +93,16 @@ const EventCard: React.FC<EventCardProps> = ({
       onClick={onOpen}
       className={cn(
         'press flex cursor-pointer select-none flex-col overflow-hidden rounded-2xl bg-white shadow-xl',
-        featured ? 'w-[270px] shrink-0 p-2.5' : 'w-full p-3',
+        featured ? 'w-[215px] shrink-0 p-2' : 'w-full p-3',
       )}
     >
       {/* ----------------------------------------------------------- cartel */}
-      <div className="relative aspect-[16/10] w-full overflow-hidden rounded-xl bg-surface">
+      <div
+        className={cn(
+          'relative w-full overflow-hidden rounded-xl bg-surface',
+          featured ? 'aspect-[16/9]' : 'aspect-[16/10]',
+        )}
+      >
         {event.posterUrl ? (
           <img src={event.posterUrl} alt="" loading="lazy" className="h-full w-full object-cover" />
         ) : (
@@ -168,6 +174,12 @@ const EventCard: React.FC<EventCardProps> = ({
         )}
 
         <div className={cn('flex flex-wrap items-center gap-1.5', featured ? 'mt-2.5' : 'mt-3')}>
+          {isFeatured(event) && (
+            <span className="inline-flex items-center gap-1 rounded-full bg-party-accent px-2.5 py-1 text-[11px] font-black text-white">
+              <Sparkles size={11} />
+              {t('home.sponsored')}
+            </span>
+          )}
           {featured && (
             <span className="rounded-full bg-party-primary px-2.5 py-1 text-[11px] font-black text-ink">
               {precio}
@@ -179,10 +191,11 @@ const EventCard: React.FC<EventCardProps> = ({
           {!featured && live && <Tag>{t('home.endsAt', { time: formatHour(event.endDate) })}</Tag>}
         </div>
 
+        {/* La destacada va sin pie: así caben los eventos antes de bajar. */}
         <div
           className={cn(
             'flex items-center justify-between gap-2',
-            featured ? 'mt-3 pt-2' : 'mt-3 border-t border-black/[0.06] pt-3',
+            featured ? 'hidden' : 'mt-3 border-t border-black/[0.06] pt-3',
           )}
         >
           <AttendeeStack activity={activity} />

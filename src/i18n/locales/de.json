@@ -97,7 +97,9 @@
             "taxIdInvalid": "Diese Steuernummer ist ungültig. Bitte prüfen.",
             "addressRequired": "Gib die vollständige Adresse des Lokals an.",
             "emailNotConfigured": "Der E-Mail-Versand ist nicht eingerichtet. Sag uns Bescheid, dann schalten wir ihn frei.",
-            "emailSendFailed": "Wir konnten dir die E-Mail nicht schicken. Dein Konto existiert: versuche es erneut zu senden."
+            "emailSendFailed": "Wir konnten dir die E-Mail nicht schicken. Dein Konto existiert: versuche es erneut zu senden.",
+            "emailTaken": "Diese E-Mail ist bereits registriert",
+            "phoneTaken": "Diese Handynummer ist bereits registriert"
         },
         "verify": {
             "verifying": "E-Mail wird bestätigt…",
@@ -214,7 +216,8 @@
         "statInsideShort": "mit Vybe drinnen",
         "statTonight": "Events heute Nacht",
         "featured": "Highlights",
-        "upcoming": "Nächste Events"
+        "upcoming": "Nächste Events",
+        "sponsored": "Hervorgehoben"
     },
     "eventAccess": {
         "verifyTitle": "Nähe bestätigen",
@@ -303,7 +306,7 @@
         "stampNope": "Nein",
         "exitShort": "Raus",
         "eventPhotoTitle": "Ein Foto von heute Abend",
-        "eventPhotoBody": "Das sehen die Leute auf dem Event. So erkennen sie dich, wie du jetzt aussiehst, und nicht auf einem Foto von vor einem Jahr.",
+        "eventPhotoBody": "Ein Selfie oder ein Ganzkörperfoto, jetzt mit der Kamera aufgenommen: Dein Gesicht muss zu sehen sein. Das sehen die Leute auf dem Event, und damit wird dein Konto verifiziert.",
         "eventPhotoCapture": "Foto machen",
         "eventPhotoWhy": "Ohne dieses Foto erscheinst du bei niemandem.",
         "eventPhotoRejected": "Dieses Foto hat die Prüfung nicht bestanden. Mach ein neues, auf dem dein Gesicht zu sehen ist.",
@@ -314,7 +317,10 @@
         "insideNow": "Gerade auf der Party",
         "insideCount": "{{count}} drinnen",
         "pass": "Weiter",
-        "onlyHere": "Du siehst nur Leute, die gerade auf dieser Party sind."
+        "onlyHere": "Du siehst nur Leute, die gerade auf dieser Party sind.",
+        "verificationPendingTitle": "Verifizierung ausstehend",
+        "verificationPending": "Deine Fotos wurden gespeichert, aber wir konnten dein Gesicht nicht erkennen. Mach neue, auf denen dein Gesicht gut zu sehen ist.",
+        "cameraOnly": "Das Foto der Nacht wird direkt mit der Kamera gemacht. Die Galerie ist nur für Profilfotos."
     },
     "filters": {
         "title": "Profile filtern",
@@ -323,8 +329,18 @@
         "interestsHelp": "Zeigt nur Leute mit mindestens einer Übereinstimmung.",
         "apply": "Filter anwenden",
         "reset": "Filter zurücksetzen",
-        "premiumOnly": "Erweiterte Filter gehören zu Vybe Premium.",
-        "activeCount": "{{count}} aktive Filter"
+        "premiumOnly": "Die Altersspanne ist Teil von Vybe Premium.",
+        "activeCount": "{{count}} aktive Filter",
+        "help": "Wähle, wen du auf der Pinnwand sehen möchtest.",
+        "music": "Musik",
+        "musicHelp": "Wähle die Musikrichtung.",
+        "noMusic": "Noch keine Genres bei diesen Partys.",
+        "clear": "Filter entfernen",
+        "franjas": {
+            "tardeo": "Nachmittag",
+            "nocheo": "Nacht",
+            "after": "After"
+        }
     },
     "match": {
         "title": "{{name}}!",
@@ -470,7 +486,8 @@
         "notificationsHelp": "Matches, Nachrichten und Hinweise zu deinen Partys",
         "safetyHelp": "Vertrauenskontakte und Hilfe-Button",
         "cancelTitle": "Vybe Premium kündigen?",
-        "cancelBody": "Premium bleibt bis zum Ende des bereits bezahlten Zeitraums aktiv."
+        "cancelBody": "Premium bleibt bis zum Ende des bereits bezahlten Zeitraums aktiv.",
+        "tagline": "Vybe · Nachtleben in Spanien"
     },
     "faceVerification": {
         "title": "Identitätsprüfung",
@@ -649,7 +666,12 @@
         "lockedBody": "Mit Vybe Premium siehst du, wem du gefällst, bevor du swipest.",
         "unlock": "Premium holen",
         "likeBack": "Zurück liken",
-        "at": "bei {{event}}"
+        "at": "bei {{event}}",
+        "lockedCount_one": "{{count}} Person mag dich",
+        "lockedCount_other": "{{count}} Personen mögen dich",
+        "lockedCount": "{{count}} Personen mögen dich",
+        "lockedTap": "Hol dir Premium, um zu sehen, wer es ist, und zurückzuliken",
+        "someone": "Jemand"
     },
     "venue": {
         "myVenue": "Mein Lokal",
@@ -1024,7 +1046,7 @@
             },
             "yourPlan": "Dein aktueller Tarif",
             "choose": "Wählen",
-            "billingNote": "Die Abrechnung für Veranstalter-Tarife ist noch nicht aktiv. Melde dich, dann richten wir es vorerst von Hand ein.",
+            "billingNote": "Preise zzgl. MwSt. Monatliche Kartenzahlung ohne Mindestlaufzeit: jederzeit im Dashboard kündbar.",
             "errors": {
                 "upgradeRequired": "Diese Funktion ist in deinem Tarif nicht enthalten.",
                 "eventLimit": "Du hast das Event-Limit deines Tarifs erreicht.",
@@ -1041,7 +1063,16 @@
             },
             "included": "Dein aktueller Tarif",
             "basic": "Basistarif inklusive",
-            "switchTo": "Zu {{plan}} wechseln"
+            "switchTo": "Zu {{plan}} wechseln",
+            "trialDaysLeft_one": "Gratis-Test: noch {{count}} Tag",
+            "trialDaysLeft_other": "Gratis-Test: noch {{count}} Tage",
+            "trialDaysLeft": "Gratis-Test: noch {{count}} Tage",
+            "trialEnds": "Dein Gratis-Test endet am {{date}}. Danach wechselst du in den Gratis-Tarif, wenn du nicht buchst.",
+            "free": "Gratis",
+            "perMonth": "{{price}} €/Monat",
+            "trialNote": "Der erste Monat ist gratis: {{count}} Tage Pro nach Freigabe deiner Location.",
+            "keepPlan": "Bei {{plan}} bleiben",
+            "boostNote": "Ein Event hervorheben kostet {{price}} € pro Nacht in jedem Tarif: Es steht in der App ganz oben, bis es endet."
         },
         "safety": {
             "needsHelp": "{{name}} hat um Hilfe gebeten",
@@ -1073,7 +1104,18 @@
             "queued": "In der Warteschlange. Geht in wenigen Minuten raus.",
             "delayNote": "Nachrichten gehen alle paar Minuten raus, nicht sofort.",
             "reached": "erreichte {{count}}",
-            "pending": "In der Warteschlange"
+            "pending": "In der Warteschlange",
+            "when": "Planen für (optional)",
+            "now": "Jetzt",
+            "schedule": "Nachricht planen",
+            "scheduled": "Nachricht geplant",
+            "scheduledCount": "Geplant: {{count}} von {{max}}",
+            "cancelled": "Abgebrochen",
+            "errors": {
+                "scheduleLimit": "Du hast das Limit deines Tarifs für geplante Nachrichten erreicht.",
+                "scheduleInPast": "Dieser Zeitpunkt ist schon vorbei.",
+                "scheduleAfterEvent": "Die Party ist dann schon vorbei."
+            }
         },
         "documents": {
             "help": "Der Nachweis, dass das Lokal dir gehört. Die Verwaltung prüft ihn vor der Freigabe.",
@@ -1275,7 +1317,51 @@
             "peakHour": "Die meisten kamen gegen {{hour}}:00.",
             "topCode": "Promoter mit den meisten Gästen: {{name}} ({{count}}).",
             "benchmark": "Schnitt pro Event: du {{mine}} Check-ins mit Vybe; ähnliche Locations {{others}}.",
-            "noBenchmark": "Noch nicht genug ähnliche Locations für einen Vergleich."
+            "noBenchmark": "Noch nicht genug ähnliche Locations für einen Vergleich.",
+            "revenueTitle": "Was dir Vybe gebracht hat",
+            "brought_one": "{{count}} Person kam über Vybe",
+            "brought_other": "{{count}} Personen kamen über Vybe",
+            "brought": "{{count}} Personen kamen über Vybe",
+            "broughtIntent": "{{count}} sagten „Ich gehe hin“ und kamen",
+            "broughtCode": "{{count}} kamen mit einem Promoter-Code",
+            "broughtFollow": "{{count}} folgen dir und kamen",
+            "revenueHow": "Schätzung: Personen × ({{spend}} Durchschnittsausgaben + Eintritt).",
+            "askSpend": "Wie viel gibt eine Person bei dir im Schnitt aus? Damit berechnen wir die Euro.",
+            "followers": "Follower",
+            "followersNew": "+{{count}} diese Woche",
+            "boosts": "Hervorgehobene Events"
+        },
+        "planChipTrial": "{{plan}} · Test",
+        "boost": {
+            "badge": "Hervorgehoben",
+            "action": "Hervorheben ({{price}} €)",
+            "title": "„{{name}}“ hervorheben",
+            "body": "Für {{price}} € steht es auf der Startseite und der Karte der App ganz oben, mit dem Label „Hervorgehoben“, bis die Party endet. Einmalzahlung.",
+            "pay": "{{price}} € bezahlen",
+            "paid": "Event hervorgehoben",
+            "paidBody": "Es steht jetzt in der App ganz oben. Danke."
+        },
+        "followers": {
+            "title": "Follower der Location",
+            "thisWeek": "+{{count}} diese Woche",
+            "hint": "Sie bekommen jedes Mal eine Benachrichtigung, wenn du eine Party veröffentlichst.",
+            "notify": "Meine Follower benachrichtigen",
+            "notified": "Benachrichtigung gesendet",
+            "notifiedBody": "Sie geht an deine {{count}} Follower.",
+            "alreadyNotified": "Deine Follower wurden über dieses Event schon benachrichtigt"
+        },
+        "profileForm": {
+            "title": "Location-Profil",
+            "hint": "Das sehen die Leute, wenn sie deine Location in der App öffnen.",
+            "descriptionPlaceholder": "Welche Musik läuft, wie die Stimmung ist, was euch besonders macht…",
+            "hours": "Öffnungszeiten",
+            "opens": "Öffnet",
+            "closes": "Schließt",
+            "avgSpend": "Durchschnittliche Ausgaben pro Person",
+            "avgSpendHint": "Niemand sonst sieht das. Der Wochenbericht berechnet damit, wie viele Euro dir Vybe gebracht hat.",
+            "perPerson": "Person",
+            "avgSpendInvalid": "Gib einen Betrag zwischen 1 und 1000 € ein",
+            "saved": "Profil gespeichert"
         }
     },
     "admin": {
@@ -1585,7 +1671,9 @@
         "today": "Heute",
         "going": "+{{count}} kommen",
         "view": "Ansehen",
-        "openAfter": "Offen nach {{time}}"
+        "openAfter": "Offen nach {{time}}",
+        "tapPin": "Tippe auf ein Event auf der Karte, um zu sehen, worum es geht.",
+        "credits": "Kartenhinweise"
     },
     "tickets": {
         "title": "Meine Tickets",
@@ -1769,8 +1857,8 @@
                         "body": "Erstelle den Code des Abends, druck ihn auf ein Plakat oder zeig ihn auf dem Bildschirm am Eingang. Rein kommt nur, wer in der Location ist."
                     },
                     "capacity": {
-                        "title": "Live-Auslastung",
-                        "body": "Wie viele Leute drin sind, mit Warnung kurz vor dem Limit und einer Ansicht für den Monitor am Eingang."
+                        "title": "Echte Besucherzahl und Stimmung live",
+                        "body": "Türzähler von jedem Handy aus. Die Leute sehen, ob es voll oder fast voll ist, nie deine Zahlen."
                     },
                     "promoters": {
                         "title": "Codes für Promoter",
@@ -1787,6 +1875,22 @@
                     "team": {
                         "title": "Team mit Rollen",
                         "body": "Lade dein Türpersonal und deine Promoter ein, jeweils mit eigenen Berechtigungen."
+                    },
+                    "followers": {
+                        "title": "Dein eigenes Publikum",
+                        "body": "Die Leute folgen deiner Location und bekommen eine Benachrichtigung, sobald du eine Party veröffentlichst."
+                    },
+                    "night": {
+                        "title": "Verlosungen, Challenges und Stempel",
+                        "body": "Live-Verlosungen, Challenges der Nacht, Stempelkarte und der Song, den die Tanzfläche wählt."
+                    },
+                    "report": {
+                        "title": "Wochenbericht in Euro",
+                        "body": "Jeden Montag: wie viele über Vybe kamen, wer wiederkommt und wie viel Geld es dir gebracht hat."
+                    },
+                    "boost": {
+                        "title": "Hebe deine Party hervor",
+                        "body": "Steh in der App ganz oben, in der Nacht, die dir am wichtigsten ist."
                     }
                 }
             }
@@ -1846,13 +1950,19 @@
         "plans": {
             "eyebrow": "Tarife für Locations",
             "title": "Kostenlos starten und wachsen, wenn du es brauchst",
-            "body": "Registriere deine Location, teste Vybe bei deiner ersten Party und wechsle den Tarif im Dashboard.",
+            "body": "Registriere deine Location und nutze Pro im ersten Monat gratis. Ohne Mindestlaufzeit: Tarif im Dashboard wechseln.",
             "free": "0 €",
             "custom": "Auf Anfrage",
             "recommended": "Empfohlen",
             "ctaFree": "Kostenlos starten",
             "ctaPaid": "Mit uns sprechen",
-            "base": "QR-Einlass und Geofence, Live-Auslastung und Türansicht in allen Tarifen."
+            "base": "QR-Einlass und Geofence, Live-Auslastung und Türansicht in allen Tarifen.",
+            "perMonth": "/Monat",
+            "trial": "Erster Monat gratis",
+            "ctaTrial": "Pro gratis testen",
+            "boostTitle": "Event hervorheben: {{price}} € pro Nacht",
+            "boostBody": "In jedem Tarif. Deine Party steht auf der Startseite und der Karte der App ganz oben, bis sie endet.",
+            "vat": "Preise zzgl. MwSt. Monatliche Zahlung, ohne Mindestlaufzeit."
         },
         "faq": {
             "eyebrow": "Häufige Fragen",
@@ -1860,7 +1970,7 @@
             "items": {
                 "price": {
                     "q": "Was kostet Vybe?",
-                    "a": "Zum Feiern ist Vybe kostenlos. Vybe Premium bietet Extras wie sehen, wem du gefällst, oder dein Profil eine Stunde hervorheben. Locations haben einen kostenlosen Tarif sowie Pro und Business."
+                    "a": "Zum Feiern ist Vybe kostenlos. Vybe Premium bietet Extras, etwa zu sehen, wer dich mag, oder dein Profil eine Stunde hervorzuheben. Für Locations gibt es den Gratis-Tarif sowie Pro (49 €/Monat, erster Monat gratis) und Business (129 €/Monat), zzgl. MwSt. und ohne Mindestlaufzeit."
                 },
                 "location": {
                     "q": "Warum fragt die App nach meinem Standort?",
@@ -1996,7 +2106,7 @@
     },
     "night": {
         "title": "Die Nacht",
-        "short": "Nacht",
+        "short": "Angebote",
         "subtitle": "Angebote, Challenges, Verlosungen und mehr von dieser Location. Nur für Leute drinnen.",
         "tabs": {
             "offers": "Angebote",
@@ -2083,5 +2193,164 @@
         "notNow": "Jetzt nicht",
         "seeMap": "Alle auf der Karte",
         "until": "bis {{time}}"
+    },
+    "venuePage": {
+        "notFound": "Diese Location haben wir nicht gefunden",
+        "vybeVenue": "Location mit Vybe",
+        "follow": "Folgen",
+        "following": "Folge ich",
+        "followers_one": "{{count}} Follower",
+        "followers_other": "{{count}} Follower",
+        "followers": "{{count}} Follower",
+        "followHint": "Wir sagen dir Bescheid, wenn sie eine neue Party veröffentlicht.",
+        "followed": "Du folgst {{name}}",
+        "followedBody": "Wir sagen dir Bescheid, wenn sie eine neue Party veröffentlicht.",
+        "until": "Bis {{time}}",
+        "go": "Ansehen",
+        "hours": "Öffnungszeiten",
+        "closed": "Geschlossen",
+        "closedToday": "Heute geschlossen",
+        "today": "Heute: {{hours}}",
+        "directions": "Route",
+        "upcoming": "Kommende Partys",
+        "past": "Vergangene Partys",
+        "noUpcoming": "Noch keine Partys angekündigt. Folge ihr und wir sagen dir bei der nächsten Bescheid.",
+        "noUpcomingFollowing": "Noch keine Partys angekündigt. Wir sagen dir bei der nächsten Bescheid.",
+        "promptTitle": "Soll dich {{name}} über ihre Partys informieren?",
+        "promptBody": "Folge ihr und du bekommst eine Benachrichtigung, wenn sie eine neue Party veröffentlicht. Entfolgen geht jederzeit auf ihrer Seite."
+    },
+    "photoCheck": {
+        "titleSingle": "Das Foto erfüllt die Anforderungen nicht",
+        "titleSome_one": "Bild {{list}} erfüllt die Anforderungen nicht",
+        "titleSome_other": "Die Bilder {{list}} erfüllen die Anforderungen nicht",
+        "titleSome": "Die Bilder {{list}} erfüllen die Anforderungen nicht",
+        "titleAll": "Keines der Bilder erfüllt die Anforderungen",
+        "unavailableTitle": "Wir konnten das Foto nicht prüfen",
+        "unavailableBody": "Die automatische Prüfung antwortet gerade nicht, deshalb wurde das Foto nicht veröffentlicht. Unser Team prüft es von Hand; bis dahin kannst du es wiederholen und es erneut versuchen.",
+        "image": "Bild {{n}}",
+        "requirementsTitle": "Anforderungen",
+        "requirements": {
+            "face": "Dein Gesicht ist zu sehen, von vorne und gut beleuchtet.",
+            "oneFace": "Nur du: keine Gruppenfotos.",
+            "nudity": "Keine Nacktheit und keine sexuellen Inhalte.",
+            "violence": "Keine Waffen, keine Gewalt, kein Blut.",
+            "offensive": "Keine beleidigenden Gesten oder Symbole.",
+            "cameraNow": "Jetzt mit der Kamera aufgenommen: Das Foto der Nacht kann nicht aus der Galerie kommen."
+        },
+        "reasons": {
+            "no_face": "kein Gesicht zu sehen",
+            "many_faces": "mehr als eine Person",
+            "nudity": "sexuelle Inhalte oder Nacktheit",
+            "weapon": "eine Waffe ist zu sehen",
+            "offensive": "beleidigender Inhalt",
+            "gore": "gewalttätiger Inhalt",
+            "unavailable": "konnte nicht geprüft werden",
+            "generic": "erfüllt die Anforderungen nicht"
+        },
+        "retakeOne": "Neues Foto machen",
+        "retakeMany": "Diese Fotos wiederholen",
+        "approved": "Foto freigegeben",
+        "and": "und"
+    },
+    "camera": {
+        "switch": "Kamera wechseln"
+    },
+    "eventMode": {
+        "chooseTitle": "Du betrittst gleich «{{name}}»",
+        "chooseBody": "Wie möchtest du rein? Du kannst es während der Nacht ändern.",
+        "enterAsVyber": "Als Vyber rein",
+        "enterAsGuest": "Als Gast rein",
+        "vyber": {
+            "title": "Vyber",
+            "short": "Vyber-Modus",
+            "body": "Du machst ein Foto vor Ort, erscheinst auf der Pinnwand und kannst swipen und matchen."
+        },
+        "guest": {
+            "title": "Gast",
+            "short": "Gast-Modus",
+            "body": "Ohne Foto. Du siehst die Angebote und Nachrichten der Location, aber weder die Pinnwand noch erscheinst du dort.",
+            "hereBody": "Du bist als Gast drin: Niemand sieht dich auf der Pinnwand. Genieß die Angebote."
+        },
+        "until": "Die Party geht {{time}}",
+        "guestPerks": "Das hast du trotzdem",
+        "perks": {
+            "offers": "Angebote und Gutscheine der Location",
+            "raffles": "Verlosungen und Challenges der Nacht",
+            "alerts": "Nachrichten der Location, solange du drin bist",
+            "private": "Du erscheinst auf keiner Pinnwand"
+        },
+        "switchTitle": "In den {{mode}}-Modus wechseln?",
+        "switchBody": {
+            "vyber": "Wir fragen nach einem Foto vor Ort und du erscheinst ab dann auf der Pinnwand.",
+            "guest": "Dein Foto von heute Nacht und die Likes ohne Match werden gelöscht. Du siehst die Pinnwand nicht mehr und erscheinst nicht darauf."
+        },
+        "switchConfirm": "Ja, wechseln",
+        "switched": {
+            "vyber": "Du bist jetzt im Vyber-Modus",
+            "guest": "Du bist jetzt im Gast-Modus"
+        }
+    },
+    "accountKind": {
+        "vyber": {
+            "tab": "Vyber-Konto",
+            "short": "Partys und Leute kennenlernen",
+            "infoCta": "Was ist ein Vyber und was kann ich tun?",
+            "infoTitle": "Was ist ein Vyber?",
+            "infoBody": "Ein Vyber geht feiern und will außerdem die Leute kennenlernen, die an dem Abend da sind.",
+            "switched": "Du bist jetzt Vyber",
+            "switchBody": "Beim nächsten Party-Eintritt fragen wir nach einem Foto vor Ort.",
+            "points": {
+                "events": "Alle Partys: Karte, Details, Zeiten und Preise",
+                "photo": "Ein Foto vor Ort beim Eintritt",
+                "board": "Du erscheinst auf der Pinnwand der Party und siehst, wer da ist",
+                "match": "Swipen, liken und matchen",
+                "chat": "Chat mit deinen Matches, solange das Event läuft",
+                "offers": "Angebote, Verlosungen und Challenges der Location",
+                "switch": "Du kannst eine einzelne Party im Gast-Modus besuchen"
+            }
+        },
+        "guest": {
+            "tab": "Gast-Konto",
+            "short": "Nur Partys, keine Pinnwand",
+            "infoCta": "Was kann ich als Gast tun?",
+            "infoTitle": "Was kann ich als Gast tun?",
+            "infoBody": "Alles, um Partys zu finden, nichts rund ums Kennenlernen: Du erscheinst auf keiner Pinnwand und siehst auch keine.",
+            "points": {
+                "events": "Alle Partys, mit Zeiten, Preisen und Plakaten",
+                "map": "Karte mit allem in der Nähe und Suche nach Gegend",
+                "access": "Du kommst mit dem Code oder QR der Location rein",
+                "offers": "Angebote, Gutscheine, Verlosungen und Challenges",
+                "push": "Handy-Hinweise bei Änderungen: neue Partys, neue Zeiten und Nachrichten der Location",
+                "follow": "Folge deinen Locations und erfahre es zuerst",
+                "private": "Du erscheinst auf keiner Pinnwand und niemand kann dich swipen"
+            },
+            "switched": "Du bist jetzt Gast",
+            "switchBody": "Du erscheinst nicht mehr auf Pinnwänden und siehst sie nicht mehr. Der Rest bleibt."
+        },
+        "switchNote": "Den Kontotyp kannst du später im Profil ändern.",
+        "switchTo": "Zu {{kind}} wechseln",
+        "switchTitle": "Zu {{kind}} wechseln?",
+        "switchConfirm": "Ja, wechseln",
+        "guestWarning": "Zurück zum Vyber-Konto geht nur einmal im Monat (dreimal mit Premium). Wenn du jetzt wechselst, musst du warten.",
+        "limitReached": "Ab dem {{date}} kannst du wieder ein Vyber-Konto haben.",
+        "changesLeft": "Dir bleiben diesen Monat {{count}} Wechsel.",
+        "compare": {
+            "title": "Als Gast siehst du die Party; als Vyber spielst du sie",
+            "guest": "Gast",
+            "vyber": "Vyber",
+            "rows": {
+                "events": "Partys, Karte und Preise",
+                "tickets": "Tickets",
+                "follow": "Hinweise und Locations folgen",
+                "qr": "Mit QR rein",
+                "offers": "Angebote und Gutscheine",
+                "raffles": "Verlosungen der Nacht",
+                "challenges": "Challenges und Stempel",
+                "songs": "Den Song wählen",
+                "vibe": "Stimmung und wie viele Leute",
+                "board": "Pinnwand, Match und Chat",
+                "premium": "Premium"
+            }
+        }
     }
 }

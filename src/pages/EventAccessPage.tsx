@@ -73,6 +73,14 @@ const EventAccessPage = () => {
 
   const comprobarUbicacion = useCallback(async () => {
     if (!event) return;
+
+    // Evento sin ubicación (la sala de pruebas): se entra desde cualquier sitio,
+    // sin pedir el GPS.
+    if (event.requiresLocation === false) {
+      setUbicacion({ estado: 'inside', distance: null });
+      return;
+    }
+
     setUbicacion({ estado: 'checking' });
 
     try {

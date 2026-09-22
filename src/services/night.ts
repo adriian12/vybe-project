@@ -1,6 +1,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { ApiError } from '@/services/api';
 import { isVibeLevel, VibeLevel } from '@/lib/vibe';
+import type { Json } from '@/integrations/supabase/types';
 
 /**
  * La noche en directo (migración 042): sorteos, retos, tarjeta de sellos,
@@ -154,6 +155,15 @@ export interface WeeklyReportData {
   stamp_cards_completed: number;
   songs_requested: number;
   benchmark_check_ins_per_event: number | null;
+  brought_people?: number;
+  brought_by_intent?: number;
+  brought_by_code?: number;
+  brought_by_follow?: number;
+  avg_spend?: number | null;
+  estimated_revenue?: number | null;
+  followers_total?: number;
+  followers_new?: number;
+  boosts?: number;
 }
 
 export interface WeeklyReport {
@@ -166,11 +176,154 @@ export interface WeeklyReport {
 
 export type QueueLevel = 'none' | 'short' | 'long';
 
+/** Un día del horario del local: 0 = lunes … 6 = domingo. */
+export interface OpeningDay {
+  day: number;
+  open: string;
+  close: string;
+  closed: boolean;
+}
+
+export interface VenueProfile {
+  id: string;
+  name: string;
+  type: string;
+  city: string | null;
+  region: string | null;
+  address: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  description: string | null;
+  openingHours: OpeningDay[];
+  followers: number;
+  iFollow: boolean;
+  subscribed: boolean;
+}
+
+export interface VenueEventSummary {
+  id: string;
+  name: string;
+  startDate: string;
+  endDate: string;
+  posterUrl: string | null;
+  price: number | null;
+  theme: string | null;
+  featured: boolean;
+}
+
+const leerHorario = (value: unknown): OpeningDay[] =>
+  Array.isArray(value)
+    ? value
+        .filter((d): d is OpeningDay => typeof d === 'object' && d !== null && typeof (d as OpeningDay).day === 'number')
+        .sort((a, b) => a.day - b.day)
+    : [];
+
 // ============================================================================
 // Servicio
 // ============================================================================
 
 export const nightService = {
+  // --------------------------------------------------------- ficha del local
+  getVenueProfile: async (venueId: string): Promise<VenueProfile | null> => {
+    const { data, error } = await supabase.rpc('get_venue_profile', { p_venue_id: venueId });
+    const row = data?.[0];
+    if (error || !row) return null;
+    return {
+      id: row.id,
+      name: row.name,
+      type: row.type,
+      city: row.city,
+      region: row.region,
+      address: row.address,
+      latitude: row.latitude,
+      longitude: row.longitude,
+      description: row.description,
+      openingHours: leerHorario(row.opening_hours),
+      followers: Number(row.followers),
+      iFollow: row.i_follow,
+      subscribed: row.subscribed,
+    };
+  },
+
+  getVenueEvents: async (venueId: string): Promise<VenueEventSummary[]> => {
+    const { data, error } = await supabase.rpc('get_venue_events_public', { p_venue_id: venueId });
+    if (error || !data) return [];
+    return data.map((row) => ({
+      id: row.id,
+      name: row.name,
+      startDate: row.start_date,
+      endDate: row.end_date,
+      posterUrl: row.poster_url,
+      price: row.price !== null ? Number(row.price) : null,
+      theme: row.theme,
+      featured: row.featured,
+    }));
+  },
+
+  /** Seguir o dejar de seguir. Devuelve si ahora se sigue. */
+  toggleFollow: async (venueId: string): Promise<boolean> => {
+    const { data, error } = await supabase.rpc('toggle_venue_follow', { p_venue_id: venueId });
+    if (error) throw fail(error.message);
+    return Boolean(data);
+  },
+
+  // ------------------------------------------------------- panel del local
+  getFollowersSummary: async (): Promise<{ total: number; lastWeek: number }> => {
+    const { data } = await supabase.rpc('get_venue_followers_summary');
+    const row = data?.[0];
+    return { total: Number(row?.total ?? 0), lastWeek: Number(row?.last_week ?? 0) };
+  },
+
+  /** Avisa a los seguidores de un evento. Devuelve false si ya se les avisó. */
+  notifyFollowers: async (eventId: string): Promise<boolean> => {
+    const { data, error } = await supabase.rpc('notify_followers', { p_event_id: eventId });
+    if (error) throw fail(error.message);
+    return Boolean(data);
+  },
+
+  setAvgSpend: async (amount: number | null): Promise<void> => {
+    const { error } = await supabase.rpc('set_venue_avg_spend', { p_amount: amount });
+    if (error) throw fail(error.message);
+  },
+
+  /** Descripción, horario y gasto medio del local (lo edita el propietario). */
+  updateVenueDetails: async (
+    venueId: string,
+    details: { description: string | null; openingHours: OpeningDay[] },
+  ): Promise<void> => {
+    const { error } = await supabase
+      .from('venues')
+      .update({ description: details.description, opening_hours: details.openingHours as unknown as Json })
+      .eq('id', venueId);
+    if (error) throw fail(error.message);
+  },
+
+  getVenueDetails: async (
+    venueId: string,
+  ): Promise<{ description: string | null; openingHours: OpeningDay[]; avgSpend: number | null }> => {
+    const { data } = await supabase
+      .from('venues')
+      .select('description, opening_hours, avg_spend')
+      .eq('id', venueId)
+      .maybeSingle();
+    return {
+      description: data?.description ?? null,
+      openingHours: leerHorario(data?.opening_hours),
+      avgSpend: data?.avg_spend !== null && data?.avg_spend !== undefined ? Number(data.avg_spend) : null,
+    };
+  },
+
+  /** Pago para destacar un evento. Devuelve la dirección de Stripe o null si no hay cobro configurado. */
+  startBoostCheckout: async (eventId: string): Promise<string | null> => {
+    const { data, error } = await supabase.functions.invoke<{ url?: string; error?: string }>('stripe-checkout', {
+      body: { plan: 'event_boost', eventId, returnUrl: `${window.location.origin}/venue/dashboard` },
+    });
+    if (error) throw new ApiError('CHECKOUT_FAILED', 'venue.plan.checkoutFailed');
+    if (data?.error === 'STRIPE_NOT_CONFIGURED') return null;
+    if (!data?.url) throw new ApiError('CHECKOUT_FAILED', 'venue.plan.checkoutFailed');
+    return data.url;
+  },
+
   /** Qué tiene activado el evento: canciones y sellos. */
   getEventFlags: async (eventId: string): Promise<{ songs: boolean; stamps: boolean }> => {
     const { data } = await supabase

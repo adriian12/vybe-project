@@ -15,6 +15,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { eventActionClass } from '@/components/ui-custom/event-action-button';
 import { socialService, EventOffer, ClaimedOffer } from '@/services/social';
 import { Challenge, nightService, Raffle, StampCard } from '@/services/night';
+import { useAppContext } from '@/context/app-context';
 import { ApiError } from '@/services/api';
 import { cn } from '@/lib/utils';
 import NightChallenges from '@/components/night/night-challenges';
@@ -46,6 +47,9 @@ const PEDIBLES: EventOffer['kind'][] = ['offer', 'voucher', 'ticket'];
  */
 const EventOffers = ({ eventId }: EventOffersProps) => {
   const { t } = useTranslation();
+  const { currentUser, activeEvent } = useAppContext();
+  // Invitado: la cuenta, o un vyber que esta noche ha entrado como invitado.
+  const invitado = currentUser?.accountType === 'guest' || activeEvent?.mode === 'guest';
   const { toast } = useToast();
 
   const [open, setOpen] = useState(false);
@@ -106,22 +110,26 @@ const EventOffers = ({ eventId }: EventOffersProps) => {
   const ticketFor = (offerId: string) => claimed.find((c) => c.promotionId === offerId);
   const sorteosVivos = raffles.filter((r) => r.status === 'scheduled' || r.status === 'drawn');
 
+  // «Como invitado ves la fiesta; como Vyber la juegas»: retos, sorteos,
+  // sellos y canciones son de Vyber (la base de datos también lo impide).
+  const juega = !invitado;
   const tabs: { key: Tab; label: string; show: boolean }[] = [
     { key: 'offers', label: t('night.tabs.offers'), show: true },
-    { key: 'challenges', label: t('night.tabs.challenges'), show: challenges.length > 0 },
-    { key: 'raffles', label: t('night.tabs.raffles'), show: sorteosVivos.length > 0 },
-    { key: 'stamps', label: t('night.tabs.stamps'), show: card !== null },
-    { key: 'songs', label: t('night.tabs.songs'), show: songs },
+    { key: 'challenges', label: t('night.tabs.challenges'), show: juega && challenges.length > 0 },
+    { key: 'raffles', label: t('night.tabs.raffles'), show: juega && sorteosVivos.length > 0 },
+    { key: 'stamps', label: t('night.tabs.stamps'), show: juega && card !== null },
+    { key: 'songs', label: t('night.tabs.songs'), show: juega && songs },
   ];
   const visibles = tabs.filter((item) => item.show);
   const activa = visibles.some((item) => item.key === tab) ? tab : 'offers';
 
   // Lo que espera a la persona: ofertas, retos cumplidos sin recoger y sorteos.
-  const pendientes =
-    offers.length +
-    challenges.filter((c) => c.done && !c.ticketCode).length +
-    raffles.filter((r) => r.status === 'scheduled').length +
-    (card?.canClaim ? 1 : 0);
+  const pendientes = juega
+    ? offers.length +
+      challenges.filter((c) => c.done && !c.ticketCode).length +
+      raffles.filter((r) => r.status === 'scheduled').length +
+      (card?.canClaim ? 1 : 0)
+    : offers.length;
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>

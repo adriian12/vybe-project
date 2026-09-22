@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { AtSign, Heart, Loader2, Lock, Star, Zap } from 'lucide-react';
+import { Heart, Loader2, Lock, Star, Zap } from 'lucide-react';
 import Header from '@/components/header';
 import Footer from '@/components/footer';
 import ConnectionListItem from '@/components/connection-list-item';
@@ -10,7 +10,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { useAppContext } from '@/context/app-context';
 import { usePremium } from '@/context/premium-context';
 import { api, ApiError } from '@/services/api';
-import { LikeReceived, socialService } from '@/services/social';
+import { LikePreview, LikeReceived, socialService } from '@/services/social';
 import { track } from '@/lib/observability';
 import { cn } from '@/lib/utils';
 
@@ -39,9 +39,16 @@ const VybesPage = () => {
   const [pestana, setPestana] = useState<Pestana>(initialTab);
   const [likes, setLikes] = useState<LikeReceived[] | null>(null);
   const [likesLocked, setLikesLocked] = useState(false);
+  const [vistaPrevia, setVistaPrevia] = useState<LikePreview[]>([]);
   const [busyId, setBusyId] = useState<string | null>(null);
 
   useEffect(() => setPestana(initialTab), [initialTab]);
+
+  // Una cuenta de invitado no tiene matches ni likes: si llega aquí escribiendo
+  // la dirección, a inicio.
+  useEffect(() => {
+    if (currentUser?.accountType === 'guest') navigate('/home', { replace: true });
+  }, [currentUser?.accountType, navigate]);
 
   const cambiar = (siguiente: Pestana) => {
     setPestana(siguiente);
@@ -56,6 +63,8 @@ const VybesPage = () => {
       setLikesLocked(false);
     } catch (error) {
       if (error instanceof ApiError && error.code === 'PREMIUM_REQUIRED') {
+        // Sin premium se ve a cuánta gente le gustas, pixelada.
+        setVistaPrevia(await socialService.getLikesPreview());
         setLikesLocked(true);
         setLikes([]);
       } else {
@@ -176,15 +185,16 @@ const VybesPage = () => {
             {/* ------------------------------------------- nuevas conexiones */}
             {nuevas.length > 0 && (
               <section className="space-y-3">
-                <div className="flex items-center justify-between gap-2">
-                  <h2 className="flex items-center gap-2 font-display text-headline-md uppercase tracking-wide">
-                    <span className="h-2.5 w-2.5 rounded-full bg-party-primary" />
+                {/* Título en una línea y, debajo, dónde fueron. */}
+                <div className="min-w-0">
+                  <h2 className="flex items-center gap-2 whitespace-nowrap font-display text-headline-md uppercase tracking-wide">
+                    <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-party-primary" />
                     {t('vybes.newConnections')}
                   </h2>
                   {activeEvent && (
-                    <span className="truncate text-label-pill uppercase text-party-primary">
+                    <p className="mt-0.5 truncate pl-[18px] text-label-pill uppercase text-party-primary">
                       {t('vybes.atEvent', { name: activeEvent.eventName })}
-                    </span>
+                    </p>
                   )}
                 </div>
                 <div className="no-scrollbar -mx-margin flex gap-4 overflow-x-auto px-margin pb-1">
@@ -247,7 +257,7 @@ const VybesPage = () => {
                       </span>
                     )}
                   </div>
-                  <div className="stagger space-y-3">
+                  <div className="stagger space-y-2">
                     {conversaciones.map((c, i) => {
                       const msg = ultimo(c.user.id);
                       const propio = msg?.senderId === currentUser?.id;
@@ -272,6 +282,88 @@ const VybesPage = () => {
           <div className="flex justify-center py-16">
             <Loader2 className="h-8 w-8 animate-spin text-party-primary" />
           </div>
+        ) : bloqueados && vistaPrevia.length > 0 ? (
+          <>
+            <button
+              type="button"
+              onClick={() => setShowPremiumDialog(true)}
+              className="press flex w-full items-center gap-3 rounded-2xl bg-party-primary p-4 text-left text-ink"
+            >
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-ink text-party-primary">
+                <Lock size={20} />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block font-display text-title-card">
+                  {t('likes.lockedCount', { count: vistaPrevia.length })}
+                </span>
+                <span className="block text-body-sm text-ink/70">{t('likes.lockedTap')}</span>
+              </span>
+            </button>
+            <ul className="grid grid-cols-2 gap-3">
+              {vistaPrevia.map((like) => (
+                <li key={like.key} className="overflow-hidden rounded-2xl bg-white text-ink">
+                  {/* Un super like se ve entero aunque no tengas Premium: quien
+                      lo manda quiere que se sepa. Los demás, pixelados. */}
+                  <button
+                    type="button"
+                    onClick={() => !like.profileId && setShowPremiumDialog(true)}
+                    aria-label={like.profileId ? like.name ?? '' : t('likes.lockedTap')}
+                    className="press block w-full text-left"
+                  >
+                    <div className="relative aspect-[4/5] bg-surface-high">
+                      {like.photo ? (
+                        <img src={like.photo} alt={like.name ?? ''} className="h-full w-full object-cover" />
+                      ) : (
+                        like.preview && (
+                          // Miniatura de 10 × 12 ampliada sin suavizar: pixelada.
+                          <img
+                            src={like.preview}
+                            alt=""
+                            className="h-full w-full object-cover"
+                            style={{ imageRendering: 'pixelated' }}
+                          />
+                        )
+                      )}
+                      {!like.profileId && (
+                        <span className="absolute inset-0 flex items-center justify-center">
+                          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-ink/70 text-party-primary">
+                            <Lock size={20} />
+                          </span>
+                        </span>
+                      )}
+                      {like.swipeType === 'super_like' && (
+                        <span className="absolute left-2 top-2 flex items-center gap-1 rounded-full bg-party-primary px-2 py-0.5 text-label-pill text-ink">
+                          <Star size={11} />
+                          Super
+                        </span>
+                      )}
+                    </div>
+                    <div className="p-3">
+                      <p className="truncate font-display text-title-card">
+                        {like.name ? `${like.name}${like.age ? `, ${like.age}` : ''}` : t('likes.someone')}
+                      </p>
+                      {like.eventName && (
+                        <p className="truncate text-caption text-ink/55">{t('likes.at', { event: like.eventName })}</p>
+                      )}
+                    </div>
+                  </button>
+                  {like.profileId && (
+                    <div className="px-3 pb-3">
+                      <button
+                        type="button"
+                        disabled={busyId === like.profileId}
+                        onClick={() => void likeBack(like.profileId as string)}
+                        className="press flex h-9 w-full items-center justify-center gap-1.5 rounded-xl bg-party-primary text-sm font-bold text-ink disabled:opacity-50"
+                      >
+                        <Heart size={14} />
+                        {t('likes.likeBack')}
+                      </button>
+                    </div>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </>
         ) : bloqueados ? (
           <div className="flex flex-col items-center rounded-2xl bg-party-primary px-6 py-10 text-center text-ink">
             <span className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-ink text-party-primary">
@@ -344,7 +436,6 @@ const VybesPage = () => {
         onClick={() => navigate(activeEvent ? `/event/${activeEvent.eventId}/live` : '/home')}
         className="press fixed bottom-[calc(var(--nav-h)+1rem)] right-margin z-20 flex h-14 items-center gap-2 rounded-full bg-party-primary px-6 font-display text-title-card text-ink shadow-[0_8px_24px_rgba(0,0,0,0.5)]"
       >
-        <AtSign size={20} />
         {t('vybes.backToExplore')}
       </button>
 

@@ -2,11 +2,14 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { Trans, useTranslation } from 'react-i18next';
 import { z } from 'zod';
-import { useForm, Control, FieldErrors } from 'react-hook-form';
+import { useForm, Control, FieldErrors, FieldValues, Path, UseFormReturn } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ArrowLeft, Building, Upload, User as UserIcon, X } from 'lucide-react';
+import { ArrowLeft, Building, Upload, User as UserIcon, X,
+  Info,
+} from 'lucide-react';
 import { PartyButton } from '@/components/ui-custom/party-button';
 import PhoneInput from '@/components/ui-custom/phone-input';
+import AccountKindInfo, { AccountKind } from '@/components/account-kind-info';
 import PasswordInput from '@/components/ui-custom/password-input';
 import { VybeMark } from '@/components/brand/vybe-logo';
 import ForgotPassword from '@/components/forgot-password';
@@ -112,7 +115,7 @@ const buildPhoneSchema = (t: Translate) =>
       message: t('auth.errors.phoneRequired'),
     });
 
-const buildUserRegisterSchema = (t: Translate) =>
+const buildUserRegisterSchema = (t: Translate, kind: AccountKind = 'vyber') =>
   z
     .object({
       name: z.string().min(2, { message: t('auth.errors.nameRequired') }).max(60),
@@ -123,8 +126,13 @@ const buildUserRegisterSchema = (t: Translate) =>
         .max(100, { message: t('auth.errors.ageMax') }),
       // El género no se puede cambiar después, así que se pide aquí y de forma
       // explícita en vez de deducirlo del nombre.
-      gender: z.enum(['man', 'woman'], { required_error: t('auth.errors.genderRequired') }),
-      wants: z.enum(['men', 'women', 'all']),
+      // La cuenta de invitado no sale en el tablón, así que no se le pregunta
+      // ni el género ni a quién quiere ver. Si algún día se pasa a Vyber, se
+      // le piden entonces.
+      gender: kind === 'vyber'
+        ? z.enum(['man', 'woman'], { required_error: t('auth.errors.genderRequired') })
+        : z.enum(['man', 'woman']).optional(),
+      wants: z.enum(['men', 'women', 'all']).optional(),
       phone: buildPhoneSchema(t),
       email: z.string().email({ message: t('auth.errors.invalidEmail') }),
       password: z.string().min(8, { message: t('auth.errors.passwordShort') }),
@@ -195,9 +203,15 @@ const handleSignUpError = (
     navigate: ReturnType<typeof useNavigate>;
     toast: ReturnType<typeof useToast>['toast'];
     t: Translate;
+    /** Marca en rojo el campo que ya está registrado. */
+    onTaken?: (campo: 'email' | 'phone') => void;
   },
 ) => {
   const { navigate, toast, t } = ctx;
+
+  if (error instanceof AuthEmailFailure && (error.code === 'EMAIL_TAKEN' || error.code === 'PHONE_TAKEN')) {
+    ctx.onTaken?.(error.code === 'EMAIL_TAKEN' ? 'email' : 'phone');
+  }
 
   if (error instanceof AuthEmailFailure && error.accountCreated) {
     navigate('/auth/verify-email-pending', { state: { email, emailFailed: true } });
@@ -210,6 +224,32 @@ const handleSignUpError = (
     variant: 'destructive',
   });
 };
+
+/**
+ * Comprueba al salir del campo si el correo o el móvil ya tienen cuenta y lo
+ * marca en rojo: «Este correo ya está registrado» / «Este móvil ya está
+ * registrado». Antes se dejaba seguir y llegaba un correo de «ya tienes cuenta».
+ */
+const useTakenCheck = <T extends FieldValues>(form: UseFormReturn<T>, t: Translate) =>
+  useCallback(
+    async (campo: 'email' | 'phone') => {
+      const valores = form.getValues() as unknown as { email?: string; phone?: string };
+      const email = (valores.email ?? '').trim();
+      const phone = valores.phone ?? '';
+      if (campo === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return;
+      if (campo === 'phone' && phone.replace(/\D/g, '').length < 7) return;
+
+      const r = await authEmailService.checkAvailability(campo === 'email' ? email : '', campo === 'phone' ? phone : undefined);
+      const ocupado = campo === 'email' ? r.emailTaken : r.phoneTaken;
+      if (ocupado) {
+        form.setError(campo as Path<T>, {
+          type: 'taken',
+          message: t(campo === 'email' ? 'auth.errors.emailTaken' : 'auth.errors.phoneTaken'),
+        });
+      }
+    },
+    [form, t],
+  );
 
 const legalLinkProps = {
   className: 'font-semibold text-white underline decoration-party-primary decoration-2 underline-offset-4',
@@ -376,14 +416,14 @@ const UserLoginForm = () => {
 // Registro de usuario
 // ============================================================================
 
-const UserRegisterForm = () => {
+const UserRegisterForm = ({ kind }: { kind: AccountKind }) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { toast } = useToast();
   const onError = useValidationToast();
   const [isLoading, setIsLoading] = useState(false);
 
-  const schema = useMemo(() => buildUserRegisterSchema(t), [t]);
+  const schema = useMemo(() => buildUserRegisterSchema(t, kind), [t, kind]);
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -400,9 +440,11 @@ const UserRegisterForm = () => {
     },
   });
 
+  const comprobarOcupado = useTakenCheck(form, t);
+
   const onSubmit = async (values: z.infer<typeof schema>) => {
     setIsLoading(true);
-    track('signup_started', { type: 'user' });
+    track('signup_started', { type: kind === 'guest' ? 'guest' : 'user' });
 
     try {
       // El perfil lo crea el trigger handle_new_user() a partir de estos
@@ -415,6 +457,7 @@ const UserRegisterForm = () => {
           account_type: 'user',
           name: values.name,
           age: values.age,
+          profile_kind: kind,
           gender: values.gender,
           wants: values.wants,
           phone: values.phone,
@@ -428,7 +471,12 @@ const UserRegisterForm = () => {
       track('signup_completed', { type: 'user' });
       navigate('/auth/verify-email-pending', { state: { email: values.email } });
     } catch (error) {
-      handleSignUpError(error, values.email, { navigate, toast, t });
+      handleSignUpError(error, values.email, {
+        navigate,
+        toast,
+        t,
+        onTaken: (campo) => void comprobarOcupado(campo),
+      });
     } finally {
       setIsLoading(false);
     }
@@ -464,66 +512,70 @@ const UserRegisterForm = () => {
             </FormItem>
           )}
         />
+        {kind === 'vyber' && (
+          <>
         <FormField
-          control={form.control}
-          name="gender"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t('auth.gender')}</FormLabel>
-              <FormControl>
-                <div className="grid grid-cols-2 gap-1 rounded-xl bg-card p-1">
-                  {(['woman', 'man'] as const).map((option) => (
-                    <button
-                      key={option}
-                      type="button"
-                      onClick={() => field.onChange(option)}
-                      aria-pressed={field.value === option}
-                      className={`press h-10 rounded-lg text-sm font-bold ${
-                        field.value === option
-                          ? 'bg-party-primary text-ink'
-                          : 'text-party-gray hover:text-foreground'
-                      }`}
-                    >
-                      {t(`auth.genders.${option}`)}
-                    </button>
-                  ))}
-                </div>
-              </FormControl>
-              <FormDescription>{t('auth.genderHelp')}</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="wants"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t('auth.wants')}</FormLabel>
-              <FormControl>
-                <div className="grid grid-cols-3 gap-1 rounded-xl bg-card p-1">
-                  {(['women', 'men', 'all'] as const).map((option) => (
-                    <button
-                      key={option}
-                      type="button"
-                      onClick={() => field.onChange(option)}
-                      aria-pressed={field.value === option}
-                      className={`press h-10 rounded-lg text-sm font-bold ${
-                        field.value === option
-                          ? 'bg-party-primary text-ink'
-                          : 'text-party-gray hover:text-foreground'
-                      }`}
-                    >
-                      {t(`auth.wantsOptions.${option}`)}
-                    </button>
-                  ))}
-                </div>
-              </FormControl>
-              <FormDescription>{t('auth.wantsHelp')}</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+            control={form.control}
+            name="gender"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t('auth.gender')}</FormLabel>
+                <FormControl>
+                  <div className="grid grid-cols-2 gap-1 rounded-xl bg-card p-1">
+                    {(['woman', 'man'] as const).map((option) => (
+                      <button
+                        key={option}
+                        type="button"
+                        onClick={() => field.onChange(option)}
+                        aria-pressed={field.value === option}
+                        className={`press h-10 rounded-lg text-sm font-bold ${
+                          field.value === option
+                            ? 'bg-party-primary text-ink'
+                            : 'text-party-gray hover:text-foreground'
+                        }`}
+                      >
+                        {t(`auth.genders.${option}`)}
+                      </button>
+                    ))}
+                  </div>
+                </FormControl>
+                <FormDescription>{t('auth.genderHelp')}</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="wants"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t('auth.wants')}</FormLabel>
+                <FormControl>
+                  <div className="grid grid-cols-3 gap-1 rounded-xl bg-card p-1">
+                    {(['women', 'men', 'all'] as const).map((option) => (
+                      <button
+                        key={option}
+                        type="button"
+                        onClick={() => field.onChange(option)}
+                        aria-pressed={field.value === option}
+                        className={`press h-10 rounded-lg text-sm font-bold ${
+                          field.value === option
+                            ? 'bg-party-primary text-ink'
+                            : 'text-party-gray hover:text-foreground'
+                        }`}
+                      >
+                        {t(`auth.wantsOptions.${option}`)}
+                      </button>
+                    ))}
+                  </div>
+                </FormControl>
+                <FormDescription>{t('auth.wantsHelp')}</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+  </>
+        )}
         <FormField
           control={form.control}
           name="phone"
@@ -534,7 +586,10 @@ const UserRegisterForm = () => {
                 <PhoneInput
                   value={field.value}
                   onChange={field.onChange}
-                  onBlur={field.onBlur}
+                  onBlur={() => {
+                    field.onBlur();
+                    void comprobarOcupado('phone');
+                  }}
                   id="user-phone"
                 />
               </FormControl>
@@ -550,7 +605,13 @@ const UserRegisterForm = () => {
             <FormItem>
               <FormLabel>{t('auth.email')}</FormLabel>
               <FormControl>
-                <Input type="email" autoComplete="email" placeholder="tu@email.com" {...field} />
+                <Input type="email" autoComplete="email" placeholder="tu@email.com"
+                  {...field}
+                  onBlur={() => {
+                    field.onBlur();
+                    void comprobarOcupado('email');
+                  }}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -780,6 +841,8 @@ const VenueRegisterForm = () => {
   const removeDocument = (file: File) =>
     setDocuments((prev) => prev.filter((f) => !(f.name === file.name && f.size === file.size)));
 
+  const comprobarOcupado = useTakenCheck(form, t);
+
   const onSubmit = async (values: z.infer<typeof schema>) => {
     setIsLoading(true);
     track('signup_started', { type: 'venue' });
@@ -811,7 +874,12 @@ const VenueRegisterForm = () => {
         state: { email: values.email, type: 'venue' },
       });
     } catch (error) {
-      handleSignUpError(error, values.email, { navigate, toast, t });
+      handleSignUpError(error, values.email, {
+        navigate,
+        toast,
+        t,
+        onTaken: (campo) => void comprobarOcupado(campo),
+      });
     } finally {
       setIsLoading(false);
     }
@@ -846,7 +914,13 @@ const VenueRegisterForm = () => {
                 <FormItem>
                   <FormLabel>{t('auth.venueEmail')}</FormLabel>
                   <FormControl>
-                    <Input type="email" placeholder="contacto@tuempresa.com" {...field} />
+                    <Input type="email" placeholder="contacto@tuempresa.com"
+                  {...field}
+                  onBlur={() => {
+                    field.onBlur();
+                    void comprobarOcupado('email');
+                  }}
+                />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -975,7 +1049,10 @@ const VenueRegisterForm = () => {
                     <PhoneInput
                       value={field.value}
                       onChange={field.onChange}
-                      onBlur={field.onBlur}
+                      onBlur={() => {
+                        field.onBlur();
+                        void comprobarOcupado('phone');
+                      }}
                       id="venue-phone"
                     />
                   </FormControl>
@@ -1100,6 +1177,8 @@ const VenueRegisterForm = () => {
 
 const AuthPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const [kind, setKind] = useState<AccountKind>('vyber');
+  const [info, setInfo] = useState<AccountKind | null>(null);
   const { t } = useTranslation();
 
   // `type` identifica la cuenta y `mode` el formulario. Antes ambos leían el
@@ -1131,7 +1210,44 @@ const AuthPage = () => {
     if (accountType === 'venue') {
       return authMode === 'login' ? <VenueLoginForm /> : <VenueRegisterForm />;
     }
-    return authMode === 'login' ? <UserLoginForm /> : <UserRegisterForm />;
+    if (authMode === 'login') return <UserLoginForm />;
+
+    // Dos formas de estar en Vybe, y se eligen aquí: no es lo mismo venir a
+    // conocer gente que venir a enterarte de dónde se sale.
+    return (
+      <div className="space-y-5">
+        <div className="grid grid-cols-2 gap-1 rounded-xl bg-card p-1">
+          {(['vyber', 'guest'] as const).map((option) => (
+            <button
+              key={option}
+              type="button"
+              onClick={() => setKind(option)}
+              aria-pressed={kind === option}
+              className={`press h-11 rounded-lg text-sm font-bold ${
+                kind === option ? 'bg-party-primary text-ink' : 'text-party-gray hover:text-foreground'
+              }`}
+            >
+              {t(`accountKind.${option}.tab`)}
+            </button>
+          ))}
+        </div>
+
+        <button
+          type="button"
+          onClick={() => setInfo(kind)}
+          className="press flex w-full items-center gap-2 rounded-xl bg-card p-3 text-left"
+        >
+          <Info size={18} className="shrink-0 text-party-primary" />
+          <span className="min-w-0 flex-1 text-body-sm text-party-gray">
+            {t(`accountKind.${kind}.infoCta`)}
+          </span>
+        </button>
+
+        <UserRegisterForm kind={kind} />
+
+        <AccountKindInfo kind={info} onClose={() => setInfo(null)} />
+      </div>
+    );
   };
 
   // «Crea tu cuenta» de Stitch: flecha sola arriba a la izquierda, la bandera

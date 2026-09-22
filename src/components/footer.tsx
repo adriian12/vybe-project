@@ -41,7 +41,11 @@ const Footer = () => {
   return (
     <nav className="pb-safe fixed bottom-0 left-0 right-0 z-30 bg-surface-container/95 shadow-[0_-2px_12px_rgba(0,0,0,0.3)] backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-2xl items-center justify-around px-1">
-        {items.map(({ to, icon: Icon, key, also }) => {
+        {/* Una cuenta de invitado no tiene tablón ni matches: esa pestaña no
+            existe para ella. */}
+        {items
+          .filter(({ to }) => to !== '/matches' || currentUser?.accountType !== 'guest')
+          .map(({ to, icon: Icon, key, also }) => {
           const activo = also.test(pathname);
 
           return (

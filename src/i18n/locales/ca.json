@@ -97,7 +97,9 @@
             "taxIdInvalid": "Aquest CIF o NIF no és vàlid. Repassa’l.",
             "addressRequired": "Escriu l'adreça completa del local.",
             "emailNotConfigured": "L'enviament de correu no està configurat. Avisa'ns i l'activem.",
-            "emailSendFailed": "No hem pogut enviar-te el correu. El teu compte està creat: prova a reenviar-lo."
+            "emailSendFailed": "No hem pogut enviar-te el correu. El teu compte està creat: prova a reenviar-lo.",
+            "emailTaken": "Aquest correu ja està registrat",
+            "phoneTaken": "Aquest mòbil ja està registrat"
         },
         "verify": {
             "verifying": "Verificant el teu correu…",
@@ -214,7 +216,8 @@
         "statInsideShort": "amb Vybe a dins",
         "statTonight": "esdeveniments aquesta nit",
         "featured": "Destacats",
-        "upcoming": "Propers esdeveniments"
+        "upcoming": "Propers esdeveniments",
+        "sponsored": "Destacat"
     },
     "eventAccess": {
         "verifyTitle": "Verificar proximitat",
@@ -303,7 +306,7 @@
         "stampNope": "No",
         "exitShort": "Sortir",
         "eventPhotoTitle": "Una foto d'aquesta nit",
-        "eventPhotoBody": "És la que veurà la gent de l'esdeveniment. Així et reconeixen per com vas ara, no per una foto de fa un any.",
+        "eventPhotoBody": "Un selfie o una foto de cos sencer, feta ara amb la càmera: se't ha de veure la cara. És la que veurà la gent de l'esdeveniment i amb ella es verifica el teu compte.",
         "eventPhotoCapture": "Fes-te la foto",
         "eventPhotoWhy": "Sense aquesta foto no apareixes al tauler de ningú.",
         "eventPhotoRejected": "Aquesta foto no ha passat la revisió. Fes-te una altra on se't vegi la cara.",
@@ -314,7 +317,10 @@
         "insideNow": "Dins la festa ara",
         "insideCount": "{{count}} dins",
         "pass": "Passar",
-        "onlyHere": "Només veus gent que és en aquesta festa ara mateix."
+        "onlyHere": "Només veus gent que és en aquesta festa ara mateix.",
+        "verificationPendingTitle": "Verificació pendent",
+        "verificationPending": "Les teves fotos s'han desat, però no hem pogut confirmar que se't vegi la cara. Fes-ne d'altres amb la cara ben visible.",
+        "cameraOnly": "La foto d'aquesta nit es fa amb la càmera en el moment. La galeria només es pot fer servir per a les fotos del perfil."
     },
     "filters": {
         "title": "Filtrar perfils",
@@ -323,8 +329,18 @@
         "interestsHelp": "Mostra només qui en comparteixi algun.",
         "apply": "Aplicar filtres",
         "reset": "Treure filtres",
-        "premiumOnly": "Els filtres avançats formen part de Vybe Premium.",
-        "activeCount": "{{count}} filtres actius"
+        "premiumOnly": "El rang d'edat és part de Vybe Premium.",
+        "activeCount": "{{count}} filtres actius",
+        "help": "Tria a qui vols veure al tauler.",
+        "music": "Música",
+        "musicHelp": "Tria el tipus de música.",
+        "noMusic": "Encara no hi ha gèneres en aquestes festes.",
+        "clear": "Treure filtre",
+        "franjas": {
+            "tardeo": "Tardeo",
+            "nocheo": "Nit",
+            "after": "After"
+        }
     },
     "match": {
         "title": "{{name}}!",
@@ -470,7 +486,8 @@
         "notificationsHelp": "Matches, missatges i avisos de les teves festes",
         "safetyHelp": "Contactes de confiança i botó d'ajuda",
         "cancelTitle": "Cancel·lar Vybe Premium?",
-        "cancelBody": "Continuaràs tenint Premium fins que acabi el període que ja has pagat."
+        "cancelBody": "Continuaràs tenint Premium fins que acabi el període que ja has pagat.",
+        "tagline": "Vybe · La nit a Espanya"
     },
     "faceVerification": {
         "title": "Verificació d'identitat",
@@ -649,7 +666,12 @@
         "lockedBody": "Amb Vybe Premium veus a qui li has agradat abans de lliscar.",
         "unlock": "Activar Premium",
         "likeBack": "Donar like",
-        "at": "a {{event}}"
+        "at": "a {{event}}",
+        "lockedCount_one": "Li agrades a {{count}} persona",
+        "lockedCount_other": "Li agrades a {{count}} persones",
+        "lockedCount": "Li agrades a {{count}} persones",
+        "lockedTap": "Fes-te Premium per veure qui és i tornar-li el like",
+        "someone": "Algú"
     },
     "venue": {
         "myVenue": "El meu local",
@@ -1024,7 +1046,7 @@
             },
             "yourPlan": "El teu pla actual",
             "choose": "Triar",
-            "billingNote": "El cobrament dels plans de local encara no està actiu. Escriu-nos i mentrestant ho activem a mà.",
+            "billingNote": "Preus sense IVA. Pagament mensual amb targeta, sense permanència: pots cancel·lar quan vulguis des del tauler.",
             "errors": {
                 "upgradeRequired": "Aquesta funció no està inclosa al teu pla.",
                 "eventLimit": "Has arribat al límit d'esdeveniments del teu pla.",
@@ -1041,7 +1063,16 @@
             },
             "included": "El teu pla actual",
             "basic": "Pla bàsic inclòs",
-            "switchTo": "Canviar a {{plan}}"
+            "switchTo": "Canviar a {{plan}}",
+            "trialDaysLeft_one": "Prova gratuïta: queda {{count}} dia",
+            "trialDaysLeft_other": "Prova gratuïta: queden {{count}} dies",
+            "trialDaysLeft": "Prova gratuïta: queden {{count}} dies",
+            "trialEnds": "La prova gratuïta acaba el {{date}}. Després passes al pla Gratis si no contractes.",
+            "free": "Gratis",
+            "perMonth": "{{price}} €/mes",
+            "trialNote": "El primer mes és gratis: {{count}} dies de Pro en aprovar el teu local.",
+            "keepPlan": "Continuar amb {{plan}}",
+            "boostNote": "Destacar un esdeveniment costa {{price}} € per nit en qualsevol pla: surt el primer a l'app fins que acaba."
         },
         "safety": {
             "needsHelp": "{{name}} ha demanat ajuda",
@@ -1073,7 +1104,18 @@
             "queued": "Avís a la cua. Surt en uns minuts.",
             "delayNote": "Els avisos surten cada pocs minuts, no a l’instant.",
             "reached": "va arribar a {{count}}",
-            "pending": "A la cua"
+            "pending": "A la cua",
+            "when": "Programar per a (opcional)",
+            "now": "Ara",
+            "schedule": "Programar avís",
+            "scheduled": "Avís programat",
+            "scheduledCount": "Programats: {{count}} de {{max}}",
+            "cancelled": "Cancel·lat",
+            "errors": {
+                "scheduleLimit": "Has arribat al límit d'avisos programats del teu pla.",
+                "scheduleInPast": "Aquesta hora ja ha passat.",
+                "scheduleAfterEvent": "La festa ja haurà acabat a aquella hora."
+            }
         },
         "documents": {
             "help": "El que acredita que el local és teu. Administració ho revisa abans d'aprovar el compte.",
@@ -1275,7 +1317,51 @@
             "peakHour": "La gent va arribar sobretot a les {{hour}}:00.",
             "topCode": "El relacions públiques que en va portar més: {{name}} ({{count}}).",
             "benchmark": "Mitjana per esdeveniment: tu {{mine}} entrades amb Vybe; locals com el teu, {{others}}.",
-            "noBenchmark": "Encara no hi ha prou locals semblants per comparar."
+            "noBenchmark": "Encara no hi ha prou locals semblants per comparar.",
+            "revenueTitle": "El que t'ha portat Vybe",
+            "brought_one": "{{count}} persona va venir per Vybe",
+            "brought_other": "{{count}} persones van venir per Vybe",
+            "brought": "{{count}} persones van venir per Vybe",
+            "broughtIntent": "{{count}} van dir «hi aniré» i van venir",
+            "broughtCode": "{{count}} van entrar amb un codi de RRPP",
+            "broughtFollow": "{{count}} et segueixen i van venir",
+            "revenueHow": "Estimació: persones × ({{spend}} de despesa mitjana + entrada).",
+            "askSpend": "Quant gasta de mitjana una persona al teu local? Amb això calculem els euros.",
+            "followers": "Seguidors",
+            "followersNew": "+{{count}} aquesta setmana",
+            "boosts": "Esdeveniments destacats"
+        },
+        "planChipTrial": "{{plan}} · prova",
+        "boost": {
+            "badge": "Destacat",
+            "action": "Destacar ({{price}} €)",
+            "title": "Destacar «{{name}}»",
+            "body": "Per {{price}} € surt el primer a l'inici i al mapa de l'app, amb l'etiqueta «Destacat», fins que acabi la festa. És un pagament únic.",
+            "pay": "Pagar {{price}} €",
+            "paid": "Esdeveniment destacat",
+            "paidBody": "Ja surt el primer a l'app. Gràcies."
+        },
+        "followers": {
+            "title": "Seguidors del local",
+            "thisWeek": "+{{count}} aquesta setmana",
+            "hint": "Reben un avís cada vegada que publiques una festa.",
+            "notify": "Avisar els meus seguidors",
+            "notified": "Avís enviat",
+            "notifiedBody": "Els arriba als teus {{count}} seguidors.",
+            "alreadyNotified": "Ja s'ha avisat els teus seguidors d'aquest esdeveniment"
+        },
+        "profileForm": {
+            "title": "Fitxa del local",
+            "hint": "El que veu la gent en obrir el teu local a l'app.",
+            "descriptionPlaceholder": "Quina música sona, quin ambient hi ha, què us fa diferents…",
+            "hours": "Horari d'obertura",
+            "opens": "Obre",
+            "closes": "Tanca",
+            "avgSpend": "Despesa mitjana per persona",
+            "avgSpendHint": "No ho veu ningú. Amb això, l'informe setmanal calcula quants euros t'ha portat Vybe.",
+            "perPerson": "persona",
+            "avgSpendInvalid": "Posa un import entre 1 i 1000 €",
+            "saved": "Fitxa desada"
         }
     },
     "admin": {
@@ -1585,7 +1671,9 @@
         "today": "Avui",
         "going": "+{{count}} hi van",
         "view": "Veure",
-        "openAfter": "Obertes després de les {{time}}"
+        "openAfter": "Obertes després de les {{time}}",
+        "tapPin": "Toca un esdeveniment del mapa per veure de què va.",
+        "credits": "Crèdits del mapa"
     },
     "tickets": {
         "title": "Les meves entrades",
@@ -1769,8 +1857,8 @@
                         "body": "Genera el codi de la nit, imprimeix-lo en un cartell o posa'l a la pantalla de la porta. Només entra qui és al local."
                     },
                     "capacity": {
-                        "title": "Aforament en directe",
-                        "body": "Quanta gent ha entrat, amb avís quan t'acostes al límit i una vista per al monitor de l'entrada."
+                        "title": "Aforament real i ambient en directe",
+                        "body": "Comptador de porta des de qualsevol mòbil. El públic veu si la sala està animada o gairebé plena, mai les teves xifres."
                     },
                     "promoters": {
                         "title": "Codis per a relacions públiques",
@@ -1787,6 +1875,22 @@
                     "team": {
                         "title": "Equip amb rols",
                         "body": "Convida el teu equip de porta i els teus RRPP, cadascú amb els seus permisos."
+                    },
+                    "followers": {
+                        "title": "El teu propi públic",
+                        "body": "La gent segueix el teu local i rep un avís al mòbil cada vegada que publiques una festa."
+                    },
+                    "night": {
+                        "title": "Sortejos, reptes i segells",
+                        "body": "Sortejos en directe, reptes de la nit, targeta de segells i la cançó que vota la pista."
+                    },
+                    "report": {
+                        "title": "Informe setmanal en euros",
+                        "body": "Cada dilluns: quanta gent va venir per Vybe, qui repeteix i quants diners t'ha portat."
+                    },
+                    "boost": {
+                        "title": "Destaca la teva festa",
+                        "body": "Surt el primer a l'app la nit que més t'importa."
                     }
                 }
             }
@@ -1846,13 +1950,19 @@
         "plans": {
             "eyebrow": "Plans per a locals",
             "title": "Comença gratis i creix quan ho necessitis",
-            "body": "Dona d'alta el teu local, prova Vybe amb la teva primera festa i canvia de pla des del tauler.",
+            "body": "Dona d'alta el teu local i estrena Pro gratis el primer mes. Sense permanència: canvia de pla des del tauler.",
             "free": "0 €",
             "custom": "Consulta'ns",
             "recommended": "Recomanat",
             "ctaFree": "Començar gratis",
             "ctaPaid": "Parlar amb nosaltres",
-            "base": "Accés amb QR i geotanca, aforament en directe i tauler de porta a tots els plans."
+            "base": "Accés amb QR i geotanca, aforament en directe i tauler de porta a tots els plans.",
+            "perMonth": "/mes",
+            "trial": "Primer mes gratis",
+            "ctaTrial": "Provar Pro gratis",
+            "boostTitle": "Destacar un esdeveniment: {{price}} € per nit",
+            "boostBody": "En qualsevol pla. La teva festa surt la primera a l'inici i al mapa de l'app fins que acaba.",
+            "vat": "Preus sense IVA. Pagament mensual, sense permanència."
         },
         "faq": {
             "eyebrow": "Preguntes freqüents",
@@ -1860,7 +1970,7 @@
             "items": {
                 "price": {
                     "q": "Quant costa Vybe?",
-                    "a": "Per sortir de festa és gratis. Vybe Premium afegeix extres com veure a qui li agrades o destacar el teu perfil una hora. Els locals tenen un pla gratuït i els plans Pro i Business."
+                    "a": "Per sortir de festa és gratis. Vybe Premium afegeix extres com veure a qui li agrades o destacar el teu perfil una hora. Els locals tenen un pla Gratis i els plans Pro (49 €/mes, el primer mes gratis) i Business (129 €/mes), sense IVA i sense permanència."
                 },
                 "location": {
                     "q": "Per què em demana la ubicació?",
@@ -1996,7 +2106,7 @@
     },
     "night": {
         "title": "La nit",
-        "short": "Nit",
+        "short": "Ofertes",
         "subtitle": "Ofertes, reptes, sortejos i més d'aquest local. Només per a qui és a dins.",
         "tabs": {
             "offers": "Ofertes",
@@ -2083,5 +2193,164 @@
         "notNow": "Ara no",
         "seeMap": "Veure-les totes al mapa",
         "until": "fins a les {{time}}"
+    },
+    "venuePage": {
+        "notFound": "No hem trobat aquest local",
+        "vybeVenue": "Local amb Vybe",
+        "follow": "Seguir",
+        "following": "Seguint",
+        "followers_one": "{{count}} seguidor",
+        "followers_other": "{{count}} seguidors",
+        "followers": "{{count}} seguidors",
+        "followHint": "T'avisarem quan publiqui una festa nova.",
+        "followed": "Segueixes {{name}}",
+        "followedBody": "T'avisarem quan publiqui una festa nova.",
+        "until": "Fins a les {{time}}",
+        "go": "Veure",
+        "hours": "Horari",
+        "closed": "Tancat",
+        "closedToday": "Avui tancat",
+        "today": "Avui: {{hours}}",
+        "directions": "Com arribar-hi",
+        "upcoming": "Properes festes",
+        "past": "Festes passades",
+        "noUpcoming": "No hi ha festes anunciades. Segueix-lo i t'avisarem de la propera.",
+        "noUpcomingFollowing": "No hi ha festes anunciades. T'avisarem de la propera.",
+        "promptTitle": "Vols que {{name}} t'avisi de les seves festes?",
+        "promptBody": "Segueix-lo i et arribarà un avís quan publiqui una festa nova. Pots deixar de seguir-lo quan vulguis des de la seva fitxa."
+    },
+    "photoCheck": {
+        "titleSingle": "La foto no compleix els requisits",
+        "titleSome_one": "La imatge {{list}} no compleix els requisits",
+        "titleSome_other": "Les imatges {{list}} no compleixen els requisits",
+        "titleSome": "Les imatges {{list}} no compleixen els requisits",
+        "titleAll": "Cap de les imatges compleix els requisits",
+        "unavailableTitle": "No hem pogut revisar la foto",
+        "unavailableBody": "La revisió automàtica no respon ara mateix, així que la foto no s'ha publicat. El nostre equip la revisarà a mà; mentrestant, pots repetir-la i tornar-ho a provar.",
+        "image": "Imatge {{n}}",
+        "requirementsTitle": "Requisits",
+        "requirements": {
+            "face": "Se't veu la cara, de front i amb prou llum.",
+            "oneFace": "Només hi surts tu: res de fotos de grup.",
+            "nudity": "Sense nus ni contingut sexual.",
+            "violence": "Sense armes, violència ni sang.",
+            "offensive": "Sense gestos ni símbols ofensius.",
+            "cameraNow": "Feta ara amb la càmera: la de la nit no es pot triar de la galeria."
+        },
+        "reasons": {
+            "no_face": "no es veu cap cara",
+            "many_faces": "hi surt més d'una persona",
+            "nudity": "contingut sexual o nus",
+            "weapon": "hi apareix una arma",
+            "offensive": "contingut ofensiu",
+            "gore": "contingut violent",
+            "unavailable": "no s'ha pogut revisar",
+            "generic": "no compleix els requisits"
+        },
+        "retakeOne": "Fer una altra foto",
+        "retakeMany": "Repetir aquestes fotos",
+        "approved": "Foto aprovada",
+        "and": "i"
+    },
+    "camera": {
+        "switch": "Canviar de càmera"
+    },
+    "eventMode": {
+        "chooseTitle": "Estàs a punt d'entrar a «{{name}}»",
+        "chooseBody": "Com hi vols accedir? Ho pots canviar durant la nit.",
+        "enterAsVyber": "Entrar com a Vyber",
+        "enterAsGuest": "Entrar com a convidat",
+        "vyber": {
+            "title": "Vyber",
+            "short": "Mode Vyber",
+            "body": "Et fas una foto del moment, surts al tauler i pots lliscar i fer match."
+        },
+        "guest": {
+            "title": "Convidat",
+            "short": "Mode convidat",
+            "body": "Sense foto. Veus les ofertes i els avisos del local, però no veus el tauler ni hi surts.",
+            "hereBody": "Hi ets com a convidat: ningú et veu al tauler. Gaudeix de les ofertes de la casa."
+        },
+        "until": "La festa és de {{time}}",
+        "guestPerks": "El que sí que tens",
+        "perks": {
+            "offers": "Ofertes i vals del local",
+            "raffles": "Sortejos i reptes de la nit",
+            "alerts": "Avisos del local mentre hi ets",
+            "private": "No surts al tauler de ningú"
+        },
+        "switchTitle": "Vols canviar al mode {{mode}}?",
+        "switchBody": {
+            "vyber": "Et demanarem una foto del moment i començaràs a sortir al tauler.",
+            "guest": "S'esborrarà la teva foto d'aquesta nit i els m'agrada que no hagin estat match. Deixaràs de veure el tauler i de sortir-hi."
+        },
+        "switchConfirm": "Sí, canviar",
+        "switched": {
+            "vyber": "Ara estàs en mode Vyber",
+            "guest": "Ara estàs en mode convidat"
+        }
+    },
+    "accountKind": {
+        "vyber": {
+            "tab": "Compte Vyber",
+            "short": "Festes i conèixer gent",
+            "infoCta": "Què és un Vyber i què hi puc fer?",
+            "infoTitle": "Què és un Vyber?",
+            "infoBody": "Un Vyber surt de festa i, a més, vol conèixer qui hi ha aquella nit al local.",
+            "switched": "Ja ets Vyber",
+            "switchBody": "Et demanarem una foto del moment la propera vegada que entris en una festa.",
+            "points": {
+                "events": "Totes les festes: mapa, fitxa, horaris i preus",
+                "photo": "Una foto del moment en entrar a la festa",
+                "board": "Surts al tauler de la festa i veus qui hi ha",
+                "match": "Llisques, fas m'agrada i fas match",
+                "chat": "Xat amb els teus matches mentre dura l'esdeveniment",
+                "offers": "Ofertes, sortejos i reptes del local",
+                "switch": "Pots entrar en una festa solta en mode convidat"
+            }
+        },
+        "guest": {
+            "tab": "Compte convidat",
+            "short": "Només festes, sense tauler",
+            "infoCta": "Què puc fer com a convidat?",
+            "infoTitle": "Què puc fer com a convidat?",
+            "infoBody": "Tot el d'assabentar-te de les festes, res de conèixer gent: no surts a cap tauler ni en veus cap.",
+            "switched": "Ja ets convidat",
+            "switchBody": "Deixaràs de sortir als taulers i de veure’ls. La resta continua igual.",
+            "points": {
+                "events": "Totes les festes, amb horaris, preus i cartells",
+                "map": "Mapa amb el que hi ha a prop i cercador per zona",
+                "access": "Entres a les festes amb el codi o el QR del local",
+                "offers": "Ofertes, vals, sortejos i reptes del local",
+                "push": "Avisos al mòbil del que canvia: festes noves, canvis d'hora i avisos del local",
+                "follow": "Segueixes els teus locals i t’assabentes el primer",
+                "private": "No surts a cap tauler i ningú et pot lliscar"
+            }
+        },
+        "switchNote": "Pots canviar de tipus de compte més endavant des del teu perfil.",
+        "switchTo": "Canviar a {{kind}}",
+        "switchTitle": "Canviar a {{kind}}?",
+        "switchConfirm": "Sí, canviar",
+        "guestWarning": "Tornar a Vyber només es pot un cop al mes (tres amb Premium). Si canvies ara, hauràs d’esperar.",
+        "limitReached": "Podràs tornar al compte Vyber a partir del {{date}}.",
+        "changesLeft": "Et queden {{count}} canvis aquest mes.",
+        "compare": {
+            "title": "Com a convidat veus la festa; com a Vyber la jugues",
+            "guest": "Convidat",
+            "vyber": "Vyber",
+            "rows": {
+                "events": "Festes, mapa i preus",
+                "tickets": "Entrades",
+                "follow": "Avisos i seguir locals",
+                "qr": "Entrar amb QR",
+                "offers": "Ofertes i vals",
+                "raffles": "Sortejos de la nit",
+                "challenges": "Reptes i segells",
+                "songs": "Votar la cançó",
+                "vibe": "Ambient i quanta gent hi ha",
+                "board": "Tauler, match i xat",
+                "premium": "Premium"
+            }
+        }
     }
 }

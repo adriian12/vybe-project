@@ -73,6 +73,9 @@ verify_jwt = true
 [functions.moderate-photo]
 verify_jwt = true
 
+[functions.likes-preview]
+verify_jwt = true
+
 [functions.send-sos-alert]
 verify_jwt = true
 

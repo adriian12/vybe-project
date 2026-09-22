@@ -9,6 +9,18 @@
 export const PLAN_FEATURES = ['promoterCodes', 'promotions', 'csvExport', 'headcountCurve', 'demographics'] as const;
 
 export type PlanId = 'free' | 'pro' | 'business';
+
+/**
+ * Precio mensual en euros (sin IVA). Son los mismos que cobra `stripe-checkout`
+ * cuando no hay un precio creado en Stripe: si cambias uno, cambia el otro.
+ */
+export const PLAN_PRICES: Record<PlanId, number> = { free: 0, pro: 49, business: 129 };
+
+/** Días de Pro gratis que recibe un local al ser aprobado. */
+export const TRIAL_DAYS = 30;
+
+/** Destacar un evento: euros por noche, en cualquier plan. */
+export const BOOST_PRICE = 19;
 export type PlanFeature = (typeof PLAN_FEATURES)[number];
 
 export const PLANS: Record<PlanId, { events: number; team: number; features: Record<PlanFeature, boolean> }> = {

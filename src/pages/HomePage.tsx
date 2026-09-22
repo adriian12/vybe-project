@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Bell, ChevronDown, ChevronRight, Flame, Loader2, PartyPopper, User } from 'lucide-react';
+import { Bell, ChevronDown, ChevronRight, Flame, Loader2, PartyPopper, User,
+  MapPin,
+} from 'lucide-react';
 import { useAppContext } from '@/context/app-context';
 import Header from '@/components/header';
 import Footer from '@/components/footer';
@@ -18,6 +20,9 @@ import {
 import { track } from '@/lib/observability';
 import { isEventLive, isEventTonight, useEventsFeed } from '@/hooks/use-events-feed';
 import { Event } from '@/types/venue';
+import { isFeatured } from '@/lib/featured';
+import PartyFilters from '@/components/party-filters';
+import { aplicarFiltros, Franja } from '@/lib/party-filters';
 
 /**
  * Radio de «cerca de mí». Diez kilómetros cubren un área metropolitana entera
@@ -30,16 +35,6 @@ const NEARBY = '__nearby__';
 
 /** Cuántas tarjetas caben en el carrusel de destacados. */
 const DESTACADOS = 5;
-
-/** Una cifra en píldora blanca: el número en un círculo amarillo y su significado. */
-const Cifra: React.FC<{ valor: number; texto: string }> = ({ valor, texto }) => (
-  <div className="flex shrink-0 items-center gap-2.5 rounded-full bg-white py-2 pl-2 pr-3.5 shadow-sm">
-    <span className="flex h-7 min-w-7 items-center justify-center rounded-full bg-party-primary px-1 font-display text-caption font-black text-ink tabular">
-      {valor}
-    </span>
-    <span className="text-body-sm font-bold text-ink">{texto}</span>
-  </div>
-);
 
 /** Título de sección en Outfit, con algo opcional a la derecha. */
 const Seccion: React.FC<{ titulo: React.ReactNode; extra?: React.ReactNode }> = ({ titulo, extra }) => (
@@ -64,6 +59,7 @@ const HomePage = () => {
 
   const [place, setPlace] = useState<string>(NEARBY);
   const [theme, setTheme] = useState<string | null>(null);
+  const [franja, setFranja] = useState<Franja | null>(null);
   const [avisosAbiertos, setAvisosAbiertos] = useState(false);
   const avisos = useActivity(intents);
 
@@ -121,10 +117,7 @@ const HomePage = () => {
     return [...encontradas].sort();
   }, [porZona]);
 
-  const visible = useMemo(
-    () => (theme ? porZona.filter((e) => e.event.theme === theme) : porZona),
-    [porZona, theme],
-  );
+  const visible = useMemo(() => aplicarFiltros(porZona, theme, franja), [porZona, theme, franja]);
 
   useEffect(() => {
     if (theme && !themes.includes(theme)) setTheme(null);
@@ -133,25 +126,21 @@ const HomePage = () => {
   const enDirecto = useMemo(() => visible.filter(({ event }) => isEventLive(event)), [visible]);
 
   /**
-   * Destacados: los que tienen más movimiento. Pesa más la gente que ya está
-   * dentro que la que dice que irá, porque es la señal que no miente.
+   * Destacados: primero los que el local ha pagado por destacar, y después los
+   * que tienen más movimiento. Pesa más la gente que ya está dentro que la que
+   * dice que irá, porque es la señal que no miente.
    */
   const destacados = useMemo(() => {
     const puntos = (id: string) => (activity[id]?.inside ?? 0) * 3 + (activity[id]?.going ?? 0);
+    const ahora = Date.now();
     return [...visible]
-      .filter(({ event }) => puntos(event.id) > 0 || isEventLive(event))
-      .sort((a, b) => puntos(b.event.id) - puntos(a.event.id))
+      .filter(({ event }) => isFeatured(event, ahora) || puntos(event.id) > 0 || isEventLive(event))
+      .sort(
+        (a, b) =>
+          Number(isFeatured(b.event, ahora)) - Number(isFeatured(a.event, ahora)) ||
+          puntos(b.event.id) - puntos(a.event.id),
+      )
       .slice(0, DESTACADOS);
-  }, [visible, activity]);
-
-  const cifras = useMemo(() => {
-    let dentro = 0;
-    let estaNoche = 0;
-    for (const { event } of visible) {
-      dentro += activity[event.id]?.inside ?? 0;
-      if (isEventTonight(event)) estaNoche += 1;
-    }
-    return { eventos: visible.length, dentro, estaNoche };
   }, [visible, activity]);
 
   const nombrePlace =
@@ -274,18 +263,17 @@ const HomePage = () => {
           </section>
         )}
 
-        {/* ---------------------------------------------------------- cifras */}
-        {/* Contestan «¿hay algo esta noche?» antes de leer la lista, y salen de
-            lo que ya está cargado: no cuestan una consulta más. */}
-        {!isLoading && visible.length > 0 && (
-          <section className="no-scrollbar flex gap-3 overflow-x-auto px-margin">
-            <Cifra
-              valor={cifras.eventos}
-              texto={place === NEARBY ? t('home.statNearby') : t('home.statEventsShort')}
-            />
-            <Cifra valor={cifras.dentro} texto={t('home.statInsideShort')} />
-            <Cifra valor={cifras.estaNoche} texto={t('home.statTonight')} />
-          </section>
+        {/* --------------------------------------------------------- filtros */}
+        {/* Música (todos los géneros dentro) y las franjas de la fiesta. */}
+        {!isLoading && porZona.length > 0 && (
+          <PartyFilters
+            className="px-margin"
+            themes={themes}
+            theme={theme}
+            onTheme={setTheme}
+            franja={franja}
+            onFranja={setFranja}
+          />
         )}
 
         {/* ------------------------------------------------------ destacados */}
@@ -311,24 +299,6 @@ const HomePage = () => {
           </section>
         )}
 
-        {/* ---------------------------------------------------------- géneros */}
-        {themes.length > 1 && (
-          <section className="no-scrollbar flex gap-2 overflow-x-auto px-margin pt-1">
-            {[null, ...themes].map((nombre) => (
-              <button
-                key={nombre ?? '__todas__'}
-                type="button"
-                onClick={() => setTheme(nombre)}
-                aria-pressed={theme === nombre}
-                className={`press shrink-0 rounded-full px-4 py-2 text-label-pill tracking-wide ${
-                  theme === nombre ? 'bg-party-primary text-ink shadow-sm' : 'bg-surface-low text-foreground'
-                }`}
-              >
-                {nombre ?? t('home.allThemes')}
-              </button>
-            ))}
-          </section>
-        )}
 
         {/* ------------------------------------------------------------ lista */}
         <section className="space-y-4 px-margin pt-1">
@@ -339,8 +309,9 @@ const HomePage = () => {
               <Select value={place} onValueChange={setPlace}>
                 <SelectTrigger
                   aria-label={t('home.filterPlace')}
-                  className="h-8 w-auto max-w-[55%] gap-1 border-0 bg-transparent px-0 text-caption text-party-gray focus:border-0 [&>svg]:hidden"
+                  className="press h-9 w-auto max-w-[55%] gap-1.5 rounded-full border border-surface-highest bg-surface-low px-3.5 text-label-pill text-foreground focus:border-party-primary [&>svg]:hidden"
                 >
+                  <MapPin size={14} className="shrink-0 text-party-primary" />
                   <SelectValue>{nombrePlace}</SelectValue>
                   <ChevronDown size={14} className="shrink-0" />
                 </SelectTrigger>

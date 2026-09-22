@@ -21,6 +21,9 @@ import { EventWithDistance, isEventLive, isEventTonight, useEventsFeed } from '@
 import { formatDistance } from '@/services/geo';
 import { cn } from '@/lib/utils';
 import { VenueType } from '@/types/venue';
+import { featuredFirst, isFeatured } from '@/lib/featured';
+import PartyFilters from '@/components/party-filters';
+import { aplicarFiltros, Franja } from '@/lib/party-filters';
 
 /** Centro por defecto: Palma, cuando no hay ubicación ni eventos con punto. */
 const PALMA: L.LatLngTuple = [39.5696, 2.6502];
@@ -39,7 +42,11 @@ const escapar = (texto: string) =>
  * mismos colores que el resto de la aplicación y no hay que empaquetar los
  * iconos de Leaflet, que con Vite se rompen.
  */
-const icono = (nombre: string, seleccionado: boolean, directo: boolean) =>
+/** Llama naranja para los eventos destacados: «evento caliente». */
+const FUEGO =
+  '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="#FF6A2B" stroke="#111114" stroke-width="1.6" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>';
+
+const icono = (nombre: string, seleccionado: boolean, directo: boolean, destacado: boolean) =>
   L.divIcon({
     className: 'vybe-pin',
     iconSize: seleccionado ? [160, 76] : [32, 38],
@@ -47,9 +54,9 @@ const icono = (nombre: string, seleccionado: boolean, directo: boolean) =>
     html: seleccionado
       ? `<div class="vybe-pin-selected">
            <span class="vybe-pin-label">${directo ? '<i></i>' : ''}${escapar(nombre)}</span>
-           <span class="vybe-pin-ring"><span class="vybe-pin-dot">${NOTA}</span></span>
+           <span class="vybe-pin-ring">${destacado ? `<span class="vybe-pin-fire">${FUEGO}</span>` : ''}<span class="vybe-pin-dot">${NOTA}</span></span>
          </div>`
-      : `<div class="vybe-pin-simple"><span class="vybe-pin-dot">${NOTA}</span></div>`,
+      : `<div class="vybe-pin-simple">${destacado ? `<span class="vybe-pin-fire">${FUEGO}</span>` : ''}<span class="vybe-pin-dot">${NOTA}</span></div>`,
   });
 
 const TIPOS: VenueType[] = ['discoteca', 'bar', 'festival', 'fiesta_privada', 'evento_empresarial', 'local'];
@@ -81,6 +88,8 @@ const MapPage = () => {
   const [soloGratis, setSoloGratis] = useState(false);
   const [seleccion, setSeleccion] = useState<string | null>(null);
   const [lista, setLista] = useState(false);
+  const [theme, setTheme] = useState<string | null>(null);
+  const [franja, setFranja] = useState<Franja | null>(null);
 
   // «¿Dónde seguimos?»: con `?desde=<hora>` sólo salen las fiestas abiertas
   // después de esa hora (las que siguen en marcha o empiezan poco después).
@@ -105,7 +114,7 @@ const MapPage = () => {
       .normalize('NFD')
       .replace(/\p{Diacritic}/gu, '');
 
-    return conPunto.filter(({ event }) => {
+    return featuredFirst(aplicarFiltros(conPunto, theme, franja).filter(({ event }) => {
       if (tipo && event.venueType !== tipo) return false;
       if (soloDirecto && !isEventLive(event)) return false;
       if (soloEstaNoche && !isEventTonight(event)) return false;
@@ -125,8 +134,14 @@ const MapPage = () => {
         .normalize('NFD')
         .replace(/\p{Diacritic}/gu, '');
       return texto.includes(q);
-    });
-  }, [conPunto, busqueda, tipo, soloDirecto, soloEstaNoche, soloGratis, desde]);
+    }));
+  }, [conPunto, busqueda, tipo, soloDirecto, soloEstaNoche, soloGratis, desde, theme, franja]);
+
+  const temasMapa = useMemo(() => {
+    const encontrados = new Set<string>();
+    for (const { event } of conPunto) if (event.theme) encontrados.add(event.theme);
+    return [...encontrados].sort();
+  }, [conPunto]);
 
   // --------------------------------------------------------------- el mapa
   useEffect(() => {
@@ -150,6 +165,8 @@ const MapPage = () => {
 
     capa.current = L.layerGroup().addTo(m);
     mapa.current = m;
+    // Tocar el mapa fuera de un alfiler cierra la tarjeta.
+    m.on('click', () => setSeleccion(null));
 
     return () => {
       m.remove();
@@ -192,11 +209,13 @@ const MapPage = () => {
       if (!event.location) continue;
       const seleccionado = event.id === seleccion;
       const marker = L.marker([event.location.latitude, event.location.longitude], {
-        icon: icono(event.venueName ?? event.name, seleccionado, isEventLive(event)),
-        zIndexOffset: seleccionado ? 1000 : 0,
+        icon: icono(event.venueName ?? event.name, seleccionado, isEventLive(event), isFeatured(event)),
+        zIndexOffset: seleccionado ? 1000 : isFeatured(event) ? 500 : 0,
         title: event.name,
       });
-      marker.on('click', () => {
+      // Tocar un alfiler enseña su tarjeta abajo; tocar la tarjeta abre el evento.
+      marker.on('click', (e) => {
+        L.DomEvent.stopPropagation(e);
         setSeleccion(event.id);
         tarjetas.current[event.id]?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
       });
@@ -297,6 +316,12 @@ const MapPage = () => {
                 <DropdownMenuCheckboxItem checked={soloGratis} onCheckedChange={(v) => setSoloGratis(v === true)}>
                   {t('map.freeOnly')}
                 </DropdownMenuCheckboxItem>
+                {/* La atribución de OpenStreetMap y CARTO es obligatoria: vive
+                    aquí, fuera de la lista de eventos. */}
+                <p
+                  className="border-t border-white/10 px-2 pb-1 pt-2 text-[10px] leading-snug text-party-gray/80 [&_a]:underline"
+                  dangerouslySetInnerHTML={{ __html: TILES_ATTRIBUTION }}
+                />
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -313,6 +338,15 @@ const MapPage = () => {
               <X size={15} />
             </button>
           )}
+
+          <PartyFilters
+            className="pointer-events-auto -mx-margin px-margin py-0.5"
+            themes={temasMapa}
+            theme={theme}
+            onTheme={setTheme}
+            franja={franja}
+            onFranja={setFranja}
+          />
 
           {tiposPresentes.length > 1 && (
             <div className="no-scrollbar pointer-events-auto -mx-margin flex items-center gap-1 overflow-x-auto px-margin py-0.5">
@@ -354,7 +388,7 @@ const MapPage = () => {
           aria-label={t('map.nearby')}
           className={cn(
             'absolute inset-x-0 bottom-[var(--nav-h)] z-[600] mx-auto flex max-w-2xl flex-col gap-2 rounded-t-[24px] bg-[#0E0E11] px-margin pb-3 pt-2.5 shadow-[0_-8px_30px_rgba(0,0,0,0.7)] transition-[max-height] duration-300 [transition-timing-function:var(--ease-drawer)]',
-            lista ? 'max-h-[calc(100%-5rem)]' : 'max-h-[16rem]',
+            lista ? 'max-h-[calc(100%-5rem)]' : 'max-h-[13rem]',
           )}
         >
           <button
@@ -384,9 +418,13 @@ const MapPage = () => {
 
           {visibles.length === 0 ? (
             <p className="py-6 text-center text-body-sm text-party-gray">{t('map.empty')}</p>
+          ) : !lista && !seleccion ? (
+            <p className="pb-1 text-caption text-party-gray">{t('map.tapPin')}</p>
           ) : (
             <div className="no-scrollbar -mx-margin flex-1 space-y-2 overflow-y-auto px-margin pb-1">
-              {visibles.map((item) => {
+              {/* Al abrir el mapa sólo se ve el mapa: la tarjeta sale al tocar un
+                  alfiler, y la lista entera con «Ver lista». */}
+              {(lista ? visibles : visibles.filter((item) => item.event.id === seleccion)).map((item) => {
                 const { event, distance } = item;
                 const activa = event.id === seleccion;
                 const directo = isEventLive(event);
@@ -400,7 +438,7 @@ const MapPage = () => {
                     ref={(el) => {
                       tarjetas.current[event.id] = el;
                     }}
-                    onClick={() => (activa ? abrir(event.id) : seleccionar(item))}
+                    onClick={() => (activa || !lista ? abrir(event.id) : seleccionar(item))}
                     className={cn(
                       'press flex w-full cursor-pointer items-center gap-3 rounded-2xl p-2',
                       activa ? 'bg-[#E4E1E6] text-ink shadow-xl' : 'bg-surface-container text-foreground',
@@ -472,10 +510,6 @@ const MapPage = () => {
             </div>
           )}
 
-          <p
-            className="shrink-0 text-right text-[10px] text-party-gray/70 [&_a]:underline"
-            dangerouslySetInnerHTML={{ __html: TILES_ATTRIBUTION }}
-          />
         </section>
       </main>
 

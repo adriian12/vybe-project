@@ -21,6 +21,8 @@ export interface User {
   gender?: 'man' | 'woman';
   /** A quién quiere ver. Sí se puede cambiar. */
   wants?: 'men' | 'women' | 'all';
+  /** `vyber` (tablón) o `guest` (sólo fiestas, ofertas y avisos). */
+  accountType?: 'vyber' | 'guest';
   status?: 'active' | 'suspended' | 'pending_deletion' | 'deleted';
   notifyMatches?: boolean;
   notifyMessages?: boolean;

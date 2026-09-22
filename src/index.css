@@ -331,6 +331,34 @@
   position: relative;
 }
 
+/* Evento destacado: una llama sobre el círculo. */
+.vybe-pin-fire {
+  position: absolute;
+  top: -15px;
+  left: 50%;
+  z-index: 1;
+  display: flex;
+  transform: translateX(-50%);
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.6));
+  animation: vybe-fire 1.6s ease-in-out infinite;
+}
+
+@keyframes vybe-fire {
+  0%,
+  100% {
+    transform: translateX(-50%) scale(1);
+  }
+  50% {
+    transform: translateX(-50%) scale(1.12);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vybe-pin-fire {
+    animation: none;
+  }
+}
+
 .vybe-pin-ring {
   position: relative;
   display: flex;

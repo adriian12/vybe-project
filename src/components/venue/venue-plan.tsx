@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 import { useToast } from '@/components/ui/use-toast';
 import { venueService, VenuePlanStatus } from '@/services/venue-service';
 import { ApiError } from '@/services/api';
-import { PLAN_FEATURES, PLANS } from '@/lib/venue-plans';
+import { BOOST_PRICE, PLAN_FEATURES, PLAN_PRICES, PLANS, TRIAL_DAYS } from '@/lib/venue-plans';
 
 interface VenuePlanProps {
   plan: VenuePlanStatus | null;
@@ -94,6 +94,10 @@ const VenuePlan = ({ plan, onUpgrade }: VenuePlanProps) => {
   }
 
   const order: Array<'free' | 'pro' | 'business'> = ['free', 'pro', 'business'];
+  const enPrueba = plan.status === 'trialing';
+  const diasPrueba = enPrueba && plan.expiresAt
+    ? Math.max(Math.ceil((new Date(plan.expiresAt).getTime() - Date.now()) / 86_400_000), 0)
+    : 0;
 
   // «Plan & Suscripción» de Stitch: el plan actual en una tarjeta amarilla con
   // lo consumido, y debajo las tres opciones en tarjetas blancas.
@@ -105,13 +109,19 @@ const VenuePlan = ({ plan, onUpgrade }: VenuePlanProps) => {
             {t('venue.plan.current')}
           </span>
           <span className="text-caption font-bold">
-            {plan.status === 'active' || plan.plan === 'free' ? t('venue.plan.statusActive') : plan.status}
+            {enPrueba
+              ? t('venue.plan.trialDaysLeft', { count: diasPrueba })
+              : plan.status === 'active' || plan.plan === 'free'
+                ? t('venue.plan.statusActive')
+                : plan.status}
           </span>
         </div>
         <p className="mt-2 font-display text-headline-xl">{t(`venue.plan.names.${plan.plan}`)}</p>
         {plan.expiresAt && (
           <p className="text-body-sm font-semibold">
-            {plan.cancelAtPeriodEnd
+            {enPrueba
+              ? t('venue.plan.trialEnds', { date: new Date(plan.expiresAt).toLocaleDateString() })
+              : plan.cancelAtPeriodEnd
               ? t('venue.plan.endsOn', { date: new Date(plan.expiresAt).toLocaleDateString() })
               : t('venue.plan.renewsOn', { date: new Date(plan.expiresAt).toLocaleDateString() })}
           </p>
@@ -153,6 +163,12 @@ const VenuePlan = ({ plan, onUpgrade }: VenuePlanProps) => {
                 {t(`venue.plan.names.${name}`)}
               </h3>
               <p className="mt-0.5 text-body-sm text-party-gray">{t(`venue.plan.taglines.${name}`)}</p>
+              <p className="mt-3 font-display text-headline-lg">
+                {PLAN_PRICES[name] === 0 ? t('venue.plan.free') : t('venue.plan.perMonth', { price: PLAN_PRICES[name] })}
+              </p>
+              {name === 'pro' && !enPrueba && plan.plan === 'free' && (
+                <p className="text-caption font-bold text-emerald-700">{t('venue.plan.trialNote', { count: TRIAL_DAYS })}</p>
+              )}
 
               <ul className="mt-4 space-y-2 text-body-sm">
                 <li className="flex items-center gap-2 font-semibold">
@@ -181,7 +197,15 @@ const VenuePlan = ({ plan, onUpgrade }: VenuePlanProps) => {
                 ))}
               </ul>
 
-              {isCurrent ? (
+              {isCurrent && enPrueba && name !== 'free' ? (
+                <PartyButton
+                  className="mt-5 w-full"
+                  disabled={contratando !== null}
+                  onClick={() => void contratar(name as 'pro' | 'business')}
+                >
+                  {contratando === name ? t('venue.plan.opening') : t('venue.plan.keepPlan', { plan: t(`venue.plan.names.${name}`) })}
+                </PartyButton>
+              ) : isCurrent ? (
                 <div className="mt-5 flex h-11 items-center justify-center rounded-xl border border-black/10 text-body-sm font-bold text-party-gray">
                   {t('venue.plan.included')}
                 </div>
@@ -206,6 +230,7 @@ const VenuePlan = ({ plan, onUpgrade }: VenuePlanProps) => {
       </div>
 
       <p className="px-1 text-caption text-party-gray">{t('venue.plan.billingNote')}</p>
+      <p className="px-1 text-caption text-party-gray">{t('venue.plan.boostNote', { price: BOOST_PRICE })}</p>
     </div>
   );
 };

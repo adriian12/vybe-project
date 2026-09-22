@@ -58,6 +58,11 @@ serve(async (req: Request): Promise<Response> => {
         .from('connections')
         .delete()
         .or(`user_id_1.eq.${profileId},user_id_2.eq.${profileId}`);
+
+      // Estas dos se quedarían anónimas (ON DELETE SET NULL); «todos mis
+      // datos» es todos, así que también se van.
+      await supabase.from('analytics_events').delete().eq('profile_id', profileId);
+      await supabase.from('booking_clicks').delete().eq('profile_id', profileId);
     }
 
     let deletedFiles = 0;

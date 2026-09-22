@@ -10,8 +10,10 @@ import { adminClient, getUser } from '../_shared/supabase.ts';
  *
  *   - `approved`: la publica en el perfil llamando a review_photo().
  *   - `rejected`: la deja marcada y el cliente borra el fichero.
- *   - sin proveedor configurado: responde 200 sin decisión y la foto queda
- *     pendiente de revisión manual en el panel de administración.
+ *   - `unavailable`: el proveedor no responde o no está configurado. La foto
+ *     NO se publica: se queda pendiente (`reason = 'unavailable'`) para
+ *     revisión manual, un disparador avisa a los admins, y el cliente lo dice
+ *     al momento y deja repetirla.
  *
  * Proveedor soportado: Sightengine (nudity, weapons, offensive).
  * Variables: SIGHTENGINE_USER, SIGHTENGINE_SECRET, MODERATION_THRESHOLD.
@@ -80,28 +82,41 @@ serve(async (req: Request): Promise<Response> => {
   if (req.method !== 'POST') return json({ error: 'Método no permitido' }, 405);
 
   const supabase = adminClient();
+  let itemId: string | undefined;
+
+  /** Sin revisión automática no se publica nada: queda para revisión manual. */
+  const unavailable = async () => {
+    if (itemId) {
+      await supabase
+        .from('moderation_queue')
+        .update({ reason: 'unavailable' })
+        .eq('id', itemId)
+        .eq('status', 'pending');
+    }
+    return json({ decision: 'unavailable', reason: 'unavailable', configured: false });
+  };
 
   try {
     const user = await getUser(req, supabase);
     if (!user) return json({ error: 'No autenticado' }, 401);
 
-    const { itemId, url } = (await req.json()) as { itemId?: string; url?: string };
-    if (!itemId || !url) return json({ error: 'Faltan parámetros' }, 400);
+    const body = (await req.json()) as { itemId?: string; url?: string };
+    const url = body.url;
+    if (!body.itemId || !url) return json({ error: 'Faltan parámetros' }, 400);
 
     // El elemento debe pertenecer a quien llama.
     const { data: item } = await supabase
       .from('moderation_queue')
-      .select('id, profile_id, kind, profiles!inner(user_id)')
-      .eq('id', itemId)
+      .select('id, profile_id, kind, event_id, profiles!inner(user_id)')
+      .eq('id', body.itemId)
       .maybeSingle();
 
     const owner = (item as { profiles?: { user_id: string } } | null)?.profiles?.user_id;
     if (!item || owner !== user.id) return json({ error: 'No autorizado' }, 403);
+    itemId = body.itemId;
 
     const analysis = await scorePhoto(url);
-
-    // Sin proveedor: se queda pendiente para revisión manual.
-    if (!analysis) return json({ decision: null, configured: false });
+    if (!analysis) return await unavailable();
 
     const threshold = Number(Deno.env.get('MODERATION_THRESHOLD') ?? DEFAULT_THRESHOLD);
 
@@ -119,7 +134,23 @@ serve(async (req: Request): Promise<Response> => {
         reason: approved ? null : rejectionReason,
         reviewed_at: new Date().toISOString(),
       })
-      .eq('id', itemId);
+      .eq('id', body.itemId);
+
+    // Si ésta ha pasado, las del mismo tipo que se quedaron pendientes porque
+    // la revisión no respondía ya no hacen falta: fuera de la cola manual. Las
+    // fotos del perfil no, porque cada una es distinta.
+    if (approved && item.kind !== 'photo') {
+      let viejas = supabase
+        .from('moderation_queue')
+        .update({ status: 'rejected', reason: 'superseded', reviewed_at: new Date().toISOString() })
+        .eq('profile_id', item.profile_id)
+        .eq('kind', item.kind)
+        .eq('status', 'pending')
+        .eq('reason', 'unavailable')
+        .neq('id', body.itemId);
+      if (item.kind === 'event_photo' && item.event_id) viejas = viejas.eq('event_id', item.event_id);
+      await viejas;
+    }
 
     // La verificación facial no publica ninguna foto: sólo confirma que hay
     // una cara y una sola. Es aquí, con la clave de servicio, donde se decide,
@@ -140,10 +171,22 @@ serve(async (req: Request): Promise<Response> => {
     // La foto del evento no se publica en el perfil: es de esta noche y sólo
     // vale para el tablón de este evento. La guarda el cliente con
     // set_event_photo() en cuanto sabe que ha pasado la revisión.
-    if (approved && item.kind !== 'event_photo') {
+    // El avatar aprobado se pone aquí, con la clave de servicio: la base de
+    // datos no deja al navegador poner un avatar que no haya pasado la revisión.
+    // Una sola foto al entrar: si la de la noche pasa y la cuenta aún no estaba
+    // verificada, la verifica (primera foto del perfil y cara comprobada).
+    if (approved && item.kind === 'event_photo') {
+      await supabase.rpc('verify_from_event_photo', { p_profile_id: item.profile_id, p_url: url });
+    }
+
+    if (approved && item.kind === 'avatar') {
+      await supabase.from('profiles').update({ avatar: url }).eq('id', item.profile_id);
+    }
+
+    if (approved && item.kind !== 'event_photo' && item.kind !== 'avatar') {
       // Publica la foto en el perfil usando la misma función que el panel.
       const { error } = await supabase.rpc('review_photo', {
-        p_item_id: itemId,
+        p_item_id: body.itemId,
         p_approve: true,
         p_reason: null,
       });
@@ -174,8 +217,7 @@ serve(async (req: Request): Promise<Response> => {
     });
   } catch (error) {
     console.error('Moderation error:', error);
-    // Un fallo del proveedor no debe bloquear al usuario: queda pendiente.
-    return json({ decision: null, configured: false }, 200);
+    return await unavailable();
   }
 });
 

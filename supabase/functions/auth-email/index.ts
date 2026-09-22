@@ -32,7 +32,7 @@ import {
  * Variables: RESEND_API_KEY, AUTH_FROM_EMAIL (o SOS_FROM_EMAIL), APP_URL.
  */
 
-type Action = 'signup' | 'resend' | 'recover';
+type Action = 'signup' | 'resend' | 'recover' | 'check';
 
 interface DocumentRequest {
   name: string;
@@ -45,6 +45,8 @@ interface RequestBody {
   password?: string;
   metadata?: Record<string, unknown>;
   documents?: DocumentRequest[];
+  /** Para `check`: el móvil que se quiere registrar. */
+  phone?: string;
   locale?: string;
 }
 
@@ -59,7 +61,9 @@ const appUrl = (): string => (Deno.env.get('APP_URL') ?? '').replace(/\/$/, '');
 
 type Copy = { subject: string; heading: string; body: string; cta: string; ignore: string };
 
-const COPY: Record<string, Record<'confirm' | 'recover', Copy>> = {
+type Kind = 'confirm' | 'recover' | 'exists';
+
+const COPY: Record<string, Record<Kind, Copy>> = {
   es: {
     confirm: {
       subject: 'Confirma tu cuenta de Vybe',
@@ -74,6 +78,13 @@ const COPY: Record<string, Record<'confirm' | 'recover', Copy>> = {
       body: 'Pulsa el botón para elegir una contraseña nueva. El enlace caduca en una hora.',
       cta: 'Cambiar la contraseña',
       ignore: 'Si no has pedido cambiarla, ignora este mensaje: tu contraseña sigue igual.',
+    },
+    exists: {
+      subject: 'Ya tienes una cuenta en Vybe',
+      heading: 'Ya tienes cuenta',
+      body: 'Alguien ha intentado registrarse con este correo, pero ya tienes una cuenta en Vybe. Entra con tu contraseña o, si no la recuerdas, elige una nueva con este botón. El enlace caduca en una hora.',
+      cta: 'Elegir una contraseña nueva',
+      ignore: 'Si no has sido tú, ignora este mensaje: tu cuenta sigue igual.',
     },
   },
   en: {
@@ -91,10 +102,63 @@ const COPY: Record<string, Record<'confirm' | 'recover', Copy>> = {
       cta: 'Change password',
       ignore: "If you didn't ask for this, ignore it: your password has not changed.",
     },
+    exists: {
+      subject: 'You already have a Vybe account',
+      heading: 'You already have an account',
+      body: "Someone tried to sign up with this email, but you already have a Vybe account. Log in with your password or, if you don't remember it, choose a new one with this button. The link expires in one hour.",
+      cta: 'Choose a new password',
+      ignore: "If it wasn't you, ignore this message: your account is unchanged.",
+    },
+  },
+  de: {
+    confirm: {
+      subject: 'Bestätige dein Vybe-Konto',
+      heading: 'Fast geschafft',
+      body: 'Bestätige deine E-Mail, um Vybe zu nutzen und auf Events neue Leute kennenzulernen.',
+      cta: 'Konto bestätigen',
+      ignore: 'Wenn du kein Vybe-Konto erstellt hast, ignoriere diese Nachricht.',
+    },
+    recover: {
+      subject: 'Ändere dein Vybe-Passwort',
+      heading: 'Passwort ändern',
+      body: 'Tippe auf den Button, um ein neues Passwort zu wählen. Der Link ist eine Stunde gültig.',
+      cta: 'Passwort ändern',
+      ignore: 'Wenn du das nicht angefordert hast, ignoriere diese Nachricht: Dein Passwort bleibt gleich.',
+    },
+    exists: {
+      subject: 'Du hast bereits ein Vybe-Konto',
+      heading: 'Du hast schon ein Konto',
+      body: 'Jemand wollte sich mit dieser E-Mail registrieren, aber du hast bereits ein Vybe-Konto. Melde dich mit deinem Passwort an oder wähle mit diesem Button ein neues. Der Link ist eine Stunde gültig.',
+      cta: 'Neues Passwort wählen',
+      ignore: 'Wenn du das nicht warst, ignoriere diese Nachricht: Dein Konto bleibt unverändert.',
+    },
+  },
+  ca: {
+    confirm: {
+      subject: 'Confirma el teu compte de Vybe',
+      heading: 'Ja gairebé hi ets',
+      body: 'Confirma el teu correu per entrar a Vybe i començar a conèixer gent als esdeveniments.',
+      cta: 'Confirmar el meu compte',
+      ignore: "Si no has creat cap compte a Vybe, ignora aquest missatge.",
+    },
+    recover: {
+      subject: 'Canvia la contrasenya de Vybe',
+      heading: 'Canvia la contrasenya',
+      body: "Prem el botó per triar una contrasenya nova. L'enllaç caduca en una hora.",
+      cta: 'Canviar la contrasenya',
+      ignore: "Si no ho has demanat, ignora aquest missatge: la contrasenya continua igual.",
+    },
+    exists: {
+      subject: 'Ja tens un compte a Vybe',
+      heading: 'Ja tens compte',
+      body: "Algú ha intentat registrar-se amb aquest correu, però ja tens un compte a Vybe. Entra amb la teva contrasenya o, si no la recordes, tria'n una de nova amb aquest botó. L'enllaç caduca en una hora.",
+      cta: 'Triar una contrasenya nova',
+      ignore: "Si no has estat tu, ignora aquest missatge: el teu compte continua igual.",
+    },
   },
 };
 
-const pickCopy = (locale: string | undefined, kind: 'confirm' | 'recover'): Copy =>
+const pickCopy = (locale: string | undefined, kind: Kind): Copy =>
   (COPY[(locale ?? 'es').slice(0, 2)] ?? COPY.es)[kind];
 
 /** Escapa lo que va dentro del HTML: el nombre lo escribe quien se registra. */
@@ -189,6 +253,30 @@ serve(async (req: Request): Promise<Response> => {
     const email = (body.email ?? '').trim().toLowerCase();
     const action: Action = body.action ?? 'signup';
 
+    const ipCheck =
+      req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? req.headers.get('cf-connecting-ip');
+
+    /** ¿Correo o móvil ya registrados? Lo pregunta el formulario de alta. */
+    const disponibilidad = async (phone: string | undefined) => {
+      const { data } = await supabase.rpc('signup_availability', { p_email: email, p_phone: phone ?? null });
+      const row = (data as { email_taken: boolean; phone_taken: boolean }[] | null)?.[0];
+      return { emailTaken: Boolean(row?.email_taken), phoneTaken: Boolean(row?.phone_taken) };
+    };
+
+    if (action === 'check') {
+      // Límite por IP: responder si un correo existe no puede servir para
+      // recorrerse una lista entera.
+      if (ipCheck) {
+        const { data: ok } = await supabase.rpc('consume_anon_rate_limit', {
+          p_key: `check:${ipCheck}`,
+          p_max: 60,
+          p_window_seconds: 3600,
+        });
+        if (ok === false) return json({ error: 'TOO_MANY_REQUESTS' }, 429);
+      }
+      return json({ ok: true, ...(await disponibilidad(body.phone)) });
+    }
+
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
       return json({ error: 'INVALID_EMAIL' }, 400);
     }
@@ -205,16 +293,46 @@ serve(async (req: Request): Promise<Response> => {
       return json({ error: 'TOO_MANY_REQUESTS' }, 429);
     }
 
+    // Alta con un correo o un móvil que ya tienen cuenta: se dice claramente y
+    // el formulario lo marca en rojo. Antes se contestaba «revisa tu correo» y
+    // llegaba un «ya tienes cuenta» que no se esperaba.
+    if (action === 'signup') {
+      const phone = typeof body.metadata?.phone === 'string' ? (body.metadata.phone as string) : undefined;
+      const { emailTaken, phoneTaken } = await disponibilidad(phone);
+      if (emailTaken) return json({ error: 'EMAIL_TAKEN' }, 409);
+      if (phoneTaken) return json({ error: 'PHONE_TAKEN' }, 409);
+    }
+
     // ------------------------------------------------------------------ enlace
     // `signup` crea la cuenta; `resend` la vuelve a enlazar sin duplicarla; y
     // `recover` sólo sirve para una cuenta que ya existe.
-    const linkType = action === 'recover' ? 'recover' : 'signup';
+    // Ojo: el tipo de Supabase es `recovery`. Con `recover` generateLink()
+    // devolvía «Invalid email action link type» y el correo nunca salía.
+    const linkType = action === 'recover' ? 'recovery' : 'signup';
 
     // Cada tipo aterriza donde toca: confirmar lleva a la pantalla de
     // verificación y recuperar a la de elegir contraseña nueva.
-    const redirectTo = `${appUrl()}${
-      linkType === 'recover' ? '/auth/reset-password' : '/auth/verify-email'
-    }`;
+    const resetUrl = `${appUrl()}/auth/reset-password`;
+    const redirectTo = linkType === 'recovery' ? resetUrl : `${appUrl()}/auth/verify-email`;
+
+    /** Manda un correo con el enlace; devuelve la respuesta de error o null. */
+    const send = async (kind: Kind, link: string): Promise<Response | null> => {
+      const copy = pickCopy(body.locale, kind);
+      const { html, text } = template(copy, link);
+      try {
+        await sendEmail({ to: email, subject: copy.subject, html, text });
+        return null;
+      } catch (sendError) {
+        if (sendError instanceof ResendNotConfiguredError) {
+          return json({ error: 'EMAIL_NOT_CONFIGURED' }, 503);
+        }
+        if (sendError instanceof ResendSendError) {
+          console.error('Resend', sendError.status, sendError.message);
+          return json({ error: 'EMAIL_SEND_FAILED', created: kind === 'confirm' }, 502);
+        }
+        throw sendError;
+      }
+    };
 
     const { data, error } = await supabase.auth.admin.generateLink({
       type: linkType,
@@ -230,9 +348,28 @@ serve(async (req: Request): Promise<Response> => {
       const message = error.message ?? '';
 
       // Que la cuenta ya exista no se le cuenta a quien pregunta: sería una
-      // forma de averiguar quién está registrado en una app de ligar.
-      if (/already registered|already been registered/i.test(message)) {
+      // forma de averiguar quién está registrado en una app de ligar. Pero sí
+      // se le escribe a ese correo: «ya tienes cuenta» con un enlace para
+      // cambiar la contraseña. Antes no le llegaba nada y parecía que el
+      // correo de verificación no funcionaba.
+      if (/already registered|already been registered|already exists/i.test(message)) {
+        const { data: recovery } = await supabase.auth.admin.generateLink({
+          type: 'recovery',
+          email,
+          options: { redirectTo: resetUrl },
+        });
+        const recoveryLink = recovery?.properties?.action_link;
+        if (recoveryLink) {
+          const failed = await send('exists', recoveryLink);
+          if (failed) return failed;
+        }
         return json({ ok: true, alreadyRegistered: true });
+      }
+
+      // Pedir el cambio de contraseña de un correo que no existe tampoco se
+      // delata: se responde igual que si se hubiera mandado.
+      if (linkType === 'recovery' && /not found|no user/i.test(message)) {
+        return json({ ok: true });
       }
       if (/rate limit/i.test(message)) return json({ error: 'TOO_MANY_REQUESTS' }, 429);
 
@@ -284,23 +421,10 @@ serve(async (req: Request): Promise<Response> => {
     }
 
     // -------------------------------------------------------------- el correo
-    const copy = pickCopy(body.locale, linkType === 'recover' ? 'recover' : 'confirm');
-    const { html, text } = template(copy, link);
-
-    try {
-      await sendEmail({ to: email, subject: copy.subject, html, text });
-    } catch (sendError) {
-      if (sendError instanceof ResendNotConfiguredError) {
-        return json({ error: 'EMAIL_NOT_CONFIGURED' }, 503);
-      }
-      if (sendError instanceof ResendSendError) {
-        console.error('Resend', sendError.status, sendError.message);
-        // La cuenta ya está creada: decirlo permite ofrecer el reenvío en vez
-        // de dejar a alguien pensando que no se ha registrado.
-        return json({ error: 'EMAIL_SEND_FAILED', created: Boolean(userId) }, 502);
-      }
-      throw sendError;
-    }
+    // Si falla con la cuenta ya creada, `created` permite ofrecer el reenvío en
+    // vez de dejar a alguien pensando que no se ha registrado.
+    const failed = await send(linkType === 'recovery' ? 'recover' : 'confirm', link);
+    if (failed) return failed;
 
     return json({ ok: true, uploads });
   } catch (error) {

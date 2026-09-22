@@ -136,7 +136,10 @@ const AdminDashboardPage = () => {
   const [busyId, setBusyId] = useState<string | null>(null);
   const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
 
-  const [seccion, setSeccion] = useState<Seccion>('overview');
+  // El aviso «Tienes imágenes por revisar» abre directamente la sección.
+  const [seccion, setSeccion] = useState<Seccion>(() =>
+    new URLSearchParams(window.location.search).get('seccion') === 'photos' ? 'photos' : 'overview',
+  );
   const [menuAbierto, setMenuAbierto] = useState(false);
   const [photoFilter, setPhotoFilter] = useState<'all' | 'event_photo' | 'face_verification'>('all');
   const [eventQuery, setEventQuery] = useState('');
