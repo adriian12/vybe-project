@@ -16,8 +16,24 @@ import { isNative } from '@/services/native';
 
 const clean = (value: string | undefined, fallback: string): string => (value || fallback).replace(/\/+$/, '');
 
-export const LANDING_URL = clean(import.meta.env.VITE_LANDING_URL as string | undefined, 'https://vybes.es');
-export const APP_URL = clean(import.meta.env.VITE_APP_URL as string | undefined, 'https://app.vybes.es');
+const PROD_LANDING = 'https://vybes.es';
+const PROD_APP = 'https://app.vybes.es';
+
+/**
+ * En los dominios de producción mandan siempre `vybes.es` y `app.vybes.es`.
+ * Las variables sólo sirven para probar en local: en Vercel estaban puestas a
+ * `vybe.com`, la web no reconocía su propio dominio y `app.vybes.es` enseñaba
+ * la landing.
+ */
+const enProduccion =
+  typeof window !== 'undefined' && /(^|\.)vybes\.es$/.test(window.location.hostname);
+
+export const LANDING_URL = enProduccion
+  ? PROD_LANDING
+  : clean(import.meta.env.VITE_LANDING_URL as string | undefined, PROD_LANDING);
+export const APP_URL = enProduccion
+  ? PROD_APP
+  : clean(import.meta.env.VITE_APP_URL as string | undefined, PROD_APP);
 
 /** Enlaces a las tiendas. Mientras no existan, la landing dice «Próximamente». */
 export const PLAY_STORE_URL = (import.meta.env.VITE_PLAY_STORE_URL as string | undefined) || null;
