@@ -493,7 +493,8 @@
         "safetyHelp": "Trusted contacts and help button",
         "cancelTitle": "Cancel Vybes Premium?",
         "cancelBody": "You'll keep Premium until the end of the period you've already paid for.",
-        "tagline": "Vybes · Nightlife in Spain"
+        "tagline": "Vybes · Nightlife in Spain",
+        "cancelledUntil": "Cancelled · active until {{date}}"
     },
     "faceVerification": {
         "title": "Identity verification",
@@ -632,8 +633,8 @@
         "activatedEvent": "You have Premium for this event.",
         "redirecting": "Taking you to checkout…",
         "features": {
-            "superLikes": "Super Likes",
-            "superLikesBody": "Stand out and multiply your chances of matching.",
+            "superLikes": "One supercrush per party",
+            "superLikesBody": "Stand out. Want more? Buy them individually and use them at any party.",
             "seeWhoLiked": "See who liked you",
             "seeWhoLikedBody": "Find out who likes you before you swipe.",
             "keepAlone": "Rescue the connection",
@@ -661,7 +662,16 @@
             "recover": "Bring back",
             "recovered": "{{name}} is back on the board."
         },
-        "badge": "Premium"
+        "badge": "Premium",
+        "monthlyPrice": "Monthly · {{price}}/month",
+        "forEventPrice": "This party only · {{price}}",
+        "eventOnlyNote": "The party pass only works at that party while it lasts.",
+        "cancelledBody": "It won't renew. You keep Premium until the end of the month.",
+        "errors": {
+            "already": "You already have Premium here.",
+            "notAtEvent": "You need to be inside the party to buy its pass.",
+            "unavailable": "Payments are not available right now."
+        }
     },
     "likes": {
         "title": "They like you",
@@ -756,7 +766,11 @@
             "period": "Period:",
             "empty": "No events with data in this period yet.",
             "conversionNote": "{{value}}% of people who say they're going actually get in.",
-            "peak": "Peak: {{time}} ({{count}})"
+            "peak": "Peak: {{time}} ({{count}})",
+            "exportPdf": "Export PDF",
+            "pdfTitle": "Event summary",
+            "popupBlocked": "Allow pop-ups to export the PDF.",
+            "exportBusiness": "Exporting is part of the Business plan"
         },
         "events": {
             "title": "Event management",
@@ -1048,7 +1062,8 @@
                 "promotions": "Offers and vouchers",
                 "csvExport": "CSV export",
                 "demographics": "Audience detail",
-                "headcountCurve": "Capacity curve and % on Vybes"
+                "headcountCurve": "Capacity curve and % on Vybes",
+                "pdfExport": "Export to PDF"
             },
             "yourPlan": "Your current plan",
             "choose": "Choose",
@@ -2370,5 +2385,24 @@
                 "premium": "Premium"
             }
         }
+    },
+    "supercrush": {
+        "buyTitle": "Supercrush",
+        "buyBody": "They arrive highlighted and with your name. Use them at any party; they never expire.",
+        "howMany": "How many supercrushes do you want?",
+        "less": "One less",
+        "more": "One more",
+        "priceLine_one": "{{count}} supercrush × {{unit}} = {{total}}",
+        "priceLine_other": "{{count}} supercrushes × {{unit}} = {{total}}",
+        "pay": "Pay {{total}}",
+        "youHave_one": "You have {{count}} supercrush",
+        "youHave_other": "You have {{count}} supercrushes",
+        "available_one": "{{count}} supercrush available",
+        "available_other": "{{count}} supercrushes available",
+        "send": "Send supercrush ({{count}})",
+        "bought": "Supercrushes bought",
+        "boughtBody": "They're in your account. Use them at any party.",
+        "buyCta": "Buy supercrushes",
+        "none": "You have no supercrushes left"
     }
 }

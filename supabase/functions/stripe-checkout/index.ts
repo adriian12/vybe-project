@@ -3,7 +3,7 @@ import { json, preflight } from '../_shared/cors.ts';
 import { adminClient, getUser, getProfileId } from '../_shared/supabase.ts';
 
 /**
- * Abre una sesión de pago de Stripe.
+ * Abre una sesión de pago de Stripe (y cancela la suscripción mensual).
  *
  * La suscripción NO se crea aquí: la crea el webhook cuando Stripe confirma el
  * cobro. Así una sesión abandonada no deja Premium activado.
@@ -17,22 +17,35 @@ import { adminClient, getUser, getProfileId } from '../_shared/supabase.ts';
  * Se distinguen por el prefijo del plan (`venue_`), y el destinatario del cobro
  * se resuelve por separado en cada caso.
  *
- * Variables: STRIPE_SECRET_KEY, STRIPE_PRICE_MONTHLY, STRIPE_PRICE_EVENT,
- *            STRIPE_PRICE_LIFETIME, STRIPE_PRICE_VENUE_PRO,
- *            STRIPE_PRICE_VENUE_BUSINESS
+ * Productos:
+ *   · monthly     9,99 €/mes, Premium en todas partes (suscripción).
+ *   · event       4,99 €, Premium sólo en el evento en el que estás dentro.
+ *   · supercrush  1 € cada uno, se compran de 1 en adelante y valen en
+ *                 cualquier evento.
+ *   · venue_pro / venue_business  plan mensual del local.
+ *
+ * Variables: STRIPE_SECRET_KEY, STRIPE_PRICE_MONTHLY_USER (o
+ *            STRIPE_PRICE_MONTHLY), STRIPE_PRICE_EVENT, STRIPE_PRICE_SUPERLIKE,
+ *            STRIPE_PRICE_VENUE_PRO, STRIPE_PRICE_VENUE_BUSINESS
  */
 
-type UserPlan = 'monthly' | 'event' | 'lifetime';
+type UserPlan = 'monthly' | 'event' | 'supercrush';
 type VenuePlan = 'venue_pro' | 'venue_business';
 type Plan = UserPlan | VenuePlan | 'event_boost';
 
-const PRICE_ENV: Record<Exclude<Plan, 'event_boost'>, string> = {
-  monthly: 'STRIPE_PRICE_MONTHLY',
-  event: 'STRIPE_PRICE_EVENT',
-  lifetime: 'STRIPE_PRICE_LIFETIME',
-  venue_pro: 'STRIPE_PRICE_VENUE_PRO',
-  venue_business: 'STRIPE_PRICE_VENUE_BUSINESS',
+const PRICE_ENV: Record<Exclude<Plan, 'event_boost'>, string[]> = {
+  monthly: ['STRIPE_PRICE_MONTHLY_USER', 'STRIPE_PRICE_MONTHLY'],
+  event: ['STRIPE_PRICE_EVENT'],
+  supercrush: ['STRIPE_PRICE_SUPERLIKE'],
+  venue_pro: ['STRIPE_PRICE_VENUE_PRO'],
+  venue_business: ['STRIPE_PRICE_VENUE_BUSINESS'],
 };
+
+const precio = (plan: Exclude<Plan, 'event_boost'>): string | undefined =>
+  PRICE_ENV[plan].map((nombre) => Deno.env.get(nombre)).find(Boolean);
+
+/** Supercrush por compra: al menos 1; el tope evita cobros por error. */
+const MAX_SUPERCRUSH = 100;
 
 /**
  * Precios de los locales, en céntimos, para cuando no hay un precio creado en
@@ -40,7 +53,7 @@ const PRICE_ENV: Record<Exclude<Plan, 'event_boost'>, string> = {
  * Son los de la landing y `src/lib/venue-plans.ts`: si cambias uno, cambia los
  * otros.
  */
-const VENUE_PRICE_CENTS: Record<VenuePlan, number> = { venue_pro: 4900, venue_business: 12900 };
+const VENUE_PRICE_CENTS: Record<VenuePlan, number> = { venue_pro: 4900, venue_business: 9900 };
 const BOOST_PRICE_CENTS = 1900;
 
 const esPlanDeLocal = (plan: Plan): plan is VenuePlan => plan.startsWith('venue_');
@@ -72,13 +85,44 @@ serve(async (req: Request): Promise<Response> => {
     const user = await getUser(req, supabase);
     if (!user) return json({ error: 'No autenticado' }, 401);
 
-    const { plan, eventId, returnUrl } = (await req.json()) as {
+    const { plan, eventId, returnUrl, quantity, action } = (await req.json()) as {
       plan?: Plan;
       eventId?: string | null;
       returnUrl?: string;
+      quantity?: number;
+      action?: 'cancel';
     };
 
     const base = returnUrl ?? Deno.env.get('APP_URL') ?? '';
+
+    // Cancelar la mensual: se para la renovación en Stripe y se conserva lo
+    // pagado hasta el final del mes (el webhook la da de baja entonces).
+    if (action === 'cancel') {
+      const profileId = await getProfileId(supabase, user.id);
+      if (!profileId) return json({ error: 'Perfil no encontrado' }, 404);
+      const { data: sub } = await supabase
+        .from('premium_subscriptions')
+        .select('id, stripe_subscription_id')
+        .eq('user_id', profileId)
+        .eq('subscription_type', 'monthly')
+        .eq('status', 'active')
+        .limit(1)
+        .maybeSingle();
+      if (!sub) return json({ error: 'NO_SUBSCRIPTION' }, 404);
+      if (sub.stripe_subscription_id) {
+        const r = await fetch(`https://api.stripe.com/v1/subscriptions/${sub.stripe_subscription_id}`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${secretKey}`, 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({ cancel_at_period_end: 'true' }),
+        });
+        if (!r.ok) {
+          console.error('Stripe cancel error:', await r.text());
+          return json({ error: 'CANCEL_FAILED' }, 502);
+        }
+      }
+      await supabase.from('premium_subscriptions').update({ cancel_at_period_end: true }).eq('id', sub.id);
+      return json({ ok: true });
+    }
 
     // Destacar un evento: pago único por noche. El evento tiene que ser del
     // local de quien paga y no haber terminado.
@@ -128,7 +172,7 @@ serve(async (req: Request): Promise<Response> => {
 
     if (!plan || !(plan in PRICE_ENV)) return json({ error: 'Plan no válido' }, 400);
 
-    const priceId = Deno.env.get(PRICE_ENV[plan as Exclude<Plan, 'event_boost'>]);
+    const priceId = precio(plan as Exclude<Plan, 'event_boost'>);
     // Los planes de local pueden cobrarse sin precio creado en Stripe; el
     // Premium de usuario, no.
     if (!priceId && !esPlanDeLocal(plan)) return json({ error: 'STRIPE_NOT_CONFIGURED' }, 200);
@@ -201,7 +245,61 @@ serve(async (req: Request): Promise<Response> => {
       params.set('client_reference_id', profileId);
       params.set('metadata[profile_id]', profileId);
 
-      if (eventId) params.set('metadata[event_id]', eventId);
+      // ¿Ya tiene Premium que valga en todas partes?
+      const { data: mensual } = await supabase
+        .from('premium_subscriptions')
+        .select('id')
+        .eq('user_id', profileId)
+        .eq('status', 'active')
+        .is('event_id', null)
+        .or(`expires_at.is.null,expires_at.gt.${new Date().toISOString()}`)
+        .limit(1)
+        .maybeSingle();
+
+      if (plan === 'monthly' && mensual) return json({ error: 'ALREADY_PREMIUM' }, 409);
+
+      if (plan === 'event') {
+        // Premium de un evento: sólo el evento en el que la persona está
+        // dentro ahora mismo, que no haya terminado, y sin pagarlo dos veces.
+        if (!eventId) return json({ error: 'EVENT_REQUIRED' }, 400);
+        if (mensual) return json({ error: 'ALREADY_PREMIUM' }, 409);
+
+        const { data: dentro } = await supabase
+          .from('event_attendance')
+          .select('event_id, left_at, events!inner(id, end_date)')
+          .eq('profile_id', profileId)
+          .eq('event_id', eventId)
+          .is('left_at', null)
+          .maybeSingle();
+        const fin = (dentro?.events as { end_date: string } | null)?.end_date;
+        if (!dentro || !fin || new Date(fin).getTime() <= Date.now()) {
+          return json({ error: 'NOT_AT_EVENT' }, 403);
+        }
+
+        const { data: yaPagado } = await supabase
+          .from('premium_subscriptions')
+          .select('id')
+          .eq('user_id', profileId)
+          .eq('event_id', eventId)
+          .eq('status', 'active')
+          .limit(1)
+          .maybeSingle();
+        if (yaPagado) return json({ error: 'ALREADY_PREMIUM' }, 409);
+
+        params.set('metadata[event_id]', eventId);
+      }
+
+      if (plan === 'supercrush') {
+        const cuantos = Math.floor(Number(quantity ?? 1));
+        if (!Number.isFinite(cuantos) || cuantos < 1 || cuantos > MAX_SUPERCRUSH) {
+          return json({ error: 'INVALID_QUANTITY' }, 400);
+        }
+        params.set('line_items[0][quantity]', String(cuantos));
+        params.set('metadata[kind]', 'supercrush');
+        params.set('metadata[quantity]', String(cuantos));
+        params.set('success_url', `${base}?supercrush=success`);
+        params.set('cancel_url', `${base}?supercrush=cancelled`);
+      }
       if (existing?.stripe_customer_id) params.set('customer', existing.stripe_customer_id);
       else if (user.email) params.set('customer_email', user.email);
     }

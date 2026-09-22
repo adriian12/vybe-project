@@ -3,6 +3,8 @@ import { Venue, VenueType, Event, EventAccess, VenueStats } from '@/types/venue'
 import { supabase } from '@/integrations/supabase/client';
 import { Tables, TablesUpdate } from '@/integrations/supabase/types';
 import { calculateDistance } from '@/services/geo';
+import { isNative } from '@/services/native';
+import { APP_URL } from '@/lib/hosts';
 
 type ProfileRow = Tables<'profiles'>;
 type EventRow = Tables<'events'>;
@@ -192,6 +194,18 @@ const parseRedeemError = (message: string): ApiError => {
   return code
     ? new ApiError(code, REDEEM_ERRORS[code])
     : new ApiError('REDEEM_FAILED', 'No se pudo validar el código. Inténtalo de nuevo.');
+};
+
+/** El código de error (`{ error: 'X' }`) que devuelve una Edge Function. */
+const functionErrorCode = async (error: unknown): Promise<string> => {
+  const context = (error as { context?: Response } | null)?.context;
+  try {
+    const body = (await context?.clone().json()) as { error?: string } | undefined;
+    if (body?.error) return body.error;
+  } catch {
+    // Sin cuerpo JSON: error genérico.
+  }
+  return 'CHECKOUT_FAILED';
 };
 
 export const api = {
@@ -441,6 +455,9 @@ export const api = {
     });
 
     // 23505 = swipe duplicado; no es un fallo real, el usuario ya había pasado.
+    if (swipeError && swipeError.message?.includes('NO_SUPERCRUSH')) {
+      throw new ApiError('NO_SUPERCRUSH', 'No te quedan supercrush');
+    }
     if (swipeError && swipeError.code !== '23505') {
       console.error('Error creating swipe:', swipeError);
       throw new ApiError('SWIPE_FAILED', 'No se pudo registrar tu decisión');
@@ -1434,96 +1451,68 @@ export const api = {
   // PREMIUM
   // ==========================================================================
 
-  getActiveSubscription: async (): Promise<Tables<'premium_subscriptions'> | null> => {
-    const profileId = await currentProfileId();
-    if (!profileId) return null;
+  /** Premium aquí y ahora: el del evento sólo cuenta dentro de ese evento. */
+  getPremiumStatus: async (): Promise<{
+    isPremium: boolean;
+    subscriptionType: string | null;
+    eventId: string | null;
+    expiresAt: string | null;
+    cancelAtPeriodEnd: boolean;
+  } | null> => {
+    const { data, error } = await supabase.rpc('my_premium_status');
+    if (error) throw new ApiError('PREMIUM_STATUS_FAILED', error.message);
+    const row = Array.isArray(data) ? data[0] : data;
+    if (!row) return null;
+    return {
+      isPremium: Boolean(row.is_premium),
+      subscriptionType: row.subscription_type ?? null,
+      eventId: row.event_id ?? null,
+      expiresAt: row.expires_at ?? null,
+      cancelAtPeriodEnd: Boolean(row.cancel_at_period_end),
+    };
+  },
 
-    const { data } = await supabase
-      .from('premium_subscriptions')
-      .select('*')
-      .eq('user_id', profileId)
-      .eq('status', 'active')
-      .order('started_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    if (!data) return null;
-    if (data.expires_at && new Date(data.expires_at) < new Date()) {
-      await supabase.from('premium_subscriptions').update({ status: 'expired' }).eq('id', data.id);
-      return null;
-    }
-
-    return data;
+  /** Supercrush que quedan y si queda el incluido de Premium en este evento. */
+  getSupercrush: async (): Promise<{ balance: number; includedAvailable: boolean }> => {
+    const { data, error } = await supabase.rpc('my_supercrush');
+    if (error) throw new ApiError('SUPERCRUSH_FAILED', error.message);
+    const row = Array.isArray(data) ? data[0] : data;
+    return { balance: row?.balance ?? 0, includedAvailable: Boolean(row?.included_available) };
   },
 
   /**
-   * Abre la pasarela de pago.
+   * Abre la pasarela de pago y devuelve su URL.
    *
-   * La suscripción no se activa aquí: la crea el webhook de Stripe cuando el
-   * cobro se confirma. Si Stripe no está configurado devolvemos null y el
-   * llamante decide qué hacer.
+   * Nada se activa aquí: Premium y los supercrush los apunta el webhook de
+   * Stripe cuando el cobro se confirma.
    */
   startCheckout: async (
-    type: 'monthly' | 'event' | 'lifetime',
-    eventId?: string,
-  ): Promise<string | null> => {
+    plan: 'monthly' | 'event' | 'supercrush',
+    options: { eventId?: string; quantity?: number } = {},
+  ): Promise<string> => {
     const { data, error } = await supabase.functions.invoke('stripe-checkout', {
       body: {
-        plan: type,
-        eventId: eventId ?? null,
-        returnUrl: `${window.location.origin}/profile`,
+        plan,
+        eventId: options.eventId ?? null,
+        quantity: options.quantity ?? 1,
+        // En la app instalada Stripe se abre en el navegador del sistema y
+        // vuelve por `/pago.html`, que reabre la app con `vybe://`. Stripe sólo
+        // acepta direcciones https, no el esquema propio.
+        returnUrl: isNative() ? `${APP_URL}/pago.html` : `${window.location.origin}/profile`,
       },
     });
-
-    if (error) {
-      const detail = (data as { error?: string } | null)?.error;
-      if (detail === 'STRIPE_NOT_CONFIGURED') return null;
-      throw new ApiError('CHECKOUT_FAILED', 'No se pudo abrir la pasarela de pago');
+    const code = error ? await functionErrorCode(error) : (data as { error?: string } | null)?.error;
+    const url = (data as { url?: string } | null)?.url;
+    if (code || !url) {
+      throw new ApiError(code ?? 'CHECKOUT_FAILED', 'No se pudo abrir la pasarela de pago');
     }
-
-    return (data as { url?: string } | null)?.url ?? null;
+    return url;
   },
 
-  createSubscription: async (
-    type: 'monthly' | 'event' | 'lifetime',
-    eventId?: string,
-  ): Promise<Tables<'premium_subscriptions'>> => {
-    const profileId = await requireProfileId();
-
-    const expiresAt = new Date();
-    if (type === 'monthly') expiresAt.setMonth(expiresAt.getMonth() + 1);
-    else if (type === 'event') expiresAt.setHours(expiresAt.getHours() + 12);
-
-    const { data, error } = await supabase
-      .from('premium_subscriptions')
-      .upsert(
-        {
-          user_id: profileId,
-          subscription_type: type,
-          event_id: eventId ?? null,
-          status: 'active',
-          started_at: new Date().toISOString(),
-          expires_at: type === 'lifetime' ? null : expiresAt.toISOString(),
-        },
-        { onConflict: 'user_id,event_id,subscription_type' },
-      )
-      .select()
-      .single();
-
-    if (error || !data) {
-      console.error('Error creating subscription:', error);
-      throw new ApiError('SUBSCRIPTION_FAILED', 'No se pudo activar Premium');
-    }
-
-    return data;
-  },
-
-  cancelSubscription: async (subscriptionId: string): Promise<void> => {
-    const { error } = await supabase
-      .from('premium_subscriptions')
-      .update({ status: 'cancelled' })
-      .eq('id', subscriptionId);
-
-    if (error) throw new ApiError('CANCEL_FAILED', 'No se pudo cancelar la suscripción');
+  /** Para la renovación de la mensual; Premium sigue hasta final de mes. */
+  cancelSubscription: async (): Promise<void> => {
+    const { data, error } = await supabase.functions.invoke('stripe-checkout', { body: { action: 'cancel' } });
+    const code = error ? await functionErrorCode(error) : (data as { error?: string } | null)?.error;
+    if (code) throw new ApiError(code, 'No se pudo cancelar la suscripción');
   },
 };

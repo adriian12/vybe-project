@@ -329,6 +329,64 @@ export const venueService = {
     }));
   },
 
+  /**
+   * Informe en PDF del resumen de eventos (plan Business). Abre una ventana con
+   * la tabla ya maquetada y el diálogo de imprimir, donde se elige «Guardar como
+   * PDF»: sin librerías y con el texto seleccionable.
+   */
+  exportSummaryPdf: (
+    rows: EventSummary[],
+    headers: Record<keyof EventSummary, string>,
+    meta: { title: string; venueName: string; brand: string },
+  ): boolean => {
+    const esc = (value: unknown) =>
+      String(value ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c] ?? c);
+    const columns: (keyof EventSummary)[] = [
+      'eventName', 'startDate', 'intents', 'checkIns', 'swipes', 'matches', 'bookingClicks',
+    ];
+    const total = (key: keyof EventSummary) => rows.reduce((sum, row) => sum + (Number(row[key]) || 0), 0);
+    const body = rows
+      .map(
+        (row) =>
+          `<tr>${columns
+            .map((c) =>
+              c === 'startDate'
+                ? `<td>${esc(new Date(row[c]).toLocaleString())}</td>`
+                : `<td${c === 'eventName' ? '' : ' class="n"'}>${esc(row[c])}</td>`,
+            )
+            .join('')}</tr>`,
+      )
+      .join('');
+    const foot = `<tr><td><b>Total</b></td><td></td>${columns
+      .slice(2)
+      .map((c) => `<td class="n"><b>${total(c)}</b></td>`)
+      .join('')}</tr>`;
+    const html = `<!doctype html><html><head><meta charset="utf-8"><title>${esc(meta.title)}</title>
+<style>
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#1c1c1c;margin:32px}
+  h1{font-size:22px;margin:0 0 4px} p{margin:0 0 20px;color:#666;font-size:13px}
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  th,td{padding:7px 8px;border-bottom:1px solid #e5e5e5;text-align:left}
+  th{background:#f8d000;color:#1c1c1c;font-weight:700}
+  td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+  tfoot td{border-top:2px solid #1c1c1c}
+  @page{size:A4 landscape;margin:14mm}
+</style></head><body>
+<h1>${esc(meta.venueName)} · ${esc(meta.title)}</h1>
+<p>${esc(meta.brand)} · ${esc(new Date().toLocaleString())}</p>
+<table><thead><tr>${columns
+      .map((c, i) => `<th${i >= 2 ? ' class="n"' : ''}>${esc(headers[c])}</th>`)
+      .join('')}</tr></thead><tbody>${body}</tbody><tfoot>${foot}</tfoot></table>
+<script>window.onload=function(){setTimeout(function(){window.print()},150)}</script>
+</body></html>`;
+    const ventana = window.open('', '_blank');
+    if (!ventana) return false;
+    ventana.document.open();
+    ventana.document.write(html);
+    ventana.document.close();
+    return true;
+  },
+
   /** Exporta el resumen de eventos a CSV para poder analizarlo fuera. */
   exportSummaryCsv: (rows: EventSummary[], headers: Record<keyof EventSummary, string>): void => {
     const columns: (keyof EventSummary)[] = [

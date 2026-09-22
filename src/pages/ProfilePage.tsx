@@ -24,6 +24,7 @@ import {
   Shield,
   ShieldAlert,
   Sparkles,
+  Star,
   Users,
   X,
   Zap,
@@ -136,7 +137,16 @@ const ProfilePage = () => {
   const interestLabel = useInterestLabel();
 
   const { currentUser, refreshProfile, logout, activeEvent, userType } = useAppContext();
-  const { isPremium, subscriptionType, expiresAt, setShowPremiumDialog, cancelPremium } = usePremium();
+  const {
+    isPremium,
+    subscriptionType,
+    expiresAt,
+    cancelAtPeriodEnd,
+    setShowPremiumDialog,
+    cancelPremium,
+    supercrushBalance,
+    setShowSupercrushDialog,
+  } = usePremium();
 
   const [captureTarget, setCaptureTarget] = useState<'avatar' | 'photo' | null>(null);
   const [showFaceVerification, setShowFaceVerification] = useState(false);
@@ -499,6 +509,16 @@ const ProfilePage = () => {
           <h1 className="mt-3 text-center font-display text-headline-lg">
             {currentUser.name}, {currentUser.age}
           </h1>
+          {/* Supercrush que le quedan: valen en cualquier evento. Tocar abre
+              la compra. */}
+          <button
+            type="button"
+            onClick={() => setShowSupercrushDialog(true)}
+            className="press mt-2 flex items-center gap-1.5 rounded-full bg-party-primary/15 px-3 py-1 text-body-sm font-bold text-party-primary"
+          >
+            <Star size={15} className="fill-party-primary" />
+            {t('supercrush.available', { count: supercrushBalance })}
+          </button>
           {miembroDesde && (
             <p className="mt-1 text-center text-body-sm text-[#C8C6C5]">
               {t('profile.memberSince', { date: miembroDesde })}
@@ -544,7 +564,9 @@ const ProfilePage = () => {
                 <p className="mt-1 text-body-sm font-medium text-ink/85">
                   {isPremium
                     ? expiresAt
-                      ? t('profile.until', { date: new Date(expiresAt).toLocaleDateString() })
+                      ? cancelAtPeriodEnd
+                        ? t('profile.cancelledUntil', { date: new Date(expiresAt).toLocaleDateString() })
+                        : t('profile.until', { date: new Date(expiresAt).toLocaleDateString() })
                       : t('premium.active')
                     : t('profile.premiumPitch')}
                 </p>
@@ -556,6 +578,9 @@ const ProfilePage = () => {
                 <span className="truncate">{t('premium.features.whoIsGoing')}</span>
               </span>
               {isPremium ? (
+                // Sólo la mensual se puede cancelar: la de un evento es un pago
+                // único y acaba con la fiesta.
+                subscriptionType === 'monthly' && !cancelAtPeriodEnd && (
                 <button
                   type="button"
                   onClick={() => setConfirmCancel(true)}
@@ -563,6 +588,7 @@ const ProfilePage = () => {
                 >
                   {t('profile.manage')}
                 </button>
+                )
               ) : (
                 <button
                   type="button"

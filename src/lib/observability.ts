@@ -98,6 +98,7 @@ export type AnalyticsEvent =
   | 'message_sent'
   | 'premium_dialog_opened'
   | 'premium_subscribed'
+  | 'supercrush_bought'
   | 'report_submitted'
   | 'sos_triggered'
   | 'venue_event_created'

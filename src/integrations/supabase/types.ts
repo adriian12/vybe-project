@@ -1996,6 +1996,64 @@ export type Database = {
           },
         ]
       }
+      supercrush_ledger: {
+        Row: {
+          amount_cents: number | null
+          created_at: string
+          delta: number
+          event_id: string | null
+          id: string
+          profile_id: string
+          reason: string
+          stripe_session_id: string | null
+          swiped_id: string | null
+        }
+        Insert: {
+          amount_cents?: number | null
+          created_at?: string
+          delta: number
+          event_id?: string | null
+          id?: string
+          profile_id: string
+          reason: string
+          stripe_session_id?: string | null
+          swiped_id?: string | null
+        }
+        Update: {
+          amount_cents?: number | null
+          created_at?: string
+          delta?: number
+          event_id?: string | null
+          id?: string
+          profile_id?: string
+          reason?: string
+          stripe_session_id?: string | null
+          swiped_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "supercrush_ledger_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "supercrush_ledger_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "supercrush_ledger_swiped_id_fkey"
+            columns: ["swiped_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       swipes: {
         Row: {
           created_at: string | null
@@ -2656,6 +2714,7 @@ export type Database = {
         Args: { p_alert_id: string }
         Returns: undefined
       }
+      active_event_of: { Args: { p_profile_id: string }; Returns: string }
       adjust_event_headcount: {
         Args: { p_delta: number; p_event_id: string }
         Returns: number
@@ -2779,6 +2838,15 @@ export type Database = {
           p_prize: string
         }
         Returns: string
+      }
+      credit_supercrush_purchase: {
+        Args: {
+          p_amount_cents: number
+          p_profile_id: string
+          p_quantity: number
+          p_session_id: string
+        }
+        Returns: boolean
       }
       current_group_id: { Args: { p_event_id: string }; Returns: string }
       current_profile_id: { Args: never; Returns: string }
@@ -3338,6 +3406,10 @@ export type Database = {
       is_group_member: { Args: { p_group_id: string }; Returns: boolean }
       is_guest_profile: { Args: { p_profile_id: string }; Returns: boolean }
       is_premium: { Args: { p_profile_id?: string }; Returns: boolean }
+      is_premium_for_event: {
+        Args: { p_event_id: string; p_profile_id: string }
+        Returns: boolean
+      }
       is_profile_active: { Args: { p_profile_id: string }; Returns: boolean }
       is_test_lab_event: { Args: { p_event_id: string }; Returns: boolean }
       is_user_blocked: {
@@ -3400,6 +3472,26 @@ export type Database = {
         }[]
       }
       my_boost: { Args: { p_event_id: string }; Returns: string }
+      my_premium_status: {
+        Args: never
+        Returns: {
+          active_event_id: string
+          cancel_at_period_end: boolean
+          event_id: string
+          expires_at: string
+          is_premium: boolean
+          subscription_id: string
+          subscription_type: string
+        }[]
+      }
+      my_supercrush: {
+        Args: never
+        Returns: {
+          balance: number
+          event_id: string
+          included_available: boolean
+        }[]
+      }
       normalize_phone: { Args: { p_phone: string }; Returns: string }
       normalize_song: {
         Args: { p_artist: string; p_title: string }
@@ -3565,6 +3657,7 @@ export type Database = {
         Returns: number
       }
       start_boost: { Args: { p_event_id: string }; Returns: string }
+      supercrush_balance: { Args: { p_profile_id: string }; Returns: number }
       suspend_profile: {
         Args: { p_days?: number; p_profile_id: string; p_reason?: string }
         Returns: undefined

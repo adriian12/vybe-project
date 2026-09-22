@@ -67,13 +67,9 @@ const verifySignature = async (
   return diff === 0;
 };
 
-const planExpiry = (plan: string): string | null => {
-  if (plan === 'lifetime') return null;
-
+const monthFromNow = (): string => {
   const expires = new Date();
-  if (plan === 'monthly') expires.setMonth(expires.getMonth() + 1);
-  else expires.setHours(expires.getHours() + 12);
-
+  expires.setMonth(expires.getMonth() + 1);
   return expires.toISOString();
 };
 
@@ -103,6 +99,22 @@ serve(async (req: Request): Promise<Response> => {
         const metadata = (object.metadata ?? {}) as Record<string, string>;
         const profileId = metadata.profile_id ?? (object.client_reference_id as string | null);
         const plan = metadata.plan ?? 'monthly';
+
+        // Un pago pendiente (transferencia, etc.) no activa nada todavía.
+        const pagado = object.payment_status as string | undefined;
+        if (pagado && pagado !== 'paid' && pagado !== 'no_payment_required') break;
+
+        // Supercrush comprados: se suman al saldo una sola vez por sesión.
+        if (metadata.kind === 'supercrush' && profileId) {
+          const { error } = await supabase.rpc('credit_supercrush_purchase', {
+            p_profile_id: profileId,
+            p_quantity: Number(metadata.quantity ?? 0),
+            p_session_id: object.id as string,
+            p_amount_cents: Number(object.amount_total ?? 0),
+          });
+          if (error) throw error;
+          break;
+        }
 
         // Destacar un evento: queda destacado hasta que termina. El pago se
         // guarda una vez por sesión (Stripe puede repetir el aviso).
@@ -154,14 +166,29 @@ serve(async (req: Request): Promise<Response> => {
 
         if (!profileId) break;
 
+        // Premium de un evento: vale hasta una hora después de que acabe, lo
+        // mismo que duran sus matches. Sin evento válido no se activa nada.
+        let expiresAt = monthFromNow();
+        if (plan === 'event') {
+          if (!metadata.event_id) break;
+          const { data: evento } = await supabase
+            .from('events')
+            .select('end_date')
+            .eq('id', metadata.event_id)
+            .maybeSingle();
+          if (!evento) break;
+          expiresAt = new Date(new Date(evento.end_date).getTime() + 3_600_000).toISOString();
+        }
+
         await supabase.from('premium_subscriptions').upsert(
           {
             user_id: profileId,
             subscription_type: plan,
-            event_id: metadata.event_id || null,
+            event_id: plan === 'event' ? metadata.event_id : null,
             status: 'active',
             started_at: new Date().toISOString(),
-            expires_at: planExpiry(plan),
+            expires_at: expiresAt,
+            cancel_at_period_end: false,
             stripe_customer_id: (object.customer as string | null) ?? null,
             stripe_subscription_id: (object.subscription as string | null) ?? null,
           },
