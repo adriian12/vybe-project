@@ -38,24 +38,28 @@ const PwaPrompt = () => {
     );
   }
 
+  // Instalar: sólo en ordenador y como un botón pequeño abajo a la derecha. En
+  // el móvil era un cuadro que tapaba la landing y molestaba; allí la app se
+  // descarga de la tienda.
   if (canInstall) {
     return (
-      <div className="fixed bottom-[calc(var(--nav-h)+1rem)] inset-x-4 z-50 max-w-sm mx-auto rounded-xl border border-border bg-card p-4 shadow-lg">
+      <div className="fixed bottom-4 right-4 z-50 hidden items-center gap-1 rounded-full border border-border bg-card py-1 pl-1 pr-1.5 shadow-lg lg:flex">
+        <button
+          type="button"
+          onClick={() => void install()}
+          className="press flex items-center gap-1.5 rounded-full bg-party-primary px-3 py-1.5 text-caption font-bold text-ink"
+        >
+          <Download size={13} />
+          {t('pwa.installTitle')}
+        </button>
         <button
           type="button"
           onClick={dismissInstall}
-          className="press absolute top-2 right-2 text-party-gray"
+          className="press flex h-6 w-6 items-center justify-center rounded-full text-party-gray hover:text-foreground"
           aria-label={t('common.close')}
         >
-          <X size={16} />
+          <X size={14} />
         </button>
-
-        <p className="font-medium mb-1">{t('pwa.installTitle')}</p>
-        <p className="text-sm text-party-gray mb-3">{t('pwa.installBody')}</p>
-        <PartyButton variant="gradient" size="sm" className="w-full" onClick={() => void install()}>
-          <Download size={14} className="mr-2" />
-          {t('pwa.install')}
-        </PartyButton>
       </div>
     );
   }
