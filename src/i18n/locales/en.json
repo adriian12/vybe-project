@@ -188,7 +188,7 @@
         "inEvent": "You're at {{name}}",
         "inEventBody": "{{venue}} · Tap to keep meeting people",
         "going": "{{count}} going",
-        "inside": "{{count}} on Vybes inside",
+        "inside": "{{count}} vybers inside",
         "beFirst": "Be the first one in",
         "imGoing": "I'm going",
         "notGoing": "I'm not going",
@@ -205,7 +205,7 @@
         "statEvents": "parties\ntonight",
         "statInside": "people\ninside now",
         "statGoing": "said they\nare going",
-        "goingPlus": "{{count}} on Vybes going",
+        "goingPlus": "{{count}} vybers going",
         "buy": "Tickets",
         "greetingDay": "Plans for the weekend?",
         "greetingNight": "What are you up to tonight?",
@@ -213,7 +213,7 @@
         "seeAll": "See all",
         "statNearby": "events near you",
         "statEventsShort": "events",
-        "statInsideShort": "on Vybes inside",
+        "statInsideShort": "vybers inside",
         "statTonight": "events tonight",
         "featured": "Featured",
         "upcoming": "Upcoming events",
@@ -1633,7 +1633,7 @@
         "lockedBody": "With Premium you see who they are before leaving home.",
         "noneForYou": "Nobody matching what you want to see is going yet.",
         "heading": "Who's going",
-        "confirmed": "{{count}} on Vybes going"
+        "confirmed": "{{count}} vybers going"
     },
     "nav": {
         "home": "Home",
@@ -1658,7 +1658,8 @@
         "tonight": "{{name}} is tonight",
         "tonightBody": "Starts at {{time}} at {{venue}}.",
         "empty": "All quiet",
-        "emptyBody": "When someone messages you, you connect or a party you're going to starts, you'll see it here."
+        "emptyBody": "When someone messages you, you connect or a party you're going to starts, you'll see it here.",
+        "dismiss": "Dismiss"
     },
     "eventDetail": {
         "shareText": "Coming to {{name}}? {{date}} at {{venue}}.",
@@ -1703,7 +1704,13 @@
         "view": "View",
         "openAfter": "Open after {{time}}",
         "tapPin": "Tap an event on the map to see what it is about.",
-        "credits": "Map credits"
+        "credits": "Map credits",
+        "filtersHelp": "Choose what you want to see on the map.",
+        "when": "When",
+        "partyType": "Type of party",
+        "venueType": "Type of venue",
+        "showResults_one": "See {{count}} party",
+        "showResults_other": "See {{count}} parties"
     },
     "tickets": {
         "title": "My tickets",
@@ -2100,7 +2107,7 @@
             "almostFull": "Almost full",
             "full": "Full"
         },
-        "withVybe": "{{level}} · {{count}} on Vybes",
+        "withVybe": "{{level}} · {{count}} vybers inside",
         "source": "From the venue · {{minutes}} min ago",
         "sourceNow": "From the venue · just now",
         "friendsGoing_one": "{{count}} of your vybes is going",

@@ -1,11 +1,12 @@
-import { useMemo } from 'react';
+import { useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Bell, CalendarClock, ChevronRight, MessageCircle, Radio, Zap } from 'lucide-react';
+import { Bell, CalendarClock, ChevronRight, MessageCircle, Radio, Trash2, Zap } from 'lucide-react';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { useAppContext } from '@/context/app-context';
 import { isEventTonight } from '@/hooks/use-events-feed';
 import { formatHour } from '@/components/event-bits';
+import { avisosOcultos, ocultarAviso, suscribirOcultos } from '@/lib/activity-dismissed';
 
 interface ActivitySheetProps {
   open: boolean;
@@ -40,13 +41,13 @@ export const useActivity =(intents: string[]): Aviso[] => {
   const { t } = useTranslation();
   const { activeEvent, messages, connections, currentUser, events } = useAppContext();
 
-  return useMemo(() => {
+  const todos = useMemo(() => {
     const avisos: Aviso[] = [];
     const ahora = Date.now();
 
     if (activeEvent) {
       avisos.push({
-        id: 'active',
+        id: `active-${activeEvent.eventId}`,
         icon: Radio,
         title: t('activity.inside', { name: activeEvent.eventName }),
         body: t('activity.insideBody'),
@@ -64,8 +65,9 @@ export const useActivity =(intents: string[]): Aviso[] => {
     for (const [profileId, lista] of sinLeer) {
       const persona = connections.find((c) => c.user.id === profileId)?.user;
       const cuantos = lista.filter((m) => m.receiverId === currentUser?.id && !m.read).length;
+      const ultimo = lista[lista.length - 1]?.id ?? '';
       avisos.push({
-        id: `msg-${profileId}`,
+        id: `msg-${profileId}-${ultimo}`,
         icon: MessageCircle,
         title: t('activity.messages', { count: cuantos, name: persona?.name ?? '' }),
         body: lista[lista.length - 1]?.content ?? '',
@@ -99,6 +101,109 @@ export const useActivity =(intents: string[]): Aviso[] => {
 
     return avisos;
   }, [activeEvent, messages, connections, currentUser, events, intents, t]);
+
+  const ocultos = useSyncExternalStore(suscribirOcultos, avisosOcultos, avisosOcultos);
+
+  return useMemo(() => todos.filter((aviso) => !(aviso.id in ocultos)), [todos, ocultos]);
+};
+
+/** Cuánto hay que arrastrar para que el aviso se descarte. */
+const UMBRAL = 96;
+
+/** Un aviso: se toca para ir, o se desliza a la izquierda para quitarlo. */
+const AvisoFila = ({
+  aviso,
+  onOpen,
+  onDismiss,
+  dismissLabel,
+}: {
+  aviso: Aviso;
+  onOpen: () => void;
+  onDismiss: () => void;
+  dismissLabel: string;
+}) => {
+  const [desplazado, setDesplazado] = useState(0);
+  const [saliendo, setSaliendo] = useState(false);
+  const inicio = useRef<{ x: number; y: number } | null>(null);
+  const arrastrado = useRef(false);
+  const Icon = aviso.icon;
+
+  const alPulsar = (e: React.PointerEvent) => {
+    inicio.current = { x: e.clientX, y: e.clientY };
+    arrastrado.current = false;
+  };
+  const alMover = (e: React.PointerEvent) => {
+    if (!inicio.current) return;
+    const dx = e.clientX - inicio.current.x;
+    const dy = e.clientY - inicio.current.y;
+    if (!arrastrado.current && Math.abs(dx) < 8) return;
+    // Si el gesto va más en vertical, es desplazamiento de la lista.
+    if (!arrastrado.current && Math.abs(dy) > Math.abs(dx)) {
+      inicio.current = null;
+      return;
+    }
+    arrastrado.current = true;
+    setDesplazado(Math.min(0, dx));
+  };
+  const alSoltar = () => {
+    if (!inicio.current) return;
+    inicio.current = null;
+    if (desplazado <= -UMBRAL) {
+      setSaliendo(true);
+      setDesplazado(-window.innerWidth);
+      window.setTimeout(onDismiss, 180);
+      return;
+    }
+    setDesplazado(0);
+  };
+
+  return (
+    <li className={`relative overflow-hidden rounded-2xl transition-[max-height,opacity] ${saliendo ? 'max-h-0 opacity-0' : 'max-h-40'}`}>
+      {/* Lo que asoma al deslizar. */}
+      <span className="absolute inset-y-0 right-0 flex w-24 items-center justify-center rounded-2xl bg-destructive text-white">
+        <Trash2 size={20} />
+      </span>
+      <button
+        type="button"
+        onPointerDown={alPulsar}
+        onPointerMove={alMover}
+        onPointerUp={alSoltar}
+        onPointerCancel={alSoltar}
+        onClick={() => {
+          if (arrastrado.current || desplazado !== 0) {
+            arrastrado.current = false;
+            setDesplazado(0);
+            return;
+          }
+          onOpen();
+        }}
+        style={{ transform: `translateX(${desplazado}px)`, touchAction: 'pan-y' }}
+        className="press relative flex w-full items-center gap-3 rounded-2xl bg-surface-high/60 p-3 text-left transition-transform duration-200 [transition-timing-function:var(--ease-out)] hover:bg-surface-high"
+      >
+        <span
+          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${
+            aviso.urgent ? 'bg-party-primary text-ink' : 'bg-surface text-party-primary'
+          }`}
+        >
+          <Icon size={18} />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block truncate font-display text-title-card">{aviso.title}</span>
+          <span className="block truncate text-body-sm text-party-gray">{aviso.body}</span>
+        </span>
+        <ChevronRight size={18} className="shrink-0 text-party-gray" />
+      </button>
+      {/* Quitarlo sin deslizar, para quien use teclado o lector de pantalla. */}
+      <button
+        type="button"
+        onClick={onDismiss}
+        aria-label={dismissLabel}
+        className="sr-only focus:not-sr-only focus:absolute focus:right-2 focus:top-2 focus:z-10 focus:rounded-full focus:bg-destructive focus:p-2 focus:text-white"
+      >
+        <Trash2 size={16} />
+      </button>
+    </li>
+  );
 };
 
 const ActivitySheet: React.FC<ActivitySheetProps> = ({ open, onOpenChange, intents }) => {
@@ -125,30 +230,17 @@ const ActivitySheet: React.FC<ActivitySheetProps> = ({ open, onOpenChange, inten
           </div>
         ) : (
           <ul className="mt-4 space-y-2">
-            {avisos.map(({ id, icon: Icon, title, body, to, urgent }) => (
-              <li key={id}>
-                <button
-                  type="button"
-                  onClick={() => {
-                    onOpenChange(false);
-                    navigate(to);
-                  }}
-                  className="press flex w-full items-center gap-3 rounded-2xl bg-surface-high/60 p-3 text-left hover:bg-surface-high"
-                >
-                  <span
-                    className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${
-                      urgent ? 'bg-party-primary text-ink' : 'bg-surface text-party-primary'
-                    }`}
-                  >
-                    <Icon size={18} />
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate text-sm font-bold">{title}</span>
-                    <span className="block truncate text-body-sm text-party-gray">{body}</span>
-                  </span>
-                  <ChevronRight size={16} className="shrink-0 text-party-gray" />
-                </button>
-              </li>
+            {avisos.map((aviso) => (
+              <AvisoFila
+                key={aviso.id}
+                aviso={aviso}
+                onOpen={() => {
+                  onOpenChange(false);
+                  navigate(aviso.to);
+                }}
+                onDismiss={() => ocultarAviso(aviso.id)}
+                dismissLabel={t('activity.dismiss')}
+              />
             ))}
           </ul>
         )}

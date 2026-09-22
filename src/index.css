@@ -332,6 +332,15 @@
   position: relative;
 }
 
+/* Evento destacado: el círculo pasa de amarillo a naranja, para que se vea de
+   un vistazo aunque la llama quede pequeña. */
+.vybe-pin-dot-hot {
+  background: #ff6a2b;
+  box-shadow:
+    0 0 0 2px rgba(255, 106, 43, 0.35),
+    0 6px 14px rgba(0, 0, 0, 0.6);
+}
+
 /* Evento destacado: una llama sobre el círculo. */
 .vybe-pin-fire {
   position: absolute;

@@ -22,7 +22,7 @@ import { formatDistance } from '@/services/geo';
 import { cn } from '@/lib/utils';
 import { VenueType } from '@/types/venue';
 import { featuredFirst, isFeatured } from '@/lib/featured';
-import PartyFilters from '@/components/party-filters';
+import MapFiltersSheet from '@/components/map-filters-sheet';
 import { aplicarFiltros, Franja } from '@/lib/party-filters';
 
 /** Centro por defecto: Palma, cuando no hay ubicación ni eventos con punto. */
@@ -54,9 +54,9 @@ const icono = (nombre: string, seleccionado: boolean, directo: boolean, destacad
     html: seleccionado
       ? `<div class="vybe-pin-selected">
            <span class="vybe-pin-label">${directo ? '<i></i>' : ''}${escapar(nombre)}</span>
-           <span class="vybe-pin-ring">${destacado ? `<span class="vybe-pin-fire">${FUEGO}</span>` : ''}<span class="vybe-pin-dot">${NOTA}</span></span>
+           <span class="vybe-pin-ring">${destacado ? `<span class="vybe-pin-fire">${FUEGO}</span>` : ''}<span class="vybe-pin-dot${destacado ? ' vybe-pin-dot-hot' : ''}">${NOTA}</span></span>
          </div>`
-      : `<div class="vybe-pin-simple">${destacado ? `<span class="vybe-pin-fire">${FUEGO}</span>` : ''}<span class="vybe-pin-dot">${NOTA}</span></div>`,
+      : `<div class="vybe-pin-simple">${destacado ? `<span class="vybe-pin-fire">${FUEGO}</span>` : ''}<span class="vybe-pin-dot${destacado ? ' vybe-pin-dot-hot' : ''}">${NOTA}</span></div>`,
   });
 
 const TIPOS: VenueType[] = ['discoteca', 'bar', 'festival', 'fiesta_privada', 'evento_empresarial', 'local'];
@@ -90,6 +90,7 @@ const MapPage = () => {
   const [lista, setLista] = useState(false);
   const [theme, setTheme] = useState<string | null>(null);
   const [franja, setFranja] = useState<Franja | null>(null);
+  const [filtrosAbiertos, setFiltrosAbiertos] = useState(false);
 
   // «¿Dónde seguimos?»: con `?desde=<hora>` sólo salen las fiestas abiertas
   // después de esa hora (las que siguen en marcha o empiezan poco después).
@@ -255,7 +256,9 @@ const MapPage = () => {
   const abrir = (id: string) =>
     navigate(activeEvent?.eventId === id ? `/event/${id}/live` : `/event/${id}`);
 
-  const filtrosActivos = [soloDirecto, soloEstaNoche, soloGratis].filter(Boolean).length;
+  const filtrosActivos = [soloDirecto, soloEstaNoche, soloGratis, tipo !== null, theme !== null, franja !== null].filter(
+    Boolean,
+  ).length;
   const cercanos = visibles.filter((e) => e.distance !== null && e.distance <= 10_000).length;
 
   return (
@@ -290,40 +293,19 @@ const MapPage = () => {
               )}
             </label>
 
-            <DropdownMenu>
-              <DropdownMenuTrigger
-                aria-label={t('map.filters')}
-                className="press relative flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-party-primary text-ink shadow-lg shadow-black/40"
-              >
-                <SlidersHorizontal size={22} />
-                {filtrosActivos > 0 && (
-                  <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-ink px-1 text-[10px] font-bold text-party-primary">
-                    {filtrosActivos}
-                  </span>
-                )}
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel>{t('map.filters')}</DropdownMenuLabel>
-                <DropdownMenuCheckboxItem checked={soloDirecto} onCheckedChange={(v) => setSoloDirecto(v === true)}>
-                  {t('map.liveOnly')}
-                </DropdownMenuCheckboxItem>
-                <DropdownMenuCheckboxItem
-                  checked={soloEstaNoche}
-                  onCheckedChange={(v) => setSoloEstaNoche(v === true)}
-                >
-                  {t('map.tonightOnly')}
-                </DropdownMenuCheckboxItem>
-                <DropdownMenuCheckboxItem checked={soloGratis} onCheckedChange={(v) => setSoloGratis(v === true)}>
-                  {t('map.freeOnly')}
-                </DropdownMenuCheckboxItem>
-                {/* La atribución de OpenStreetMap y CARTO es obligatoria: vive
-                    aquí, fuera de la lista de eventos. */}
-                <p
-                  className="border-t border-white/10 px-2 pb-1 pt-2 text-[10px] leading-snug text-party-gray/80 [&_a]:underline"
-                  dangerouslySetInnerHTML={{ __html: TILES_ATTRIBUTION }}
-                />
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <button
+              type="button"
+              onClick={() => setFiltrosAbiertos(true)}
+              aria-label={t('map.filters')}
+              className="press relative flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-party-primary text-ink shadow-lg shadow-black/40"
+            >
+              <SlidersHorizontal size={22} />
+              {filtrosActivos > 0 && (
+                <span className="absolute -right-1 -top-1 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-ink px-1 text-[10px] font-bold text-party-primary">
+                  {filtrosActivos}
+                </span>
+              )}
+            </button>
           </div>
 
           {desde && (
@@ -339,34 +321,35 @@ const MapPage = () => {
             </button>
           )}
 
-          <PartyFilters
-            className="pointer-events-auto -mx-margin px-margin py-0.5"
-            themes={temasMapa}
-            theme={theme}
-            onTheme={setTheme}
-            franja={franja}
-            onFranja={setFranja}
-          />
-
-          {tiposPresentes.length > 1 && (
-            <div className="no-scrollbar pointer-events-auto -mx-margin flex items-center gap-1 overflow-x-auto px-margin py-0.5">
-              {[null, ...tiposPresentes].map((tp) => (
-                <button
-                  key={tp ?? '__todos__'}
-                  type="button"
-                  onClick={() => setTipo(tp)}
-                  aria-pressed={tipo === tp}
-                  className={cn(
-                    'press h-8 shrink-0 whitespace-nowrap rounded-full px-3 text-label-pill shadow-md',
-                    tipo === tp ? 'bg-party-primary text-ink' : 'bg-surface-container text-[#D0C6AB]',
-                  )}
-                >
-                  {tp ? t(`venueTypes.${tp}`) : t('map.all')}
-                </button>
-              ))}
-            </div>
-          )}
         </div>
+
+        <MapFiltersSheet
+          open={filtrosAbiertos}
+          onOpenChange={setFiltrosAbiertos}
+          venueTypes={tiposPresentes}
+          venueType={tipo}
+          onVenueType={setTipo}
+          franja={franja}
+          onFranja={setFranja}
+          themes={temasMapa}
+          theme={theme}
+          onTheme={setTheme}
+          live={soloDirecto}
+          onLive={setSoloDirecto}
+          tonight={soloEstaNoche}
+          onTonight={setSoloEstaNoche}
+          free={soloGratis}
+          onFree={setSoloGratis}
+          results={visibles.length}
+          onReset={() => {
+            setTipo(null);
+            setTheme(null);
+            setFranja(null);
+            setSoloDirecto(false);
+            setSoloEstaNoche(false);
+            setSoloGratis(false);
+          }}
+        />
 
         {/* ------------------------------------------------- centrar en mí */}
         {position && (

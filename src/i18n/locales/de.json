@@ -188,7 +188,7 @@
         "inEvent": "Du bist bei {{name}}",
         "inEventBody": "{{venue}} · Tippen, um weiter Leute zu entdecken",
         "going": "{{count}} kommen",
-        "inside": "{{count}} mit Vybes drinnen",
+        "inside": "{{count}} Vyber drin",
         "beFirst": "Sei die erste Person dort",
         "imGoing": "Ich komme",
         "notGoing": "Ich komme doch nicht",
@@ -205,7 +205,7 @@
         "statEvents": "Partys\nheute Abend",
         "statInside": "Leute\njetzt drin",
         "statGoing": "haben\nzugesagt",
-        "goingPlus": "{{count}} mit Vybes kommen",
+        "goingPlus": "{{count}} Vyber kommen",
         "buy": "Tickets",
         "greetingDay": "Was machst du am Wochenende?",
         "greetingNight": "Was machst du heute Nacht?",
@@ -213,7 +213,7 @@
         "seeAll": "Alle ansehen",
         "statNearby": "Events in deiner Nähe",
         "statEventsShort": "Events",
-        "statInsideShort": "mit Vybes drinnen",
+        "statInsideShort": "Vyber drin",
         "statTonight": "Events heute Nacht",
         "featured": "Highlights",
         "upcoming": "Nächste Events",
@@ -1633,7 +1633,7 @@
         "lockedBody": "Mit Premium siehst du, wer sie sind, bevor du losgehst.",
         "noneForYou": "Bisher kommt niemand, der zu deinen Angaben passt.",
         "heading": "Wer kommt",
-        "confirmed": "{{count}} mit Vybes kommen"
+        "confirmed": "{{count}} Vyber kommen"
     },
     "nav": {
         "home": "Start",
@@ -1658,7 +1658,8 @@
         "tonight": "{{name}} ist heute Nacht",
         "tonightBody": "Beginnt um {{time}} im {{venue}}.",
         "empty": "Alles ruhig",
-        "emptyBody": "Wenn dir jemand schreibt, du ein Match hast oder eine Party beginnt, zu der du gehst, siehst du es hier."
+        "emptyBody": "Wenn dir jemand schreibt, du ein Match hast oder eine Party beginnt, zu der du gehst, siehst du es hier.",
+        "dismiss": "Ausblenden"
     },
     "eventDetail": {
         "shareText": "Kommst du mit zu {{name}}? {{date}} im {{venue}}.",
@@ -1703,7 +1704,13 @@
         "view": "Ansehen",
         "openAfter": "Offen nach {{time}}",
         "tapPin": "Tippe auf ein Event auf der Karte, um zu sehen, worum es geht.",
-        "credits": "Kartenhinweise"
+        "credits": "Kartenhinweise",
+        "filtersHelp": "Wähle aus, was du auf der Karte sehen willst.",
+        "when": "Wann",
+        "partyType": "Art der Party",
+        "venueType": "Art der Location",
+        "showResults_one": "{{count}} Party ansehen",
+        "showResults_other": "{{count}} Partys ansehen"
     },
     "tickets": {
         "title": "Meine Tickets",
@@ -2100,7 +2107,7 @@
             "almostFull": "Fast voll",
             "full": "Voll"
         },
-        "withVybe": "{{level}} · {{count}} mit Vybes",
+        "withVybe": "{{level}} · {{count}} Vyber drin",
         "source": "Laut Location · vor {{minutes}} Min.",
         "sourceNow": "Laut Location · gerade eben",
         "friendsGoing_one": "{{count}} deiner Vybes kommt",

@@ -57,7 +57,7 @@ const HomePage = () => {
   const { withDistance, isLoading, position, locationDenied, activity, intents, busyIntent, toggleIntent } =
     useEventsFeed();
 
-  const [place, setPlace] = useState<string>(NEARBY);
+  const [place, setPlace] = useState<string>(ALL);
   const [theme, setTheme] = useState<string | null>(null);
   const [franja, setFranja] = useState<Franja | null>(null);
   const [avisosAbiertos, setAvisosAbiertos] = useState(false);
@@ -316,9 +316,8 @@ const HomePage = () => {
                   <ChevronDown size={14} className="shrink-0" />
                 </SelectTrigger>
                 <SelectContent align="end">
-                  <SelectItem value={NEARBY} disabled={!position}>
-                    {t('home.nearMe')}
-                  </SelectItem>
+                  {/* «Cerca de mí» está oculto: la lista sale de todas las
+                      zonas y el mapa es lo que enseña lo que tienes cerca. */}
                   <SelectItem value={ALL}>{t('home.allPlaces')}</SelectItem>
                   {places.map(({ region, cities }) => (
                     <SelectGroupBlock key={region} region={region} cities={cities} />
