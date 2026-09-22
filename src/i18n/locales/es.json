@@ -188,7 +188,7 @@
         "inEvent": "Estás en {{name}}",
         "inEventBody": "{{venue}} · Toca para seguir descubriendo gente",
         "going": "{{count}} van",
-        "inside": "{{count}} con Fiestea dentro",
+        "inside": "{{count}} fiesteros dentro",
         "beFirst": "Sé el primero en entrar",
         "imGoing": "Voy a ir",
         "notGoing": "Ya no voy a ir",
@@ -205,7 +205,7 @@
         "statEvents": "fiestas\nesta noche",
         "statInside": "personas\ndentro ahora",
         "statGoing": "han dicho\nque van",
-        "goingPlus": "{{count}} con Fiestea van a ir",
+        "goingPlus": "{{count}} fiesteros van a ir",
         "buy": "Entradas",
         "greetingDay": "¿Qué haces este finde?",
         "greetingNight": "¿Qué haces esta noche?",
@@ -213,7 +213,7 @@
         "seeAll": "Ver todo",
         "statNearby": "eventos cerca de ti",
         "statEventsShort": "eventos",
-        "statInsideShort": "con Fiestea dentro",
+        "statInsideShort": "fiesteros dentro",
         "statTonight": "eventos esta noche",
         "featured": "Destacados",
         "upcoming": "Próximos eventos",
@@ -1633,7 +1633,7 @@
         "lockedBody": "Con Premium ves quiénes son antes de salir de casa.",
         "noneForYou": "De momento no va nadie que encaje con lo que quieres ver.",
         "heading": "Quién va",
-        "confirmed": "{{count}} con Fiestea van a ir"
+        "confirmed": "{{count}} fiesteros van a ir"
     },
     "nav": {
         "home": "Inicio",
@@ -1658,7 +1658,8 @@
         "tonight": "{{name}} es esta noche",
         "tonightBody": "Empieza a las {{time}} en {{venue}}.",
         "empty": "Todo tranquilo",
-        "emptyBody": "Cuando alguien te escriba, conectes o empiece una fiesta a la que vas, lo verás aquí."
+        "emptyBody": "Cuando alguien te escriba, conectes o empiece una fiesta a la que vas, lo verás aquí.",
+        "dismiss": "Descartar"
     },
     "eventDetail": {
         "shareText": "¿Te vienes a {{name}}? {{date}} en {{venue}}.",
@@ -1703,7 +1704,13 @@
         "view": "Ver",
         "openAfter": "Abiertas después de las {{time}}",
         "tapPin": "Toca un evento del mapa para ver de qué va.",
-        "credits": "Créditos del mapa"
+        "credits": "Créditos del mapa",
+        "filtersHelp": "Elige lo que quieres ver en el mapa.",
+        "when": "Cuándo",
+        "partyType": "Tipo de fiesta",
+        "venueType": "Tipo de local",
+        "showResults_one": "Ver {{count}} fiesta",
+        "showResults_other": "Ver {{count}} fiestas"
     },
     "tickets": {
         "title": "Mis entradas",
@@ -2100,7 +2107,7 @@
             "almostFull": "Casi lleno",
             "full": "Lleno"
         },
-        "withVybe": "{{level}} · {{count}} con Fiestea",
+        "withVybe": "{{level}} · {{count}} fiesteros dentro",
         "source": "Según el local · hace {{minutes}} min",
         "sourceNow": "Según el local · ahora",
         "friendsGoing_one": "{{count}} de tus crushes va a ir",

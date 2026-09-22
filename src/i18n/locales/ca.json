@@ -188,7 +188,7 @@
         "inEvent": "Ets a {{name}}",
         "inEventBody": "{{venue}} · Toca per seguir coneixent gent",
         "going": "{{count}} hi van",
-        "inside": "{{count}} amb Fiestea a dins",
+        "inside": "{{count}} festers dins",
         "beFirst": "Sigues el primer a entrar",
         "imGoing": "Hi vaig",
         "notGoing": "Ja no hi vaig",
@@ -205,7 +205,7 @@
         "statEvents": "festes\naquesta nit",
         "statInside": "persones\ndins ara",
         "statGoing": "han dit\nque hi van",
-        "goingPlus": "{{count}} amb Fiestea hi van",
+        "goingPlus": "{{count}} festers hi van",
         "buy": "Entrades",
         "greetingDay": "Què fas aquest cap de setmana?",
         "greetingNight": "Què fas aquesta nit?",
@@ -213,7 +213,7 @@
         "seeAll": "Veure-ho tot",
         "statNearby": "esdeveniments a prop teu",
         "statEventsShort": "esdeveniments",
-        "statInsideShort": "amb Fiestea a dins",
+        "statInsideShort": "festers dins",
         "statTonight": "esdeveniments aquesta nit",
         "featured": "Destacats",
         "upcoming": "Propers esdeveniments",
@@ -1633,7 +1633,7 @@
         "lockedBody": "Amb Premium veus qui són abans de sortir de casa.",
         "noneForYou": "De moment no hi va ningú que encaixi amb el que vols veure.",
         "heading": "Qui hi va",
-        "confirmed": "{{count}} amb Fiestea hi van"
+        "confirmed": "{{count}} festers hi van"
     },
     "nav": {
         "home": "Inici",
@@ -1658,7 +1658,8 @@
         "tonight": "{{name}} és aquesta nit",
         "tonightBody": "Comença a les {{time}} a {{venue}}.",
         "empty": "Tot tranquil",
-        "emptyBody": "Quan algú t'escrigui, connectis o comenci una festa on vas, ho veuràs aquí."
+        "emptyBody": "Quan algú t'escrigui, connectis o comenci una festa on vas, ho veuràs aquí.",
+        "dismiss": "Descartar"
     },
     "eventDetail": {
         "shareText": "Véns a {{name}}? {{date}} a {{venue}}.",
@@ -1703,7 +1704,13 @@
         "view": "Veure",
         "openAfter": "Obertes després de les {{time}}",
         "tapPin": "Toca un esdeveniment del mapa per veure de què va.",
-        "credits": "Crèdits del mapa"
+        "credits": "Crèdits del mapa",
+        "filtersHelp": "Tria què vols veure al mapa.",
+        "when": "Quan",
+        "partyType": "Tipus de festa",
+        "venueType": "Tipus de local",
+        "showResults_one": "Veure {{count}} festa",
+        "showResults_other": "Veure {{count}} festes"
     },
     "tickets": {
         "title": "Les meves entrades",
@@ -2100,7 +2107,7 @@
             "almostFull": "Gairebé ple",
             "full": "Ple"
         },
-        "withVybe": "{{level}} · {{count}} amb Fiestea",
+        "withVybe": "{{level}} · {{count}} festers dins",
         "source": "Segons el local · fa {{minutes}} min",
         "sourceNow": "Segons el local · ara",
         "friendsGoing_one": "{{count}} dels teus crushes hi va",
