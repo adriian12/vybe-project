@@ -67,6 +67,29 @@ const verifySignature = async (
   return diff === 0;
 };
 
+/**
+ * El id de la suscripción de una factura. Desde la API 2025-03 (basil) ya no
+ * viene en `invoice.subscription` sino en
+ * `invoice.parent.subscription_details.subscription`; el webhook de producción
+ * usa una versión posterior. Se aceptan las dos formas.
+ */
+const invoiceSubscription = (invoice: Record<string, unknown>): string | null => {
+  const directa = invoice.subscription;
+  if (typeof directa === 'string') return directa;
+  if (directa && typeof directa === 'object' && 'id' in directa) return String((directa as { id: string }).id);
+  const parent = invoice.parent as { subscription_details?: { subscription?: string | { id: string } } } | null;
+  const sub = parent?.subscription_details?.subscription;
+  if (typeof sub === 'string') return sub;
+  return sub?.id ?? null;
+};
+
+/** Fin del periodo pagado de una factura, si viene (segundos Unix). */
+const invoicePeriodEnd = (invoice: Record<string, unknown>): string | null => {
+  const lines = (invoice.lines as { data?: { period?: { end?: number } }[] } | undefined)?.data ?? [];
+  const fin = Math.max(0, ...lines.map((l) => l.period?.end ?? 0));
+  return fin > 0 ? new Date(fin * 1000).toISOString() : null;
+};
+
 const monthFromNow = (): string => {
   const expires = new Date();
   expires.setMonth(expires.getMonth() + 1);
@@ -203,11 +226,15 @@ serve(async (req: Request): Promise<Response> => {
         // La suscripción puede ser de un usuario o de un local, y desde aquí no
         // se sabe cuál: se actualizan las dos tablas por el mismo id de Stripe,
         // y la que no lo tenga no cambia ninguna fila.
-        const subscriptionId = object.subscription as string | null;
+        const subscriptionId = invoiceSubscription(object);
         if (!subscriptionId) break;
 
-        const expires = new Date();
-        expires.setMonth(expires.getMonth() + 1);
+        // Hasta el final del periodo que se acaba de pagar (con un día de
+        // margen por si el siguiente cobro tarda); si no viene, un mes.
+        const finPeriodo = invoicePeriodEnd(object);
+        const expires = finPeriodo ? new Date(finPeriodo) : new Date();
+        if (finPeriodo) expires.setDate(expires.getDate() + 1);
+        else expires.setMonth(expires.getMonth() + 1);
 
         await Promise.all([
           supabase
@@ -224,7 +251,11 @@ serve(async (req: Request): Promise<Response> => {
 
       case 'customer.subscription.deleted':
       case 'invoice.payment_failed': {
-        const subscriptionId = (object.id ?? object.subscription) as string | null;
+        // En `customer.subscription.deleted` el objeto es la suscripción; en
+        // `invoice.payment_failed`, la factura (su id es el de la factura, no
+        // el de la suscripción).
+        const subscriptionId =
+          event.type === 'customer.subscription.deleted' ? (object.id as string | null) : invoiceSubscription(object);
         if (!subscriptionId) break;
 
         await Promise.all([
