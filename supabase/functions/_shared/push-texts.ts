@@ -26,6 +26,7 @@ interface Texts {
   endingSoon: (event: string, vybes: number) => { title: string; body: string };
   raffleCreated: (event: string, prize: string, time: string | null) => { title: string; body: string };
   raffleWon: (event: string, prize: string) => { title: string; body: string };
+  raffleWinner: (event: string, prize: string, winner: string) => { title: string; body: string };
   newEvent: (venue: string, event: string, when: string) => { title: string; body: string };
   photosPending: (count: number) => { title: string; body: string };
 }
@@ -45,7 +46,7 @@ const TEXTS: Record<Locale, Texts> = {
       body: `${venue} ya está abierto. Dijiste que ibas: no te quedes en casa.`,
     }),
     fillingUp: (event, inside) => ({
-      title: `Ya hay ${inside} personas con Vybe en ${event}`,
+      title: `Ya hay ${inside} personas con Vybes en ${event}`,
       body: '¿Te lo vas a perder? Acércate y escanea el código para entrar.',
     }),
     fillingUpVibe: (event, level) => ({
@@ -74,8 +75,12 @@ const TEXTS: Record<Locale, Texts> = {
         : `${prize}. Para participar, sigue dentro.`,
     }),
     raffleWon: (event, prize) => ({
-      title: '¡Te ha tocado!',
-      body: `Has ganado ${prize} en ${event}. Enseña el vale de «Entradas» en la barra.`,
+      title: '¡Has ganado el sorteo!',
+      body: `Te ha tocado «${prize}» en ${event}. Ve a Ofertas → Sorteos y enséñalo en la barra.`,
+    }),
+    raffleWinner: (event, prize, winner) => ({
+      title: `Sorteo de ${event}`,
+      body: `El ganador de «${prize}» ha sido ${winner}.`,
     }),
     newEvent: (venue, event, when) => ({
       title: `${venue} tiene nueva fiesta`,
@@ -100,7 +105,7 @@ const TEXTS: Record<Locale, Texts> = {
       body: `${venue} is open. You said you were going: don't stay home.`,
     }),
     fillingUp: (event, inside) => ({
-      title: `${inside} people on Vybe are already at ${event}`,
+      title: `${inside} people on Vybes are already at ${event}`,
       body: 'Going to miss it? Head over and scan the code to get in.',
     }),
     fillingUpVibe: (event, level) => ({
@@ -127,8 +132,12 @@ const TEXTS: Record<Locale, Texts> = {
       body: time ? `${prize} · at ${time}. Stay inside to take part.` : `${prize}. Stay inside to take part.`,
     }),
     raffleWon: (event, prize) => ({
-      title: 'You won!',
-      body: `You won ${prize} at ${event}. Show the voucher in "Tickets" at the bar.`,
+      title: 'You won the raffle!',
+      body: `You won «${prize}» at ${event}. Go to Offers → Raffles and show it at the bar.`,
+    }),
+    raffleWinner: (event, prize, winner) => ({
+      title: `${event} raffle`,
+      body: `The winner of «${prize}» is ${winner}.`,
     }),
     newEvent: (venue, event, when) => ({
       title: `New party at ${venue}`,
@@ -153,7 +162,7 @@ const TEXTS: Record<Locale, Texts> = {
       body: `${venue} ist geöffnet. Du wolltest hin: bleib nicht zu Hause.`,
     }),
     fillingUp: (event, inside) => ({
-      title: `Schon ${inside} Leute mit Vybe bei ${event}`,
+      title: `Schon ${inside} Leute mit Vybes bei ${event}`,
       body: 'Willst du das verpassen? Komm vorbei und scanne den Code.',
     }),
     fillingUpVibe: (event, level) => ({
@@ -172,7 +181,7 @@ const TEXTS: Record<Locale, Texts> = {
       title: `${event} endet in 30 Minuten`,
       body:
         vybes > 0
-          ? `Du hast heute ${vybes} ${vybes === 1 ? 'Vybe' : 'Vybes'}. Schreibt euch und tippt beide auf „Behalten", sonst läuft der Chat ab.`
+          ? `Du hast heute ${vybes} ${vybes === 1 ? 'Vybes' : 'Vybes'}. Schreibt euch und tippt beide auf „Behalten", sonst läuft der Chat ab.`
           : 'Letzte halbe Stunde: nutze sie, um jemanden kennenzulernen.',
     }),
     raffleCreated: (event, prize, time) => ({
@@ -182,8 +191,12 @@ const TEXTS: Record<Locale, Texts> = {
         : `${prize}. Bleib drinnen, um mitzumachen.`,
     }),
     raffleWon: (event, prize) => ({
-      title: 'Du hast gewonnen!',
-      body: `Du hast ${prize} bei ${event} gewonnen. Zeig den Gutschein unter „Tickets" an der Bar.`,
+      title: 'Du hast die Verlosung gewonnen!',
+      body: `Du hast «${prize}» bei ${event} gewonnen. Geh zu Angebote → Verlosungen und zeig es an der Bar.`,
+    }),
+    raffleWinner: (event, prize, winner) => ({
+      title: `Verlosung bei ${event}`,
+      body: `Gewonnen hat «${prize}»: ${winner}.`,
     }),
     newEvent: (venue, event, when) => ({
       title: `Neue Party bei ${venue}`,
@@ -208,7 +221,7 @@ const TEXTS: Record<Locale, Texts> = {
       body: `${venue} ja és obert. Vas dir que hi anaves: no et quedis a casa.`,
     }),
     fillingUp: (event, inside) => ({
-      title: `Ja hi ha ${inside} persones amb Vybe a ${event}`,
+      title: `Ja hi ha ${inside} persones amb Vybes a ${event}`,
       body: "T'ho perdràs? Acosta't i escaneja el codi per entrar.",
     }),
     fillingUpVibe: (event, level) => ({
@@ -237,8 +250,12 @@ const TEXTS: Record<Locale, Texts> = {
         : `${prize}. Per participar, queda't a dins.`,
     }),
     raffleWon: (event, prize) => ({
-      title: "T'ha tocat!",
-      body: `Has guanyat ${prize} a ${event}. Ensenya el val d'«Entrades» a la barra.`,
+      title: 'Has guanyat el sorteig!',
+      body: `T'ha tocat «${prize}» a ${event}. Ves a Ofertes → Sortejos i ensenya-ho a la barra.`,
+    }),
+    raffleWinner: (event, prize, winner) => ({
+      title: `Sorteig de ${event}`,
+      body: `El guanyador de «${prize}» ha estat ${winner}.`,
     }),
     newEvent: (venue, event, when) => ({
       title: `${venue} té festa nova`,

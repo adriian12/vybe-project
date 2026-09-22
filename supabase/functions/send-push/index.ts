@@ -69,7 +69,7 @@ const fromVenueEvent = async (
     .maybeSingle();
   if (!evento) return [];
 
-  const venueName = (evento.venues as { name?: string } | null)?.name ?? 'Vybe';
+  const venueName = (evento.venues as { name?: string } | null)?.name ?? 'Vybes';
   const { data: seguidores } = await supabase
     .from('venue_followers')
     .select('profile_id, profiles(locale)')
@@ -126,24 +126,47 @@ const fromRaffle = async (
     .maybeSingle();
 
   if (!raffle) return [];
-  const eventName = (raffle.events as { name?: string } | null)?.name ?? 'Vybe';
+  const eventName = (raffle.events as { name?: string } | null)?.name ?? 'Vybes';
 
   if (payload.type === 'RAFFLE_DRAWN') {
     if (!raffle.winner_profile_id) return [];
     const { data: winner } = await supabase
       .from('profiles')
-      .select('locale')
+      .select('locale, name')
       .eq('id', raffle.winner_profile_id)
       .maybeSingle();
+    const winnerName = (winner?.name ?? '').trim() || 'Vybes';
+
+    // A quien ha ganado, «¡Has ganado el sorteo!»; a todos los demás que
+    // siguen dentro (vyber o invitado), quién ha sido.
+    const desdeSorteo = new Date(Date.now() - 90 * 60_000).toISOString();
+    const { data: dentroSorteo } = await supabase
+      .from('event_attendance')
+      .select('profile_id, profiles(locale)')
+      .eq('event_id', raffle.event_id)
+      .is('left_at', null)
+      .gt('last_seen_at', desdeSorteo)
+      .neq('profile_id', raffle.winner_profile_id)
+      .limit(2000);
 
     return [
       {
         profileId: raffle.winner_profile_id,
-        kind: 'event',
+        kind: 'event' as const,
         ...pushTexts(winner?.locale).raffleWon(eventName, raffle.prize),
-        url: '/tickets',
+        url: `/event/${raffle.event_id}/live`,
         tag: `raffle-${raffle.id}`,
       },
+      ...(dentroSorteo ?? []).map((row) => {
+        const locale = (row.profiles as { locale?: string | null } | null)?.locale ?? null;
+        return {
+          profileId: row.profile_id as string,
+          kind: 'event' as const,
+          ...pushTexts(locale).raffleWinner(eventName, raffle.prize, winnerName),
+          url: `/event/${raffle.event_id}/live`,
+          tag: `raffle-${raffle.id}`,
+        };
+      }),
     ];
   }
 
@@ -296,7 +319,7 @@ const fromWebhook = async (
       {
         profileId: record.receiver_id,
         kind: 'message',
-        title: sender?.name ?? 'Vybe',
+        title: sender?.name ?? 'Vybes',
         body: (record.content ?? '').slice(0, 120),
         url: `/chat/${record.sender_id}`,
         // Mismo `tag` por conversación: el aviso nuevo sustituye al anterior
@@ -322,7 +345,7 @@ const fromWebhook = async (
   return [record.user_id_1, record.user_id_2].map((id) => {
     const otherId = id === record.user_id_1 ? record.user_id_2 : record.user_id_1;
     const texts = pushTexts(profileOf(id)?.locale);
-    const name = profileOf(otherId)?.name ?? 'Vybe';
+    const name = profileOf(otherId)?.name ?? 'Vybes';
     const { title, body } =
       record.connection_type === 'vybe_check' ? texts.vybeCheck(name) : texts.match(name);
 

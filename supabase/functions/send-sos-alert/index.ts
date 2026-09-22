@@ -98,7 +98,7 @@ serve(async (req: Request): Promise<Response> => {
         `Hola ${contactName}, tu amigo/a ${name} necesita ayuda y ${where}.`,
         place && link ? `Evento: ${place}.` : null,
         record.note ? `Dice: ${record.note}` : null,
-        '- Vybe',
+        '- Vybes',
       ]
         .filter(Boolean)
         .join(' ');

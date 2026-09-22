@@ -124,7 +124,7 @@ const VenueRaffles = ({ event }: { event: { id: string; startDate: string; endDa
                 <p className="truncate text-body-sm font-bold">{raffle.prize}</p>
                 <p className="truncate text-caption text-party-gray">
                   {raffle.status === 'drawn'
-                    ? t('venue.raffles.wonBy', { name: raffle.winnerName ?? '—' })
+                    ? t('venue.raffles.wonByCode', { name: raffle.winnerName ?? '—', code: raffle.winnerCode ?? '—' })
                     : raffle.status === 'cancelled'
                       ? t('venue.raffles.cancelled')
                       : raffle.status === 'no_participants'

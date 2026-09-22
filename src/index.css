@@ -15,7 +15,8 @@
        contenido empieza y acaba con esto, no con un `pt-16` a secas: en Android
        15+ la app se dibuja bajo la barra de estado y la cabecera crece con
        ella, así que un margen fijo dejaba la primera fila tapada. */
-    --header-h: calc(4rem + var(--safe-top));
+    /* Cabecera oculta por ahora (header.tsx): sólo la zona segura y un respiro. */
+    --header-h: calc(0.5rem + var(--safe-top));
     --nav-h: calc(4rem + var(--safe-bottom));
 
     /* Negro y amarillo, tomados del diseño `diseños/home_usuario.png`: el

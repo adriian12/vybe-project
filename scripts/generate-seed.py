@@ -113,7 +113,7 @@ VENUES = [
     ('bolero', 'Bolero Cala Ratjada', 'discoteca', 'Capdepera', 'Carrer Elionor Servera, Cala Rajada', 39.7121, 3.4611, 100),
     ('physical', 'Physical Cala Ratjada', 'discoteca', 'Capdepera', 'Carrer Elionor Servera, Cala Rajada', 39.7106, 3.4622, 100),
     # Se mueve a la ubicación de quien prueba con admin_reset_test_lab().
-    ('lab', 'Vybe · Sala de pruebas', 'discoteca', 'Palma', 'Ubicación de pruebas', 39.5754, 2.6545, 300),
+    ('lab', 'Vybes · Sala de pruebas', 'discoteca', 'Palma', 'Ubicación de pruebas', 39.5754, 2.6545, 300),
 ]
 
 # ---------------------------------------------------------------------------
@@ -370,13 +370,13 @@ WHERE NOT EXISTS (SELECT 1 FROM public.events x WHERE x.venue_id = v.id AND x.na
 -- La fiesta de la sala de pruebas: en marcha desde ya y durante 30 días.
 INSERT INTO public.events (venue_id, name, description, start_date, end_date, latitude, longitude,
                            theme, dress_code, min_age, price, max_capacity, poster_url, recurrence)
-SELECT v.id, 'Vybe Test Night',
+SELECT v.id, 'Vybes Test Night',
        'Fiesta permanente para probar la app: entra con el código LAB777 y encontrarás a 35 personas dentro.',
        NOW() - INTERVAL '1 hour', NOW() + INTERVAL '30 days', v.latitude, v.longitude,
        'Techno', 'Libre', 18, 0, 300, {q(lab_poster)}, 'none'
 FROM public.venues v
 WHERE v.email = 'sala-pruebas@{DOMAIN}'
-  AND NOT EXISTS (SELECT 1 FROM public.events x WHERE x.venue_id = v.id AND x.name = 'Vybe Test Night');
+  AND NOT EXISTS (SELECT 1 FROM public.events x WHERE x.venue_id = v.id AND x.name = 'Vybes Test Night');
 
 -- Códigos de acceso de las fiestas en marcha.
 INSERT INTO public.event_codes (venue_id, event_id, code, expires_at, active, kind, label)
@@ -392,7 +392,7 @@ INSERT INTO public.event_codes (venue_id, event_id, code, expires_at, active, ki
 SELECT x.venue_id, x.id, 'LAB777', x.end_date, TRUE, 'general', 'Sala de pruebas'
 FROM public.events x
 JOIN public.venues v ON v.id = x.venue_id
-WHERE v.email = 'sala-pruebas@{DOMAIN}' AND x.name = 'Vybe Test Night'
+WHERE v.email = 'sala-pruebas@{DOMAIN}' AND x.name = 'Vybes Test Night'
 ON CONFLICT (code) DO UPDATE SET active = TRUE, event_id = EXCLUDED.event_id,
     venue_id = EXCLUDED.venue_id, expires_at = EXCLUDED.expires_at;
 """)

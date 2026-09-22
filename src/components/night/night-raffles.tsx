@@ -1,5 +1,13 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Gift, PartyPopper } from 'lucide-react';
+import { Gift, PartyPopper, Trophy } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Raffle } from '@/services/night';
 import { cn } from '@/lib/utils';
 import TicketCode from './ticket-code';
@@ -13,6 +21,7 @@ const hora = (iso: string) => new Date(iso).toLocaleTimeString(undefined, { hour
  */
 const NightRaffles = ({ raffles }: { raffles: Raffle[] }) => {
   const { t } = useTranslation();
+  const [enseñar, setEnseñar] = useState<Raffle | null>(null);
   const visibles = raffles.filter((r) => r.status === 'scheduled' || r.status === 'drawn');
 
   if (visibles.length === 0) {
@@ -49,10 +58,47 @@ const NightRaffles = ({ raffles }: { raffles: Raffle[] }) => {
                 )}
               </div>
             </div>
+            {ganado && (
+              <button
+                type="button"
+                onClick={() => setEnseñar(raffle)}
+                className="press mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-party-primary font-display text-title-card text-ink"
+              >
+                <Trophy size={17} />
+                {t('night.raffles.showAtBar')}
+              </button>
+            )}
             {ganado && raffle.ticketCode && <TicketCode code={raffle.ticketCode} />}
           </li>
         );
       })}
+
+      {/* Lo que se enseña en la barra: premio, nombre y el código del ganador,
+          que el local comprueba en su panel. */}
+      <Dialog open={enseñar !== null} onOpenChange={(open) => !open && setEnseñar(null)}>
+        <DialogContent className="border-0 bg-party-primary text-ink">
+          {enseñar && (
+            <div className="flex flex-col items-center py-4 text-center">
+              <span className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-ink text-party-primary">
+                <Trophy size={32} />
+              </span>
+              <DialogHeader className="items-center text-center">
+                <DialogTitle className="font-display text-headline-lg text-ink">
+                  {t('night.raffles.winnerTitle')}
+                </DialogTitle>
+                <DialogDescription className="text-body-md font-bold text-ink/80">«{enseñar.prize}»</DialogDescription>
+              </DialogHeader>
+              {enseñar.winnerName && <p className="mt-3 font-display text-headline-md">{enseñar.winnerName}</p>}
+              {enseñar.winnerCode && (
+                <p className="mt-4 rounded-2xl bg-ink px-6 py-3 font-display text-headline-xl tracking-widest text-party-primary tabular">
+                  {enseñar.winnerCode}
+                </p>
+              )}
+              <p className="mt-4 text-body-sm text-ink/70">{t('night.raffles.showHint')}</p>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </ul>
   );
 };

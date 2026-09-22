@@ -1,6 +1,15 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Clock, Crown, Loader2, Sparkles, Trophy } from 'lucide-react';
+import { Clock, Crown, Loader2, Pencil, Sparkles, Trophy } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';
 import { PartyButton } from '@/components/ui-custom/party-button';
@@ -20,6 +29,13 @@ interface Props {
 }
 
 const hora = (iso: string) => new Date(iso).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+
+/** «2026-09-20T23:30Z» → «23:30» en hora local, para el campo de hora. */
+const aCampoHora = (iso: string | null | undefined): string => {
+  if (!iso) return '';
+  const d = new Date(iso);
+  return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+};
 
 /** «23:30» → la fecha de ese evento a esa hora (si es de madrugada, al día siguiente). */
 const horaDelEvento = (valor: string, event: { startDate: string }): string | null => {
@@ -43,6 +59,10 @@ const VenuePromoTemplates = ({ event, venueId, promotions, canUse, onUpgrade, on
   const [busy, setBusy] = useState<string | null>(null);
   const [programando, setProgramando] = useState<string | null>(null);
   const [horaProgramada, setHoraProgramada] = useState('');
+  // Edición de un reto o promo: texto y horas.
+  const [editando, setEditando] = useState<PromoTemplate | null>(null);
+  const [form, setForm] = useState({ title: '', description: '', inicio: '', fin: '' });
+  const [guardando, setGuardando] = useState(false);
 
   const existente = (key: string) => promotions.find((p) => p.templateKey === key);
 
@@ -106,6 +126,68 @@ const VenuePromoTemplates = ({ event, venueId, promotions, canUse, onUpgrade, on
     }
   };
 
+  const abrirEdicion = (template: PromoTemplate) => {
+    const actual = existente(template.key);
+    const limite = templateDeadline(template, event);
+    setForm({
+      title: actual?.title ?? t(`venue.templates.${template.key}.title`),
+      description: actual?.description ?? t(`venue.templates.${template.key}.description`),
+      inicio: aCampoHora(actual?.startsAt),
+      fin: aCampoHora(template.kind === 'challenge' ? actual?.challengeDeadline ?? limite : actual?.endsAt),
+    });
+    setEditando(template);
+  };
+
+  /** Guarda el texto y las horas; si todavía no existe, la crea sin activar. */
+  const guardarEdicion = async () => {
+    if (!editando) return;
+    if (!canUse) {
+      onUpgrade();
+      return;
+    }
+    const template = editando;
+    const esReto = template.kind === 'challenge';
+    const inicio = form.inicio ? horaDelEvento(form.inicio, event) : null;
+    const fin = form.fin ? horaDelEvento(form.fin, event) : null;
+    setGuardando(true);
+    try {
+      const actual = existente(template.key);
+      if (actual) {
+        await venueService.updatePromotion(actual.id, {
+          title: form.title.trim() || actual.title,
+          description: form.description.trim() || null,
+          startsAt: inicio,
+          // Sin hora límite, la de la plantilla (sale del horario de la fiesta).
+          ...(esReto ? { challengeDeadline: fin ?? templateDeadline(template, event) ?? null } : { endsAt: fin }),
+        });
+      } else {
+        await venueService.createPromotion(venueId, {
+          eventId: event.id,
+          title: form.title.trim() || t(`venue.templates.${template.key}.title`),
+          description: form.description.trim() || undefined,
+          kind: template.kind,
+          startsAt: inicio ?? undefined,
+          endsAt: esReto ? undefined : fin ?? undefined,
+          maxPerPerson: template.maxPerPerson ?? 1,
+          templateKey: template.key,
+          challengeType: template.challengeType,
+          challengeTarget: template.challengeTarget,
+          challengeDeadline: esReto ? fin ?? templateDeadline(template, event) : templateDeadline(template, event),
+        });
+        // Queda guardada pero apagada: se enciende con su interruptor.
+        const nuevas = await venueService.getPromotions(event.id);
+        const creada = nuevas.find((p) => p.templateKey === template.key);
+        if (creada) await venueService.setPromotionActive(creada.id, false);
+      }
+      setEditando(null);
+      onChange();
+    } catch (error) {
+      fail(error);
+    } finally {
+      setGuardando(false);
+    }
+  };
+
   const bloque = (kind: 'promo' | 'challenge') =>
     PROMO_TEMPLATES.filter((tpl) => (kind === 'challenge' ? tpl.kind === 'challenge' : tpl.kind !== 'challenge'));
 
@@ -119,14 +201,25 @@ const VenuePromoTemplates = ({ event, venueId, promotions, canUse, onUpgrade, on
       <li key={template.key} className={cn('rounded-xl p-3', activa ? 'bg-party-primary/15' : 'bg-black/[0.03]')}>
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <p className="text-body-md font-bold">{t(`venue.templates.${template.key}.title`)}</p>
+            <p className="text-body-md font-bold">{actual?.title ?? t(`venue.templates.${template.key}.title`)}</p>
+            {actual?.description && <p className="text-caption">{actual.description}</p>}
             <p className="text-caption text-party-gray">
               {t(`venue.templates.${template.key}.how`, {
                 count: template.challengeTarget ?? 1,
-                time: limite ? hora(limite) : '',
+                time: (template.kind === 'challenge' ? actual?.challengeDeadline ?? limite : limite)
+                  ? hora((template.kind === 'challenge' ? actual?.challengeDeadline ?? limite : limite) as string)
+                  : '',
                 minutes: template.durationMinutes ?? 0,
               })}
             </p>
+            <button
+              type="button"
+              onClick={() => abrirEdicion(template)}
+              className="press mt-1 flex items-center gap-1 text-caption font-bold underline underline-offset-2"
+            >
+              <Pencil size={12} />
+              {t('common.edit')}
+            </button>
             {programada && actual?.startsAt && (
               <p className="mt-1 flex items-center gap-1 text-caption font-bold">
                 <Clock size={12} />
@@ -216,6 +309,61 @@ const VenuePromoTemplates = ({ event, venueId, promotions, canUse, onUpgrade, on
         <p className="mb-3 text-caption text-party-gray">{t('venue.templates.challengesSubtitle')}</p>
         <ul className="space-y-2">{bloque('challenge').map(tarjeta)}</ul>
       </div>
+
+      <Dialog open={editando !== null} onOpenChange={(open) => !open && !guardando && setEditando(null)}>
+        <DialogContent className="cards-light">
+          <DialogHeader className="text-left">
+            <DialogTitle>{t('venue.templates.editTitle')}</DialogTitle>
+            <DialogDescription>{t('venue.templates.editBody')}</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="tpl-title">{t('venue.templates.fieldTitle')}</Label>
+              <Input
+                id="tpl-title"
+                value={form.title}
+                maxLength={80}
+                onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="tpl-desc">{t('venue.templates.fieldDescription')}</Label>
+              <Textarea
+                id="tpl-desc"
+                rows={3}
+                maxLength={300}
+                value={form.description}
+                onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <div className="space-y-1.5">
+                <Label htmlFor="tpl-start">{t('venue.templates.fieldStart')}</Label>
+                <Input
+                  id="tpl-start"
+                  type="time"
+                  value={form.inicio}
+                  onChange={(e) => setForm((f) => ({ ...f, inicio: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="tpl-end">
+                  {editando?.kind === 'challenge' ? t('venue.templates.fieldDeadline') : t('venue.templates.fieldEnd')}
+                </Label>
+                <Input
+                  id="tpl-end"
+                  type="time"
+                  value={form.fin}
+                  onChange={(e) => setForm((f) => ({ ...f, fin: e.target.value }))}
+                />
+              </div>
+            </div>
+            <PartyButton className="w-full" disabled={guardando} onClick={() => void guardarEdicion()}>
+              {guardando ? <Loader2 size={16} className="animate-spin" /> : t('common.save')}
+            </PartyButton>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

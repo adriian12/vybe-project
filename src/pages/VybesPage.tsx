@@ -13,6 +13,16 @@ import { api, ApiError } from '@/services/api';
 import { LikePreview, LikeReceived, socialService } from '@/services/social';
 import { track } from '@/lib/observability';
 import { cn } from '@/lib/utils';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 const FALLBACK_PHOTO = '/placeholder.svg';
 
@@ -33,7 +43,7 @@ const VybesPage = () => {
   // pestaña React lo conserva y no vuelve a pedir los likes.
   const initialTab: Pestana = pathname.startsWith('/likes') ? 'likes' : 'matches';
   const { toast } = useToast();
-  const { connections, messages, currentUser, activeEvent, events } = useAppContext();
+  const { connections, messages, currentUser, activeEvent, events, refreshConnections } = useAppContext();
   const { isPremium, setShowPremiumDialog } = usePremium();
 
   const [pestana, setPestana] = useState<Pestana>(initialTab);
@@ -41,6 +51,9 @@ const VybesPage = () => {
   const [likesLocked, setLikesLocked] = useState(false);
   const [vistaPrevia, setVistaPrevia] = useState<LikePreview[]>([]);
   const [busyId, setBusyId] = useState<string | null>(null);
+  // Deshacer un match desde la lista (deslizando a la izquierda).
+  const [borrar, setBorrar] = useState<{ id: string; name: string } | null>(null);
+  const [borrando, setBorrando] = useState(false);
 
   useEffect(() => setPestana(initialTab), [initialTab]);
 
@@ -269,6 +282,7 @@ const VybesPage = () => {
                             lastAt={msg?.createdAt}
                             unreadCount={sinLeer(c.user.id)}
                             eventName={nombreEvento(c.eventId)}
+                            onDelete={() => setBorrar({ id: c.user.id, name: c.user.name })}
                           />
                         </div>
                       );
@@ -438,6 +452,41 @@ const VybesPage = () => {
       >
         {t('vybes.backToExplore')}
       </button>
+
+      <AlertDialog open={borrar !== null} onOpenChange={(open) => !open && !borrando && setBorrar(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('chat.unmatchTitle', { name: borrar?.name ?? '' })}</AlertDialogTitle>
+            <AlertDialogDescription>{t('chat.unmatchBody')}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={borrando}>{t('common.cancel')}</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={borrando}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={(e) => {
+                e.preventDefault();
+                if (!borrar) return;
+                void (async () => {
+                  setBorrando(true);
+                  try {
+                    await api.unmatch(borrar.id);
+                    await refreshConnections();
+                    toast({ title: t('chat.unmatched') });
+                    setBorrar(null);
+                  } catch {
+                    toast({ title: t('common.error'), description: t('errors.generic'), variant: 'destructive' });
+                  } finally {
+                    setBorrando(false);
+                  }
+                })();
+              }}
+            >
+              {t('chat.unmatchConfirm')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <Footer />
     </div>

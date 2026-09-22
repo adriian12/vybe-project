@@ -174,17 +174,17 @@ const VenueBroadcast = ({ eventId, venueId }: VenueBroadcastProps) => {
                   </div>
 
                   {broadcast.status === 'sent' ? (
-                    <Badge variant="secondary" className="shrink-0 gap-1 text-[10px]">
+                    <Badge className="shrink-0 gap-1 border-0 bg-emerald-100 text-[10px] font-bold text-emerald-800 hover:bg-emerald-100">
                       <Check size={10} />
                       {t('venue.broadcast.reached', { count: broadcast.recipients ?? 0 })}
                     </Badge>
                   ) : broadcast.status === 'cancelled' ? (
-                    <Badge variant="outline" className="shrink-0 text-[10px]">
+                    <Badge className="shrink-0 border-0 bg-red-100 text-[10px] font-bold text-red-700 hover:bg-red-100">
                       {t('venue.broadcast.cancelled')}
                     </Badge>
                   ) : broadcast.scheduledAt ? (
                     <div className="flex shrink-0 items-center gap-1">
-                      <Badge variant="outline" className="gap-1 text-[10px]">
+                      <Badge className="gap-1 border-0 bg-sky-100 text-[10px] font-bold text-sky-800 hover:bg-sky-100">
                         <Clock size={10} />
                         {new Date(broadcast.scheduledAt).toLocaleString(undefined, {
                           day: 'numeric',
@@ -208,7 +208,7 @@ const VenueBroadcast = ({ eventId, venueId }: VenueBroadcastProps) => {
                       </button>
                     </div>
                   ) : (
-                    <Badge variant="outline" className="shrink-0 text-[10px]">
+                    <Badge className="shrink-0 border-0 bg-amber-100 text-[10px] font-bold text-amber-800 hover:bg-amber-100">
                       {t('venue.broadcast.pending')}
                     </Badge>
                   )}

@@ -423,7 +423,7 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onCreated, onClose, e
             >
               <span
                 className={cn(
-                  'absolute top-0.5 h-5 w-5 rounded-full transition-transform duration-200 [transition-timing-function:var(--ease-out)]',
+                  'absolute left-0 top-0.5 h-5 w-5 rounded-full transition-transform duration-200 [transition-timing-function:var(--ease-out)]',
                   recurrence !== 'none' ? 'translate-x-[22px] bg-party-primary' : 'translate-x-0.5 bg-white',
                 )}
               />

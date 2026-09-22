@@ -777,6 +777,7 @@ export type Database = {
           promotion_id: string | null
           status: string
           venue_id: string
+          winner_code: string | null
           winner_profile_id: string | null
         }
         Insert: {
@@ -791,6 +792,7 @@ export type Database = {
           promotion_id?: string | null
           status?: string
           venue_id: string
+          winner_code?: string | null
           winner_profile_id?: string | null
         }
         Update: {
@@ -805,6 +807,7 @@ export type Database = {
           promotion_id?: string | null
           status?: string
           venue_id?: string
+          winner_code?: string | null
           winner_profile_id?: string | null
         }
         Relationships: [
@@ -2941,6 +2944,7 @@ export type Database = {
           prize: string
           status: string
           ticket_code: string
+          winner_code: string
           winner_name: string
         }[]
       }
@@ -3332,6 +3336,7 @@ export type Database = {
       is_admin: { Args: never; Returns: boolean }
       is_current_user_verified: { Args: never; Returns: boolean }
       is_group_member: { Args: { p_group_id: string }; Returns: boolean }
+      is_guest_profile: { Args: { p_profile_id: string }; Returns: boolean }
       is_premium: { Args: { p_profile_id?: string }; Returns: boolean }
       is_profile_active: { Args: { p_profile_id: string }; Returns: boolean }
       is_test_lab_event: { Args: { p_event_id: string }; Returns: boolean }
@@ -3571,6 +3576,7 @@ export type Database = {
         Args: { p_event_id: string; p_profile_id: string }
         Returns: boolean
       }
+      unmatch: { Args: { p_other: string }; Returns: undefined }
       update_user_location: {
         Args: { p_latitude: number; p_longitude: number; p_profile_id: string }
         Returns: undefined

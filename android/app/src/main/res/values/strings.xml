@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Vybe</string>
-    <string name="title_activity_main">Vybe</string>
+    <string name="app_name">Vybes</string>
+    <string name="title_activity_main">Vybes</string>
     <string name="package_name">com.vybe.app</string>
     <string name="custom_url_scheme">com.vybe.app</string>
     <!-- El dominio desde el que se abren los enlaces directos. Cuando lo

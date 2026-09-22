@@ -331,7 +331,7 @@ const VenueInsights = ({ eventId, venueId, plan, onUpgrade }: VenueInsightsProps
                     </div>
                     <span className="w-24 shrink-0 text-right text-xs tabular-nums">
                       <strong>{point.total}</strong>
-                      <span className="text-muted-foreground"> · {point.vybe} Vybe</span>
+                      <span className="text-muted-foreground"> · {point.vybe} Vybes</span>
                     </span>
                   </li>
                 ))}

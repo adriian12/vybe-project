@@ -28,9 +28,9 @@ const MobileOnlyPage = () => {
   return (
     <div className="pt-safe pb-safe flex min-h-[100dvh] flex-col px-margin">
       <div className="flex items-center justify-between pt-4">
-        <a href={landingHref('/')} className="flex items-center gap-2" aria-label="Vybe">
+        <a href={landingHref('/')} className="flex items-center gap-2" aria-label="Vybes">
           <VybeMark size={32} />
-          <span className="font-display text-headline-lg uppercase tracking-tight">Vybe</span>
+          <span className="font-display text-headline-lg uppercase tracking-tight">Vybes</span>
         </a>
         <LanguageSwitcher />
       </div>

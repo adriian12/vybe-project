@@ -549,7 +549,7 @@ const VenueDashboardPage = () => {
               <VybeMark size={34} />
               <div className="leading-tight">
                 <p className="flex items-center gap-2 font-display text-headline-md">
-                  Vybe
+                  Vybes
                   <span className="rounded bg-party-primary px-1.5 py-0.5 text-[10px] font-extrabold uppercase text-ink">
                     Venue Suite
                   </span>
@@ -1040,7 +1040,7 @@ const VenueDashboardPage = () => {
                 label: t('venue.drawer.help'),
                 onClick: () =>
                   void openExternal(
-                    `mailto:${COMPANY.email}?subject=${encodeURIComponent(`Vybe · ${currentVenue.name}`)}`,
+                    `mailto:${COMPANY.email}?subject=${encodeURIComponent(`Vybes · ${currentVenue.name}`)}`,
                   ),
                 show: true,
               },

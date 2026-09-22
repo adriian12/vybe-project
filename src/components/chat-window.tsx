@@ -13,6 +13,8 @@ import {
   Hourglass,
   SendHorizontal,
   ShieldAlert,
+  Trash2,
+  X,
   UserRound,
 } from 'lucide-react';
 import { useAppContext } from '@/context/app-context';
@@ -36,6 +38,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { premiumNight } from '@/services/premium-night';
+import { api } from '@/services/api';
 import { usePremium } from '@/context/premium-context';
 import { track } from '@/lib/observability';
 import { cn } from '@/lib/utils';
@@ -53,10 +56,14 @@ const MISMO_GRUPO_MS = 5 * 60_000;
 const hora = (iso: string) =>
   new Date(iso).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
 
-/** «3h 42m» o «18m» hasta que caduque la conversación. */
+/**
+ * «3h 42m» o «18m» hasta que caduque la conversación. Con más de dos días por
+ * delante no se enseña: en las salas de pruebas salían decenas de miles de
+ * horas.
+ */
 const restante = (iso: string): string | null => {
   const diff = new Date(iso).getTime() - Date.now();
-  if (diff <= 0) return null;
+  if (diff <= 0 || diff > 48 * 3_600_000) return null;
   const h = Math.floor(diff / 3_600_000);
   const m = Math.floor((diff % 3_600_000) / 60_000);
   return h > 0 ? `${h}h ${m}m` : `${Math.max(m, 1)}m`;
@@ -90,6 +97,18 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ matchId }) => {
   const [isSending, setIsSending] = useState(false);
   const [showReport, setShowReport] = useState(false);
   const [showBlockConfirm, setShowBlockConfirm] = useState(false);
+  const [showUnmatch, setShowUnmatch] = useState(false);
+  const [unmatching, setUnmatching] = useState(false);
+  // El aviso de caducidad se puede cerrar: con el teclado abierto apenas se
+  // veía la conversación. Se recuerda por conversación en esta sesión.
+  const claveAviso = `vybe_chat_notice_${matchId}`;
+  const [avisoCerrado, setAvisoCerrado] = useState(() => {
+    try {
+      return window.sessionStorage.getItem(claveAviso) === '1';
+    } catch {
+      return false;
+    }
+  });
   const [isKeeping, setIsKeeping] = useState(false);
   const [, forzar] = useState(0);
 
@@ -216,26 +235,26 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ matchId }) => {
   return (
     <div className="flex h-full flex-col bg-background">
       {/* ------------------------------------------------------- cabecera */}
-      <div className="flex items-center gap-3 px-margin pb-3 pt-4">
+      <div className="flex items-center gap-2 px-margin pb-2 pt-3">
         <button
           type="button"
           onClick={() => navigate(-1)}
           aria-label={t('common.back')}
-          className="press flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-card text-foreground"
+          className="press flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-card text-foreground"
         >
           <ArrowLeft size={20} />
         </button>
 
         <Link to={`/u/${match.id}`} className="press flex min-w-0 flex-1 items-center gap-3">
           <span className="relative shrink-0">
-            <img src={foto} alt="" className="h-12 w-12 rounded-full object-cover" />
+            <img src={foto} alt="" className="h-10 w-10 rounded-full object-cover" />
             {enDirecto && (
               <span className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full bg-party-primary ring-2 ring-background" />
             )}
           </span>
           <span className="min-w-0">
             <span className="flex items-center gap-2">
-              <span className="truncate font-display text-headline-md font-extrabold">{match.name}</span>
+              <span className="truncate font-display text-title-card font-extrabold">{match.name}</span>
               {enDirecto && (
                 <span className="shrink-0 rounded-full bg-party-primary/20 px-2 py-0.5 text-label-pill uppercase text-party-primary">
                   Live
@@ -250,9 +269,19 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ matchId }) => {
           </span>
         </Link>
 
+        {/* Borrar la conversación y deshacer el match, junto a seguridad. */}
+        <button
+          type="button"
+          onClick={() => setShowUnmatch(true)}
+          aria-label={t('chat.unmatch')}
+          className="press flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-card text-destructive"
+        >
+          <Trash2 size={18} />
+        </button>
+
         <DropdownMenu>
           <DropdownMenuTrigger
-            className="press flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-card text-foreground"
+            className="press flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-card text-foreground"
             aria-label={t('chat.options')}
           >
             <ShieldAlert size={20} />
@@ -279,44 +308,42 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ matchId }) => {
       </div>
 
       {/* ------------------------------------------- aviso de caducidad */}
-      {connection.expiresAt && (
-        <div className="mx-margin space-y-2">
-          <div className="flex items-center gap-3 rounded-2xl bg-party-primary px-4 py-3 text-ink">
-            <Hourglass size={20} className="shrink-0" />
-            <p className="min-w-0 flex-1 text-body-sm font-bold leading-snug">
-              {/* Sin Premium se dice la verdad incómoda: no basta contigo. */}
-              {connection.keptByMe && !isPremium
-                ? t('matches.waitingOther')
+      {/* Pequeño y en una línea: con el teclado abierto casi no quedaba chat. */}
+      {connection.expiresAt && !avisoCerrado && (
+        <div className="mx-margin flex items-center gap-2 rounded-xl bg-party-primary px-2.5 py-1.5 text-ink">
+          <Hourglass size={14} className="shrink-0" />
+          <p className="min-w-0 flex-1 truncate text-caption font-bold">
+            {/* Sin Premium se dice la verdad incómoda: no basta contigo. */}
+            {connection.keptByMe && !isPremium
+              ? t('matches.waitingOther')
+              : quedan
+                ? t('chat.disappearsIn', { time: quedan })
                 : t('chat.disappears', { time: cierre })}
-            </p>
-            {quedan && (
-              <span className="shrink-0 rounded-lg bg-[#E0BC00] px-2.5 py-1.5 text-center font-display text-sm font-bold leading-tight tabular">
-                {quedan}
-              </span>
-            )}
-          </div>
-
-          <div className="flex items-center justify-end gap-3">
-            {connection.keptByMe && !isPremium && (
-              <button
-                type="button"
-                onClick={() => setShowPremiumDialog(true)}
-                className="press flex min-w-0 items-center gap-1.5 text-caption text-party-primary"
-              >
-                <Crown size={13} className="shrink-0 text-party-accent" />
-                <span className="truncate">{t('matches.keepAlonePremium')}</span>
-              </button>
-            )}
-            <button
-              type="button"
-              onClick={() => void handleKeep()}
-              disabled={isKeeping || connection.keptByMe}
-              className="press flex shrink-0 items-center gap-1 rounded-full bg-card px-3 py-1.5 text-caption font-bold text-party-primary disabled:opacity-70"
-            >
-              {connection.keptByMe ? <BookmarkCheck size={13} /> : <Bookmark size={13} />}
-              {connection.keptByMe ? t('matches.kept') : t('matches.keep')}
-            </button>
-          </div>
+          </p>
+          <button
+            type="button"
+            onClick={() => (connection.keptByMe && !isPremium ? setShowPremiumDialog(true) : void handleKeep())}
+            disabled={isKeeping || (connection.keptByMe && isPremium)}
+            className="press flex shrink-0 items-center gap-1 rounded-full bg-ink/10 px-2 py-0.5 text-[11px] font-bold disabled:opacity-60"
+          >
+            {connection.keptByMe ? <BookmarkCheck size={12} /> : <Bookmark size={12} />}
+            {connection.keptByMe ? t('matches.kept') : t('matches.keep')}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setAvisoCerrado(true);
+              try {
+                window.sessionStorage.setItem(claveAviso, '1');
+              } catch {
+                // Sin almacenamiento vuelve a salir al recargar; no pasa nada.
+              }
+            }}
+            aria-label={t('common.close')}
+            className="press flex h-6 w-6 shrink-0 items-center justify-center rounded-full"
+          >
+            <X size={14} />
+          </button>
         </div>
       )}
 
@@ -419,6 +446,39 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ matchId }) => {
         userId={matchId}
         userName={match.name}
       />
+
+      <AlertDialog open={showUnmatch} onOpenChange={(open) => !unmatching && setShowUnmatch(open)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('chat.unmatchTitle', { name: match.name })}</AlertDialogTitle>
+            <AlertDialogDescription>{t('chat.unmatchBody')}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={unmatching}>{t('common.cancel')}</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={unmatching}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={(e) => {
+                e.preventDefault();
+                void (async () => {
+                  setUnmatching(true);
+                  try {
+                    await api.unmatch(match.id);
+                    await refreshConnections();
+                    toast({ title: t('chat.unmatched') });
+                    navigate('/matches', { replace: true });
+                  } catch {
+                    toast({ title: t('common.error'), description: t('errors.generic'), variant: 'destructive' });
+                    setUnmatching(false);
+                  }
+                })();
+              }}
+            >
+              {t('chat.unmatchConfirm')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <AlertDialog open={showBlockConfirm} onOpenChange={setShowBlockConfirm}>
         <AlertDialogContent>

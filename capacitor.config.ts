@@ -12,7 +12,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
  */
 const config: CapacitorConfig = {
   appId: 'com.vybe.app',
-  appName: 'Vybe',
+  appName: 'Vybes',
   webDir: 'dist',
 
   // El teclado no debe empujar la pantalla entera hacia arriba: en el chat, eso

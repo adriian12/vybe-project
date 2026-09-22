@@ -89,7 +89,7 @@ export const initNativePush = (): Promise<void> => {
         const url = notification.data?.url;
         const tag = notification.data?.tag;
         handlers?.onForeground({
-          title: notification.title ?? 'Vybe',
+          title: notification.title ?? 'Vybes',
           body: notification.body ?? '',
           url: typeof url === 'string' && url.startsWith('/') ? url : null,
           tag: typeof tag === 'string' ? tag : null,
@@ -99,7 +99,7 @@ export const initNativePush = (): Promise<void> => {
       if (platform() === 'android') {
         await PushNotifications.createChannel({
           id: CHANNEL_ID,
-          name: 'Vybe',
+          name: 'Vybes',
           description: 'Mensajes, vybe matches y avisos de tus eventos',
           importance: 5,
           visibility: 1,

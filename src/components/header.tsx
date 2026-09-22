@@ -33,6 +33,9 @@ interface HeaderProps {
  * diseño: en la cabecera ocupaba el hueco del nombre de la sección, que es lo
  * que de verdad orienta cuando se entra desde una notificación.
  */
+/** La cabecera con el logo y la foto de perfil, de momento oculta. */
+const MOSTRAR_CABECERA = false;
+
 const Header: React.FC<HeaderProps> = ({ section }) => {
   const { t } = useTranslation();
   const { pathname } = useLocation();
@@ -41,6 +44,13 @@ const Header: React.FC<HeaderProps> = ({ section }) => {
   const clave = SECCIONES.find((s) => s.match.test(pathname))?.key;
   const titulo = section ?? (clave ? t(clave) : '');
   const foto = currentUser?.avatar || currentUser?.photos?.[0];
+
+  // Oculta por ahora para ganar pantalla: queda sólo una franja del alto de la
+  // barra de estado, para que nada se dibuje debajo de la hora. Para volver a
+  // enseñarla, `MOSTRAR_CABECERA = true` y `--header-h` en `index.css`.
+  if (!MOSTRAR_CABECERA) {
+    return <div aria-hidden className="pt-safe fixed left-0 right-0 top-0 z-30 bg-background" />;
+  }
 
   return (
     <header className="pt-safe fixed left-0 right-0 top-0 z-30 bg-surface/90 backdrop-blur-xl">

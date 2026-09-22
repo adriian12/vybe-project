@@ -36,7 +36,7 @@ export const VybeLogo: React.FC<{ className?: string; size?: number }> = ({
   <span className={cn('flex items-center gap-2', className)}>
     <VybeMark size={size} />
     <span className="font-display text-headline-lg uppercase tracking-tight text-foreground">
-      Vybe
+      Vybes
     </span>
   </span>
 );

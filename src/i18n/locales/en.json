@@ -1,6 +1,6 @@
 {
     "common": {
-        "appName": "Vybe",
+        "appName": "Vybes",
         "tagline": "A party is all about the vibe",
         "location": "Mallorca",
         "loading": "Loading…",
@@ -53,7 +53,7 @@
         "name": "Name",
         "namePlaceholder": "How you want to be seen",
         "age": "Age",
-        "ageHelp": "Vybe is for people aged 18 and over only.",
+        "ageHelp": "Vybes is for people aged 18 and over only.",
         "login": "Sign in",
         "loggingIn": "Signing in…",
         "loginAsVenue": "Sign in as a venue",
@@ -79,7 +79,7 @@
             "passwordMismatch": "Passwords do not match.",
             "nameRequired": "Tell us your name.",
             "ageRequired": "Enter your age.",
-            "ageMin": "You must be 18 or over to use Vybe.",
+            "ageMin": "You must be 18 or over to use Vybes.",
             "ageMax": "Enter a valid age.",
             "venueNameRequired": "Venue name is required.",
             "phoneRequired": "Contact phone is required.",
@@ -165,7 +165,7 @@
         "showPassword": "Show password",
         "hidePassword": "Hide password",
         "adminAccess": "Admin access",
-        "toAdminAccess": "Part of the Vybe team? Admin access",
+        "toAdminAccess": "Part of the Vybes team? Admin access",
         "toVenueAccess": "Back to venue login"
     },
     "consent": {
@@ -176,7 +176,7 @@
         "age": "I confirm I am 18 or over.",
         "marketing": "I want to receive news about events. (optional)",
         "accept": "Accept and continue",
-        "required": "You must accept the first three items to use Vybe.",
+        "required": "You must accept the first three items to use Vybes.",
         "readDocs": "You can read the full documents any time from your profile."
     },
     "home": {
@@ -188,7 +188,7 @@
         "inEvent": "You're at {{name}}",
         "inEventBody": "{{venue}} · Tap to keep meeting people",
         "going": "{{count}} going",
-        "inside": "{{count}} on Vybe inside",
+        "inside": "{{count}} on Vybes inside",
         "beFirst": "Be the first one in",
         "imGoing": "I'm going",
         "notGoing": "I'm not going",
@@ -205,7 +205,7 @@
         "statEvents": "parties\ntonight",
         "statInside": "people\ninside now",
         "statGoing": "said they\nare going",
-        "goingPlus": "{{count}} on Vybe going",
+        "goingPlus": "{{count}} on Vybes going",
         "buy": "Tickets",
         "greetingDay": "Plans for the weekend?",
         "greetingNight": "What are you up to tonight?",
@@ -213,7 +213,7 @@
         "seeAll": "See all",
         "statNearby": "events near you",
         "statEventsShort": "events",
-        "statInsideShort": "on Vybe inside",
+        "statInsideShort": "on Vybes inside",
         "statTonight": "events tonight",
         "featured": "Featured",
         "upcoming": "Upcoming events",
@@ -274,11 +274,11 @@
         "codeTooShort": "The code must be at least 6 characters",
         "cameraError": "Couldn't access the camera. Check permissions or type the code manually.",
         "manualButton": "Enter code manually",
-        "serverChecked": "Entry is verified on Vybe' servers"
+        "serverChecked": "Entry is verified on Vybes' servers"
     },
     "location": {
         "title": "Verify your location",
-        "body": "Vybe only works inside verified events, clubs and parties.",
+        "body": "Vybes only works inside verified events, clubs and parties.",
         "bodyTwo": "You'll only see people who are at the same event as you.",
         "insideTitle": "You're in!",
         "endsAt": "Ends",
@@ -329,7 +329,7 @@
         "interestsHelp": "Only show people who share at least one.",
         "apply": "Apply filters",
         "reset": "Clear filters",
-        "premiumOnly": "The age range is part of Vybe Premium.",
+        "premiumOnly": "The age range is part of Vybes Premium.",
         "activeCount": "{{count}} active filters",
         "help": "Choose who you want to see on the board.",
         "music": "Music",
@@ -388,7 +388,13 @@
         "disappears": "This chat disappears when the party ends ({{time}})",
         "placeholderEphemeral": "Say something before sunrise…",
         "read": "Read",
-        "sent": "Sent"
+        "sent": "Sent",
+        "unmatch": "Delete conversation",
+        "unmatchTitle": "Undo the match with {{name}}?",
+        "unmatchBody": "The conversation and the vybe match will be deleted. They won't show up on your board again.",
+        "unmatchConfirm": "Delete",
+        "unmatched": "Conversation deleted",
+        "disappearsIn": "This chat disappears in {{time}}"
     },
     "report": {
         "title": "Report {{name}}",
@@ -401,7 +407,7 @@
         "sent": "Report sent",
         "sentBody": "Our team will review it as soon as possible.",
         "blocked": "User blocked",
-        "blockedBody": "You won't see each other on Vybe again.",
+        "blockedBody": "You won't see each other on Vybes again.",
         "reasons": {
             "inappropriate_content": "Inappropriate content",
             "harassment": "Harassment or offensive behaviour",
@@ -485,9 +491,9 @@
         "groupsHelp": "Available once you're inside a party",
         "notificationsHelp": "Matches, messages and updates about your parties",
         "safetyHelp": "Trusted contacts and help button",
-        "cancelTitle": "Cancel Vybe Premium?",
+        "cancelTitle": "Cancel Vybes Premium?",
         "cancelBody": "You'll keep Premium until the end of the period you've already paid for.",
-        "tagline": "Vybe · Nightlife in Spain"
+        "tagline": "Vybes · Nightlife in Spain"
     },
     "faceVerification": {
         "title": "Identity verification",
@@ -612,7 +618,7 @@
         "removed": "{{name}} is no longer in the group"
     },
     "premium": {
-        "title": "Vybe Premium",
+        "title": "Vybes Premium",
         "subtitle": "Get more out of every night",
         "monthly": "Monthly subscription",
         "forEvent": "Just for {{name}}",
@@ -639,7 +645,7 @@
             "boost": "Stand out for an hour",
             "boostBody": "Your profile first on the board for 60 minutes."
         },
-        "required": "This is a Vybe Premium feature.",
+        "required": "This is a Vybes Premium feature.",
         "boost": {
             "cta": "Stand out 1 h",
             "active": "{{minutes}} min left",
@@ -663,7 +669,7 @@
         "empty": "No pending likes yet",
         "emptyBody": "Keep swiping at events so more people see you.",
         "locked": "Find out who liked you",
-        "lockedBody": "With Vybe Premium you see who likes you before you swipe.",
+        "lockedBody": "With Vybes Premium you see who likes you before you swipe.",
         "unlock": "Get Premium",
         "likeBack": "Like back",
         "at": "at {{event}}",
@@ -677,7 +683,7 @@
         "myVenue": "My venue",
         "exit": "Sign out",
         "pendingTitle": "Venue pending approval",
-        "pendingBody": "Your events won't be visible and you can't generate codes until the Vybe team verifies your venue.",
+        "pendingBody": "Your events won't be visible and you can't generate codes until the Vybes team verifies your venue.",
         "tabs": {
             "qr": "QR code",
             "stats": "Analytics",
@@ -704,7 +710,7 @@
             "download": "Download",
             "copied": "Code copied",
             "copiedBody": "You can paste it wherever you need.",
-            "shareText": "Use code {{code}} to get into Vybe.",
+            "shareText": "Use code {{code}} to get into Vybes.",
             "notLinked": "The current code isn't linked to this event. Generate a new one.",
             "notVerified": "You'll be able to generate access codes as soon as our team approves your venue.",
             "rotation": "Auto rotation",
@@ -714,7 +720,7 @@
             "rotated": "Code rotated automatically",
             "printPoster": "Print poster",
             "posterSlogan": "Fancy a new way to meet people?",
-            "posterFooter": "Scan the code with the Vybe app",
+            "posterFooter": "Scan the code with the Vybes app",
             "manualCodeLabel": "Manual code",
             "expiresInShort": "Expires in {{hours}} h {{minutes}} min",
             "rotationInterval": "Change interval"
@@ -762,7 +768,7 @@
             "startDate": "Start date",
             "endDate": "End date",
             "minAge": "Minimum age",
-            "minAgeHelp": "Vybe is an 18+ app only.",
+            "minAgeHelp": "Vybes is an 18+ app only.",
             "theme": "Theme",
             "themePlaceholder": "Electronic, Reggaeton, Pop…",
             "dressCode": "Dress code",
@@ -845,7 +851,7 @@
             "members": "Members",
             "invite": "Add member",
             "inviteEmail": "Their email address",
-            "inviteHelp": "They must already have a Vybe account with that email.",
+            "inviteHelp": "They must already have a Vybes account with that email.",
             "role": "Role",
             "roles": {
                 "owner": "Owner",
@@ -907,7 +913,7 @@
             "closeEntryTitle": "Close the door?",
             "closeEntryBody": "Nobody else will be able to get in with the app: no code will work. People already inside stay, and you can reopen whenever you want.",
             "insideReal": "Inside (door)",
-            "insideVybe": "On Vybe now",
+            "insideVybe": "On Vybes now",
             "ofCapacityShort": "of {{capacity}}",
             "insideNow": "Inside now",
             "reopened": "Door open again",
@@ -1014,12 +1020,12 @@
             "dropoffEmpty": "No data for this event yet.",
             "peak": "It peaked at {{time}} with {{count}} people inside.",
             "privacyNote": "Audience figures are always grouped. Groups with very few people are hidden, because they would point at individuals.",
-            "headcountTitle": "Real capacity vs Vybe",
-            "headcountSubtitle": "What the door counts, slot by slot, and how much of that crowd uses Vybe.",
+            "headcountTitle": "Real capacity vs Vybes",
+            "headcountSubtitle": "What the door counts, slot by slot, and how much of that crowd uses Vybes.",
             "headcountNeedsPlan": "The capacity curve is part of Pro and Business",
             "headcountEmpty": "Nothing has been counted at the door tonight.",
             "headcountPeak": "Peak of {{count}} people at {{time}}.",
-            "headcountShare": "On average, {{percent}}% were on Vybe."
+            "headcountShare": "On average, {{percent}}% were on Vybes."
         },
         "plan": {
             "current": "Your plan",
@@ -1042,7 +1048,7 @@
                 "promotions": "Offers and vouchers",
                 "csvExport": "CSV export",
                 "demographics": "Audience detail",
-                "headcountCurve": "Capacity curve and % on Vybe"
+                "headcountCurve": "Capacity curve and % on Vybes"
             },
             "yourPlan": "Your current plan",
             "choose": "Choose",
@@ -1086,8 +1092,8 @@
         "tv": {
             "open": "Show on the big screen",
             "insideNow": "{{count}} people inside right now",
-            "vybeCount_one": "{{count}} person is already on Vybe · scan and join",
-            "vybeCount_other": "{{count}} people are already on Vybe · scan and join",
+            "vybeCount_one": "{{count}} person is already on Vybes · scan and join",
+            "vybeCount_other": "{{count}} people are already on Vybes · scan and join",
             "raffleWinner": "{{name}} won! {{prize}}",
             "raffleAt": "Raffle at {{time}}: {{prize}}",
             "raffleSoon": "Raffle tonight: {{prize}}"
@@ -1151,11 +1157,11 @@
             "publicNote": "The public only sees the vibe (Quiet, Lively, Almost full, Full), never the number.",
             "needCapacity": "Set the event capacity to use the door counter and let the public see the vibe.",
             "linksTitle": "Links for the door staff",
-            "linksBody": "Count from any phone, no Vybe account needed. Expires when the night ends.",
+            "linksBody": "Count from any phone, no Vybes account needed. Expires when the night ends.",
             "createdOnce": "Save or send the link now: for security it won't be shown again.",
             "copy": "Copy",
             "copied": "Link copied",
-            "whatsappText": "Vybe door counter for tonight: {{url}}",
+            "whatsappText": "Vybes door counter for tonight: {{url}}",
             "done": "Done",
             "labelPlaceholder": "Name (e.g. Main door)",
             "create": "Create link",
@@ -1181,8 +1187,8 @@
             "nowPlayingPlaceholder": "Song, artist or DJ"
         },
         "intentList": {
-            "title": "Vybe List",
-            "paid": "This is a ticketed event: your forecast is ticket sales. On Vybe, {{count}} people said they are coming.",
+            "title": "Vybes List",
+            "paid": "This is a ticketed event: your forecast is ticket sales. On Vybes, {{count}} people said they are coming.",
             "empty": "Nobody has marked they are coming yet.",
             "summary": "{{arrived}} already arrived · {{women}} women · {{men}} men",
             "arrived": "Already inside",
@@ -1253,8 +1259,15 @@
             "firstVisit": {
                 "title": "First time here",
                 "description": "Your first time at this venue comes with a reward.",
-                "how": "For people who had never been to one of the venue's events with Vybe."
-            }
+                "how": "For people who had never been to one of the venue's events with Vybes."
+            },
+            "editTitle": "Edit",
+            "editBody": "Change the text and times. Anything left empty follows the party.",
+            "fieldTitle": "Title",
+            "fieldDescription": "Description",
+            "fieldStart": "Starts",
+            "fieldEnd": "Ends",
+            "fieldDeadline": "Deadline"
         },
         "raffles": {
             "title": "Live raffles",
@@ -1274,11 +1287,12 @@
             "time": "Raffle time (optional)",
             "timeHelp": "Without a time, you run it with \"Draw\".",
             "create": "Announce raffle",
-            "new": "New raffle"
+            "new": "New raffle",
+            "wonByCode": "Won by {{name}} · ID {{code}}"
         },
         "stamps": {
             "title": "Stamp card",
-            "subtitle": "One stamp for every night someone gets in with Vybe. A full card earns a reward.",
+            "subtitle": "One stamp for every night someone gets in with Vybes. A full card earns a reward.",
             "invalid": "Set between 2 and 20 stamps and a reward.",
             "saved": "Stamp card saved",
             "disabled": "Stamp card turned off",
@@ -1295,7 +1309,7 @@
         "report": {
             "title": "Weekly report",
             "empty": "No reports yet.",
-            "checkIns": "Check-ins with Vybe",
+            "checkIns": "Check-ins with Vybes",
             "vsPrev": "{{percent}}% vs the previous week",
             "uniquePeople": "Unique people",
             "returning": "Returning",
@@ -1313,15 +1327,15 @@
             "readyTitle": "Your weekly report is ready",
             "readyBody": "Your week summary ({{range}}): who came, who returns and how you did compared with venues like yours.",
             "view": "View report",
-            "bestEvent": "Best night: {{name}} ({{count}} check-ins with Vybe).",
+            "bestEvent": "Best night: {{name}} ({{count}} check-ins with Vybes).",
             "peakHour": "Most people arrived around {{hour}}:00.",
             "topCode": "Promoter who brought the most people: {{name}} ({{count}}).",
-            "benchmark": "Average per event: you {{mine}} check-ins with Vybe; venues like yours, {{others}}.",
+            "benchmark": "Average per event: you {{mine}} check-ins with Vybes; venues like yours, {{others}}.",
             "noBenchmark": "Not enough similar venues to compare yet.",
-            "revenueTitle": "What Vybe brought you",
-            "brought_one": "{{count}} person came through Vybe",
-            "brought_other": "{{count}} people came through Vybe",
-            "brought": "{{count}} people came through Vybe",
+            "revenueTitle": "What Vybes brought you",
+            "brought_one": "{{count}} person came through Vybes",
+            "brought_other": "{{count}} people came through Vybes",
+            "brought": "{{count}} people came through Vybes",
             "broughtIntent": "{{count}} said \"I'm going\" and came",
             "broughtCode": "{{count}} came in with a promoter code",
             "broughtFollow": "{{count}} follow you and came",
@@ -1358,7 +1372,7 @@
             "opens": "Opens",
             "closes": "Closes",
             "avgSpend": "Average spend per person",
-            "avgSpendHint": "Nobody else sees it. The weekly report uses it to work out how many euros Vybe brought you.",
+            "avgSpendHint": "Nobody else sees it. The weekly report uses it to work out how many euros Vybes brought you.",
             "perPerson": "person",
             "avgSpendInvalid": "Enter an amount between €1 and €1000",
             "saved": "Venue page saved"
@@ -1388,7 +1402,7 @@
             "approved": "Venue approved",
             "approvedBody": "They can now publish events and generate codes.",
             "rejected": "Venue rejected",
-            "rejectedBody": "The venue won't be able to operate on Vybe.",
+            "rejectedBody": "The venue won't be able to operate on Vybes.",
             "noDocuments": "No documents. Ask for them before approving.",
             "colVenue": "Venue",
             "colCity": "City",
@@ -1476,7 +1490,7 @@
         },
         "menu": "Menu",
         "shortTitle": "Admin",
-        "staffHq": "Vybe Staff HQ",
+        "staffHq": "Vybes Staff HQ",
         "navigation": "Navigation",
         "updated": "Updated {{time}}",
         "refresh": "Refresh",
@@ -1509,7 +1523,7 @@
             "body": "Bring the test venue to where you are right now, with its party running and 35 people inside, so you can test entry, the board and matches without going anywhere.",
             "move": "Bring the room to my location",
             "resetSwipes": "Clear my swipes for that party so I see everyone again",
-            "help": "Uses this device's GPS. Then join the “Vybe Test Night” party with code LAB777.",
+            "help": "Uses this device's GPS. Then join the “Vybes Test Night” party with code LAB777.",
             "moved": "Test room ready",
             "movedBody": "It's now at your location. Access code: {{code}}",
             "code": "Code",
@@ -1535,9 +1549,9 @@
     },
     "pwa": {
         "updateTitle": "A new version is available",
-        "updateBody": "Reload to update Vybe.",
+        "updateBody": "Reload to update Vybes.",
         "update": "Update",
-        "installTitle": "Install Vybe",
+        "installTitle": "Install Vybes",
         "installBody": "Add it to your home screen to get into events faster.",
         "install": "Install",
         "offline": "You're offline. Some features won't be available."
@@ -1603,7 +1617,7 @@
         "lockedBody": "With Premium you see who they are before leaving home.",
         "noneForYou": "Nobody matching what you want to see is going yet.",
         "heading": "Who's going",
-        "confirmed": "{{count}} on Vybe going"
+        "confirmed": "{{count}} on Vybes going"
     },
     "nav": {
         "home": "Home",
@@ -1643,7 +1657,7 @@
         "ended": "This event has ended",
         "enterNow": "Get in now",
         "confirmed": "You're going!",
-        "intentNote": "When you mark \"I'm going\", the venue will see you on its Vybe List (name, age and photo)."
+        "intentNote": "When you mark \"I'm going\", the venue will see you on its Vybes List (name, age and photo)."
     },
     "venueTypes": {
         "discoteca": "Club",
@@ -1733,7 +1747,8 @@
         "chatExpires": "The chat expires when the party ends",
         "left": "{{time}} left",
         "sendMessage": "Send message",
-        "viewProfile": "View {{name}}'s profile"
+        "viewProfile": "View {{name}}'s profile",
+        "viewProfileShort": "View profile"
     },
     "userProfile": {
         "notFound": "This profile is no longer available",
@@ -1768,18 +1783,18 @@
             "faq": "FAQ",
             "login": "Venue login",
             "registerVenue": "Register my venue",
-            "openApp": "Open Vybe",
+            "openApp": "Open Vybes",
             "menu": "Open menu",
             "close": "Close menu"
         },
         "hero": {
             "pill": "The nightlife app in Mallorca",
             "titleStart": "Nights are lived on the dance floor.",
-            "titleBrand": "Vybe",
+            "titleBrand": "Vybes",
             "titleEnd": "connects vybers and venues in real time.",
             "body": "Discover parties near you, get in with the venue's QR code and do a Vybe Check only with people who are inside with you. And if you run a venue: live capacity, codes for your promoters and offers for people already on the floor.",
             "ctaUser": "Get the app",
-            "ctaVenue": "Vybe for venues",
+            "ctaVenue": "Vybes for venues",
             "imageAlt": "People dancing in a club under yellow lights",
             "imageTag": "Mallorca",
             "imageCaption": "Verified parties, real people inside",
@@ -1796,7 +1811,7 @@
             "steps": {
                 "access": {
                     "title": "Get in with the venue's QR",
-                    "body": "Scan the code at the door. Vybe checks on its servers that the code is valid and that you're within the venue's radius.",
+                    "body": "Scan the code at the door. Vybes checks on its servers that the code is valid and that you're within the venue's radius.",
                     "tag": "Server-validated code and geofence"
                 },
                 "check": {
@@ -1886,7 +1901,7 @@
                     },
                     "report": {
                         "title": "Weekly report in euros",
-                        "body": "Every Monday: how many people came through Vybe, who came back and how much money it brought you."
+                        "body": "Every Monday: how many people came through Vybes, who came back and how much money it brought you."
                     },
                     "boost": {
                         "title": "Feature your party",
@@ -1969,8 +1984,8 @@
             "title": "What people usually ask us",
             "items": {
                 "price": {
-                    "q": "How much does Vybe cost?",
-                    "a": "Going out with Vybe is free. Vybe Premium adds extras like seeing who likes you or boosting your profile for an hour. Venues have a Free plan plus Pro (€49/month, first month free) and Business (€129/month), excluding VAT and with no commitment."
+                    "q": "How much does Vybes cost?",
+                    "a": "Going out with Vybes is free. Vybes Premium adds extras like seeing who likes you or boosting your profile for an hour. Venues have a Free plan plus Pro (€49/month, first month free) and Business (€129/month), excluding VAT and with no commitment."
                 },
                 "location": {
                     "q": "Why does it ask for my location?",
@@ -1989,19 +2004,19 @@
                     "a": "We're starting in Mallorca. If your venue is somewhere else, get in touch and we'll let you know when we arrive."
                 },
                 "apps": {
-                    "q": "Where can I download Vybe?",
-                    "a": "Vybe for going out is an iPhone and Android app, and we're publishing it on the App Store and Google Play. The app.vybes.es website is only for venues and their staff."
+                    "q": "Where can I download Vybes?",
+                    "a": "Vybes for going out is an iPhone and Android app, and we're publishing it on the App Store and Google Play. The app.vybes.es website is only for venues and their staff."
                 }
             }
         },
         "cta": {
             "eyebrow": "Start the night",
             "title": "Ready to experience nightlife differently?",
-            "body": "Download Vybe and join your next party. If you run a venue, tell us about it and we'll show you around."
+            "body": "Download Vybes and join your next party. If you run a venue, tell us about it and we'll show you around."
         },
         "form": {
             "title": "Do you run a club, bar or festival?",
-            "body": "Leave your details and we'll show you Vybe in a 15-minute call.",
+            "body": "Leave your details and we'll show you Vybes in a 15-minute call.",
             "venueName": "Venue name",
             "city": "City or area (e.g. Palma, Magaluf)",
             "type": "Type of venue",
@@ -2015,7 +2030,7 @@
             },
             "contact": "Email or phone",
             "message": "Anything we should know? (optional)",
-            "consent": "I agree that Vybe may use these details to contact me about my venue, as described in the <privacy>privacy policy</privacy>.",
+            "consent": "I agree that Vybes may use these details to contact me about my venue, as described in the <privacy>privacy policy</privacy>.",
             "submit": "Request a demo",
             "sending": "Sending…",
             "successTitle": "Got it!",
@@ -2042,7 +2057,7 @@
             "privacy": "Privacy",
             "terms": "Terms",
             "contact": "Contact",
-            "rights": "© {{year}} Vybe. All rights reserved.",
+            "rights": "© {{year}} Vybes. All rights reserved.",
             "made": "Made in Palma de Mallorca"
         },
         "download": {
@@ -2053,11 +2068,11 @@
         }
     },
     "mobileOnly": {
-        "title": "Vybe lives on your phone",
+        "title": "Vybes lives on your phone",
         "body": "This website is for venues and admins. To discover parties, get in with the QR code and do a Vybe Check, download the app.",
         "venueAccess": "Run a venue? Log in here",
         "reason": {
-            "clubber": "This site is only for venues and admins. Your Vybe account works in the app, at the venue.",
+            "clubber": "This site is only for venues and admins. Your Vybes account works in the app, at the venue.",
             "verified": "Email verified. You can now log in from the app.",
             "password": "Password changed. Use it to log in from the app."
         }
@@ -2069,7 +2084,7 @@
             "almostFull": "Almost full",
             "full": "Full"
         },
-        "withVybe": "{{level}} · {{count}} on Vybe",
+        "withVybe": "{{level}} · {{count}} on Vybes",
         "source": "From the venue · {{minutes}} min ago",
         "sourceNow": "From the venue · just now",
         "friendsGoing_one": "{{count}} of your vybes is going",
@@ -2081,8 +2096,8 @@
         "askVenue": "Ask the venue for a new link.",
         "ofCapacity": "of {{capacity}}",
         "percent": "{{percent}}% of capacity",
-        "withVybe": "{{count}} on Vybe ({{percent}}%)",
-        "withVybeNoPct": "{{count}} on Vybe",
+        "withVybe": "{{count}} on Vybes ({{percent}}%)",
+        "withVybeNoPct": "{{count}} on Vybes",
         "add": "Add one person",
         "remove": "Remove one person",
         "addFive": "Add five people",
@@ -2102,7 +2117,7 @@
             "INVALID_DELTA": "Couldn't count. Try again.",
             "generic": "Couldn't count. Try again."
         },
-        "belowVybe": "There are {{count}} people on Vybe inside: the real total can't be lower. Tap \"Correct total\"."
+        "belowVybe": "There are {{count}} people on Vybes inside: the real total can't be lower. Tap \"Correct total\"."
     },
     "night": {
         "title": "Tonight",
@@ -2146,7 +2161,10 @@
             "live": "Live raffle: the venue runs it during the night",
             "stayInside": "You take part just by being inside at raffle time.",
             "youWon": "You won!",
-            "wonBy": "{{name}} won"
+            "wonBy": "{{name}} won",
+            "showAtBar": "Show at the bar",
+            "winnerTitle": "Raffle winner",
+            "showHint": "Show this screen at the bar: the venue checks the code in its dashboard."
         },
         "stamps": {
             "title": "{{venue}} card",
@@ -2182,7 +2200,7 @@
             "long": "Long queue"
         },
         "nowPlaying": "Playing: {{song}}",
-        "mix": "{{women}}% women · {{men}}% men (on Vybe)"
+        "mix": "{{women}}% women · {{men}}% men (on Vybes)"
     },
     "whereNext": {
         "title": "The party is ending",
@@ -2196,7 +2214,7 @@
     },
     "venuePage": {
         "notFound": "We couldn't find this venue",
-        "vybeVenue": "Venue on Vybe",
+        "vybeVenue": "Venue on Vybes",
         "follow": "Follow",
         "following": "Following",
         "followers_one": "{{count}} follower",

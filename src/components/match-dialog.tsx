@@ -1,10 +1,10 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { BadgeCheck, MessageCircle, Sparkles, Timer, UserRound, Zap } from 'lucide-react';
+import { BadgeCheck, MessageCircle, Timer, UserRound, Zap } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { User } from '@/types/user';
 import { useInterestLabel } from './interest-picker';
-import { formatDistance } from '@/services/geo';
+import { cn } from '@/lib/utils';
 
 interface MatchDialogProps {
   isOpen: boolean;
@@ -115,25 +115,6 @@ const MatchDialog: React.FC<MatchDialogProps> = ({
         </div>
 
         <div className="space-y-3 rounded-xl bg-[#0E0E11] p-4">
-          {matchedUser.distance !== undefined && (
-            <div className="flex items-center gap-3 rounded-lg bg-surface-container px-3 py-2">
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-party-primary/20 text-party-primary">
-                <Sparkles size={16} />
-              </span>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center justify-between">
-                  <span className="text-caption uppercase tracking-wider text-[#D0C6AB]">
-                    {t('matchDialog.nearby')}
-                  </span>
-                  <span className="text-label-pill text-emerald-400">{t('matchDialog.live')}</span>
-                </div>
-                <p className="truncate text-body-sm font-semibold">
-                  {t('swiping.distanceFromYou', { distance: formatDistance(matchedUser.distance) })}
-                </p>
-              </div>
-            </div>
-          )}
-
           {comunes.length > 0 && (
             <div>
               <p className="text-caption uppercase tracking-wider text-[#D0C6AB]">{t('matchDialog.sameRhythm')}</p>
@@ -152,7 +133,9 @@ const MatchDialog: React.FC<MatchDialogProps> = ({
               <Timer size={13} className="text-party-primary" />
               {t('matchDialog.chatExpires')}
             </span>
-            {restante > 0 && (
+            {/* Con más de dos días por delante la cuenta atrás no dice nada
+                (en las salas de pruebas salían decenas de miles de horas). */}
+            {restante > 0 && horas < 48 && (
               <span className="shrink-0 text-label-pill uppercase text-party-primary tabular">
                 {t('matchDialog.left', { time: `${horas}h ${String(minutos).padStart(2, '0')}m` })}
               </span>
@@ -171,25 +154,26 @@ const MatchDialog: React.FC<MatchDialogProps> = ({
             {t('matchDialog.sendMessage')}
           </button>
 
-          <div className="flex items-center justify-between pt-1">
-            {onViewProfile ? (
+          <div className="grid grid-cols-2 gap-2">
+            {onViewProfile && (
               <button
                 type="button"
                 onClick={onViewProfile}
-                className="press flex items-center gap-1 text-caption text-[#D0C6AB] hover:text-white"
+                className="press flex h-11 items-center justify-center gap-1.5 rounded-xl border border-white/15 bg-surface-high px-2 text-body-sm font-bold text-foreground"
               >
-                <UserRound size={14} />
-                {t('matchDialog.viewProfile', { name: matchedUser.name })}
+                <UserRound size={15} className="shrink-0" />
+                <span className="truncate">{t('matchDialog.viewProfileShort')}</span>
               </button>
-            ) : (
-              <span />
             )}
             <button
               type="button"
               onClick={onClose}
-              className="press text-caption font-bold text-party-primary"
+              className={cn(
+                'press flex h-11 items-center justify-center rounded-xl border border-party-primary/50 px-2 text-body-sm font-bold text-party-primary',
+                !onViewProfile && 'col-span-2',
+              )}
             >
-              {t('match.keepDiscovering')} →
+              {t('match.keepDiscovering')}
             </button>
           </div>
         </div>

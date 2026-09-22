@@ -1,7 +1,8 @@
-import { useTranslation } from 'react-i18next';
-import QRCode from 'qrcode.react';
-import { Printer } from 'lucide-react';
-import { PartyButton } from '@/components/ui-custom/party-button';
+import { createPortal } from "react-dom";
+import { useTranslation } from "react-i18next";
+import QRCode from "qrcode.react";
+import { Printer } from "lucide-react";
+import { PartyButton } from "@/components/ui-custom/party-button";
 
 interface VenueQRPosterProps {
   /** Código de acceso que se imprime como QR. */
@@ -19,7 +20,9 @@ interface VenueQRPosterProps {
  * el local se quedaría sin cartel sin saber por qué.
  *
  * `print-poster` en `index.css` es lo que oculta el resto de la página y deja
- * el cartel a página completa.
+ * el cartel a página completa. Esa regla oculta todo lo que cuelga de `body`
+ * salvo el cartel, así que el cartel **tiene** que colgar de `body`: por eso va
+ * en un portal. Dentro de la app se ocultaba con ella y salía la hoja en blanco.
  */
 const VenueQRPoster = ({ code, eventName, venueName }: VenueQRPosterProps) => {
   const { t } = useTranslation();
@@ -30,34 +33,53 @@ const VenueQRPoster = ({ code, eventName, venueName }: VenueQRPosterProps) => {
         variant="outline"
         size="sm"
         className="w-full gap-2"
-        onClick={() => window.print()}
+        // Primero se pinta el clic y luego se abre el diálogo de imprimir, que
+        // bloquea la página mientras está abierto.
+        onClick={() => window.setTimeout(() => window.print(), 50)}
       >
         <Printer size={16} />
-        {t('venue.qr.printPoster')}
+        {t("venue.qr.printPoster")}
       </PartyButton>
 
-      <div className="print-poster" aria-hidden="true">
-        <div className="print-poster-inner">
-          <div className="print-poster-brand">Vybe</div>
+      {createPortal(
+        <div className="print-poster" aria-hidden="true">
+          <div className="print-poster-inner">
+            <div className="print-poster-brand">Vybes</div>
 
-          <div className="print-poster-headline">{t('venue.qr.posterSlogan')}</div>
+            <div className="print-poster-headline">
+              {t("venue.qr.posterSlogan")}
+            </div>
 
-          <div className="print-poster-qr">
-            {/* Nivel H de corrección de errores: el cartel acabará con marcas
+            <div className="print-poster-qr">
+              {/* Nivel H de corrección de errores: el cartel acabará con marcas
                 de vasos y luz de discoteca, y aun así tiene que leerse. */}
-            <QRCode value={code} size={520} level="H" includeMargin renderAs="svg" />
+              <QRCode
+                value={code}
+                size={520}
+                level="H"
+                includeMargin
+                renderAs="svg"
+              />
+            </div>
+
+            <div className="print-poster-code">{code}</div>
+
+            <div className="print-poster-event">
+              {eventName && (
+                <div className="print-poster-event-name">{eventName}</div>
+              )}
+              {venueName && (
+                <div className="print-poster-venue">{venueName}</div>
+              )}
+            </div>
+
+            <div className="print-poster-footer">
+              {t("venue.qr.posterFooter")}
+            </div>
           </div>
-
-          <div className="print-poster-code">{code}</div>
-
-          <div className="print-poster-event">
-            {eventName && <div className="print-poster-event-name">{eventName}</div>}
-            {venueName && <div className="print-poster-venue">{venueName}</div>}
-          </div>
-
-          <div className="print-poster-footer">{t('venue.qr.posterFooter')}</div>
-        </div>
-      </div>
+        </div>,
+        document.body,
+      )}
     </>
   );
 };

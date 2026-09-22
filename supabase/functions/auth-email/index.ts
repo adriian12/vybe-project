@@ -66,92 +66,92 @@ type Kind = 'confirm' | 'recover' | 'exists';
 const COPY: Record<string, Record<Kind, Copy>> = {
   es: {
     confirm: {
-      subject: 'Confirma tu cuenta de Vybe',
+      subject: 'Confirma tu cuenta de Vybes',
       heading: 'Ya casi estás',
-      body: 'Confirma tu correo para entrar en Vybe y empezar a conocer gente en los eventos.',
+      body: 'Confirma tu correo para entrar en Vybes y empezar a conocer gente en los eventos.',
       cta: 'Confirmar mi cuenta',
-      ignore: 'Si no has creado ninguna cuenta en Vybe, ignora este mensaje.',
+      ignore: 'Si no has creado ninguna cuenta en Vybes, ignora este mensaje.',
     },
     recover: {
-      subject: 'Cambia tu contraseña de Vybe',
+      subject: 'Cambia tu contraseña de Vybes',
       heading: 'Cambia tu contraseña',
       body: 'Pulsa el botón para elegir una contraseña nueva. El enlace caduca en una hora.',
       cta: 'Cambiar la contraseña',
       ignore: 'Si no has pedido cambiarla, ignora este mensaje: tu contraseña sigue igual.',
     },
     exists: {
-      subject: 'Ya tienes una cuenta en Vybe',
+      subject: 'Ya tienes una cuenta en Vybes',
       heading: 'Ya tienes cuenta',
-      body: 'Alguien ha intentado registrarse con este correo, pero ya tienes una cuenta en Vybe. Entra con tu contraseña o, si no la recuerdas, elige una nueva con este botón. El enlace caduca en una hora.',
+      body: 'Alguien ha intentado registrarse con este correo, pero ya tienes una cuenta en Vybes. Entra con tu contraseña o, si no la recuerdas, elige una nueva con este botón. El enlace caduca en una hora.',
       cta: 'Elegir una contraseña nueva',
       ignore: 'Si no has sido tú, ignora este mensaje: tu cuenta sigue igual.',
     },
   },
   en: {
     confirm: {
-      subject: 'Confirm your Vybe account',
+      subject: 'Confirm your Vybes account',
       heading: 'Almost there',
-      body: 'Confirm your email to get into Vybe and start meeting people at events.',
+      body: 'Confirm your email to get into Vybes and start meeting people at events.',
       cta: 'Confirm my account',
-      ignore: "If you didn't create a Vybe account, ignore this message.",
+      ignore: "If you didn't create a Vybes account, ignore this message.",
     },
     recover: {
-      subject: 'Change your Vybe password',
+      subject: 'Change your Vybes password',
       heading: 'Change your password',
       body: 'Tap the button to choose a new password. The link expires in one hour.',
       cta: 'Change password',
       ignore: "If you didn't ask for this, ignore it: your password has not changed.",
     },
     exists: {
-      subject: 'You already have a Vybe account',
+      subject: 'You already have a Vybes account',
       heading: 'You already have an account',
-      body: "Someone tried to sign up with this email, but you already have a Vybe account. Log in with your password or, if you don't remember it, choose a new one with this button. The link expires in one hour.",
+      body: "Someone tried to sign up with this email, but you already have a Vybes account. Log in with your password or, if you don't remember it, choose a new one with this button. The link expires in one hour.",
       cta: 'Choose a new password',
       ignore: "If it wasn't you, ignore this message: your account is unchanged.",
     },
   },
   de: {
     confirm: {
-      subject: 'Bestätige dein Vybe-Konto',
+      subject: 'Bestätige dein Vybes-Konto',
       heading: 'Fast geschafft',
-      body: 'Bestätige deine E-Mail, um Vybe zu nutzen und auf Events neue Leute kennenzulernen.',
+      body: 'Bestätige deine E-Mail, um Vybes zu nutzen und auf Events neue Leute kennenzulernen.',
       cta: 'Konto bestätigen',
-      ignore: 'Wenn du kein Vybe-Konto erstellt hast, ignoriere diese Nachricht.',
+      ignore: 'Wenn du kein Vybes-Konto erstellt hast, ignoriere diese Nachricht.',
     },
     recover: {
-      subject: 'Ändere dein Vybe-Passwort',
+      subject: 'Ändere dein Vybes-Passwort',
       heading: 'Passwort ändern',
       body: 'Tippe auf den Button, um ein neues Passwort zu wählen. Der Link ist eine Stunde gültig.',
       cta: 'Passwort ändern',
       ignore: 'Wenn du das nicht angefordert hast, ignoriere diese Nachricht: Dein Passwort bleibt gleich.',
     },
     exists: {
-      subject: 'Du hast bereits ein Vybe-Konto',
+      subject: 'Du hast bereits ein Vybes-Konto',
       heading: 'Du hast schon ein Konto',
-      body: 'Jemand wollte sich mit dieser E-Mail registrieren, aber du hast bereits ein Vybe-Konto. Melde dich mit deinem Passwort an oder wähle mit diesem Button ein neues. Der Link ist eine Stunde gültig.',
+      body: 'Jemand wollte sich mit dieser E-Mail registrieren, aber du hast bereits ein Vybes-Konto. Melde dich mit deinem Passwort an oder wähle mit diesem Button ein neues. Der Link ist eine Stunde gültig.',
       cta: 'Neues Passwort wählen',
       ignore: 'Wenn du das nicht warst, ignoriere diese Nachricht: Dein Konto bleibt unverändert.',
     },
   },
   ca: {
     confirm: {
-      subject: 'Confirma el teu compte de Vybe',
+      subject: 'Confirma el teu compte de Vybes',
       heading: 'Ja gairebé hi ets',
-      body: 'Confirma el teu correu per entrar a Vybe i començar a conèixer gent als esdeveniments.',
+      body: 'Confirma el teu correu per entrar a Vybes i començar a conèixer gent als esdeveniments.',
       cta: 'Confirmar el meu compte',
-      ignore: "Si no has creat cap compte a Vybe, ignora aquest missatge.",
+      ignore: "Si no has creat cap compte a Vybes, ignora aquest missatge.",
     },
     recover: {
-      subject: 'Canvia la contrasenya de Vybe',
+      subject: 'Canvia la contrasenya de Vybes',
       heading: 'Canvia la contrasenya',
       body: "Prem el botó per triar una contrasenya nova. L'enllaç caduca en una hora.",
       cta: 'Canviar la contrasenya',
       ignore: "Si no ho has demanat, ignora aquest missatge: la contrasenya continua igual.",
     },
     exists: {
-      subject: 'Ja tens un compte a Vybe',
+      subject: 'Ja tens un compte a Vybes',
       heading: 'Ja tens compte',
-      body: "Algú ha intentat registrar-se amb aquest correu, però ja tens un compte a Vybe. Entra amb la teva contrasenya o, si no la recordes, tria'n una de nova amb aquest botó. L'enllaç caduca en una hora.",
+      body: "Algú ha intentat registrar-se amb aquest correu, però ja tens un compte a Vybes. Entra amb la teva contrasenya o, si no la recordes, tria'n una de nova amb aquest botó. L'enllaç caduca en una hora.",
       cta: 'Triar una contrasenya nova',
       ignore: "Si no has estat tu, ignora aquest missatge: el teu compte continua igual.",
     },
@@ -183,7 +183,7 @@ const template = (copy: Copy, link: string): { html: string; text: string } => {
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#121832;padding:32px 16px;">
     <tr><td align="center">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;background:#1E2449;border-radius:16px;padding:32px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
-        <tr><td style="font-size:28px;font-weight:800;color:#9b87f5;padding-bottom:8px;">Vybe</td></tr>
+        <tr><td style="font-size:28px;font-weight:800;color:#9b87f5;padding-bottom:8px;">Vybes</td></tr>
         <tr><td style="font-size:20px;font-weight:700;color:#ffffff;padding-bottom:12px;">${escapeHtml(copy.heading)}</td></tr>
         <tr><td style="font-size:15px;line-height:1.55;color:#c8ccd6;padding-bottom:28px;">${escapeHtml(copy.body)}</td></tr>
         <tr><td align="center" style="padding-bottom:28px;">

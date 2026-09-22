@@ -179,7 +179,7 @@ const requireProfileId = async (): Promise<string> => {
 const REDEEM_ERRORS: Record<string, string> = {
   PROFILE_NOT_FOUND: 'No se encontró tu perfil. Vuelve a iniciar sesión.',
   INVALID_CODE: 'El código no es válido o ya ha caducado.',
-  VENUE_NOT_VERIFIED: 'El local todavía no está verificado por Vybe.',
+  VENUE_NOT_VERIFIED: 'El local todavía no está verificado por Vybes.',
   NO_ACTIVE_EVENT: 'Este local no tiene ningún evento activo ahora mismo.',
   EVENT_ENDED: 'El evento ya ha terminado.',
   TOO_FAR: 'Estás demasiado lejos del evento. Acércate para poder entrar.',
@@ -288,6 +288,15 @@ export const api = {
    * Sale del evento: deja de salir en el tablón y se borra la foto de esa
    * noche, fichero incluido. Los chats con los matches siguen.
    */
+  /**
+   * Deshace un vybe match: borra la conversación y la conexión, y deja un «no»
+   * para que no vuelva a salir ni se rehaga el match solo.
+   */
+  unmatch: async (otherProfileId: string): Promise<void> => {
+    const { error } = await supabase.rpc('unmatch', { p_other: otherProfileId });
+    if (error) throw new ApiError('UNMATCH_FAILED', 'errors.generic');
+  },
+
   leaveEvent: async (eventId: string, photoUrl?: string | null): Promise<void> => {
     const { error } = await supabase.rpc('leave_event', { p_event_id: eventId });
     if (error) console.error('Error leaving event:', error);

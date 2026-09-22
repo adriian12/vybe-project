@@ -630,6 +630,27 @@ export const venueService = {
     if (error) throw new ApiError('PROMOTION_FAILED', 'errors.generic');
   },
 
+  /** Cambiar texto y horas de una promoción o un reto (también los preestablecidos). */
+  updatePromotion: async (
+    promotionId: string,
+    changes: {
+      title?: string;
+      description?: string | null;
+      startsAt?: string | null;
+      endsAt?: string | null;
+      challengeDeadline?: string | null;
+    },
+  ): Promise<void> => {
+    const payload: Record<string, string | null> = {};
+    if (changes.title !== undefined) payload.title = changes.title;
+    if (changes.description !== undefined) payload.description = changes.description;
+    if (changes.startsAt !== undefined) payload.starts_at = changes.startsAt;
+    if (changes.endsAt !== undefined) payload.ends_at = changes.endsAt;
+    if (changes.challengeDeadline !== undefined) payload.challenge_deadline = changes.challengeDeadline;
+    const { error } = await supabase.from('promotions').update(payload).eq('id', promotionId);
+    if (error) throw venueError(error.message);
+  },
+
   /** Programar (o activar ya) una promoción que ya existe. */
   schedulePromotion: async (promotionId: string, startsAt: string | null): Promise<void> => {
     const { error } = await supabase

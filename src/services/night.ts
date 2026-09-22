@@ -50,6 +50,8 @@ export interface Raffle {
   isMe: boolean;
   ticketCode: string | null;
   drawnAt: string | null;
+  /** «VY-4F2A9C»: lo ven el ganador (para enseñarlo) y el local (para comprobarlo). */
+  winnerCode: string | null;
 }
 
 export type ChallengeType = 'early_bird' | 'matches' | 'group' | 'stay_until' | 'first_visit';
@@ -376,6 +378,7 @@ export const nightService = {
       isMe: row.is_me,
       ticketCode: row.ticket_code,
       drawnAt: row.drawn_at,
+      winnerCode: row.winner_code ?? null,
     }));
   },
 

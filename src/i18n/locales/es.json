@@ -1,6 +1,6 @@
 {
     "common": {
-        "appName": "Vybe",
+        "appName": "Vybes",
         "tagline": "Una fiesta es cuestión de vibras",
         "location": "Mallorca",
         "loading": "Cargando…",
@@ -53,7 +53,7 @@
         "name": "Nombre",
         "namePlaceholder": "Cómo quieres que te vean",
         "age": "Edad",
-        "ageHelp": "Vybe es solo para mayores de 18 años.",
+        "ageHelp": "Vybes es solo para mayores de 18 años.",
         "login": "Iniciar sesión",
         "loggingIn": "Iniciando sesión…",
         "loginAsVenue": "Entrar como empresa",
@@ -79,7 +79,7 @@
             "passwordMismatch": "Las contraseñas no coinciden.",
             "nameRequired": "Dinos cómo te llamas.",
             "ageRequired": "Introduce tu edad.",
-            "ageMin": "Debes ser mayor de 18 años para usar Vybe.",
+            "ageMin": "Debes ser mayor de 18 años para usar Vybes.",
             "ageMax": "Introduce una edad válida.",
             "venueNameRequired": "El nombre del local es obligatorio.",
             "phoneRequired": "El teléfono de contacto es obligatorio.",
@@ -165,7 +165,7 @@
         "showPassword": "Mostrar contraseña",
         "hidePassword": "Ocultar contraseña",
         "adminAccess": "Acceso de administración",
-        "toAdminAccess": "¿Eres del equipo de Vybe? Acceso de administración",
+        "toAdminAccess": "¿Eres del equipo de Vybes? Acceso de administración",
         "toVenueAccess": "Volver al acceso de locales"
     },
     "consent": {
@@ -176,7 +176,7 @@
         "age": "Confirmo que tengo 18 años o más.",
         "marketing": "Quiero recibir novedades sobre eventos. (opcional)",
         "accept": "Acepto y continúo",
-        "required": "Debes aceptar los tres primeros puntos para usar Vybe.",
+        "required": "Debes aceptar los tres primeros puntos para usar Vybes.",
         "readDocs": "Puedes consultar los documentos completos en cualquier momento desde tu perfil."
     },
     "home": {
@@ -188,7 +188,7 @@
         "inEvent": "Estás en {{name}}",
         "inEventBody": "{{venue}} · Toca para seguir descubriendo gente",
         "going": "{{count}} van",
-        "inside": "{{count}} con Vybe dentro",
+        "inside": "{{count}} con Vybes dentro",
         "beFirst": "Sé el primero en entrar",
         "imGoing": "Voy a ir",
         "notGoing": "Ya no voy a ir",
@@ -205,7 +205,7 @@
         "statEvents": "fiestas\nesta noche",
         "statInside": "personas\ndentro ahora",
         "statGoing": "han dicho\nque van",
-        "goingPlus": "{{count}} con Vybe van a ir",
+        "goingPlus": "{{count}} con Vybes van a ir",
         "buy": "Entradas",
         "greetingDay": "¿Qué haces este finde?",
         "greetingNight": "¿Qué haces esta noche?",
@@ -213,7 +213,7 @@
         "seeAll": "Ver todo",
         "statNearby": "eventos cerca de ti",
         "statEventsShort": "eventos",
-        "statInsideShort": "con Vybe dentro",
+        "statInsideShort": "con Vybes dentro",
         "statTonight": "eventos esta noche",
         "featured": "Destacados",
         "upcoming": "Próximos eventos",
@@ -274,11 +274,11 @@
         "codeTooShort": "El código debe tener al menos 6 caracteres",
         "cameraError": "No se pudo acceder a la cámara. Revisa los permisos o introduce el código a mano.",
         "manualButton": "Introducir código manualmente",
-        "serverChecked": "El acceso se valida en el servidor de Vybe"
+        "serverChecked": "El acceso se valida en el servidor de Vybes"
     },
     "location": {
         "title": "Verifica tu ubicación",
-        "body": "Vybe sólo funciona dentro de eventos, discotecas o fiestas verificadas.",
+        "body": "Vybes sólo funciona dentro de eventos, discotecas o fiestas verificadas.",
         "bodyTwo": "Sólo verás perfiles de gente que esté en el mismo evento que tú.",
         "insideTitle": "¡Estás dentro!",
         "endsAt": "Termina",
@@ -329,7 +329,7 @@
         "interestsHelp": "Muestra sólo a quien comparta alguno.",
         "apply": "Aplicar filtros",
         "reset": "Quitar filtros",
-        "premiumOnly": "El rango de edad es parte de Vybe Premium.",
+        "premiumOnly": "El rango de edad es parte de Vybes Premium.",
         "activeCount": "{{count}} filtros activos",
         "help": "Elige a quién quieres ver en el tablón.",
         "music": "Música",
@@ -388,7 +388,13 @@
         "disappears": "Este chat desaparece al acabar la fiesta ({{time}})",
         "placeholderEphemeral": "Escribe algo antes de que amanezca…",
         "read": "Leído",
-        "sent": "Enviado"
+        "sent": "Enviado",
+        "unmatch": "Eliminar conversación",
+        "unmatchTitle": "¿Deshacer el match con {{name}}?",
+        "unmatchBody": "Se borrará la conversación y el vybe match. No volverá a salirte en el tablón.",
+        "unmatchConfirm": "Eliminar",
+        "unmatched": "Conversación eliminada",
+        "disappearsIn": "Este chat desaparece en {{time}}"
     },
     "report": {
         "title": "Reportar a {{name}}",
@@ -401,7 +407,7 @@
         "sent": "Reporte enviado",
         "sentBody": "Nuestro equipo lo revisará lo antes posible.",
         "blocked": "Usuario bloqueado",
-        "blockedBody": "Ya no volveréis a veros en Vybe.",
+        "blockedBody": "Ya no volveréis a veros en Vybes.",
         "reasons": {
             "inappropriate_content": "Contenido inapropiado",
             "harassment": "Acoso o comportamiento ofensivo",
@@ -485,9 +491,9 @@
         "groupsHelp": "Disponible cuando estés dentro de una fiesta",
         "notificationsHelp": "Matches, mensajes y avisos de tus fiestas",
         "safetyHelp": "Contactos de confianza y botón de ayuda",
-        "cancelTitle": "¿Cancelar Vybe Premium?",
+        "cancelTitle": "¿Cancelar Vybes Premium?",
         "cancelBody": "Seguirás teniendo Premium hasta que acabe el periodo que ya has pagado.",
-        "tagline": "Vybe · La noche en España"
+        "tagline": "Vybes · La noche en España"
     },
     "faceVerification": {
         "title": "Verificación de identidad",
@@ -612,7 +618,7 @@
         "removed": "{{name}} ya no está en el grupo"
     },
     "premium": {
-        "title": "Vybe Premium",
+        "title": "Vybes Premium",
         "subtitle": "Saca más partido a cada fiesta",
         "monthly": "Suscripción mensual",
         "forEvent": "Sólo para {{name}}",
@@ -639,7 +645,7 @@
             "boost": "Destacar una hora",
             "boostBody": "Tu perfil el primero del tablón durante 60 minutos."
         },
-        "required": "Esto es de Vybe Premium.",
+        "required": "Esto es de Vybes Premium.",
         "boost": {
             "cta": "Destacar 1 h",
             "active": "Destacas {{minutes}} min",
@@ -663,7 +669,7 @@
         "empty": "Todavía no tienes likes pendientes",
         "emptyBody": "Sigue deslizando en los eventos para que te vea más gente.",
         "locked": "Descubre quién te ha dado like",
-        "lockedBody": "Con Vybe Premium ves quién te ha gustado antes de deslizar.",
+        "lockedBody": "Con Vybes Premium ves quién te ha gustado antes de deslizar.",
         "unlock": "Activar Premium",
         "likeBack": "Dar like",
         "at": "en {{event}}",
@@ -677,7 +683,7 @@
         "myVenue": "Mi Local",
         "exit": "Salir",
         "pendingTitle": "Local pendiente de aprobación",
-        "pendingBody": "Tus eventos no serán visibles y no podrás generar códigos hasta que el equipo de Vybe verifique tu local.",
+        "pendingBody": "Tus eventos no serán visibles y no podrás generar códigos hasta que el equipo de Vybes verifique tu local.",
         "tabs": {
             "qr": "Código QR",
             "stats": "Estadísticas",
@@ -704,7 +710,7 @@
             "download": "Descargar",
             "copied": "Código copiado",
             "copiedBody": "Ya puedes pegarlo donde quieras.",
-            "shareText": "Usa el código {{code}} para entrar en Vybe.",
+            "shareText": "Usa el código {{code}} para entrar en Vybes.",
             "notLinked": "El código actual no está vinculado a este evento. Genera uno nuevo.",
             "notVerified": "Podrás generar códigos de acceso en cuanto nuestro equipo apruebe tu local.",
             "rotation": "Rotación automática",
@@ -714,7 +720,7 @@
             "rotated": "Código rotado automáticamente",
             "printPoster": "Imprimir cartel",
             "posterSlogan": "¿Quieres probar una manera de conocer gente nueva?",
-            "posterFooter": "Escanea el código con la app Vybe",
+            "posterFooter": "Escanea el código con la app Vybes",
             "manualCodeLabel": "Código manual",
             "expiresInShort": "Caduca en {{hours}} h {{minutes}} min",
             "rotationInterval": "Intervalo de cambio"
@@ -762,7 +768,7 @@
             "startDate": "Fecha de inicio",
             "endDate": "Fecha de fin",
             "minAge": "Edad mínima",
-            "minAgeHelp": "Vybe es una app solo para mayores de 18.",
+            "minAgeHelp": "Vybes es una app solo para mayores de 18.",
             "theme": "Temática",
             "themePlaceholder": "Electrónica, Reggaeton, Pop…",
             "dressCode": "Código de vestimenta",
@@ -845,7 +851,7 @@
             "members": "Miembros",
             "invite": "Añadir miembro",
             "inviteEmail": "Email de la persona",
-            "inviteHelp": "Debe tener ya una cuenta de Vybe con ese email.",
+            "inviteHelp": "Debe tener ya una cuenta de Vybes con ese email.",
             "role": "Rol",
             "roles": {
                 "owner": "Propietario",
@@ -907,7 +913,7 @@
             "closeEntryTitle": "¿Cerrar la puerta?",
             "closeEntryBody": "Nadie más podrá entrar con la app: ningún código funcionará. Quien ya está dentro sigue dentro y puedes reabrir cuando quieras.",
             "insideReal": "Dentro (puerta)",
-            "insideVybe": "Con Vybe ahora",
+            "insideVybe": "Con Vybes ahora",
             "ofCapacityShort": "de {{capacity}}",
             "insideNow": "Dentro ahora",
             "reopened": "Puerta abierta de nuevo",
@@ -1014,12 +1020,12 @@
             "dropoffEmpty": "Sin datos todavía para este evento.",
             "peak": "El lleno fue a las {{time}}, con {{count}} personas dentro.",
             "privacyNote": "Los datos de público van siempre agrupados. Los grupos con muy poca gente no se muestran, porque señalarían a personas concretas.",
-            "headcountTitle": "Aforo real frente a Vybe",
-            "headcountSubtitle": "Lo que cuenta la puerta, tramo a tramo, y cuánto de ese público usa Vybe.",
+            "headcountTitle": "Aforo real frente a Vybes",
+            "headcountSubtitle": "Lo que cuenta la puerta, tramo a tramo, y cuánto de ese público usa Vybes.",
             "headcountNeedsPlan": "La curva de aforo es de los planes Pro y Business",
             "headcountEmpty": "Esta noche aún no se ha contado en la puerta.",
             "headcountPeak": "Pico de {{count}} personas a las {{time}}.",
-            "headcountShare": "De media, el {{percent}} % usaba Vybe."
+            "headcountShare": "De media, el {{percent}} % usaba Vybes."
         },
         "plan": {
             "current": "Tu plan",
@@ -1042,7 +1048,7 @@
                 "promotions": "Promociones y vales",
                 "csvExport": "Exportar a CSV",
                 "demographics": "Detalle de público",
-                "headcountCurve": "Curva de aforo y % con Vybe"
+                "headcountCurve": "Curva de aforo y % con Vybes"
             },
             "yourPlan": "Tu plan actual",
             "choose": "Elegir",
@@ -1086,8 +1092,8 @@
         "tv": {
             "open": "Ver en pantalla grande",
             "insideNow": "{{count}} personas dentro ahora",
-            "vybeCount_one": "{{count}} persona ya está en Vybe · escanea y únete",
-            "vybeCount_other": "{{count}} personas ya están en Vybe · escanea y únete",
+            "vybeCount_one": "{{count}} persona ya está en Vybes · escanea y únete",
+            "vybeCount_other": "{{count}} personas ya están en Vybes · escanea y únete",
             "raffleWinner": "¡Ha ganado {{name}}! {{prize}}",
             "raffleAt": "Sorteo a las {{time}}: {{prize}}",
             "raffleSoon": "Sorteo esta noche: {{prize}}"
@@ -1151,11 +1157,11 @@
             "publicNote": "El público solo ve el ambiente (Tranquilo, Animado, Casi lleno, Lleno), nunca la cifra.",
             "needCapacity": "Pon el aforo del evento para usar el contador de puerta y para que el público vea el ambiente.",
             "linksTitle": "Enlaces para el portero",
-            "linksBody": "Cuenta desde cualquier móvil, sin cuenta de Vybe. Caduca al acabar la noche.",
+            "linksBody": "Cuenta desde cualquier móvil, sin cuenta de Vybes. Caduca al acabar la noche.",
             "createdOnce": "Guarda o envía el enlace ahora: por seguridad no se vuelve a enseñar.",
             "copy": "Copiar",
             "copied": "Enlace copiado",
-            "whatsappText": "Contador de puerta de Vybe para esta noche: {{url}}",
+            "whatsappText": "Contador de puerta de Vybes para esta noche: {{url}}",
             "done": "Hecho",
             "labelPlaceholder": "Nombre (p. ej. Puerta principal)",
             "create": "Crear enlace",
@@ -1181,8 +1187,8 @@
             "nowPlayingPlaceholder": "Canción, artista o DJ"
         },
         "intentList": {
-            "title": "Lista Vybe",
-            "paid": "Este evento es con entrada: tu previsión son las ventas. Con Vybe, {{count}} personas han dicho que vienen.",
+            "title": "Lista Vybes",
+            "paid": "Este evento es con entrada: tu previsión son las ventas. Con Vybes, {{count}} personas han dicho que vienen.",
             "empty": "Todavía nadie ha marcado que viene.",
             "summary": "{{arrived}} ya han llegado · {{women}} chicas · {{men}} chicos",
             "arrived": "Ya está dentro",
@@ -1253,8 +1259,15 @@
             "firstVisit": {
                 "title": "Primera vez aquí",
                 "description": "Tu primera vez en este local tiene premio.",
-                "how": "Para quien nunca había entrado en un evento del local con Vybe."
-            }
+                "how": "Para quien nunca había entrado en un evento del local con Vybes."
+            },
+            "editTitle": "Editar",
+            "editBody": "Cambia el texto y las horas. Lo que dejes vacío toma lo de la fiesta.",
+            "fieldTitle": "Título",
+            "fieldDescription": "Descripción",
+            "fieldStart": "Empieza",
+            "fieldEnd": "Termina",
+            "fieldDeadline": "Hora límite"
         },
         "raffles": {
             "title": "Sorteos en directo",
@@ -1274,11 +1287,12 @@
             "time": "Hora del sorteo (opcional)",
             "timeHelp": "Sin hora, lo lanzas tú con «Sortear».",
             "create": "Anunciar sorteo",
-            "new": "Nuevo sorteo"
+            "new": "Nuevo sorteo",
+            "wonByCode": "Ganó {{name}} · ID {{code}}"
         },
         "stamps": {
             "title": "Tarjeta de sellos",
-            "subtitle": "Un sello por cada noche que alguien entra con Vybe. Con la tarjeta llena, un premio.",
+            "subtitle": "Un sello por cada noche que alguien entra con Vybes. Con la tarjeta llena, un premio.",
             "invalid": "Pon entre 2 y 20 sellos y un premio.",
             "saved": "Tarjeta de sellos guardada",
             "disabled": "Tarjeta de sellos desactivada",
@@ -1295,7 +1309,7 @@
         "report": {
             "title": "Informe semanal",
             "empty": "Todavía no hay informes.",
-            "checkIns": "Entradas con Vybe",
+            "checkIns": "Entradas con Vybes",
             "vsPrev": "{{percent}} % frente a la semana anterior",
             "uniquePeople": "Personas distintas",
             "returning": "Repiten",
@@ -1313,15 +1327,15 @@
             "readyTitle": "Ya disponible el informe semanal",
             "readyBody": "El resumen de tu semana ({{range}}): quién vino, quién repite y cómo te fue frente a locales como el tuyo.",
             "view": "Ver informe",
-            "bestEvent": "Mejor noche: {{name}} ({{count}} entradas con Vybe).",
+            "bestEvent": "Mejor noche: {{name}} ({{count}} entradas con Vybes).",
             "peakHour": "La gente llegó sobre todo a las {{hour}}:00.",
             "topCode": "El relaciones públicas que más trajo: {{name}} ({{count}}).",
-            "benchmark": "Media por evento: tú {{mine}} entradas con Vybe; locales como el tuyo, {{others}}.",
+            "benchmark": "Media por evento: tú {{mine}} entradas con Vybes; locales como el tuyo, {{others}}.",
             "noBenchmark": "Todavía no hay suficientes locales parecidos para comparar.",
-            "revenueTitle": "Lo que te ha traído Vybe",
-            "brought_one": "{{count}} persona vino por Vybe",
-            "brought_other": "{{count}} personas vinieron por Vybe",
-            "brought": "{{count}} personas vinieron por Vybe",
+            "revenueTitle": "Lo que te ha traído Vybes",
+            "brought_one": "{{count}} persona vino por Vybes",
+            "brought_other": "{{count}} personas vinieron por Vybes",
+            "brought": "{{count}} personas vinieron por Vybes",
             "broughtIntent": "{{count}} dijeron «voy a ir» y vinieron",
             "broughtCode": "{{count}} entraron con un código de RRPP",
             "broughtFollow": "{{count}} te siguen y vinieron",
@@ -1358,7 +1372,7 @@
             "opens": "Abre",
             "closes": "Cierra",
             "avgSpend": "Gasto medio por persona",
-            "avgSpendHint": "No se enseña a nadie. Con él, el informe semanal calcula cuántos euros te ha traído Vybe.",
+            "avgSpendHint": "No se enseña a nadie. Con él, el informe semanal calcula cuántos euros te ha traído Vybes.",
             "perPerson": "persona",
             "avgSpendInvalid": "Pon un importe entre 1 y 1000 €",
             "saved": "Ficha guardada"
@@ -1388,7 +1402,7 @@
             "approved": "Local aprobado",
             "approvedBody": "Ya puede publicar eventos y generar códigos.",
             "rejected": "Local rechazado",
-            "rejectedBody": "El local no podrá operar en Vybe.",
+            "rejectedBody": "El local no podrá operar en Vybes.",
             "noDocuments": "Sin documentación. Pídesela antes de aprobar.",
             "colVenue": "Local",
             "colCity": "Ciudad",
@@ -1476,7 +1490,7 @@
         },
         "menu": "Menú",
         "shortTitle": "Administración",
-        "staffHq": "Vybe Staff HQ",
+        "staffHq": "Vybes Staff HQ",
         "navigation": "Navegación",
         "updated": "Actualizado {{time}}",
         "refresh": "Actualizar",
@@ -1509,7 +1523,7 @@
             "body": "Lleva a donde estás ahora el local de prueba, con su fiesta en marcha y 35 personas dentro, para probar acceso, tablón y matches sin ir a ningún sitio.",
             "move": "Traer la sala a mi ubicación",
             "resetSwipes": "Borrar mis swipes de esa fiesta para volver a ver a todo el mundo",
-            "help": "Usa el GPS de este dispositivo. Después entra en la fiesta «Vybe Test Night» con el código LAB777.",
+            "help": "Usa el GPS de este dispositivo. Después entra en la fiesta «Vybes Test Night» con el código LAB777.",
             "moved": "Sala de pruebas lista",
             "movedBody": "Ya está en tu ubicación. Código de acceso: {{code}}",
             "code": "Código",
@@ -1535,9 +1549,9 @@
     },
     "pwa": {
         "updateTitle": "Hay una versión nueva",
-        "updateBody": "Recarga para actualizar Vybe.",
+        "updateBody": "Recarga para actualizar Vybes.",
         "update": "Actualizar",
-        "installTitle": "Instala Vybe",
+        "installTitle": "Instala Vybes",
         "installBody": "Añádela a tu pantalla de inicio para entrar más rápido en los eventos.",
         "install": "Instalar",
         "offline": "Sin conexión. Algunas funciones no estarán disponibles."
@@ -1603,7 +1617,7 @@
         "lockedBody": "Con Premium ves quiénes son antes de salir de casa.",
         "noneForYou": "De momento no va nadie que encaje con lo que quieres ver.",
         "heading": "Quién va",
-        "confirmed": "{{count}} con Vybe van a ir"
+        "confirmed": "{{count}} con Vybes van a ir"
     },
     "nav": {
         "home": "Inicio",
@@ -1643,7 +1657,7 @@
         "ended": "Este evento ya ha terminado",
         "enterNow": "Entrar ahora",
         "confirmed": "¡Confirmado!",
-        "intentNote": "Al marcar «voy a ir», el local te verá en su Lista Vybe (nombre, edad y foto)."
+        "intentNote": "Al marcar «voy a ir», el local te verá en su Lista Vybes (nombre, edad y foto)."
     },
     "venueTypes": {
         "discoteca": "Discoteca",
@@ -1733,7 +1747,8 @@
         "chatExpires": "El chat caduca al acabar la fiesta",
         "left": "{{time}} restantes",
         "sendMessage": "Enviar mensaje",
-        "viewProfile": "Ver perfil de {{name}}"
+        "viewProfile": "Ver perfil de {{name}}",
+        "viewProfileShort": "Ver perfil"
     },
     "userProfile": {
         "notFound": "Este perfil ya no está disponible",
@@ -1745,7 +1760,7 @@
         "inCommon_one": "interés en común",
         "inCommon_other": "intereses en común",
         "radar": "Radar",
-        "tastes": "Vybe nocturno y gustos",
+        "tastes": "Vybes nocturno y gustos",
         "nights": "noches",
         "vybes": "vybes",
         "connectedTitle": "Conectados mediante Vybe Check",
@@ -1768,18 +1783,18 @@
             "faq": "Preguntas",
             "login": "Acceso locales",
             "registerVenue": "Registrar mi local",
-            "openApp": "Abrir Vybe",
+            "openApp": "Abrir Vybes",
             "menu": "Abrir menú",
             "close": "Cerrar menú"
         },
         "hero": {
             "pill": "La app de la noche en Mallorca",
             "titleStart": "La noche se vive en la pista.",
-            "titleBrand": "Vybe",
+            "titleBrand": "Vybes",
             "titleEnd": "conecta vybers y salas en tiempo real.",
             "body": "Descubre las fiestas de tu zona, entra con el QR del local y haz Vybe Check sólo con quien está dentro contigo. Y si tienes un local: aforo en directo, códigos para tus RRPP y promociones para quien ya está en la pista.",
             "ctaUser": "Descargar la app",
-            "ctaVenue": "Vybe para locales",
+            "ctaVenue": "Vybes para locales",
             "imageAlt": "Gente bailando en una discoteca con luces amarillas",
             "imageTag": "Mallorca",
             "imageCaption": "Fiestas verificadas, gente real dentro",
@@ -1796,7 +1811,7 @@
             "steps": {
                 "access": {
                     "title": "Entra con el QR del local",
-                    "body": "Escaneas el código en la puerta. Vybe comprueba en el servidor que el código es válido y que estás dentro del radio del local.",
+                    "body": "Escaneas el código en la puerta. Vybes comprueba en el servidor que el código es válido y que estás dentro del radio del local.",
                     "tag": "Código validado en el servidor y geocerca"
                 },
                 "check": {
@@ -1886,7 +1901,7 @@
                     },
                     "report": {
                         "title": "Informe semanal en euros",
-                        "body": "Cada lunes: cuánta gente vino por Vybe, quién repite y cuánto dinero te ha traído."
+                        "body": "Cada lunes: cuánta gente vino por Vybes, quién repite y cuánto dinero te ha traído."
                     },
                     "boost": {
                         "title": "Destaca tu fiesta",
@@ -1969,8 +1984,8 @@
             "title": "Lo que nos suelen preguntar",
             "items": {
                 "price": {
-                    "q": "¿Cuánto cuesta Vybe?",
-                    "a": "Para salir de fiesta es gratis. Vybe Premium añade extras como ver a quién le gustas o destacar tu perfil una hora. Los locales tienen un plan Gratis y los planes Pro (49 €/mes, el primer mes gratis) y Business (129 €/mes), sin IVA y sin permanencia."
+                    "q": "¿Cuánto cuesta Vybes?",
+                    "a": "Para salir de fiesta es gratis. Vybes Premium añade extras como ver a quién le gustas o destacar tu perfil una hora. Los locales tienen un plan Gratis y los planes Pro (49 €/mes, el primer mes gratis) y Business (129 €/mes), sin IVA y sin permanencia."
                 },
                 "location": {
                     "q": "¿Por qué me pide la ubicación?",
@@ -1989,19 +2004,19 @@
                     "a": "Empezamos en Mallorca. Si tu local está en otra zona, escríbenos y te avisamos cuando lleguemos."
                 },
                 "apps": {
-                    "q": "¿Dónde descargo Vybe?",
-                    "a": "Vybe para salir de fiesta es una app para iPhone y Android, y la estamos publicando en App Store y Google Play. La web app.vybes.es es sólo para locales y su equipo."
+                    "q": "¿Dónde descargo Vybes?",
+                    "a": "Vybes para salir de fiesta es una app para iPhone y Android, y la estamos publicando en App Store y Google Play. La web app.vybes.es es sólo para locales y su equipo."
                 }
             }
         },
         "cta": {
             "eyebrow": "Empieza la noche",
             "title": "¿Listo para vivir la noche de otra forma?",
-            "body": "Descarga Vybe y entra en tu próxima fiesta. Si tienes un local, cuéntanos y te lo enseñamos."
+            "body": "Descarga Vybes y entra en tu próxima fiesta. Si tienes un local, cuéntanos y te lo enseñamos."
         },
         "form": {
             "title": "¿Tienes una discoteca, bar o festival?",
-            "body": "Déjanos tus datos y te enseñamos Vybe en una llamada de 15 minutos.",
+            "body": "Déjanos tus datos y te enseñamos Vybes en una llamada de 15 minutos.",
             "venueName": "Nombre del local",
             "city": "Ciudad o zona (ej. Palma, Magaluf)",
             "type": "Tipo de local",
@@ -2015,7 +2030,7 @@
             },
             "contact": "Email o teléfono",
             "message": "¿Algo que debamos saber? (opcional)",
-            "consent": "Acepto que Vybe use estos datos para contactarme sobre mi local, según la <privacy>política de privacidad</privacy>.",
+            "consent": "Acepto que Vybes use estos datos para contactarme sobre mi local, según la <privacy>política de privacidad</privacy>.",
             "submit": "Solicitar demo",
             "sending": "Enviando…",
             "successTitle": "¡Recibido!",
@@ -2042,7 +2057,7 @@
             "privacy": "Privacidad",
             "terms": "Términos",
             "contact": "Contacto",
-            "rights": "© {{year}} Vybe. Todos los derechos reservados.",
+            "rights": "© {{year}} Vybes. Todos los derechos reservados.",
             "made": "Hecho en Palma de Mallorca"
         },
         "download": {
@@ -2053,11 +2068,11 @@
         }
     },
     "mobileOnly": {
-        "title": "Vybe se vive desde el móvil",
+        "title": "Vybes se vive desde el móvil",
         "body": "Esta web es para locales y administración. Para descubrir fiestas, entrar con el QR y hacer Vybe Check, descarga la app.",
         "venueAccess": "¿Tienes un local? Accede aquí",
         "reason": {
-            "clubber": "Esta web es sólo para locales y administración. Tu cuenta de Vybe se usa desde la app, en el local.",
+            "clubber": "Esta web es sólo para locales y administración. Tu cuenta de Vybes se usa desde la app, en el local.",
             "verified": "Email verificado. Ya puedes entrar desde la app.",
             "password": "Contraseña cambiada. Entra con ella desde la app."
         }
@@ -2069,7 +2084,7 @@
             "almostFull": "Casi lleno",
             "full": "Lleno"
         },
-        "withVybe": "{{level}} · {{count}} con Vybe",
+        "withVybe": "{{level}} · {{count}} con Vybes",
         "source": "Según el local · hace {{minutes}} min",
         "sourceNow": "Según el local · ahora",
         "friendsGoing_one": "{{count}} de tus vybes va a ir",
@@ -2081,8 +2096,8 @@
         "askVenue": "Pide al local un enlace nuevo.",
         "ofCapacity": "de {{capacity}}",
         "percent": "{{percent}} % del aforo",
-        "withVybe": "{{count}} con Vybe ({{percent}} %)",
-        "withVybeNoPct": "{{count}} con Vybe",
+        "withVybe": "{{count}} con Vybes ({{percent}} %)",
+        "withVybeNoPct": "{{count}} con Vybes",
         "add": "Sumar una persona",
         "remove": "Restar una persona",
         "addFive": "Sumar cinco personas",
@@ -2102,7 +2117,7 @@
             "INVALID_DELTA": "No se pudo contar. Prueba otra vez.",
             "generic": "No se pudo contar. Prueba otra vez."
         },
-        "belowVybe": "Hay {{count}} personas con Vybe dentro: el total real no puede ser menor. Pulsa «Corregir total»."
+        "belowVybe": "Hay {{count}} personas con Vybes dentro: el total real no puede ser menor. Pulsa «Corregir total»."
     },
     "night": {
         "title": "La noche",
@@ -2146,7 +2161,10 @@
             "live": "Sorteo en directo: el local lo lanza durante la noche",
             "stayInside": "Participas solo por seguir dentro a la hora del sorteo.",
             "youWon": "¡Has ganado!",
-            "wonBy": "Ha ganado {{name}}"
+            "wonBy": "Ha ganado {{name}}",
+            "showAtBar": "Enseñar en la barra",
+            "winnerTitle": "Ganador/a del sorteo",
+            "showHint": "Enseña esta pantalla en la barra: el local comprueba el código en su panel."
         },
         "stamps": {
             "title": "Tarjeta de {{venue}}",
@@ -2182,7 +2200,7 @@
             "long": "Mucha cola"
         },
         "nowPlaying": "Suena: {{song}}",
-        "mix": "{{women}} % chicas · {{men}} % chicos (con Vybe)"
+        "mix": "{{women}} % chicas · {{men}} % chicos (con Vybes)"
     },
     "whereNext": {
         "title": "La fiesta se está acabando",
@@ -2196,7 +2214,7 @@
     },
     "venuePage": {
         "notFound": "No encontramos este local",
-        "vybeVenue": "Local con Vybe",
+        "vybeVenue": "Local con Vybes",
         "follow": "Seguir",
         "following": "Siguiendo",
         "followers_one": "{{count}} seguidor",

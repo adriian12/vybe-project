@@ -69,7 +69,7 @@ serve(async (req: Request): Promise<Response> => {
 
     await sendSms(
       phoneNumber,
-      `Tu código de verificación de Vybe es ${code}. Caduca en ${CODE_TTL_MINUTES} minutos.`,
+      `Tu código de verificación de Vybes es ${code}. Caduca en ${CODE_TTL_MINUTES} minutos.`,
     );
 
     // Guardamos el teléfono, todavía sin verificar.

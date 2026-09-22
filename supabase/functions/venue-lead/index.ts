@@ -119,7 +119,7 @@ serve(async (req: Request): Promise<Response> => {
     ];
     const html = `
       <div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;color:#111114">
-        <p style="font-size:22px;font-weight:800;margin:0 0 4px">Vybe</p>
+        <p style="font-size:22px;font-weight:800;margin:0 0 4px">Vybes</p>
         <p style="font-size:16px;margin:0 0 16px">Nueva solicitud de demo desde la landing</p>
         <table style="border-collapse:collapse;width:100%">
           ${rows
@@ -134,7 +134,7 @@ serve(async (req: Request): Promise<Response> => {
     const text = ['Nueva solicitud de demo desde la landing', '', ...rows.map(([k, v]) => `${k}: ${v}`)].join('\n');
 
     try {
-      await sendEmail({ to: notifyTo(), subject: `Vybe · Solicitud de ${venueName} (${city})`, html, text });
+      await sendEmail({ to: notifyTo(), subject: `Vybes · Solicitud de ${venueName} (${city})`, html, text });
     } catch (mailError) {
       // La solicitud ya está guardada: el aviso por correo es un extra.
       console.error('venue-lead email', mailError);
