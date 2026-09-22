@@ -31,7 +31,7 @@ const PRIVACY_SECTIONS = [
   },
   {
     title: 'Ubicación',
-    body: 'Sólo usamos tu ubicación cuando la app está abierta y para comprobar que estás dentro del radio del evento. No la compartimos con otros usuarios: sólo mostramos una distancia aproximada. Puedes revocar el permiso cuando quieras, desde los ajustes del navegador o del teléfono según cómo uses Vybes.',
+    body: 'Sólo usamos tu ubicación cuando la app está abierta y para comprobar que estás dentro del radio del evento. No la compartimos con otros usuarios: sólo mostramos una distancia aproximada. Puedes revocar el permiso cuando quieras, desde los ajustes del navegador o del teléfono según cómo uses Fiestea.',
   },
   {
     title: 'Fotografías',
@@ -39,7 +39,7 @@ const PRIVACY_SECTIONS = [
   },
   {
     title: 'Verificación facial',
-    body: 'Para verificar que hay una persona real detrás de cada cuenta analizamos la fotografía que envías con un servicio automático que detecta cuántas caras aparecen. Es un tratamiento de datos biométricos, de los que el Reglamento considera de categoría especial, y por eso se hace únicamente con tu consentimiento explícito y sólo con esa finalidad: no identificamos a nadie, no comparamos tu cara con ninguna base de datos ni guardamos ninguna plantilla biométrica. La fotografía se descarta si no supera la comprobación. Puedes usar Vybes sin verificarte, aunque entonces no aparecerás en el tablón de los eventos.',
+    body: 'Para verificar que hay una persona real detrás de cada cuenta analizamos la fotografía que envías con un servicio automático que detecta cuántas caras aparecen. Es un tratamiento de datos biométricos, de los que el Reglamento considera de categoría especial, y por eso se hace únicamente con tu consentimiento explícito y sólo con esa finalidad: no identificamos a nadie, no comparamos tu cara con ninguna base de datos ni guardamos ninguna plantilla biométrica. La fotografía se descarta si no supera la comprobación. Puedes usar Fiestea sin verificarte, aunque entonces no aparecerás en el tablón de los eventos.',
   },
   {
     title: 'Con quién los compartimos',
@@ -55,14 +55,14 @@ const PRIVACY_SECTIONS = [
   },
   {
     title: 'Menores',
-    body: 'Vybes es un servicio exclusivamente para mayores de 18 años. Si detectamos una cuenta de una persona menor de edad, la eliminaremos.',
+    body: 'Fiestea es un servicio exclusivamente para mayores de 18 años. Si detectamos una cuenta de una persona menor de edad, la eliminaremos.',
   },
 ];
 
 const TERMS_SECTIONS = [
   {
     title: 'Objeto',
-    body: 'Vybes es una aplicación que permite conocer a otras personas que asisten al mismo evento presencial. El acceso requiere verificar la ubicación y canjear un código facilitado por el local.',
+    body: 'Fiestea es una aplicación que permite conocer a otras personas que asisten al mismo evento presencial. El acceso requiere verificar la ubicación y canjear un código facilitado por el local.',
   },
   {
     title: 'Requisitos de uso',
@@ -74,7 +74,7 @@ const TERMS_SECTIONS = [
   },
   {
     title: 'Seguridad',
-    body: 'Vybes no verifica los antecedentes de sus usuarios. Reúnete siempre en lugares públicos, avisa a alguien de confianza y utiliza el botón de emergencia si te sientes en peligro. El uso del servicio es bajo tu propia responsabilidad.',
+    body: 'Fiestea no verifica los antecedentes de sus usuarios. Reúnete siempre en lugares públicos, avisa a alguien de confianza y utiliza el botón de emergencia si te sientes en peligro. El uso del servicio es bajo tu propia responsabilidad.',
   },
   {
     title: 'Contenido de los usuarios',

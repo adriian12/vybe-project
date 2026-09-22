@@ -44,7 +44,7 @@ self.addEventListener('push', (event) => {
   try {
     payload = event.data.json() as PushPayload;
   } catch {
-    payload = { title: 'Vybes', body: event.data.text() };
+    payload = { title: 'Fiestea', body: event.data.text() };
   }
 
   // `renotify` y `vibrate` existen en los navegadores pero no en los tipos DOM

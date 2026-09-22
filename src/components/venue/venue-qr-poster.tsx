@@ -44,7 +44,7 @@ const VenueQRPoster = ({ code, eventName, venueName }: VenueQRPosterProps) => {
       {createPortal(
         <div className="print-poster" aria-hidden="true">
           <div className="print-poster-inner">
-            <div className="print-poster-brand">Vybes</div>
+            <div className="print-poster-brand">Fiestea</div>
 
             <div className="print-poster-headline">
               {t("venue.qr.posterSlogan")}

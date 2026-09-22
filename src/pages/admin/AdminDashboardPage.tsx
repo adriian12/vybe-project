@@ -1124,7 +1124,7 @@ const AdminDashboardPage = () => {
                   {leadsVisibles.map((lead) => {
                     const esEmail = lead.contact.includes('@');
                     const enlace = esEmail
-                      ? `mailto:${lead.contact}?subject=${encodeURIComponent(`Vybes · ${lead.venueName}`)}`
+                      ? `mailto:${lead.contact}?subject=${encodeURIComponent(`Fiestea · ${lead.venueName}`)}`
                       : `tel:${lead.contact.replace(/[^+0-9]/g, '')}`;
                     return (
                       <li key={lead.id} className="surface-light rounded-2xl p-4 lg:p-5">

@@ -77,8 +77,8 @@ export default defineConfig(({ mode }) => (comprobarVariablesPublicas(mode), {
         globPatterns: ["**/*.{js,css,html,ico,png,svg,webmanifest}"],
       },
       manifest: {
-        name: "Vybes",
-        short_name: "Vybes",
+        name: "Fiestea",
+        short_name: "Fiestea",
         description: "Conecta con la gente que está en la misma fiesta que tú.",
         lang: "es",
         start_url: "/",

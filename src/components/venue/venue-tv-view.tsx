@@ -93,7 +93,7 @@ const VenueTvView = ({ code, eventId, eventName, venueName }: VenueTvViewProps) 
         <X size={20} />
       </button>
 
-      <p className="text-5xl font-extrabold tracking-tight mb-4">Vybes</p>
+      <p className="text-5xl font-extrabold tracking-tight mb-4">Fiestea</p>
 
       <p className="max-w-3xl text-center text-2xl md:text-3xl font-semibold leading-snug mb-8">
         {t('venue.qr.posterSlogan')}

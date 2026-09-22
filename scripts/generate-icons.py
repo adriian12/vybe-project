@@ -6,8 +6,8 @@ Parte del logotipo del proyecto de Stitch («Vybes Nightlife App», pantalla
 «Vybes Logo»), que es este SVG de 100 x 100:
 
     <rect width="100" height="100" rx="24" fill="#1C1C1C"/>
-    <path d="M28 28 L50 72 L72 28 L60 28 L50 52 L40 28 Z" fill="#F8D000"/>
-    <circle cx="50" cy="22" r="4" fill="#F8D000"/>
+    <path d="M35.8 26 L73.8 26 L71.9 38 L47.9 38 L46.6 46 L62.6 46 L60.9 57 L44.9 57 L41.8 76 L27.8 76 Z" fill="#F8D000"/>
+    <path d="M73 56 L76.2 66.8 L87 70 L76.2 73.2 L73 84 L69.8 73.2 L59 70 L69.8 66.8 Z" fill="#F8D000"/>
 
 Es el mismo que dibuja `src/components/brand/vybe-logo.tsx` y el que se sirve
 como `public/favicon.svg`. Se pinta con Pillow a ocho veces el tamaño final y se
@@ -24,16 +24,16 @@ CANVAS = (0x11, 0x11, 0x14, 255)
 YELLOW = (0xF8, 0xD0, 0x00, 255)
 SS = 8  # sobremuestreo
 
-V = [(28, 28), (50, 72), (72, 28), (60, 28), (50, 52), (40, 28)]
-DOT = (50, 22, 4)
+# Fiestea: F inclinada y destello de cuatro puntas.
+F = [(35.8, 26), (73.8, 26), (71.9, 38), (47.9, 38), (46.6, 46), (62.6, 46), (60.9, 57), (44.9, 57), (41.8, 76), (27.8, 76)]
+STAR = [(73, 56), (76.2, 66.8), (87, 70), (76.2, 73.2), (73, 84), (69.8, 73.2), (59, 70), (69.8, 66.8)]
 
 
 def draw_mark(draw, x, y, side):
     """La V y el punto, con el cuadrado de 100 unidades en (x, y) de lado `side`."""
     k = side / 100
-    draw.polygon([(x + px * k, y + py * k) for px, py in V], fill=YELLOW)
-    cx, cy, r = DOT
-    draw.ellipse([x + (cx - r) * k, y + (cy - r) * k, x + (cx + r) * k, y + (cy + r) * k], fill=YELLOW)
+    for shape in (F, STAR):
+        draw.polygon([(x + px * k, y + py * k) for px, py in shape], fill=YELLOW)
 
 
 def render(size, shape='rounded', background=None, scale=1.0, transparent=True):

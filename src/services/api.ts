@@ -179,7 +179,7 @@ const requireProfileId = async (): Promise<string> => {
 const REDEEM_ERRORS: Record<string, string> = {
   PROFILE_NOT_FOUND: 'No se encontró tu perfil. Vuelve a iniciar sesión.',
   INVALID_CODE: 'El código no es válido o ya ha caducado.',
-  VENUE_NOT_VERIFIED: 'El local todavía no está verificado por Vybes.',
+  VENUE_NOT_VERIFIED: 'El local todavía no está verificado por Fiestea.',
   NO_ACTIVE_EVENT: 'Este local no tiene ningún evento activo ahora mismo.',
   EVENT_ENDED: 'El evento ya ha terminado.',
   TOO_FAR: 'Estás demasiado lejos del evento. Acércate para poder entrar.',

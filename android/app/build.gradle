@@ -4,7 +4,7 @@ android {
     namespace = "com.vybe.app"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.vybe.app"
+        applicationId "party.vybe.app"  // rama fiestea: se instala junto a Vybes
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

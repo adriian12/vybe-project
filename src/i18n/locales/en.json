@@ -1,6 +1,6 @@
 {
     "common": {
-        "appName": "Vybes",
+        "appName": "Fiestea",
         "tagline": "A party is all about the vibe",
         "location": "Mallorca",
         "loading": "Loading…",
@@ -53,7 +53,7 @@
         "name": "Name",
         "namePlaceholder": "How you want to be seen",
         "age": "Age",
-        "ageHelp": "Vybes is for people aged 18 and over only.",
+        "ageHelp": "Fiestea is for people aged 18 and over only.",
         "login": "Sign in",
         "loggingIn": "Signing in…",
         "loginAsVenue": "Sign in as a venue",
@@ -79,7 +79,7 @@
             "passwordMismatch": "Passwords do not match.",
             "nameRequired": "Tell us your name.",
             "ageRequired": "Enter your age.",
-            "ageMin": "You must be 18 or over to use Vybes.",
+            "ageMin": "You must be 18 or over to use Fiestea.",
             "ageMax": "Enter a valid age.",
             "venueNameRequired": "Venue name is required.",
             "phoneRequired": "Contact phone is required.",
@@ -165,7 +165,7 @@
         "showPassword": "Show password",
         "hidePassword": "Hide password",
         "adminAccess": "Admin access",
-        "toAdminAccess": "Part of the Vybes team? Admin access",
+        "toAdminAccess": "Part of the Fiestea team? Admin access",
         "toVenueAccess": "Back to venue login"
     },
     "consent": {
@@ -176,7 +176,7 @@
         "age": "I confirm I am 18 or over.",
         "marketing": "I want to receive news about events. (optional)",
         "accept": "Accept and continue",
-        "required": "You must accept the first three items to use Vybes.",
+        "required": "You must accept the first three items to use Fiestea.",
         "readDocs": "You can read the full documents any time from your profile."
     },
     "home": {
@@ -188,7 +188,7 @@
         "inEvent": "You're at {{name}}",
         "inEventBody": "{{venue}} · Tap to keep meeting people",
         "going": "{{count}} going",
-        "inside": "{{count}} on Vybes inside",
+        "inside": "{{count}} on Fiestea inside",
         "beFirst": "Be the first one in",
         "imGoing": "I'm going",
         "notGoing": "I'm not going",
@@ -205,7 +205,7 @@
         "statEvents": "parties\ntonight",
         "statInside": "people\ninside now",
         "statGoing": "said they\nare going",
-        "goingPlus": "{{count}} on Vybes going",
+        "goingPlus": "{{count}} on Fiestea going",
         "buy": "Tickets",
         "greetingDay": "Plans for the weekend?",
         "greetingNight": "What are you up to tonight?",
@@ -213,7 +213,7 @@
         "seeAll": "See all",
         "statNearby": "events near you",
         "statEventsShort": "events",
-        "statInsideShort": "on Vybes inside",
+        "statInsideShort": "on Fiestea inside",
         "statTonight": "events tonight",
         "featured": "Featured",
         "upcoming": "Upcoming events",
@@ -274,11 +274,11 @@
         "codeTooShort": "The code must be at least 6 characters",
         "cameraError": "Couldn't access the camera. Check permissions or type the code manually.",
         "manualButton": "Enter code manually",
-        "serverChecked": "Entry is verified on Vybes' servers"
+        "serverChecked": "Entry is verified on Fiestea' servers"
     },
     "location": {
         "title": "Verify your location",
-        "body": "Vybes only works inside verified events, clubs and parties.",
+        "body": "Fiestea only works inside verified events, clubs and parties.",
         "bodyTwo": "You'll only see people who are at the same event as you.",
         "insideTitle": "You're in!",
         "endsAt": "Ends",
@@ -329,7 +329,7 @@
         "interestsHelp": "Only show people who share at least one.",
         "apply": "Apply filters",
         "reset": "Clear filters",
-        "premiumOnly": "The age range is part of Vybes Premium.",
+        "premiumOnly": "The age range is part of Fiestea Premium.",
         "activeCount": "{{count}} active filters",
         "help": "Choose who you want to see on the board.",
         "music": "Music",
@@ -351,9 +351,9 @@
         "connectedWith": "You connected with {{name}}"
     },
     "matches": {
-        "title": "My Vybes",
+        "title": "My Crushes",
         "empty": "No connections yet",
-        "emptyBody": "Join an event and do a Vybe Check to meet new people.",
+        "emptyBody": "Join an event and do a Fiestea Check to meet new people.",
         "noMessages": "No messages yet. Start the conversation!",
         "you": "You: ",
         "expiresIn": "Expires in {{time}}",
@@ -370,7 +370,7 @@
     },
     "chat": {
         "noConversation": "Conversation not found",
-        "backToMatches": "Back to My Vybes",
+        "backToMatches": "Back to My Crushes",
         "notFound": "This conversation was not found",
         "empty": "No messages yet",
         "emptyBody": "Start the conversation!",
@@ -391,7 +391,7 @@
         "sent": "Sent",
         "unmatch": "Delete conversation",
         "unmatchTitle": "Undo the match with {{name}}?",
-        "unmatchBody": "The conversation and the vybe match will be deleted. They won't show up on your board again.",
+        "unmatchBody": "The conversation and the crush will be deleted. They won't show up on your board again.",
         "unmatchConfirm": "Delete",
         "unmatched": "Conversation deleted",
         "disappearsIn": "This chat disappears in {{time}}"
@@ -407,7 +407,7 @@
         "sent": "Report sent",
         "sentBody": "Our team will review it as soon as possible.",
         "blocked": "User blocked",
-        "blockedBody": "You won't see each other on Vybes again.",
+        "blockedBody": "You won't see each other on Fiestea again.",
         "reasons": {
             "inappropriate_content": "Inappropriate content",
             "harassment": "Harassment or offensive behaviour",
@@ -491,9 +491,9 @@
         "groupsHelp": "Available once you're inside a party",
         "notificationsHelp": "Matches, messages and updates about your parties",
         "safetyHelp": "Trusted contacts and help button",
-        "cancelTitle": "Cancel Vybes Premium?",
+        "cancelTitle": "Cancel Fiestea Premium?",
         "cancelBody": "You'll keep Premium until the end of the period you've already paid for.",
-        "tagline": "Vybes · Nightlife in Spain"
+        "tagline": "Fiestea · Nightlife in Spain"
     },
     "faceVerification": {
         "title": "Identity verification",
@@ -618,7 +618,7 @@
         "removed": "{{name}} is no longer in the group"
     },
     "premium": {
-        "title": "Vybes Premium",
+        "title": "Fiestea Premium",
         "subtitle": "Get more out of every night",
         "monthly": "Monthly subscription",
         "forEvent": "Just for {{name}}",
@@ -645,7 +645,7 @@
             "boost": "Stand out for an hour",
             "boostBody": "Your profile first on the board for 60 minutes."
         },
-        "required": "This is a Vybes Premium feature.",
+        "required": "This is a Fiestea Premium feature.",
         "boost": {
             "cta": "Stand out 1 h",
             "active": "{{minutes}} min left",
@@ -669,7 +669,7 @@
         "empty": "No pending likes yet",
         "emptyBody": "Keep swiping at events so more people see you.",
         "locked": "Find out who liked you",
-        "lockedBody": "With Vybes Premium you see who likes you before you swipe.",
+        "lockedBody": "With Fiestea Premium you see who likes you before you swipe.",
         "unlock": "Get Premium",
         "likeBack": "Like back",
         "at": "at {{event}}",
@@ -683,7 +683,7 @@
         "myVenue": "My venue",
         "exit": "Sign out",
         "pendingTitle": "Venue pending approval",
-        "pendingBody": "Your events won't be visible and you can't generate codes until the Vybes team verifies your venue.",
+        "pendingBody": "Your events won't be visible and you can't generate codes until the Fiestea team verifies your venue.",
         "tabs": {
             "qr": "QR code",
             "stats": "Analytics",
@@ -710,7 +710,7 @@
             "download": "Download",
             "copied": "Code copied",
             "copiedBody": "You can paste it wherever you need.",
-            "shareText": "Use code {{code}} to get into Vybes.",
+            "shareText": "Use code {{code}} to get into Fiestea.",
             "notLinked": "The current code isn't linked to this event. Generate a new one.",
             "notVerified": "You'll be able to generate access codes as soon as our team approves your venue.",
             "rotation": "Auto rotation",
@@ -720,7 +720,7 @@
             "rotated": "Code rotated automatically",
             "printPoster": "Print poster",
             "posterSlogan": "Fancy a new way to meet people?",
-            "posterFooter": "Scan the code with the Vybes app",
+            "posterFooter": "Scan the code with the Fiestea app",
             "manualCodeLabel": "Manual code",
             "expiresInShort": "Expires in {{hours}} h {{minutes}} min",
             "rotationInterval": "Change interval"
@@ -768,7 +768,7 @@
             "startDate": "Start date",
             "endDate": "End date",
             "minAge": "Minimum age",
-            "minAgeHelp": "Vybes is an 18+ app only.",
+            "minAgeHelp": "Fiestea is an 18+ app only.",
             "theme": "Theme",
             "themePlaceholder": "Electronic, Reggaeton, Pop…",
             "dressCode": "Dress code",
@@ -851,7 +851,7 @@
             "members": "Members",
             "invite": "Add member",
             "inviteEmail": "Their email address",
-            "inviteHelp": "They must already have a Vybes account with that email.",
+            "inviteHelp": "They must already have a Fiestea account with that email.",
             "role": "Role",
             "roles": {
                 "owner": "Owner",
@@ -913,7 +913,7 @@
             "closeEntryTitle": "Close the door?",
             "closeEntryBody": "Nobody else will be able to get in with the app: no code will work. People already inside stay, and you can reopen whenever you want.",
             "insideReal": "Inside (door)",
-            "insideVybe": "On Vybes now",
+            "insideVybe": "On Fiestea now",
             "ofCapacityShort": "of {{capacity}}",
             "insideNow": "Inside now",
             "reopened": "Door open again",
@@ -1020,12 +1020,12 @@
             "dropoffEmpty": "No data for this event yet.",
             "peak": "It peaked at {{time}} with {{count}} people inside.",
             "privacyNote": "Audience figures are always grouped. Groups with very few people are hidden, because they would point at individuals.",
-            "headcountTitle": "Real capacity vs Vybes",
-            "headcountSubtitle": "What the door counts, slot by slot, and how much of that crowd uses Vybes.",
+            "headcountTitle": "Real capacity vs Fiestea",
+            "headcountSubtitle": "What the door counts, slot by slot, and how much of that crowd uses Fiestea.",
             "headcountNeedsPlan": "The capacity curve is part of Pro and Business",
             "headcountEmpty": "Nothing has been counted at the door tonight.",
             "headcountPeak": "Peak of {{count}} people at {{time}}.",
-            "headcountShare": "On average, {{percent}}% were on Vybes."
+            "headcountShare": "On average, {{percent}}% were on Fiestea."
         },
         "plan": {
             "current": "Your plan",
@@ -1048,7 +1048,7 @@
                 "promotions": "Offers and vouchers",
                 "csvExport": "CSV export",
                 "demographics": "Audience detail",
-                "headcountCurve": "Capacity curve and % on Vybes"
+                "headcountCurve": "Capacity curve and % on Fiestea"
             },
             "yourPlan": "Your current plan",
             "choose": "Choose",
@@ -1092,8 +1092,8 @@
         "tv": {
             "open": "Show on the big screen",
             "insideNow": "{{count}} people inside right now",
-            "vybeCount_one": "{{count}} person is already on Vybes · scan and join",
-            "vybeCount_other": "{{count}} people are already on Vybes · scan and join",
+            "vybeCount_one": "{{count}} person is already on Fiestea · scan and join",
+            "vybeCount_other": "{{count}} people are already on Fiestea · scan and join",
             "raffleWinner": "{{name}} won! {{prize}}",
             "raffleAt": "Raffle at {{time}}: {{prize}}",
             "raffleSoon": "Raffle tonight: {{prize}}"
@@ -1157,11 +1157,11 @@
             "publicNote": "The public only sees the vibe (Quiet, Lively, Almost full, Full), never the number.",
             "needCapacity": "Set the event capacity to use the door counter and let the public see the vibe.",
             "linksTitle": "Links for the door staff",
-            "linksBody": "Count from any phone, no Vybes account needed. Expires when the night ends.",
+            "linksBody": "Count from any phone, no Fiestea account needed. Expires when the night ends.",
             "createdOnce": "Save or send the link now: for security it won't be shown again.",
             "copy": "Copy",
             "copied": "Link copied",
-            "whatsappText": "Vybes door counter for tonight: {{url}}",
+            "whatsappText": "Fiestea door counter for tonight: {{url}}",
             "done": "Done",
             "labelPlaceholder": "Name (e.g. Main door)",
             "create": "Create link",
@@ -1187,8 +1187,8 @@
             "nowPlayingPlaceholder": "Song, artist or DJ"
         },
         "intentList": {
-            "title": "Vybes List",
-            "paid": "This is a ticketed event: your forecast is ticket sales. On Vybes, {{count}} people said they are coming.",
+            "title": "Fiestea List",
+            "paid": "This is a ticketed event: your forecast is ticket sales. On Fiestea, {{count}} people said they are coming.",
             "empty": "Nobody has marked they are coming yet.",
             "summary": "{{arrived}} already arrived · {{women}} women · {{men}} men",
             "arrived": "Already inside",
@@ -1237,14 +1237,14 @@
                 "how": "For people who get in before {{time}}. Fills the first hour."
             },
             "firstVybe": {
-                "title": "Your first vybe",
-                "description": "Get your first vybe tonight and get a shot.",
-                "how": "Completed with {{count}} vybe (match) at this party."
+                "title": "Your first crush",
+                "description": "Get your first crush tonight and get a shot.",
+                "how": "Completed with {{count}} crush at this party."
             },
             "threeVybes": {
-                "title": "Three vybes",
-                "description": "Get three vybes tonight and get a drink.",
-                "how": "Completed with {{count}} vybes at this party."
+                "title": "Three crushes",
+                "description": "Get three crushes tonight and get a drink.",
+                "how": "Completed with {{count}} crushes at this party."
             },
             "squad": {
                 "title": "Bring your squad",
@@ -1259,7 +1259,7 @@
             "firstVisit": {
                 "title": "First time here",
                 "description": "Your first time at this venue comes with a reward.",
-                "how": "For people who had never been to one of the venue's events with Vybes."
+                "how": "For people who had never been to one of the venue's events with Fiestea."
             },
             "editTitle": "Edit",
             "editBody": "Change the text and times. Anything left empty follows the party.",
@@ -1292,7 +1292,7 @@
         },
         "stamps": {
             "title": "Stamp card",
-            "subtitle": "One stamp for every night someone gets in with Vybes. A full card earns a reward.",
+            "subtitle": "One stamp for every night someone gets in with Fiestea. A full card earns a reward.",
             "invalid": "Set between 2 and 20 stamps and a reward.",
             "saved": "Stamp card saved",
             "disabled": "Stamp card turned off",
@@ -1309,14 +1309,14 @@
         "report": {
             "title": "Weekly report",
             "empty": "No reports yet.",
-            "checkIns": "Check-ins with Vybes",
+            "checkIns": "Check-ins with Fiestea",
             "vsPrev": "{{percent}}% vs the previous week",
             "uniquePeople": "Unique people",
             "returning": "Returning",
             "ofPeople": "{{percent}}% of the crowd",
             "intents": "Said they were coming",
             "arrived": "{{count}} came ({{percent}}%)",
-            "matches": "Vybes (matches)",
+            "matches": "Crushes",
             "events": "Events",
             "headcountPeak": "Door count peak",
             "promos": "Promos claimed",
@@ -1327,15 +1327,15 @@
             "readyTitle": "Your weekly report is ready",
             "readyBody": "Your week summary ({{range}}): who came, who returns and how you did compared with venues like yours.",
             "view": "View report",
-            "bestEvent": "Best night: {{name}} ({{count}} check-ins with Vybes).",
+            "bestEvent": "Best night: {{name}} ({{count}} check-ins with Fiestea).",
             "peakHour": "Most people arrived around {{hour}}:00.",
             "topCode": "Promoter who brought the most people: {{name}} ({{count}}).",
-            "benchmark": "Average per event: you {{mine}} check-ins with Vybes; venues like yours, {{others}}.",
+            "benchmark": "Average per event: you {{mine}} check-ins with Fiestea; venues like yours, {{others}}.",
             "noBenchmark": "Not enough similar venues to compare yet.",
-            "revenueTitle": "What Vybes brought you",
-            "brought_one": "{{count}} person came through Vybes",
-            "brought_other": "{{count}} people came through Vybes",
-            "brought": "{{count}} people came through Vybes",
+            "revenueTitle": "What Fiestea brought you",
+            "brought_one": "{{count}} person came through Fiestea",
+            "brought_other": "{{count}} people came through Fiestea",
+            "brought": "{{count}} people came through Fiestea",
             "broughtIntent": "{{count}} said \"I'm going\" and came",
             "broughtCode": "{{count}} came in with a promoter code",
             "broughtFollow": "{{count}} follow you and came",
@@ -1372,7 +1372,7 @@
             "opens": "Opens",
             "closes": "Closes",
             "avgSpend": "Average spend per person",
-            "avgSpendHint": "Nobody else sees it. The weekly report uses it to work out how many euros Vybes brought you.",
+            "avgSpendHint": "Nobody else sees it. The weekly report uses it to work out how many euros Fiestea brought you.",
             "perPerson": "person",
             "avgSpendInvalid": "Enter an amount between €1 and €1000",
             "saved": "Venue page saved"
@@ -1402,7 +1402,7 @@
             "approved": "Venue approved",
             "approvedBody": "They can now publish events and generate codes.",
             "rejected": "Venue rejected",
-            "rejectedBody": "The venue won't be able to operate on Vybes.",
+            "rejectedBody": "The venue won't be able to operate on Fiestea.",
             "noDocuments": "No documents. Ask for them before approving.",
             "colVenue": "Venue",
             "colCity": "City",
@@ -1490,7 +1490,7 @@
         },
         "menu": "Menu",
         "shortTitle": "Admin",
-        "staffHq": "Vybes Staff HQ",
+        "staffHq": "Fiestea Staff HQ",
         "navigation": "Navigation",
         "updated": "Updated {{time}}",
         "refresh": "Refresh",
@@ -1549,9 +1549,9 @@
     },
     "pwa": {
         "updateTitle": "A new version is available",
-        "updateBody": "Reload to update Vybes.",
+        "updateBody": "Reload to update Fiestea.",
         "update": "Update",
-        "installTitle": "Install Vybes",
+        "installTitle": "Install Fiestea",
         "installBody": "Add it to your home screen to get into events faster.",
         "install": "Install",
         "offline": "You're offline. Some features won't be available."
@@ -1617,13 +1617,13 @@
         "lockedBody": "With Premium you see who they are before leaving home.",
         "noneForYou": "Nobody matching what you want to see is going yet.",
         "heading": "Who's going",
-        "confirmed": "{{count}} on Vybes going"
+        "confirmed": "{{count}} on Fiestea going"
     },
     "nav": {
         "home": "Home",
         "map": "Map",
         "tickets": "Tickets",
-        "vybes": "Vybes",
+        "vybes": "Crushes",
         "profile": "Profile",
         "chat": "Chat",
         "access": "Entry",
@@ -1634,10 +1634,10 @@
         "title": "Updates",
         "subtitle": "What happened while you weren't looking.",
         "inside": "You're still at {{name}}",
-        "insideBody": "Head back to the floor to keep doing Vybe Check.",
+        "insideBody": "Head back to the floor to keep doing Fiestea Check.",
         "messages_one": "{{name}} messaged you",
         "messages_other": "{{name}} sent you {{count}} messages",
-        "newVybe": "New Vybe with {{name}}",
+        "newVybe": "New crush with {{name}}",
         "newVybeBody": "Message them before the party ends.",
         "tonight": "{{name}} is tonight",
         "tonightBody": "Starts at {{time}} at {{venue}}.",
@@ -1657,7 +1657,7 @@
         "ended": "This event has ended",
         "enterNow": "Get in now",
         "confirmed": "You're going!",
-        "intentNote": "When you mark \"I'm going\", the venue will see you on its Vybes List (name, age and photo)."
+        "intentNote": "When you mark \"I'm going\", the venue will see you on its Fiestea List (name, age and photo)."
     },
     "venueTypes": {
         "discoteca": "Club",
@@ -1736,7 +1736,7 @@
     },
     "matchDialog": {
         "onTheFloor": "On the floor now · {{name}}",
-        "title": "New Vybe!",
+        "title": "New Crush!",
         "bodyAt": "You and {{name}} connected at {{event}}",
         "you": "You",
         "inCommon_one": "{{count}} in common",
@@ -1762,8 +1762,8 @@
         "radar": "Radar",
         "tastes": "Nightlife vibe & tastes",
         "nights": "nights",
-        "vybes": "vybes",
-        "connectedTitle": "Connected through Vybe Check",
+        "vybes": "crushes",
+        "connectedTitle": "Connected through Fiestea Check",
         "connectedAgo": "You matched {{ago}}",
         "connectedAt": "at {{venue}}.",
         "expiresAt": "The ephemeral chat expires at {{time}}.",
@@ -1776,25 +1776,25 @@
     },
     "landing": {
         "nav": {
-            "users": "For vybers",
+            "users": "For fiesters",
             "venues": "For venues",
             "how": "How it works",
             "plans": "Plans",
             "faq": "FAQ",
             "login": "Venue login",
             "registerVenue": "Register my venue",
-            "openApp": "Open Vybes",
+            "openApp": "Open Fiestea",
             "menu": "Open menu",
             "close": "Close menu"
         },
         "hero": {
             "pill": "The nightlife app in Mallorca",
             "titleStart": "Nights are lived on the dance floor.",
-            "titleBrand": "Vybes",
-            "titleEnd": "connects vybers and venues in real time.",
-            "body": "Discover parties near you, get in with the venue's QR code and do a Vybe Check only with people who are inside with you. And if you run a venue: live capacity, codes for your promoters and offers for people already on the floor.",
+            "titleBrand": "Fiestea",
+            "titleEnd": "connects fiesters and venues in real time.",
+            "body": "Discover parties near you, get in with the venue's QR code and do a Fiestea Check only with people who are inside with you. And if you run a venue: live capacity, codes for your promoters and offers for people already on the floor.",
             "ctaUser": "Get the app",
-            "ctaVenue": "Vybes for venues",
+            "ctaVenue": "Fiestea for venues",
             "imageAlt": "People dancing in a club under yellow lights",
             "imageTag": "Mallorca",
             "imageCaption": "Verified parties, real people inside",
@@ -1811,11 +1811,11 @@
             "steps": {
                 "access": {
                     "title": "Get in with the venue's QR",
-                    "body": "Scan the code at the door. Vybes checks on its servers that the code is valid and that you're within the venue's radius.",
+                    "body": "Scan the code at the door. Fiestea checks on its servers that the code is valid and that you're within the venue's radius.",
                     "tag": "Server-validated code and geofence"
                 },
                 "check": {
-                    "title": "Do a Vybe Check",
+                    "title": "Do a Fiestea Check",
                     "body": "Swipe through the people who got into the same party, with filters for age and interests. If you both like each other, it's a match.",
                     "tag": "Only people at your party"
                 },
@@ -1831,11 +1831,11 @@
             "title": "Built for the party and for the people who run it",
             "body": "What partygoers are looking for and what venues need to fill the room, in the same app.",
             "tabs": {
-                "users": "Vybers",
+                "users": "Fiesters",
                 "venues": "Venues"
             },
             "users": {
-                "eyebrow": "For vybers",
+                "eyebrow": "For fiesters",
                 "title": "Enjoy the night without wasting time",
                 "cta": "Get the app",
                 "items": {
@@ -1901,7 +1901,7 @@
                     },
                     "report": {
                         "title": "Weekly report in euros",
-                        "body": "Every Monday: how many people came through Vybes, who came back and how much money it brought you."
+                        "body": "Every Monday: how many people came through Fiestea, who came back and how much money it brought you."
                     },
                     "boost": {
                         "title": "Feature your party",
@@ -1916,7 +1916,7 @@
             "body": "From the phone of the person dancing to the dashboard of the person running the venue.",
             "sample": "Sample view",
             "phone": {
-                "title": "Vybe Check",
+                "title": "Fiestea Check",
                 "inside": "Inside the party",
                 "tag": "On the floor now",
                 "name": "Lucía, 24",
@@ -1984,8 +1984,8 @@
             "title": "What people usually ask us",
             "items": {
                 "price": {
-                    "q": "How much does Vybes cost?",
-                    "a": "Going out with Vybes is free. Vybes Premium adds extras like seeing who likes you or boosting your profile for an hour. Venues have a Free plan plus Pro (€49/month, first month free) and Business (€129/month), excluding VAT and with no commitment."
+                    "q": "How much does Fiestea cost?",
+                    "a": "Going out with Fiestea is free. Fiestea Premium adds extras like seeing who likes you or boosting your profile for an hour. Venues have a Free plan plus Pro (€49/month, first month free) and Business (€129/month), excluding VAT and with no commitment."
                 },
                 "location": {
                     "q": "Why does it ask for my location?",
@@ -2004,19 +2004,19 @@
                     "a": "We're starting in Mallorca. If your venue is somewhere else, get in touch and we'll let you know when we arrive."
                 },
                 "apps": {
-                    "q": "Where can I download Vybes?",
-                    "a": "Vybes for going out is an iPhone and Android app, and we're publishing it on the App Store and Google Play. The app.vybes.es website is only for venues and their staff."
+                    "q": "Where can I download Fiestea?",
+                    "a": "Fiestea for going out is an iPhone and Android app, and we're publishing it on the App Store and Google Play. The app.vybes.es website is only for venues and their staff."
                 }
             }
         },
         "cta": {
             "eyebrow": "Start the night",
             "title": "Ready to experience nightlife differently?",
-            "body": "Download Vybes and join your next party. If you run a venue, tell us about it and we'll show you around."
+            "body": "Download Fiestea and join your next party. If you run a venue, tell us about it and we'll show you around."
         },
         "form": {
             "title": "Do you run a club, bar or festival?",
-            "body": "Leave your details and we'll show you Vybes in a 15-minute call.",
+            "body": "Leave your details and we'll show you Fiestea in a 15-minute call.",
             "venueName": "Venue name",
             "city": "City or area (e.g. Palma, Magaluf)",
             "type": "Type of venue",
@@ -2030,7 +2030,7 @@
             },
             "contact": "Email or phone",
             "message": "Anything we should know? (optional)",
-            "consent": "I agree that Vybes may use these details to contact me about my venue, as described in the <privacy>privacy policy</privacy>.",
+            "consent": "I agree that Fiestea may use these details to contact me about my venue, as described in the <privacy>privacy policy</privacy>.",
             "submit": "Request a demo",
             "sending": "Sending…",
             "successTitle": "Got it!",
@@ -2047,7 +2047,7 @@
         },
         "footer": {
             "tagline": "The app that connects people at the same party and helps venues fill the room.",
-            "users": "Vybers",
+            "users": "Fiesters",
             "venues": "Venues",
             "legal": "Legal",
             "signup": "Get the app",
@@ -2057,7 +2057,7 @@
             "privacy": "Privacy",
             "terms": "Terms",
             "contact": "Contact",
-            "rights": "© {{year}} Vybes. All rights reserved.",
+            "rights": "© {{year}} Fiestea. All rights reserved.",
             "made": "Made in Palma de Mallorca"
         },
         "download": {
@@ -2068,11 +2068,11 @@
         }
     },
     "mobileOnly": {
-        "title": "Vybes lives on your phone",
-        "body": "This website is for venues and admins. To discover parties, get in with the QR code and do a Vybe Check, download the app.",
+        "title": "Fiestea lives on your phone",
+        "body": "This website is for venues and admins. To discover parties, get in with the QR code and do a Fiestea Check, download the app.",
         "venueAccess": "Run a venue? Log in here",
         "reason": {
-            "clubber": "This site is only for venues and admins. Your Vybes account works in the app, at the venue.",
+            "clubber": "This site is only for venues and admins. Your Fiestea account works in the app, at the venue.",
             "verified": "Email verified. You can now log in from the app.",
             "password": "Password changed. Use it to log in from the app."
         }
@@ -2084,11 +2084,11 @@
             "almostFull": "Almost full",
             "full": "Full"
         },
-        "withVybe": "{{level}} · {{count}} on Vybes",
+        "withVybe": "{{level}} · {{count}} on Fiestea",
         "source": "From the venue · {{minutes}} min ago",
         "sourceNow": "From the venue · just now",
-        "friendsGoing_one": "{{count}} of your vybes is going",
-        "friendsGoing_other": "{{count}} of your vybes are going"
+        "friendsGoing_one": "{{count}} of your crushes is going",
+        "friendsGoing_other": "{{count}} of your crushes are going"
     },
     "counter": {
         "title": "Door counter",
@@ -2096,8 +2096,8 @@
         "askVenue": "Ask the venue for a new link.",
         "ofCapacity": "of {{capacity}}",
         "percent": "{{percent}}% of capacity",
-        "withVybe": "{{count}} on Vybes ({{percent}}%)",
-        "withVybeNoPct": "{{count}} on Vybes",
+        "withVybe": "{{count}} on Fiestea ({{percent}}%)",
+        "withVybeNoPct": "{{count}} on Fiestea",
         "add": "Add one person",
         "remove": "Remove one person",
         "addFive": "Add five people",
@@ -2117,7 +2117,7 @@
             "INVALID_DELTA": "Couldn't count. Try again.",
             "generic": "Couldn't count. Try again."
         },
-        "belowVybe": "There are {{count}} people on Vybes inside: the real total can't be lower. Tap \"Correct total\"."
+        "belowVybe": "There are {{count}} people on Fiestea inside: the real total can't be lower. Tap \"Correct total\"."
     },
     "night": {
         "title": "Tonight",
@@ -2149,7 +2149,7 @@
             "claim": "Collect reward",
             "hints": {
                 "early_bird": "Get in before {{time}}.",
-                "matches": "Get {{count}} vybes tonight.",
+                "matches": "Get {{count}} crushes tonight.",
                 "group": "Get {{count}} people from your group in.",
                 "stay_until": "Still be inside at {{time}}.",
                 "first_visit": "Your first time at this venue."
@@ -2200,7 +2200,7 @@
             "long": "Long queue"
         },
         "nowPlaying": "Playing: {{song}}",
-        "mix": "{{women}}% women · {{men}}% men (on Vybes)"
+        "mix": "{{women}}% women · {{men}}% men (on Fiestea)"
     },
     "whereNext": {
         "title": "The party is ending",
@@ -2214,7 +2214,7 @@
     },
     "venuePage": {
         "notFound": "We couldn't find this venue",
-        "vybeVenue": "Venue on Vybes",
+        "vybeVenue": "Venue on Fiestea",
         "follow": "Follow",
         "following": "Following",
         "followers_one": "{{count}} follower",
@@ -2276,11 +2276,11 @@
     "eventMode": {
         "chooseTitle": "You're about to enter «{{name}}»",
         "chooseBody": "How do you want to join? You can change it during the night.",
-        "enterAsVyber": "Join as a Vyber",
+        "enterAsVyber": "Join as a Fiester",
         "enterAsGuest": "Join as a guest",
         "vyber": {
-            "title": "Vyber",
-            "short": "Vyber mode",
+            "title": "Fiester",
+            "short": "Fiester mode",
             "body": "You take a photo on the spot, appear on the board and can swipe and match."
         },
         "guest": {
@@ -2304,18 +2304,18 @@
         },
         "switchConfirm": "Yes, switch",
         "switched": {
-            "vyber": "You're now in Vyber mode",
+            "vyber": "You're now in Fiester mode",
             "guest": "You're now in guest mode"
         }
     },
     "accountKind": {
         "vyber": {
-            "tab": "Vyber account",
+            "tab": "Fiester account",
             "short": "Parties and meeting people",
-            "infoCta": "What is a Vyber and what can I do?",
-            "infoTitle": "What is a Vyber?",
-            "infoBody": "A Vyber goes out and also wants to meet whoever is at the venue that night.",
-            "switched": "You're a Vyber now",
+            "infoCta": "What is a Fiester and what can I do?",
+            "infoTitle": "What is a Fiester?",
+            "infoBody": "A Fiester goes out and also wants to meet whoever is at the venue that night.",
+            "switched": "You're a Fiester now",
             "switchBody": "We'll ask for a photo on the spot next time you enter a party.",
             "points": {
                 "events": "Every party: map, details, times and prices",
@@ -2349,13 +2349,13 @@
         "switchTo": "Switch to {{kind}}",
         "switchTitle": "Switch to {{kind}}?",
         "switchConfirm": "Yes, switch",
-        "guestWarning": "Going back to Vyber is only possible once a month (three times with Premium). If you switch now, you will have to wait.",
-        "limitReached": "You can go back to a Vyber account from {{date}}.",
+        "guestWarning": "Going back to Fiester is only possible once a month (three times with Premium). If you switch now, you will have to wait.",
+        "limitReached": "You can go back to a Fiester account from {{date}}.",
         "changesLeft": "You have {{count}} changes left this month.",
         "compare": {
-            "title": "As a guest you see the party; as a Vyber you play it",
+            "title": "As a guest you see the party; as a Fiester you play it",
             "guest": "Guest",
-            "vyber": "Vyber",
+            "vyber": "Fiester",
             "rows": {
                 "events": "Parties, map and prices",
                 "tickets": "Tickets",

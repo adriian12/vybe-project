@@ -15,7 +15,7 @@ import { resolve } from 'node:path';
 import { root } from './supabase-project.mjs';
 import { findJava21 } from './java21.mjs';
 
-const NOMBRE = 'Vybes.apk';
+const NOMBRE = 'Fiestea.apk';
 
 const android = resolve(root, 'android');
 const origen = resolve(android, 'app/build/outputs/apk/debug/app-debug.apk');

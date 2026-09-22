@@ -1,6 +1,6 @@
 {
     "common": {
-        "appName": "Vybes",
+        "appName": "Fiestea",
         "tagline": "Una festa és qüestió de vibracions",
         "location": "Mallorca",
         "loading": "Carregant…",
@@ -53,7 +53,7 @@
         "name": "Nom",
         "namePlaceholder": "Com vols que et vegin",
         "age": "Edat",
-        "ageHelp": "Vybes és només per a majors de 18 anys.",
+        "ageHelp": "Fiestea és només per a majors de 18 anys.",
         "login": "Iniciar sessió",
         "loggingIn": "Iniciant sessió…",
         "loginAsVenue": "Entrar com a empresa",
@@ -79,7 +79,7 @@
             "passwordMismatch": "Les contrasenyes no coincideixen.",
             "nameRequired": "Digues com et dius.",
             "ageRequired": "Introdueix la teva edat.",
-            "ageMin": "Has de ser major de 18 anys per fer servir Vybes.",
+            "ageMin": "Has de ser major de 18 anys per fer servir Fiestea.",
             "ageMax": "Introdueix una edat vàlida.",
             "venueNameRequired": "El nom del local és obligatori.",
             "phoneRequired": "El telèfon de contacte és obligatori.",
@@ -165,7 +165,7 @@
         "showPassword": "Mostrar la contrasenya",
         "hidePassword": "Amagar la contrasenya",
         "adminAccess": "Accés d'administració",
-        "toAdminAccess": "Ets de l'equip de Vybes? Accés d'administració",
+        "toAdminAccess": "Ets de l'equip de Fiestea? Accés d'administració",
         "toVenueAccess": "Tornar a l'accés de locals"
     },
     "consent": {
@@ -176,7 +176,7 @@
         "age": "Confirmo que tinc 18 anys o més.",
         "marketing": "Vull rebre novetats sobre esdeveniments. (opcional)",
         "accept": "Accepto i continuo",
-        "required": "Has d'acceptar els tres primers punts per fer servir Vybes.",
+        "required": "Has d'acceptar els tres primers punts per fer servir Fiestea.",
         "readDocs": "Pots consultar els documents complets en qualsevol moment des del teu perfil."
     },
     "home": {
@@ -188,7 +188,7 @@
         "inEvent": "Ets a {{name}}",
         "inEventBody": "{{venue}} · Toca per seguir coneixent gent",
         "going": "{{count}} hi van",
-        "inside": "{{count}} amb Vybes a dins",
+        "inside": "{{count}} amb Fiestea a dins",
         "beFirst": "Sigues el primer a entrar",
         "imGoing": "Hi vaig",
         "notGoing": "Ja no hi vaig",
@@ -205,7 +205,7 @@
         "statEvents": "festes\naquesta nit",
         "statInside": "persones\ndins ara",
         "statGoing": "han dit\nque hi van",
-        "goingPlus": "{{count}} amb Vybes hi van",
+        "goingPlus": "{{count}} amb Fiestea hi van",
         "buy": "Entrades",
         "greetingDay": "Què fas aquest cap de setmana?",
         "greetingNight": "Què fas aquesta nit?",
@@ -213,7 +213,7 @@
         "seeAll": "Veure-ho tot",
         "statNearby": "esdeveniments a prop teu",
         "statEventsShort": "esdeveniments",
-        "statInsideShort": "amb Vybes a dins",
+        "statInsideShort": "amb Fiestea a dins",
         "statTonight": "esdeveniments aquesta nit",
         "featured": "Destacats",
         "upcoming": "Propers esdeveniments",
@@ -274,11 +274,11 @@
         "codeTooShort": "El codi ha de tenir com a mínim 6 caràcters",
         "cameraError": "No s'ha pogut accedir a la càmera. Revisa els permisos o introdueix el codi a mà.",
         "manualButton": "Introduir codi manualment",
-        "serverChecked": "L'accés es valida al servidor de Vybes"
+        "serverChecked": "L'accés es valida al servidor de Fiestea"
     },
     "location": {
         "title": "Verifica la teva ubicació",
-        "body": "Vybes només funciona dins d'esdeveniments, discoteques o festes verificades.",
+        "body": "Fiestea només funciona dins d'esdeveniments, discoteques o festes verificades.",
         "bodyTwo": "Només veuràs perfils de gent que sigui al mateix esdeveniment que tu.",
         "insideTitle": "Ja ets a dins!",
         "endsAt": "Acaba",
@@ -329,7 +329,7 @@
         "interestsHelp": "Mostra només qui en comparteixi algun.",
         "apply": "Aplicar filtres",
         "reset": "Treure filtres",
-        "premiumOnly": "El rang d'edat és part de Vybes Premium.",
+        "premiumOnly": "El rang d'edat és part de Fiestea Premium.",
         "activeCount": "{{count}} filtres actius",
         "help": "Tria a qui vols veure al tauler.",
         "music": "Música",
@@ -351,9 +351,9 @@
         "connectedWith": "T'has connectat amb {{name}}"
     },
     "matches": {
-        "title": "Els meus Vybes",
+        "title": "Els meus Crushes",
         "empty": "Encara no tens connexions",
-        "emptyBody": "Entra en un esdeveniment i fes un Vybe Check per conèixer gent nova.",
+        "emptyBody": "Entra en un esdeveniment i fes un Fiestea Check per conèixer gent nova.",
         "noMessages": "Encara no hi ha missatges. Comença la conversa!",
         "you": "Tu: ",
         "expiresIn": "Caduca en {{time}}",
@@ -370,7 +370,7 @@
     },
     "chat": {
         "noConversation": "No s'ha trobat la conversa",
-        "backToMatches": "Tornar als meus Vybes",
+        "backToMatches": "Tornar als meus Crushes",
         "notFound": "No s'ha trobat aquesta conversa",
         "empty": "Encara no hi ha missatges",
         "emptyBody": "Comença la conversa!",
@@ -391,7 +391,7 @@
         "sent": "Enviat",
         "unmatch": "Eliminar conversa",
         "unmatchTitle": "Desfer el match amb {{name}}?",
-        "unmatchBody": "S'esborrarà la conversa i el vybe match. No et tornarà a sortir al tauler.",
+        "unmatchBody": "S'esborrarà la conversa i el crush. No et tornarà a sortir al tauler.",
         "unmatchConfirm": "Eliminar",
         "unmatched": "Conversa eliminada",
         "disappearsIn": "Aquest xat desapareix en {{time}}"
@@ -407,7 +407,7 @@
         "sent": "Report enviat",
         "sentBody": "El nostre equip el revisarà com més aviat millor.",
         "blocked": "Usuari bloquejat",
-        "blockedBody": "Ja no us tornareu a veure a Vybes.",
+        "blockedBody": "Ja no us tornareu a veure a Fiestea.",
         "reasons": {
             "inappropriate_content": "Contingut inapropiat",
             "harassment": "Assetjament o comportament ofensiu",
@@ -491,9 +491,9 @@
         "groupsHelp": "Disponible quan siguis dins d'una festa",
         "notificationsHelp": "Matches, missatges i avisos de les teves festes",
         "safetyHelp": "Contactes de confiança i botó d'ajuda",
-        "cancelTitle": "Cancel·lar Vybes Premium?",
+        "cancelTitle": "Cancel·lar Fiestea Premium?",
         "cancelBody": "Continuaràs tenint Premium fins que acabi el període que ja has pagat.",
-        "tagline": "Vybes · La nit a Espanya"
+        "tagline": "Fiestea · La nit a Espanya"
     },
     "faceVerification": {
         "title": "Verificació d'identitat",
@@ -618,7 +618,7 @@
         "removed": "{{name}} ja no és al grup"
     },
     "premium": {
-        "title": "Vybes Premium",
+        "title": "Fiestea Premium",
         "subtitle": "Treu més partit a cada festa",
         "monthly": "Subscripció mensual",
         "forEvent": "Només per a {{name}}",
@@ -645,7 +645,7 @@
             "boost": "Destacar una hora",
             "boostBody": "El teu perfil el primer del tauler durant 60 minuts."
         },
-        "required": "Això és de Vybes Premium.",
+        "required": "Això és de Fiestea Premium.",
         "boost": {
             "cta": "Destacar 1 h",
             "active": "Destaques {{minutes}} min",
@@ -669,7 +669,7 @@
         "empty": "Encara no tens likes pendents",
         "emptyBody": "Segueix lliscant als esdeveniments perquè et vegi més gent.",
         "locked": "Descobreix qui t'ha donat like",
-        "lockedBody": "Amb Vybes Premium veus a qui li has agradat abans de lliscar.",
+        "lockedBody": "Amb Fiestea Premium veus a qui li has agradat abans de lliscar.",
         "unlock": "Activar Premium",
         "likeBack": "Donar like",
         "at": "a {{event}}",
@@ -683,7 +683,7 @@
         "myVenue": "El meu local",
         "exit": "Sortir",
         "pendingTitle": "Local pendent d'aprovació",
-        "pendingBody": "Els teus esdeveniments no seran visibles i no podràs generar codis fins que l'equip de Vybes verifiqui el local.",
+        "pendingBody": "Els teus esdeveniments no seran visibles i no podràs generar codis fins que l'equip de Fiestea verifiqui el local.",
         "tabs": {
             "qr": "Codi QR",
             "stats": "Estadístiques",
@@ -710,7 +710,7 @@
             "download": "Descarregar",
             "copied": "Codi copiat",
             "copiedBody": "Ja el pots enganxar on vulguis.",
-            "shareText": "Fes servir el codi {{code}} per entrar a Vybes.",
+            "shareText": "Fes servir el codi {{code}} per entrar a Fiestea.",
             "notLinked": "El codi actual no està vinculat a aquest esdeveniment. Genera'n un de nou.",
             "notVerified": "Podràs generar codis d'accés quan el nostre equip aprovi el teu local.",
             "rotation": "Rotació automàtica",
@@ -720,7 +720,7 @@
             "rotated": "Codi rotat automàticament",
             "printPoster": "Imprimir cartell",
             "posterSlogan": "Vols provar una manera de conèixer gent nova?",
-            "posterFooter": "Escaneja el codi amb l'app Vybes",
+            "posterFooter": "Escaneja el codi amb l'app Fiestea",
             "manualCodeLabel": "Codi manual",
             "expiresInShort": "Caduca d'aquí a {{hours}} h {{minutes}} min",
             "rotationInterval": "Interval de canvi"
@@ -768,7 +768,7 @@
             "startDate": "Data d'inici",
             "endDate": "Data de fi",
             "minAge": "Edat mínima",
-            "minAgeHelp": "Vybes és una app només per a majors de 18 anys.",
+            "minAgeHelp": "Fiestea és una app només per a majors de 18 anys.",
             "theme": "Temàtica",
             "themePlaceholder": "Electrònica, Reggaeton, Pop…",
             "dressCode": "Codi de vestimenta",
@@ -851,7 +851,7 @@
             "members": "Membres",
             "invite": "Afegir membre",
             "inviteEmail": "Correu de la persona",
-            "inviteHelp": "Ha de tenir ja un compte de Vybes amb aquest correu.",
+            "inviteHelp": "Ha de tenir ja un compte de Fiestea amb aquest correu.",
             "role": "Rol",
             "roles": {
                 "owner": "Propietari",
@@ -913,7 +913,7 @@
             "closeEntryTitle": "Tancar la porta?",
             "closeEntryBody": "Ningú més podrà entrar amb l'app: cap codi funcionarà. Qui ja és a dins continua a dins i pots reobrir quan vulguis.",
             "insideReal": "A dins (porta)",
-            "insideVybe": "Amb Vybes ara",
+            "insideVybe": "Amb Fiestea ara",
             "ofCapacityShort": "de {{capacity}}",
             "insideNow": "A dins ara",
             "reopened": "Porta oberta de nou",
@@ -1020,12 +1020,12 @@
             "dropoffEmpty": "Encara no hi ha dades per a aquest esdeveniment.",
             "peak": "El ple va ser a les {{time}}, amb {{count}} persones a dins.",
             "privacyNote": "Les dades de públic van sempre agrupades. Els grups amb molt poca gent no es mostren, perquè assenyalarien persones concretes.",
-            "headcountTitle": "Aforament real davant de Vybes",
-            "headcountSubtitle": "El que compta la porta, tram a tram, i quant d'aquest públic fa servir Vybes.",
+            "headcountTitle": "Aforament real davant de Fiestea",
+            "headcountSubtitle": "El que compta la porta, tram a tram, i quant d'aquest públic fa servir Fiestea.",
             "headcountNeedsPlan": "La corba d'aforament és dels plans Pro i Business",
             "headcountEmpty": "Aquesta nit encara no s'ha comptat a la porta.",
             "headcountPeak": "Pic de {{count}} persones a les {{time}}.",
-            "headcountShare": "De mitjana, el {{percent}} % feia servir Vybes."
+            "headcountShare": "De mitjana, el {{percent}} % feia servir Fiestea."
         },
         "plan": {
             "current": "El teu pla",
@@ -1048,7 +1048,7 @@
                 "promotions": "Promocions i vals",
                 "csvExport": "Exportar a CSV",
                 "demographics": "Detall de públic",
-                "headcountCurve": "Corba d'aforament i % amb Vybes"
+                "headcountCurve": "Corba d'aforament i % amb Fiestea"
             },
             "yourPlan": "El teu pla actual",
             "choose": "Triar",
@@ -1092,8 +1092,8 @@
         "tv": {
             "open": "Veure en pantalla gran",
             "insideNow": "{{count}} persones a dins ara",
-            "vybeCount_one": "{{count}} persona ja és a Vybes · escaneja i uneix-te",
-            "vybeCount_other": "{{count}} persones ja són a Vybes · escaneja i uneix-te",
+            "vybeCount_one": "{{count}} persona ja és a Fiestea · escaneja i uneix-te",
+            "vybeCount_other": "{{count}} persones ja són a Fiestea · escaneja i uneix-te",
             "raffleWinner": "Ha guanyat {{name}}! {{prize}}",
             "raffleAt": "Sorteig a les {{time}}: {{prize}}",
             "raffleSoon": "Sorteig aquesta nit: {{prize}}"
@@ -1157,11 +1157,11 @@
             "publicNote": "El públic només veu l'ambient (Tranquil, Animat, Gairebé ple, Ple), mai la xifra.",
             "needCapacity": "Posa l'aforament de l'esdeveniment per fer servir el comptador de porta i perquè el públic vegi l'ambient.",
             "linksTitle": "Enllaços per al porter",
-            "linksBody": "Compta des de qualsevol mòbil, sense compte de Vybes. Caduca quan acaba la nit.",
+            "linksBody": "Compta des de qualsevol mòbil, sense compte de Fiestea. Caduca quan acaba la nit.",
             "createdOnce": "Desa o envia l'enllaç ara: per seguretat no es torna a mostrar.",
             "copy": "Copiar",
             "copied": "Enllaç copiat",
-            "whatsappText": "Comptador de porta de Vybes per a aquesta nit: {{url}}",
+            "whatsappText": "Comptador de porta de Fiestea per a aquesta nit: {{url}}",
             "done": "Fet",
             "labelPlaceholder": "Nom (p. ex. Porta principal)",
             "create": "Crear enllaç",
@@ -1187,8 +1187,8 @@
             "nowPlayingPlaceholder": "Cançó, artista o DJ"
         },
         "intentList": {
-            "title": "Llista Vybes",
-            "paid": "Aquest esdeveniment és amb entrada: la teva previsió són les vendes. Amb Vybes, {{count}} persones han dit que vénen.",
+            "title": "Llista Fiestea",
+            "paid": "Aquest esdeveniment és amb entrada: la teva previsió són les vendes. Amb Fiestea, {{count}} persones han dit que vénen.",
             "empty": "Encara ningú ha marcat que ve.",
             "summary": "{{arrived}} ja han arribat · {{women}} noies · {{men}} nois",
             "arrived": "Ja és a dins",
@@ -1237,14 +1237,14 @@
                 "how": "Per a qui entra abans de les {{time}}. Omple la primera hora."
             },
             "firstVybe": {
-                "title": "El teu primer vybe",
-                "description": "Aconsegueix el teu primer vybe aquesta nit i emporta't un xarrup.",
-                "how": "Es compleix amb {{count}} vybe (match) en aquesta festa."
+                "title": "El teu primer crush",
+                "description": "Aconsegueix el teu primer crush aquesta nit i emporta't un xarrup.",
+                "how": "Es compleix amb {{count}} crush en aquesta festa."
             },
             "threeVybes": {
-                "title": "Tres vybes",
-                "description": "Aconsegueix tres vybes aquesta nit i emporta't una copa.",
-                "how": "Es compleix amb {{count}} vybes en aquesta festa."
+                "title": "Tres crushes",
+                "description": "Aconsegueix tres crushes aquesta nit i emporta't una copa.",
+                "how": "Es compleix amb {{count}} crushes en aquesta festa."
             },
             "squad": {
                 "title": "Vine amb el teu grup",
@@ -1259,7 +1259,7 @@
             "firstVisit": {
                 "title": "Primera vegada aquí",
                 "description": "La teva primera vegada en aquest local té premi.",
-                "how": "Per a qui no havia entrat mai a un esdeveniment del local amb Vybes."
+                "how": "Per a qui no havia entrat mai a un esdeveniment del local amb Fiestea."
             },
             "editTitle": "Editar",
             "editBody": "Canvia el text i les hores. El que deixis buit segueix la festa.",
@@ -1292,7 +1292,7 @@
         },
         "stamps": {
             "title": "Targeta de segells",
-            "subtitle": "Un segell per cada nit que algú entra amb Vybes. Amb la targeta plena, un premi.",
+            "subtitle": "Un segell per cada nit que algú entra amb Fiestea. Amb la targeta plena, un premi.",
             "invalid": "Posa entre 2 i 20 segells i un premi.",
             "saved": "Targeta de segells desada",
             "disabled": "Targeta de segells desactivada",
@@ -1309,14 +1309,14 @@
         "report": {
             "title": "Informe setmanal",
             "empty": "Encara no hi ha informes.",
-            "checkIns": "Entrades amb Vybes",
+            "checkIns": "Entrades amb Fiestea",
             "vsPrev": "{{percent}} % respecte de la setmana anterior",
             "uniquePeople": "Persones diferents",
             "returning": "Repeteixen",
             "ofPeople": "{{percent}} % del públic",
             "intents": "Van dir que venien",
             "arrived": "{{count}} van venir ({{percent}} %)",
-            "matches": "Vybes (matches)",
+            "matches": "Crushes",
             "events": "Esdeveniments",
             "headcountPeak": "Màxim comptat a la porta",
             "promos": "Promocions demanades",
@@ -1327,15 +1327,15 @@
             "readyTitle": "Ja és disponible l'informe setmanal",
             "readyBody": "El resum de la teva setmana ({{range}}): qui va venir, qui repeteix i com et va anar davant de locals com el teu.",
             "view": "Veure l'informe",
-            "bestEvent": "Millor nit: {{name}} ({{count}} entrades amb Vybes).",
+            "bestEvent": "Millor nit: {{name}} ({{count}} entrades amb Fiestea).",
             "peakHour": "La gent va arribar sobretot a les {{hour}}:00.",
             "topCode": "El relacions públiques que en va portar més: {{name}} ({{count}}).",
-            "benchmark": "Mitjana per esdeveniment: tu {{mine}} entrades amb Vybes; locals com el teu, {{others}}.",
+            "benchmark": "Mitjana per esdeveniment: tu {{mine}} entrades amb Fiestea; locals com el teu, {{others}}.",
             "noBenchmark": "Encara no hi ha prou locals semblants per comparar.",
-            "revenueTitle": "El que t'ha portat Vybes",
-            "brought_one": "{{count}} persona va venir per Vybes",
-            "brought_other": "{{count}} persones van venir per Vybes",
-            "brought": "{{count}} persones van venir per Vybes",
+            "revenueTitle": "El que t'ha portat Fiestea",
+            "brought_one": "{{count}} persona va venir per Fiestea",
+            "brought_other": "{{count}} persones van venir per Fiestea",
+            "brought": "{{count}} persones van venir per Fiestea",
             "broughtIntent": "{{count}} van dir «hi aniré» i van venir",
             "broughtCode": "{{count}} van entrar amb un codi de RRPP",
             "broughtFollow": "{{count}} et segueixen i van venir",
@@ -1372,7 +1372,7 @@
             "opens": "Obre",
             "closes": "Tanca",
             "avgSpend": "Despesa mitjana per persona",
-            "avgSpendHint": "No ho veu ningú. Amb això, l'informe setmanal calcula quants euros t'ha portat Vybes.",
+            "avgSpendHint": "No ho veu ningú. Amb això, l'informe setmanal calcula quants euros t'ha portat Fiestea.",
             "perPerson": "persona",
             "avgSpendInvalid": "Posa un import entre 1 i 1000 €",
             "saved": "Fitxa desada"
@@ -1402,7 +1402,7 @@
             "approved": "Local aprovat",
             "approvedBody": "Ja pot publicar esdeveniments i generar codis.",
             "rejected": "Local rebutjat",
-            "rejectedBody": "El local no podrà operar a Vybes.",
+            "rejectedBody": "El local no podrà operar a Fiestea.",
             "noDocuments": "Sense documentació. Demana-la abans d'aprovar.",
             "colVenue": "Local",
             "colCity": "Ciutat",
@@ -1490,7 +1490,7 @@
         },
         "menu": "Menú",
         "shortTitle": "Administració",
-        "staffHq": "Vybes Staff HQ",
+        "staffHq": "Fiestea Staff HQ",
         "navigation": "Navegació",
         "updated": "Actualitzat {{time}}",
         "refresh": "Actualitzar",
@@ -1549,9 +1549,9 @@
     },
     "pwa": {
         "updateTitle": "Hi ha una versió nova",
-        "updateBody": "Recarrega per actualitzar Vybes.",
+        "updateBody": "Recarrega per actualitzar Fiestea.",
         "update": "Actualitzar",
-        "installTitle": "Instal·la Vybes",
+        "installTitle": "Instal·la Fiestea",
         "installBody": "Afegeix-la a la pantalla d'inici per entrar més ràpid als esdeveniments.",
         "install": "Instal·lar",
         "offline": "Sense connexió. Algunes funcions no estaran disponibles."
@@ -1617,13 +1617,13 @@
         "lockedBody": "Amb Premium veus qui són abans de sortir de casa.",
         "noneForYou": "De moment no hi va ningú que encaixi amb el que vols veure.",
         "heading": "Qui hi va",
-        "confirmed": "{{count}} amb Vybes hi van"
+        "confirmed": "{{count}} amb Fiestea hi van"
     },
     "nav": {
         "home": "Inici",
         "map": "Mapa",
         "tickets": "Entrades",
-        "vybes": "Vybes",
+        "vybes": "Crushes",
         "profile": "Perfil",
         "chat": "Xat",
         "access": "Accés",
@@ -1634,10 +1634,10 @@
         "title": "Avisos",
         "subtitle": "El que ha passat mentre no miraves.",
         "inside": "Encara ets a {{name}}",
-        "insideBody": "Torna a la pista per continuar fent Vybe Check.",
+        "insideBody": "Torna a la pista per continuar fent Fiestea Check.",
         "messages_one": "{{name}} t'ha escrit",
         "messages_other": "{{name}} t'ha escrit {{count}} missatges",
-        "newVybe": "Nou Vybe amb {{name}}",
+        "newVybe": "Nou crush amb {{name}}",
         "newVybeBody": "Escriu-li abans que s'acabi la festa.",
         "tonight": "{{name}} és aquesta nit",
         "tonightBody": "Comença a les {{time}} a {{venue}}.",
@@ -1657,7 +1657,7 @@
         "ended": "Aquest esdeveniment ja ha acabat",
         "enterNow": "Entrar ara",
         "confirmed": "Confirmat!",
-        "intentNote": "En marcar «hi vaig», el local et veurà a la seva Llista Vybes (nom, edat i foto)."
+        "intentNote": "En marcar «hi vaig», el local et veurà a la seva Llista Fiestea (nom, edat i foto)."
     },
     "venueTypes": {
         "discoteca": "Discoteca",
@@ -1736,7 +1736,7 @@
     },
     "matchDialog": {
         "onTheFloor": "A la pista ara · {{name}}",
-        "title": "Nou Vybe!",
+        "title": "Nou Crush!",
         "bodyAt": "Tu i {{name}} us heu connectat a {{event}}",
         "you": "Tu",
         "inCommon_one": "{{count}} en comú",
@@ -1760,10 +1760,10 @@
         "inCommon_one": "interès en comú",
         "inCommon_other": "interessos en comú",
         "radar": "Radar",
-        "tastes": "Vybes nocturn i gustos",
+        "tastes": "Rotllo nocturn i gustos",
         "nights": "nits",
-        "vybes": "vybes",
-        "connectedTitle": "Connectats amb Vybe Check",
+        "vybes": "crushes",
+        "connectedTitle": "Connectats amb Fiestea Check",
         "connectedAgo": "Vau fer match {{ago}}",
         "connectedAt": "a {{venue}}.",
         "expiresAt": "El xat efímer caduca a les {{time}}.",
@@ -1776,25 +1776,25 @@
     },
     "landing": {
         "nav": {
-            "users": "Per a vybers",
+            "users": "Per a fiester@s",
             "venues": "Per a locals",
             "how": "Com funciona",
             "plans": "Plans",
             "faq": "Preguntes",
             "login": "Accés locals",
             "registerVenue": "Registrar el meu local",
-            "openApp": "Obrir Vybes",
+            "openApp": "Obrir Fiestea",
             "menu": "Obrir el menú",
             "close": "Tancar el menú"
         },
         "hero": {
             "pill": "L'app de la nit a Mallorca",
             "titleStart": "La nit es viu a la pista.",
-            "titleBrand": "Vybes",
-            "titleEnd": "connecta vybers i sales en temps real.",
-            "body": "Descobreix les festes de la teva zona, entra amb el QR del local i fes Vybe Check només amb qui és a dins amb tu. I si tens un local: aforament en directe, codis per als teus RRPP i promocions per a qui ja és a la pista.",
+            "titleBrand": "Fiestea",
+            "titleEnd": "connecta fiester@s i sales en temps real.",
+            "body": "Descobreix les festes de la teva zona, entra amb el QR del local i fes Fiestea Check només amb qui és a dins amb tu. I si tens un local: aforament en directe, codis per als teus RRPP i promocions per a qui ja és a la pista.",
             "ctaUser": "Descarregar l'app",
-            "ctaVenue": "Vybes per a locals",
+            "ctaVenue": "Fiestea per a locals",
             "imageAlt": "Gent ballant en una discoteca amb llums grogues",
             "imageTag": "Mallorca",
             "imageCaption": "Festes verificades, gent real a dins",
@@ -1811,11 +1811,11 @@
             "steps": {
                 "access": {
                     "title": "Entra amb el QR del local",
-                    "body": "Escaneges el codi a la porta. Vybes comprova al servidor que el codi és vàlid i que ets dins del radi del local.",
+                    "body": "Escaneges el codi a la porta. Fiestea comprova al servidor que el codi és vàlid i que ets dins del radi del local.",
                     "tag": "Codi validat al servidor i geotanca"
                 },
                 "check": {
-                    "title": "Fes Vybe Check",
+                    "title": "Fes Fiestea Check",
                     "body": "Llisca entre les persones que han entrat a la mateixa festa, amb filtres per edat i interessos. Si us agradeu tots dos, és match.",
                     "tag": "Només gent de la teva festa"
                 },
@@ -1831,11 +1831,11 @@
             "title": "Pensat per a la festa i per a qui l'organitza",
             "body": "El que busca qui surt de festa i el que necessita qui omple la sala, a la mateixa app.",
             "tabs": {
-                "users": "Vybers",
+                "users": "Fiester@s",
                 "venues": "Locals"
             },
             "users": {
-                "eyebrow": "Per a vybers",
+                "eyebrow": "Per a fiester@s",
                 "title": "Viu la nit sense perdre el temps",
                 "cta": "Descarregar l'app",
                 "items": {
@@ -1901,7 +1901,7 @@
                     },
                     "report": {
                         "title": "Informe setmanal en euros",
-                        "body": "Cada dilluns: quanta gent va venir per Vybes, qui repeteix i quants diners t'ha portat."
+                        "body": "Cada dilluns: quanta gent va venir per Fiestea, qui repeteix i quants diners t'ha portat."
                     },
                     "boost": {
                         "title": "Destaca la teva festa",
@@ -1916,7 +1916,7 @@
             "body": "Del mòbil de qui balla al tauler de qui dirigeix la sala.",
             "sample": "Vista d'exemple",
             "phone": {
-                "title": "Vybe Check",
+                "title": "Fiestea Check",
                 "inside": "Dins la festa",
                 "tag": "A la pista ara",
                 "name": "Lucía, 24",
@@ -1984,8 +1984,8 @@
             "title": "El que ens solen preguntar",
             "items": {
                 "price": {
-                    "q": "Quant costa Vybes?",
-                    "a": "Per sortir de festa és gratis. Vybes Premium afegeix extres com veure a qui li agrades o destacar el teu perfil una hora. Els locals tenen un pla Gratis i els plans Pro (49 €/mes, el primer mes gratis) i Business (129 €/mes), sense IVA i sense permanència."
+                    "q": "Quant costa Fiestea?",
+                    "a": "Per sortir de festa és gratis. Fiestea Premium afegeix extres com veure a qui li agrades o destacar el teu perfil una hora. Els locals tenen un pla Gratis i els plans Pro (49 €/mes, el primer mes gratis) i Business (129 €/mes), sense IVA i sense permanència."
                 },
                 "location": {
                     "q": "Per què em demana la ubicació?",
@@ -2004,19 +2004,19 @@
                     "a": "Comencem a Mallorca. Si el teu local és en una altra zona, escriu-nos i t'avisarem quan hi arribem."
                 },
                 "apps": {
-                    "q": "On descarrego Vybes?",
-                    "a": "Vybes per sortir de festa és una app per a iPhone i Android, i l'estem publicant a App Store i Google Play. El web app.vybes.es és només per a locals i el seu equip."
+                    "q": "On descarrego Fiestea?",
+                    "a": "Fiestea per sortir de festa és una app per a iPhone i Android, i l'estem publicant a App Store i Google Play. El web app.vybes.es és només per a locals i el seu equip."
                 }
             }
         },
         "cta": {
             "eyebrow": "Comença la nit",
             "title": "A punt per viure la nit d'una altra manera?",
-            "body": "Descarrega Vybes i entra a la propera festa. Si tens un local, explica'ns-ho i te l'ensenyem."
+            "body": "Descarrega Fiestea i entra a la propera festa. Si tens un local, explica'ns-ho i te l'ensenyem."
         },
         "form": {
             "title": "Tens una discoteca, un bar o un festival?",
-            "body": "Deixa'ns les teves dades i t'ensenyem Vybes en una trucada de 15 minuts.",
+            "body": "Deixa'ns les teves dades i t'ensenyem Fiestea en una trucada de 15 minuts.",
             "venueName": "Nom del local",
             "city": "Ciutat o zona (p. ex. Palma, Magaluf)",
             "type": "Tipus de local",
@@ -2030,7 +2030,7 @@
             },
             "contact": "Correu o telèfon",
             "message": "Hi ha res que hàgim de saber? (opcional)",
-            "consent": "Accepto que Vybes utilitzi aquestes dades per contactar-me sobre el meu local, segons la <privacy>política de privadesa</privacy>.",
+            "consent": "Accepto que Fiestea utilitzi aquestes dades per contactar-me sobre el meu local, segons la <privacy>política de privadesa</privacy>.",
             "submit": "Sol·licitar demo",
             "sending": "Enviant…",
             "successTitle": "Rebut!",
@@ -2047,7 +2047,7 @@
         },
         "footer": {
             "tagline": "L'app que connecta la gent que és a la mateixa festa i ajuda els locals a omplir la sala.",
-            "users": "Vybers",
+            "users": "Fiester@s",
             "venues": "Locals",
             "legal": "Legal",
             "signup": "Descarregar l'app",
@@ -2057,7 +2057,7 @@
             "privacy": "Privadesa",
             "terms": "Termes",
             "contact": "Contacte",
-            "rights": "© {{year}} Vybes. Tots els drets reservats.",
+            "rights": "© {{year}} Fiestea. Tots els drets reservats.",
             "made": "Fet a Palma de Mallorca"
         },
         "download": {
@@ -2068,11 +2068,11 @@
         }
     },
     "mobileOnly": {
-        "title": "Vybes es viu des del mòbil",
-        "body": "Aquest web és per a locals i administració. Per descobrir festes, entrar amb el QR i fer Vybe Check, descarrega l'app.",
+        "title": "Fiestea es viu des del mòbil",
+        "body": "Aquest web és per a locals i administració. Per descobrir festes, entrar amb el QR i fer Fiestea Check, descarrega l'app.",
         "venueAccess": "Tens un local? Accedeix aquí",
         "reason": {
-            "clubber": "Aquesta web és només per a locals i administració. El teu compte de Vybes s'utilitza des de l'app, al local.",
+            "clubber": "Aquesta web és només per a locals i administració. El teu compte de Fiestea s'utilitza des de l'app, al local.",
             "verified": "Email verificat. Ja pots entrar des de l'app.",
             "password": "Contrasenya canviada. Entra-hi des de l'app."
         }
@@ -2084,11 +2084,11 @@
             "almostFull": "Gairebé ple",
             "full": "Ple"
         },
-        "withVybe": "{{level}} · {{count}} amb Vybes",
+        "withVybe": "{{level}} · {{count}} amb Fiestea",
         "source": "Segons el local · fa {{minutes}} min",
         "sourceNow": "Segons el local · ara",
-        "friendsGoing_one": "{{count}} dels teus vybes hi va",
-        "friendsGoing_other": "{{count}} dels teus vybes hi van"
+        "friendsGoing_one": "{{count}} dels teus crushes hi va",
+        "friendsGoing_other": "{{count}} dels teus crushes hi van"
     },
     "counter": {
         "title": "Comptador de porta",
@@ -2096,8 +2096,8 @@
         "askVenue": "Demana al local un enllaç nou.",
         "ofCapacity": "de {{capacity}}",
         "percent": "{{percent}} % de l'aforament",
-        "withVybe": "{{count}} amb Vybes ({{percent}} %)",
-        "withVybeNoPct": "{{count}} amb Vybes",
+        "withVybe": "{{count}} amb Fiestea ({{percent}} %)",
+        "withVybeNoPct": "{{count}} amb Fiestea",
         "add": "Sumar una persona",
         "remove": "Restar una persona",
         "addFive": "Sumar cinc persones",
@@ -2117,7 +2117,7 @@
             "INVALID_DELTA": "No s'ha pogut comptar. Torna-ho a provar.",
             "generic": "No s'ha pogut comptar. Torna-ho a provar."
         },
-        "belowVybe": "Hi ha {{count}} persones amb Vybes a dins: el total real no pot ser menor. Prem «Corregir el total»."
+        "belowVybe": "Hi ha {{count}} persones amb Fiestea a dins: el total real no pot ser menor. Prem «Corregir el total»."
     },
     "night": {
         "title": "La nit",
@@ -2149,7 +2149,7 @@
             "claim": "Recollir el premi",
             "hints": {
                 "early_bird": "Entra abans de les {{time}}.",
-                "matches": "Aconsegueix {{count}} vybes aquesta nit.",
+                "matches": "Aconsegueix {{count}} crushes aquesta nit.",
                 "group": "Entreu {{count}} del teu grup.",
                 "stay_until": "Continua a dins a les {{time}}.",
                 "first_visit": "La teva primera vegada en aquest local."
@@ -2200,7 +2200,7 @@
             "long": "Molta cua"
         },
         "nowPlaying": "Sona: {{song}}",
-        "mix": "{{women}} % noies · {{men}} % nois (amb Vybes)"
+        "mix": "{{women}} % noies · {{men}} % nois (amb Fiestea)"
     },
     "whereNext": {
         "title": "La festa s'està acabant",
@@ -2214,7 +2214,7 @@
     },
     "venuePage": {
         "notFound": "No hem trobat aquest local",
-        "vybeVenue": "Local amb Vybes",
+        "vybeVenue": "Local amb Fiestea",
         "follow": "Seguir",
         "following": "Seguint",
         "followers_one": "{{count}} seguidor",
@@ -2276,11 +2276,11 @@
     "eventMode": {
         "chooseTitle": "Estàs a punt d'entrar a «{{name}}»",
         "chooseBody": "Com hi vols accedir? Ho pots canviar durant la nit.",
-        "enterAsVyber": "Entrar com a Vyber",
+        "enterAsVyber": "Entrar com a Fiester@",
         "enterAsGuest": "Entrar com a convidat",
         "vyber": {
-            "title": "Vyber",
-            "short": "Mode Vyber",
+            "title": "Fiester@",
+            "short": "Mode Fiester@",
             "body": "Et fas una foto del moment, surts al tauler i pots lliscar i fer match."
         },
         "guest": {
@@ -2304,18 +2304,18 @@
         },
         "switchConfirm": "Sí, canviar",
         "switched": {
-            "vyber": "Ara estàs en mode Vyber",
+            "vyber": "Ara estàs en mode Fiester@",
             "guest": "Ara estàs en mode convidat"
         }
     },
     "accountKind": {
         "vyber": {
-            "tab": "Compte Vyber",
+            "tab": "Compte Fiester@",
             "short": "Festes i conèixer gent",
-            "infoCta": "Què és un Vyber i què hi puc fer?",
-            "infoTitle": "Què és un Vyber?",
-            "infoBody": "Un Vyber surt de festa i, a més, vol conèixer qui hi ha aquella nit al local.",
-            "switched": "Ja ets Vyber",
+            "infoCta": "Què és un Fiester@ i què hi puc fer?",
+            "infoTitle": "Què és un Fiester@?",
+            "infoBody": "Un Fiester@ surt de festa i, a més, vol conèixer qui hi ha aquella nit al local.",
+            "switched": "Ja ets Fiester@",
             "switchBody": "Et demanarem una foto del moment la propera vegada que entris en una festa.",
             "points": {
                 "events": "Totes les festes: mapa, fitxa, horaris i preus",
@@ -2349,13 +2349,13 @@
         "switchTo": "Canviar a {{kind}}",
         "switchTitle": "Canviar a {{kind}}?",
         "switchConfirm": "Sí, canviar",
-        "guestWarning": "Tornar a Vyber només es pot un cop al mes (tres amb Premium). Si canvies ara, hauràs d’esperar.",
-        "limitReached": "Podràs tornar al compte Vyber a partir del {{date}}.",
+        "guestWarning": "Tornar a Fiester@ només es pot un cop al mes (tres amb Premium). Si canvies ara, hauràs d’esperar.",
+        "limitReached": "Podràs tornar al compte Fiester@ a partir del {{date}}.",
         "changesLeft": "Et queden {{count}} canvis aquest mes.",
         "compare": {
-            "title": "Com a convidat veus la festa; com a Vyber la jugues",
+            "title": "Com a convidat veus la festa; com a Fiester@ la jugues",
             "guest": "Convidat",
-            "vyber": "Vyber",
+            "vyber": "Fiester@",
             "rows": {
                 "events": "Festes, mapa i preus",
                 "tickets": "Entrades",

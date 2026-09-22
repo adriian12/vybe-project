@@ -111,7 +111,7 @@ const LandingPage = () => {
   const appHome = userType === 'venue' ? '/venue/dashboard' : userType === 'admin' ? '/admin/dashboard' : '/home';
 
   useEffect(() => {
-    document.title = `Vybes · ${t('landing.hero.pill')}`;
+    document.title = `Fiestea · ${t('landing.hero.pill')}`;
   }, [t]);
 
   useEffect(() => {
@@ -241,9 +241,9 @@ const LandingPage = () => {
       {/* ------------------------------------------------------------ cabecera */}
       <header className="pt-safe sticky top-0 z-40 border-b border-white/[0.06] bg-background/95">
         <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-margin lg:h-[72px] lg:px-8">
-          <a href="#inicio" className="flex items-center gap-2.5" aria-label="Vybes">
+          <a href="#inicio" className="flex items-center gap-2.5" aria-label="Fiestea">
             <VybeMark size={34} />
-            <span className="font-display text-headline-lg uppercase tracking-tight">Vybes</span>
+            <span className="font-display text-headline-lg uppercase tracking-tight">Fiestea</span>
           </a>
 
           <nav className="ml-6 hidden items-center gap-6 lg:flex">
@@ -665,7 +665,7 @@ const LandingPage = () => {
           <div>
             <div className="flex items-center gap-2.5">
               <VybeMark size={34} />
-              <span className="font-display text-headline-lg uppercase tracking-tight">Vybes</span>
+              <span className="font-display text-headline-lg uppercase tracking-tight">Fiestea</span>
             </div>
             <p className="mt-4 max-w-sm text-body-md font-normal text-party-gray">{t('landing.footer.tagline')}</p>
           </div>
