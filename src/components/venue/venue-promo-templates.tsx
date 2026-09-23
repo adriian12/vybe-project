@@ -18,6 +18,7 @@ import { ApiError } from '@/services/api';
 import { Promotion, venueService } from '@/services/venue-service';
 import { PROMO_TEMPLATES, PromoTemplate, templateDeadline } from '@/lib/promo-templates';
 import { cn } from '@/lib/utils';
+import InfoHelp from '@/components/venue/info-help';
 
 interface Props {
   event: { id: string; startDate: string; endDate: string };
@@ -287,6 +288,7 @@ const VenuePromoTemplates = ({ event, venueId, promotions, canUse, only, onUpgra
           <h3 className="flex items-center gap-2 font-display text-title-card uppercase tracking-wide">
             <Sparkles size={17} className="text-party-primary" />
             {t('venue.templates.promosTitle')}
+            <InfoHelp topic="promos" />
           </h3>
           <p className="text-caption text-party-gray">{t('venue.templates.promosSubtitle')}</p>
         </div>
@@ -310,6 +312,7 @@ const VenuePromoTemplates = ({ event, venueId, promotions, canUse, only, onUpgra
           <h3 className="flex items-center gap-2 font-display text-title-card uppercase tracking-wide">
             <Trophy size={17} className="text-party-primary" />
             {t('venue.templates.challengesTitle')}
+            <InfoHelp topic="challenges" />
           </h3>
           <p className="mb-3 text-caption text-party-gray">{t('venue.templates.challengesSubtitle')}</p>
           <ul className="space-y-2">{bloque('challenge').map(tarjeta)}</ul>

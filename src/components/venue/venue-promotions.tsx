@@ -27,6 +27,7 @@ import VenuePromoTemplates from '@/components/venue/venue-promo-templates';
 import PanelTabs from '@/components/venue/panel-tabs';
 import VenueRaffles from '@/components/venue/venue-raffles';
 import VenueStampCard from '@/components/venue/venue-stamp-card';
+import InfoHelp from '@/components/venue/info-help';
 
 interface VenuePromotionsProps {
   event: { id: string; startDate: string; endDate: string };
@@ -445,6 +446,7 @@ const VenuePromotions = ({ event, venueId, plan, onUpgrade }: VenuePromotionsPro
           <CardTitle className="flex items-center gap-2 text-title-card uppercase tracking-wide">
             <ScanLine size={16} className="text-party-primary" />
             {t('venue.promotions.validateTitle')}
+            <InfoHelp topic="validate" />
           </CardTitle>
           <p className="text-xs text-muted-foreground">
             {t('venue.promotions.validateSubtitle')}

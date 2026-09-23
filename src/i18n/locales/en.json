@@ -1412,6 +1412,101 @@
             "perPerson": "person",
             "avgSpendInvalid": "Enter an amount between €1 and €1000",
             "saved": "Venue page saved"
+        },
+        "help": {
+            "open": "Qué es esto",
+            "validate": {
+                "title": "Validar un vale",
+                "body": "Es la pantalla de la barra. Cuando alguien gana un sorteo o pide una promoción, la app le da un código de 8 caracteres. Aquí se comprueba y se marca como usado, para que no se canjee dos veces ni valga una captura de pantalla.",
+                "steps": [
+                    "El cliente enseña el código en su móvil, en «Entradas».",
+                    "Lo escribes aquí y pulsas «Validar».",
+                    "Si está bien, sale el nombre de quien lo tiene y la promoción; si ya se usó, te avisa en rojo."
+                ]
+            },
+            "raffles": {
+                "title": "Cómo funciona el sorteo",
+                "body": "Un sorteo reparte un premio entre la gente que está dentro de la fiesta ahora mismo. Al crearlo, a todos les llega un aviso al móvil.",
+                "steps": [
+                    "Creas el sorteo con el premio y, si quieres, la hora.",
+                    "Mientras esté abierto, el número de personas sube según entra gente.",
+                    "Con «Cerrar» congelas la lista: quien entre después ya no participa.",
+                    "Al pulsar «Sortear» sale el ganador con un código; lo enseña en la barra y lo validas como cualquier vale.",
+                    "Si algo sale mal, «Reiniciar» anula el resultado y puedes volver a sortear."
+                ]
+            },
+            "promos": {
+                "title": "Promociones",
+                "body": "Ofertas que sólo ve quien ha entrado a tu fiesta con la app. Sirven para mover la barra en las horas flojas: un chupito de bienvenida, un 2x1 de una hora, una copa de cumpleaños.",
+                "steps": [
+                    "Enciendes una de las listas o creas la tuya.",
+                    "Quien está dentro la ve al momento en «Ofertas».",
+                    "Al pedirla, recibe un vale con código que validas en barra."
+                ]
+            },
+            "challenges": {
+                "title": "Retos",
+                "body": "Un reto es una promoción que hay que ganarse: llegar pronto, hacer tres crushes, venir en grupo o quedarse hasta el final. La app comprueba sola si se cumple y sólo entonces da el vale.",
+                "steps": [
+                    "Enciendes el reto y su hora límite sale del horario de la fiesta.",
+                    "La gente lo ve en «Ofertas» con su progreso.",
+                    "Al cumplirlo reciben el vale, que validas en barra."
+                ]
+            },
+            "stamps": {
+                "title": "Tarjeta de sellos",
+                "body": "Un sello por cada noche que alguien entra en tu local con la app. Al llenar la tarjeta recibe el premio que elijas. Es lo que hace que vuelvan.",
+                "steps": [
+                    "Eliges cuántos sellos hacen falta y qué premio das.",
+                    "Cada check-in en una fiesta tuya suma un sello.",
+                    "Cuando llena la tarjeta, la app le da el vale del premio."
+                ]
+            },
+            "codes": {
+                "title": "Códigos y relaciones públicas",
+                "body": "El código general es el del cartel de la puerta. Además puedes crear uno por cada relaciones públicas o lista, para saber cuánta gente trae cada uno.",
+                "steps": [
+                    "Creas un código con el nombre de la lista o del RRPP.",
+                    "Esa persona lo comparte con su gente.",
+                    "Cada quien entra con él queda contado en su nombre, aunque luego escanee otro."
+                ]
+            },
+            "intent": {
+                "title": "Lista Fiestea",
+                "body": "Quién ha dicho en la app que viene esta noche: nombre, edad y foto. Sirve para hacerte una idea del aforo antes de abrir y para preparar la puerta.",
+                "steps": [
+                    "La gente marca «voy a ir» en la ficha de tu fiesta.",
+                    "Aquí los ves a todos; la ficha les avisa de que el local lo verá.",
+                    "No es una reserva: es una intención."
+                ]
+            },
+            "counter": {
+                "title": "Contador de puerta",
+                "body": "La app sólo sabe de quien entra con ella. Con este contador das el total real de gente dentro, que es lo que decide el ambiente que ve el público (Tranquilo, Animado, Casi lleno, Lleno).",
+                "steps": [
+                    "Pones el aforo del local.",
+                    "El portero cuenta con los botones, desde el panel o con un enlace sin cuenta.",
+                    "El público nunca ve el total: sólo el ambiente."
+                ]
+            },
+            "broadcast": {
+                "title": "Avisar a quien está dentro",
+                "body": "Un aviso al móvil de la gente que ha entrado en las últimas horas: cambio de sala, invitados, última hora de barra. Llega al momento, o a la hora que le pongas.",
+                "steps": [
+                    "Escribes título y mensaje.",
+                    "Sin hora sale al momento; con hora, espera a esa hora.",
+                    "Sólo lo recibe quien está dentro de esta fiesta."
+                ]
+            },
+            "thermometer": {
+                "title": "Termómetro de la noche",
+                "body": "Lo que la gente ve antes de venir: si hay cola, qué suena ahora y cómo está de lleno. Cuanto más al día lo tengas, más fácil es que se decidan por tu local.",
+                "steps": [
+                    "Marcas la cola y lo que está sonando.",
+                    "Se publica en la ficha de tu fiesta.",
+                    "Caduca solo: si no lo tocas, deja de salir."
+                ]
+            }
         }
     },
     "admin": {
@@ -1606,6 +1701,38 @@
             "noEvents": "This venue has no events yet.",
             "eventStats": "{{checkIns}} inside · {{matches}} crushes · {{intents}} going",
             "planSaved": "Plan changed"
+        },
+        "create": {
+            "title": "Create an account",
+            "subtitle": "Just name and email. They get a link to choose their password.",
+            "user": "Person",
+            "venue": "Venue",
+            "name": "Name",
+            "email": "Email",
+            "send": "Create and send",
+            "userDone": "Account created",
+            "venueDone": "Venue created",
+            "mailSent": "We've sent them the link to choose a password.",
+            "mailFailed": "The account exists, but the email failed. Use \"Forgot password\".",
+            "emailTaken": "That email already has an account.",
+            "emailInvalid": "That email is not valid.",
+            "nameRequired": "The name is missing."
+        },
+        "newEvent": {
+            "title": "Create a party",
+            "subtitle": "Town festivals or festivals. With no venue, they are published as Fiestea.",
+            "name": "Name",
+            "venue": "Venue",
+            "house": "Fiestea (no venue)",
+            "date": "Day",
+            "start": "Starts",
+            "end": "Ends",
+            "city": "City",
+            "theme": "Music",
+            "price": "Price (€)",
+            "capacity": "Capacity",
+            "create": "Publish party",
+            "done": "Party published"
         }
     },
     "pwa": {

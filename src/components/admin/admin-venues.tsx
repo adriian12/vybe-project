@@ -88,85 +88,101 @@ const AdminVenues = () => {
       ) : locales.length === 0 ? (
         <p className="py-10 text-center text-body-sm text-party-gray">{t('admin.venuesAll.empty')}</p>
       ) : (
-        <ul className="space-y-2">
-          {locales.map((venue) => (
-            <li key={venue.venueId} className="rounded-2xl bg-white p-3 text-ink">
-              <div className="flex flex-wrap items-start justify-between gap-2">
-                <div className="min-w-0">
+        <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+          {locales.map((venue) => {
+            const expandida = abierto === venue.venueId;
+            return (
+              <li
+                key={venue.venueId}
+                className={cn(
+                  'rounded-2xl bg-white p-3 text-ink transition-shadow',
+                  expandida && 'col-span-2 shadow-lg sm:col-span-3 lg:col-span-4 xl:col-span-5',
+                )}
+              >
+                <button type="button" onClick={() => void abrir(venue)} className="press w-full text-left">
                   <p className="flex items-center gap-1.5 truncate font-display text-title-card">
                     {venue.name}
-                    {venue.isVerified && <BadgeCheck size={14} className="shrink-0 text-party-primary" />}
+                    {venue.isVerified && <BadgeCheck size={13} className="shrink-0 text-party-primary" />}
                   </p>
-                  <p className="truncate text-caption text-ink/60">
-                    {[venue.city, venue.email].filter(Boolean).join(' · ') || '—'}
-                  </p>
-                  <p className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-caption text-ink/50">
-                    <span className="flex items-center gap-1">
-                      <CalendarDays size={12} />
-                      {t('admin.venuesAll.events', { total: venue.eventsTotal, upcoming: venue.eventsUpcoming })}
+                  <p className="truncate text-caption text-ink/60">{venue.city ?? '—'}</p>
+                  <p className="mt-1 flex flex-wrap items-center gap-1">
+                    <span
+                      className={cn(
+                        'rounded-full px-1.5 py-0.5 text-[10px] font-bold uppercase',
+                        venue.plan === 'free' ? 'bg-black/[0.06] text-ink/60' : 'bg-party-primary text-ink',
+                      )}
+                    >
+                      {t(`venue.plan.names.${venue.plan}`)}
                     </span>
-                    <span className="flex items-center gap-1">
-                      <Users size={12} />
-                      {t('admin.venuesAll.followers', { count: venue.followers })}
+                    <span className="flex items-center gap-0.5 rounded-full bg-black/[0.06] px-1.5 py-0.5 text-[10px] font-bold text-ink/60">
+                      <CalendarDays size={10} />
+                      {venue.eventsTotal}
+                    </span>
+                    <span className="flex items-center gap-0.5 rounded-full bg-black/[0.06] px-1.5 py-0.5 text-[10px] font-bold text-ink/60">
+                      <Users size={10} />
+                      {venue.followers}
                     </span>
                   </p>
-                </div>
+                </button>
 
-                <Select
-                  value={venue.plan}
-                  disabled={ocupado === venue.venueId}
-                  onValueChange={(v) => void cambiarPlan(venue, v)}
-                >
-                  <SelectTrigger className="h-9 w-auto min-w-[7.5rem] gap-2 rounded-full border-black/10 bg-[#F5F5F7] text-ink">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="free">{t('venue.plan.names.free')}</SelectItem>
-                    <SelectItem value="pro">{t('venue.plan.names.pro')}</SelectItem>
-                    <SelectItem value="business">{t('venue.plan.names.business')}</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+                {expandida && (
+                  <div className="mt-3 space-y-3 border-t border-black/[0.06] pt-3">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="min-w-0 flex-1 truncate text-caption text-ink/60">
+                        {[venue.email, t('admin.venuesAll.events', {
+                          total: venue.eventsTotal,
+                          upcoming: venue.eventsUpcoming,
+                        })]
+                          .filter(Boolean)
+                          .join(' · ')}
+                      </p>
+                      <Select
+                        value={venue.plan}
+                        disabled={ocupado === venue.venueId}
+                        onValueChange={(v) => void cambiarPlan(venue, v)}
+                      >
+                        <SelectTrigger className="h-9 w-auto min-w-[7.5rem] gap-2 rounded-full border-black/10 bg-[#F5F5F7] text-ink">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="free">{t('venue.plan.names.free')}</SelectItem>
+                          <SelectItem value="pro">{t('venue.plan.names.pro')}</SelectItem>
+                          <SelectItem value="business">{t('venue.plan.names.business')}</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
 
-              <button
-                type="button"
-                onClick={() => void abrir(venue)}
-                className="press mt-2 flex items-center gap-1 text-caption font-bold text-ink/60"
-              >
-                <ChevronDown size={13} className={cn('transition-transform', abierto === venue.venueId && 'rotate-180')} />
-                {t('admin.venuesAll.seeEvents')}
-              </button>
-
-              {abierto === venue.venueId && (
-                <div className="mt-2 space-y-1.5 border-t border-black/[0.06] pt-2">
-                  {!eventos[venue.venueId] ? (
-                    <Loader2 className="mx-auto my-3 h-5 w-5 animate-spin text-ink/40" />
-                  ) : eventos[venue.venueId].length === 0 ? (
-                    <p className="py-2 text-caption text-ink/50">{t('admin.venuesAll.noEvents')}</p>
-                  ) : (
-                    eventos[venue.venueId].map((evento) => (
-                      <div key={evento.eventId} className="flex items-center justify-between gap-2 text-caption">
-                        <span className="min-w-0 flex-1 truncate">
-                          {evento.featuredUntil && new Date(evento.featuredUntil) > new Date() && (
-                            <Flame size={11} className="mr-1 inline text-[#FF6A2B]" />
-                          )}
-                          <strong className="font-bold">{evento.name}</strong>{' '}
-                          <span className="text-ink/50">{new Date(evento.startDate).toLocaleDateString()}</span>
-                        </span>
-                        <span className="shrink-0 text-ink/60">
-                          {t('admin.venuesAll.eventStats', {
-                            checkIns: evento.checkIns,
-                            matches: evento.matches,
-                            intents: evento.intents,
-                          })}
-                        </span>
-                      </div>
-                    ))
-                  )}
-                </div>
-              )}
-            </li>
-          ))}
+                    <div className="space-y-1.5">
+                      {!eventos[venue.venueId] ? (
+                        <Loader2 className="mx-auto my-3 h-5 w-5 animate-spin text-ink/40" />
+                      ) : eventos[venue.venueId].length === 0 ? (
+                        <p className="py-2 text-caption text-ink/50">{t('admin.venuesAll.noEvents')}</p>
+                      ) : (
+                        eventos[venue.venueId].map((evento) => (
+                          <div key={evento.eventId} className="flex items-center justify-between gap-2 text-caption">
+                            <span className="min-w-0 flex-1 truncate">
+                              {evento.featuredUntil && new Date(evento.featuredUntil) > new Date() && (
+                                <Flame size={11} className="mr-1 inline text-[#FF6A2B]" />
+                              )}
+                              <strong className="font-bold">{evento.name}</strong>{' '}
+                              <span className="text-ink/50">{new Date(evento.startDate).toLocaleDateString()}</span>
+                            </span>
+                            <span className="shrink-0 text-ink/60">
+                              {t('admin.venuesAll.eventStats', {
+                                checkIns: evento.checkIns,
+                                matches: evento.matches,
+                                intents: evento.intents,
+                              })}
+                            </span>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                )}
+              </li>
+            );
+          })}
         </ul>
       )}
     </div>

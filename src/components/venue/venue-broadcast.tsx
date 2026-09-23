@@ -7,6 +7,7 @@ import { PartyButton } from '@/components/ui-custom/party-button';
 import { useToast } from '@/components/ui/use-toast';
 import { ApiError } from '@/services/api';
 import { venueService, Broadcast } from '@/services/venue-service';
+import InfoHelp from '@/components/venue/info-help';
 
 interface VenueBroadcastProps {
   /** Sin evento, el aviso va a toda la aplicación y sólo puede administración. */
@@ -91,6 +92,7 @@ const VenueBroadcast = ({ eventId, venueId }: VenueBroadcastProps) => {
         <h3 className="flex items-center gap-2 font-display text-title-card uppercase tracking-wide">
           <Megaphone size={16} className="text-party-primary" />
           {t('venue.broadcast.title')}
+          <InfoHelp topic="broadcast" />
         </h3>
         <p className="text-caption text-party-gray">
           {eventId ? t('venue.broadcast.subtitle') : t('venue.broadcast.subtitleGlobal')}

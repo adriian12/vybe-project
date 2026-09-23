@@ -2729,6 +2729,25 @@ export type Database = {
         Args: { p_profile_id: string; p_quantity: number }
         Returns: number
       }
+      admin_create_event: {
+        Args: {
+          p_capacity?: number
+          p_city?: string
+          p_description?: string
+          p_end: string
+          p_latitude?: number
+          p_longitude?: number
+          p_name: string
+          p_price?: number
+          p_region?: string
+          p_requires_location?: boolean
+          p_start: string
+          p_theme?: string
+          p_venue_id?: string
+        }
+        Returns: string
+      }
+      admin_house_venue: { Args: never; Returns: string }
       admin_is_staff_only: { Args: never; Returns: boolean }
       admin_list_users: {
         Args: { p_limit?: number; p_offset?: number; p_search?: string }

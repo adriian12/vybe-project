@@ -544,7 +544,7 @@ const LandingPage = () => {
                       {t(`venue.plan.taglines.${id}`)}
                     </p>
                     <p className="mt-5 flex items-baseline gap-1.5 font-display text-[32px] font-extrabold leading-none">
-                      {PLAN_PRICES[id] === 0 ? t('landing.plans.free') : `${PLAN_PRICES[id]} €`}
+                      {PLAN_PRICES[id] === 0 ? t('landing.plans.free') : `${PLAN_PRICES[id].toLocaleString(undefined, { minimumFractionDigits: PLAN_PRICES[id] % 1 ? 2 : 0 })} €`}
                       {PLAN_PRICES[id] > 0 && (
                         <span className={cn('text-body-sm font-semibold', destacado ? 'text-ink/60' : 'text-party-gray')}>
                           {t('landing.plans.perMonth')}

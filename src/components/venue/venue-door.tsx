@@ -40,6 +40,7 @@ import {
   VenuePlanStatus,
 } from '@/services/venue-service';
 import { cn } from '@/lib/utils';
+import InfoHelp from '@/components/venue/info-help';
 
 interface VenueDoorProps {
   eventId: string;
@@ -358,7 +359,7 @@ const VenueDoor = ({ eventId, plan, onUpgrade }: VenueDoorProps) => {
           <div className="surface-light rounded-2xl p-4">
             {occupancy?.capacity ? (
               <>
-                <Titulo>{t('venue.counter.title')}</Titulo>
+                <Titulo extra={<InfoHelp topic="counter" />}>{t('venue.counter.title')}</Titulo>
                 <DoorCounter
                   transport={transport}
                   variant="panel"
@@ -478,7 +479,7 @@ const VenueDoor = ({ eventId, plan, onUpgrade }: VenueDoorProps) => {
           <div className="space-y-4 lg:col-span-7">
             <div className="surface-light rounded-2xl p-4">
               <Titulo extra={<span className="text-caption text-party-gray">{t('venue.door.activeLists', { count: activos.length })}</span>}>
-                {t('venue.door.activeCodesTitle')}
+                {t('venue.door.activeCodesTitle')} <InfoHelp topic="codes" className="inline-flex align-middle" />
               </Titulo>
 
               {codes.length === 0 ? (
