@@ -7,6 +7,7 @@ import { Switch } from '@/components/ui/switch';
 import { PartyButton } from '@/components/ui-custom/party-button';
 import { useToast } from '@/components/ui/use-toast';
 import { nightService, VenueStampCard as Card } from '@/services/night';
+import InfoHelp from '@/components/venue/info-help';
 
 /**
  * La tarjeta de sellos del local, opcional. Cada noche que alguien entra en un
@@ -94,6 +95,7 @@ const VenueStampCard = ({
           <h3 className="flex items-center gap-2 font-display text-title-card uppercase tracking-wide">
             <Stamp size={17} className="text-party-primary" />
             {t('venue.stamps.title')}
+            <InfoHelp topic="stamps" />
           </h3>
           <p className="text-caption text-party-gray">{t('venue.stamps.subtitle')}</p>
         </div>

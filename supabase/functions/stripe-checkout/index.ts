@@ -53,7 +53,7 @@ const MAX_SUPERCRUSH = 100;
  * Son los de la landing y `src/lib/venue-plans.ts`: si cambias uno, cambia los
  * otros.
  */
-const VENUE_PRICE_CENTS: Record<VenuePlan, number> = { venue_pro: 4900, venue_business: 9900 };
+const VENUE_PRICE_CENTS: Record<VenuePlan, number> = { venue_pro: 4900, venue_business: 6999 };
 const BOOST_PRICE_CENTS = 1900;
 
 const esPlanDeLocal = (plan: Plan): plan is VenuePlan => plan.startsWith('venue_');

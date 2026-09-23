@@ -46,6 +46,8 @@ import { useAppContext } from '@/context/app-context';
 import LanguageSwitcher from '@/components/language-switcher';
 import AdminMetrics from '@/components/admin/admin-metrics';
 import AdminUsers from '@/components/admin/admin-users';
+import AdminCreate from '@/components/admin/admin-create';
+import AdminEventForm from '@/components/admin/admin-event-form';
 import AdminVenues from '@/components/admin/admin-venues';
 import TestLabCard from '@/components/admin/test-lab-card';
 import { VybeMark } from '@/components/brand/vybe-logo';
@@ -143,6 +145,8 @@ const AdminDashboardPage = () => {
   const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
 
   // El aviso «Tienes imágenes por revisar» abre directamente la sección.
+  // Cambia al crear una cuenta, para volver a cargar las listas.
+  const [altas, setAltas] = useState(0);
   const [seccion, setSeccion] = useState<Seccion>(() =>
     new URLSearchParams(window.location.search).get('seccion') === 'photos' ? 'photos' : 'overview',
   );
@@ -999,6 +1003,9 @@ const AdminDashboardPage = () => {
           {/* =================================================== eventos */}
           {seccion === 'events' && (
             <>
+              <AdminEventForm onCreated={() => setAltas((n) => n + 1)} />
+
+            <>
               <CabeceraSeccion
                 title={t('admin.events.title')}
                 subtitle={t('admin.events.subtitle')}
@@ -1097,6 +1104,7 @@ const AdminDashboardPage = () => {
                   </table>
                 </div>
               )}
+            </>
             </>
           )}
 
@@ -1204,9 +1212,19 @@ const AdminDashboardPage = () => {
           )}
 
           {/* ================================================== métricas */}
-          {seccion === 'users' && <AdminUsers />}
+          {seccion === 'users' && (
+            <div className="space-y-4">
+              <AdminCreate key={`alta-${altas}`} onCreated={() => setAltas((n) => n + 1)} />
+              <AdminUsers key={`usuarios-${altas}`} />
+            </div>
+          )}
 
-          {seccion === 'venuesAll' && <AdminVenues />}
+          {seccion === 'venuesAll' && (
+            <div className="space-y-4">
+              <AdminCreate key={`alta-local-${altas}`} onCreated={() => setAltas((n) => n + 1)} />
+              <AdminVenues key={`locales-${altas}`} />
+            </div>
+          )}
 
           {seccion === 'metrics' && <AdminMetrics />}
         </main>

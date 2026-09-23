@@ -66,6 +66,62 @@ const fallo = (mensaje: string): never => {
 };
 
 export const adminService = {
+  /**
+   * Da de alta una cuenta con nombre y correo. La contraseña la elige quien la
+   * reciba, con el enlace que le llega por correo.
+   */
+  createAccount: async (
+    type: 'user' | 'venue',
+    name: string,
+    email: string,
+  ): Promise<{ id: string; emailSent: boolean }> => {
+    const { data, error } = await supabase.functions.invoke('admin-create-account', {
+      body: { type, name, email },
+    });
+    if (error) {
+      // El código del error viene en el cuerpo de la respuesta.
+      const context = (error as { context?: Response }).context;
+      let code = 'CREATE_FAILED';
+      try {
+        const body = (await context?.clone().json()) as { error?: string } | undefined;
+        if (body?.error) code = body.error;
+      } catch {
+        // Sin cuerpo: error genérico.
+      }
+      throw new Error(code);
+    }
+    const respuesta = data as { id?: string; emailSent?: boolean; error?: string } | null;
+    if (respuesta?.error && !respuesta.id) throw new Error(respuesta.error);
+    return { id: respuesta?.id ?? '', emailSent: Boolean(respuesta?.emailSent) };
+  },
+
+  /** Crea una fiesta; sin local va al local de la casa («Fiestea»). */
+  createEvent: async (event: {
+    name: string;
+    start: string;
+    end: string;
+    venueId?: string | null;
+    description?: string | null;
+    city?: string | null;
+    price?: number | null;
+    capacity?: number | null;
+    theme?: string | null;
+  }): Promise<string> => {
+    const { data, error } = await supabase.rpc('admin_create_event', {
+      p_name: event.name,
+      p_start: event.start,
+      p_end: event.end,
+      p_venue_id: event.venueId ?? null,
+      p_description: event.description ?? null,
+      p_city: event.city ?? null,
+      p_price: event.price ?? null,
+      p_capacity: event.capacity ?? null,
+      p_theme: event.theme ?? null,
+    });
+    if (error) fallo(error.message);
+    return String(data ?? '');
+  },
+
   listUsers: async (search = '', limit = 50, offset = 0): Promise<AdminUser[]> => {
     const { data, error } = await supabase.rpc('admin_list_users', {
       p_search: search || null,

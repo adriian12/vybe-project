@@ -14,7 +14,7 @@ export type PlanId = 'free' | 'pro' | 'business';
  * Precio mensual en euros (sin IVA). Son los mismos que cobra `stripe-checkout`
  * cuando no hay un precio creado en Stripe: si cambias uno, cambia el otro.
  */
-export const PLAN_PRICES: Record<PlanId, number> = { free: 0, pro: 49, business: 99 };
+export const PLAN_PRICES: Record<PlanId, number> = { free: 0, pro: 49, business: 69.99 };
 
 /** Días de Pro gratis que recibe un local al ser aprobado. */
 export const TRIAL_DAYS = 30;

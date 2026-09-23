@@ -6,6 +6,7 @@ import { PartyButton } from '@/components/ui-custom/party-button';
 import { useToast } from '@/components/ui/use-toast';
 import { nightService, QueueLevel } from '@/services/night';
 import { cn } from '@/lib/utils';
+import InfoHelp from '@/components/venue/info-help';
 
 const COLAS: QueueLevel[] = ['none', 'short', 'long'];
 
@@ -45,7 +46,10 @@ const DoorLiveInfo = ({
 
   return (
     <div className="surface-light rounded-2xl p-4">
-      <h3 className="font-display text-title-card uppercase tracking-wide">{t('venue.liveInfo.title')}</h3>
+      <h3 className="flex items-center gap-2 font-display text-title-card uppercase tracking-wide">
+        {t('venue.liveInfo.title')}
+        <InfoHelp topic="thermometer" />
+      </h3>
       <p className="mb-3 text-caption text-party-gray">{t('venue.liveInfo.subtitle')}</p>
 
       <p className="mb-1.5 flex items-center gap-1.5 text-caption font-bold uppercase text-party-gray">

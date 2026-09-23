@@ -8,6 +8,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { ApiError } from '@/services/api';
 import { nightService, Raffle } from '@/services/night';
 import { cn } from '@/lib/utils';
+import InfoHelp from '@/components/venue/info-help';
 
 const hora = (iso: string) => new Date(iso).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
 
@@ -139,6 +140,7 @@ const VenueRaffles = ({ event }: { event: { id: string; startDate: string; endDa
       <h3 className="flex items-center gap-2 font-display text-title-card uppercase tracking-wide">
         <Gift size={17} className="text-party-primary" />
         {t('venue.raffles.title')}
+        <InfoHelp topic="raffles" />
       </h3>
       <p className="mb-3 text-caption text-party-gray">{t('venue.raffles.subtitle')}</p>
 

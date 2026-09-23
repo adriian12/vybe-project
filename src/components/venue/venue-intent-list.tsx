@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { CheckCircle2, ListChecks, Ticket, User } from 'lucide-react';
 import { IntentPerson, nightService } from '@/services/night';
 import { cn } from '@/lib/utils';
+import InfoHelp from '@/components/venue/info-help';
 
 /**
  * Lista Vybe: quién ha marcado «voy a ir». Es la previsión de gente de una
@@ -42,6 +43,7 @@ const VenueIntentList = ({ eventId, paid }: { eventId: string; paid: boolean }) 
         <h3 className="flex items-center gap-2 font-display text-title-card uppercase tracking-wide">
           <ListChecks size={17} className="text-party-primary" />
           {t('venue.intentList.title')}
+          <InfoHelp topic="intent" />
         </h3>
         <span className="font-display text-headline-md tabular">{people.length}</span>
       </div>
