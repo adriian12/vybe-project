@@ -2438,5 +2438,8 @@
         "boughtBody": "Sie sind in deinem Konto. Nutze sie auf jeder Party.",
         "buyCta": "Supercrushes kaufen",
         "none": "Du hast keine Supercrushes mehr"
+    },
+    "notFound": {
+        "body": "Diese Seite gibt es nicht. Vielleicht ist der Link falsch geschrieben oder nicht mehr verfügbar."
     }
 }

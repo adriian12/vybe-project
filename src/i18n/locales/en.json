@@ -2438,5 +2438,8 @@
         "boughtBody": "They're in your account. Use them at any party.",
         "buyCta": "Buy supercrushes",
         "none": "You have no supercrushes left"
+    },
+    "notFound": {
+        "body": "This page doesn't exist. The link may be mistyped or no longer available."
     }
 }

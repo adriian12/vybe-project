@@ -2438,5 +2438,8 @@
         "boughtBody": "Ja els tens al compte. Fes-los servir a qualsevol festa.",
         "buyCta": "Comprar supercrush",
         "none": "No et queden supercrush"
+    },
+    "notFound": {
+        "body": "Aquesta pàgina no existeix. Potser l'enllaç està mal escrit o ja no està disponible."
     }
 }
