@@ -139,10 +139,31 @@
     color: #7a6200;
   }
 
+  /* Los planos de superficie son colores fijos y oscuros. Dentro de una
+     tarjeta clara (paneles de local y administración) dejaban etiquetas negras
+     con texto oscuro encima, ilegibles: aquí se aclaran de una vez para todas
+     las que haya. */
+  .surface-light :is(.bg-surface, .bg-surface-low, .bg-surface-container, .bg-surface-high, .bg-surface-highest),
+  .cards-light [data-slot='card'] :is(.bg-surface, .bg-surface-low, .bg-surface-container, .bg-surface-high, .bg-surface-highest) {
+    background-color: rgb(17 17 20 / 0.06);
+    color: hsl(var(--foreground));
+  }
+
   /* Cifras que cambian mientras se miran (aforo, contadores): con dígitos de
      ancho fijo no bailan al pasar de 9 a 10. */
   .tabular {
     font-variant-numeric: tabular-nums;
+  }
+}
+
+@layer base {
+  /* Nada se desplaza de lado: en el móvil, un elemento algo más ancho que la
+     pantalla dejaba mover la página entera y se veía la mitad de las tarjetas
+     cortadas. */
+  html,
+  body {
+    max-width: 100%;
+    overflow-x: hidden;
   }
 }
 
