@@ -1,0 +1,99 @@
+# Compilación de iOS en Codemagic (Fiestea).
+#
+# Aquí no hay ningún Mac: el proyecto de iOS se genera con Capacitor desde
+# Windows, pero compilarlo y firmarlo exige Xcode. Codemagic pone el Mac.
+#
+# Lo que hace este flujo:
+#   1. instala las dependencias y compila la web (Vite);
+#   2. sincroniza el proyecto nativo (`cap sync ios`) e instala los Pods;
+#   3. pone el identificador de la app y firma con la clave de App Store
+#      Connect, que crea sola el certificado y el perfil;
+#   4. genera el `.ipa` y, si se quiere, lo sube a TestFlight.
+#
+# Antes de la primera compilación hay que crear en Codemagic:
+#   · La integración «App Store Connect» con la clave de la API (Issuer ID,
+#     Key ID y el fichero .p8). Se le pone el nombre `fiestea-asc`.
+#   · El grupo de variables `fiestea` con lo que usa la web
+#     (VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY, VITE_CARTO_API_KEY,
+#     VITE_SENTRY_DSN, VITE_VAPID_PUBLIC_KEY).
+
+definitions:
+  env_ios: &env_ios
+    groups:
+      - fiestea
+    vars:
+      BUNDLE_ID: 'es.fiestea.app'
+      XCODE_WORKSPACE: 'vybe-project/ios/App/App.xcworkspace'
+      XCODE_SCHEME: 'App'
+    node: 20
+    xcode: latest
+    cocoapods: default
+
+workflows:
+  ios-fiestea:
+    name: Fiestea iOS
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    environment:
+      <<: *env_ios
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: es.fiestea.app
+    integrations:
+      app_store_connect: fiestea-asc
+    scripts:
+      - name: Instalar dependencias
+        script: |
+          cd vybe-project
+          npm ci
+
+      - name: Compilar la web
+        script: |
+          cd vybe-project
+          npm run build
+
+      - name: Preparar el proyecto de iOS
+        script: |
+          cd vybe-project
+          npx cap sync ios
+          cd ios/App
+          pod install
+
+      - name: Identificador de la app
+        script: |
+          cd vybe-project/ios/App
+          /usr/libexec/PlistBuddy -c "Set :CFBundleIdentifier \$(PRODUCT_BUNDLE_IDENTIFIER)" App/Info.plist || true
+          sed -i '' "s/PRODUCT_BUNDLE_IDENTIFIER = [^;]*;/PRODUCT_BUNDLE_IDENTIFIER = $BUNDLE_ID;/g" App.xcodeproj/project.pbxproj
+
+      - name: Firmar
+        script: |
+          # Crea (si hace falta) el identificador con sus capacidades y baja el
+          # perfil de firma.
+          app-store-connect bundle-ids create "$BUNDLE_ID" "Fiestea" --platform IOS || true
+          app-store-connect bundle-ids enable-capabilities "$BUNDLE_ID" --capability PUSH_NOTIFICATIONS --capability ASSOCIATED_DOMAINS || true
+          keychain initialize
+          app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE --create
+          keychain add-certificates
+          xcode-project use-profiles --project vybe-project/ios/App/App.xcodeproj
+
+      - name: Compilar el .ipa
+        script: |
+          cd vybe-project/ios/App
+          xcode-project build-ipa --workspace App.xcworkspace --scheme "$XCODE_SCHEME"
+
+    artifacts:
+      - vybe-project/ios/App/build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+
+    publishing:
+      email:
+        recipients:
+          - inf4badroma1011@gmail.com
+        notify:
+          success: true
+          failure: true
+      # Para que cada compilación llegue a TestFlight, quita el comentario. La
+      # app tiene que existir antes en App Store Connect con este identificador.
+      # app_store_connect:
+      #   auth: integration
+      #   submit_to_testflight: true
