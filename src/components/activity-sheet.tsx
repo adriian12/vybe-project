@@ -159,10 +159,6 @@ const AvisoFila = ({
 
   return (
     <li className={`relative overflow-hidden rounded-2xl transition-[max-height,opacity] ${saliendo ? 'max-h-0 opacity-0' : 'max-h-40'}`}>
-      {/* Lo que asoma al deslizar. */}
-      <span className="absolute inset-y-0 right-0 flex w-24 items-center justify-center rounded-2xl bg-destructive text-white">
-        <Trash2 size={20} />
-      </span>
       <button
         type="button"
         onPointerDown={alPulsar}
@@ -177,8 +173,13 @@ const AvisoFila = ({
           }
           onOpen();
         }}
-        style={{ transform: `translateX(${desplazado}px)`, touchAction: 'pan-y' }}
-        className="press relative flex w-full items-center gap-3 rounded-2xl bg-surface-high/60 p-3 text-left transition-transform duration-200 [transition-timing-function:var(--ease-out)] hover:bg-surface-high"
+        style={{
+          transform: `translateX(${desplazado}px)`,
+          // Se desvanece según se arrastra: al soltarlo pasado el umbral, se va.
+          opacity: Math.max(0, 1 - Math.abs(desplazado) / (UMBRAL * 2)),
+          touchAction: 'pan-y',
+        }}
+        className="press relative flex w-full items-center gap-3 rounded-2xl bg-surface-high p-3 text-left transition-[transform,opacity] duration-200 [transition-timing-function:var(--ease-out)] hover:bg-surface-high"
       >
         <span
           className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${

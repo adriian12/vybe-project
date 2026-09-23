@@ -214,11 +214,29 @@ export const pickNativePhoto = async (): Promise<string | null> => {
   return photo.dataUrl ?? null;
 };
 
-/** Abre un enlace externo en el navegador del sistema, no dentro de la app. */
-export const openExternal = async (url: string): Promise<void> => {
+/**
+ * Abre un enlace externo.
+ *
+ * Por defecto, en la aplicación instalada se usa la pestaña del sistema
+ * (Custom Tab), que vuelve a la app al cerrarse. Con `system: true` se abre el
+ * navegador del teléfono entero: es lo que hace falta para pagar, porque la
+ * pestaña del sistema se quedaba en una franja pequeña arriba y la pasarela de
+ * Stripe no se veía.
+ */
+export const openExternal = async (url: string, options: { system?: boolean } = {}): Promise<void> => {
   if (!isNative()) {
     window.open(url, '_blank', 'noopener,noreferrer');
     return;
+  }
+
+  if (options.system) {
+    try {
+      const { AppLauncher } = await import('@capacitor/app-launcher');
+      const { completed } = await AppLauncher.openUrl({ url });
+      if (completed) return;
+    } catch (error) {
+      console.error('No se pudo abrir el navegador del sistema:', error);
+    }
   }
 
   const { Browser } = await import('@capacitor/browser');

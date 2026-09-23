@@ -184,7 +184,7 @@ export const PremiumProvider = ({ children }: { children: ReactNode }) => {
         if (isNative()) {
           setShowPremiumDialog(false);
           setShowSupercrushDialog(false);
-          await openExternal(url);
+          await openExternal(url, { system: true });
         } else {
           window.location.href = url;
         }
