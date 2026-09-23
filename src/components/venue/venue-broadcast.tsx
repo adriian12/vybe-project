@@ -1,8 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Megaphone, Send, Loader2, Check, Clock, X } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { PartyButton } from '@/components/ui-custom/party-button';
@@ -31,8 +29,12 @@ const paraInput = (fecha: Date): string => {
  * en las últimas horas: una app que manda publicidad a quien no está en el local
  * se desinstala esa misma noche.
  *
- * El envío no es inmediato: la nota se encola y sale en la siguiente pasada del
- * programador, como mucho unos minutos después.
+ * Sin hora sale al momento; con hora, espera a esa hora. Cuántos avisos se
+ * pueden dejar programados a la vez depende del plan.
+ *
+ * La tarjeta se pinta con el mismo estilo que el resto del panel
+ * (`surface-light`, títulos en mayúsculas, campos claros): antes usaba los
+ * colores por defecto de shadcn y en el móvil desentonaba con todo lo demás.
  */
 const VenueBroadcast = ({ eventId, venueId }: VenueBroadcastProps) => {
   const { t } = useTranslation();
@@ -45,6 +47,7 @@ const VenueBroadcast = ({ eventId, venueId }: VenueBroadcastProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [cuando, setCuando] = useState('');
   const [limite, setLimite] = useState(1);
+  const [programar, setProgramar] = useState(false);
 
   const load = useCallback(async () => {
     setSent(await venueService.getBroadcasts(eventId));
@@ -66,8 +69,7 @@ const VenueBroadcast = ({ eventId, venueId }: VenueBroadcastProps) => {
 
     setIsBusy(true);
     try {
-      // Con hora, el aviso espera a esa hora; sin ella, sale en la siguiente
-      // pasada del programador.
+      // Con hora, el aviso espera a esa hora; sin ella, sale al momento.
       const programado = cuando ? new Date(cuando).toISOString() : null;
       await venueService.queueBroadcast(title.trim(), body.trim(), eventId, programado);
       setTitle('');
@@ -84,20 +86,20 @@ const VenueBroadcast = ({ eventId, venueId }: VenueBroadcastProps) => {
   };
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-title-card uppercase tracking-wide">
+    <section className="surface-light space-y-4 rounded-2xl p-4">
+      <header className="space-y-1">
+        <h3 className="flex items-center gap-2 font-display text-title-card uppercase tracking-wide">
           <Megaphone size={16} className="text-party-primary" />
           {t('venue.broadcast.title')}
-        </CardTitle>
-        <p className="text-xs text-muted-foreground">
+        </h3>
+        <p className="text-caption text-party-gray">
           {eventId ? t('venue.broadcast.subtitle') : t('venue.broadcast.subtitleGlobal')}
         </p>
-      </CardHeader>
+      </header>
 
-      <CardContent className="space-y-3">
+      <div className="space-y-3">
         <div className="space-y-1.5">
-          <Label htmlFor="broadcast-title" className="text-xs">
+          <Label htmlFor="broadcast-title" className="text-caption">
             {t('venue.broadcast.heading')}
           </Label>
           <Input
@@ -110,7 +112,7 @@ const VenueBroadcast = ({ eventId, venueId }: VenueBroadcastProps) => {
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="broadcast-body" className="text-xs">
+          <Label htmlFor="broadcast-body" className="text-caption">
             {t('venue.broadcast.message')}
           </Label>
           <Input
@@ -122,103 +124,118 @@ const VenueBroadcast = ({ eventId, venueId }: VenueBroadcastProps) => {
           />
         </div>
 
-        <div className="space-y-1.5">
-          <Label htmlFor="broadcast-when" className="flex items-center gap-1.5 text-xs">
-            <Clock size={12} />
-            {t('venue.broadcast.when')}
-          </Label>
-          <div className="flex gap-2">
-            <Input
-              id="broadcast-when"
-              type="datetime-local"
-              value={cuando}
-              min={paraInput(new Date())}
-              onChange={(e) => setCuando(e.target.value)}
-              className="flex-1"
-            />
-            {cuando && (
-              <PartyButton variant="outline" size="sm" onClick={() => setCuando('')}>
+        {/* La hora sólo aparece si se pide: en el móvil, un campo de fecha y
+            hora ocupaba media tarjeta para algo que casi nunca se usa. */}
+        {programar ? (
+          <div className="space-y-1.5">
+            <Label htmlFor="broadcast-when" className="flex items-center gap-1.5 text-caption">
+              <Clock size={12} />
+              {t('venue.broadcast.when')}
+            </Label>
+            <div className="flex flex-wrap items-center gap-2">
+              <Input
+                id="broadcast-when"
+                type="datetime-local"
+                value={cuando}
+                min={paraInput(new Date())}
+                onChange={(e) => setCuando(e.target.value)}
+                className="min-w-[11rem] flex-1"
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  setCuando('');
+                  setProgramar(false);
+                }}
+                className="press h-9 shrink-0 rounded-full px-3 text-caption font-bold text-party-gray"
+              >
                 {t('venue.broadcast.now')}
-              </PartyButton>
-            )}
+              </button>
+            </div>
+            <p className="text-caption text-party-gray">
+              {t('venue.broadcast.scheduledCount', { count: programados.length, max: limite })}
+            </p>
           </div>
-          <p className="text-[11px] text-muted-foreground">
-            {t('venue.broadcast.scheduledCount', { count: programados.length, max: limite })}
-          </p>
-        </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setProgramar(true)}
+            className="press flex items-center gap-1.5 text-caption font-bold text-party-gray"
+          >
+            <Clock size={13} />
+            {t('venue.broadcast.scheduleCta')}
+          </button>
+        )}
 
         <PartyButton
-          size="sm"
           className="w-full gap-2"
           disabled={isBusy || !title.trim() || !body.trim() || (Boolean(cuando) && programados.length >= limite)}
           onClick={() => void send()}
         >
-          <Send size={14} />
+          {isBusy ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />}
           {t(cuando ? 'venue.broadcast.schedule' : 'venue.broadcast.send')}
         </PartyButton>
+      </div>
 
-        <p className="text-[11px] text-muted-foreground">{t('venue.broadcast.delayNote')}</p>
-
-        {isLoading ? (
-          <div className="flex justify-center py-4">
-            <Loader2 className="w-4 h-4 animate-spin text-party-primary" />
-          </div>
-        ) : sent.length > 0 ? (
-          <ul className="space-y-2 pt-2">
-            {sent.map((broadcast) => (
-              <li key={broadcast.id} className="rounded-lg bg-muted/50 p-2.5">
-                <div className="flex items-start justify-between gap-2">
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium truncate">{broadcast.title}</p>
-                    <p className="text-xs text-muted-foreground truncate">{broadcast.body}</p>
-                  </div>
-
-                  {broadcast.status === 'sent' ? (
-                    <Badge className="shrink-0 gap-1 border-0 bg-emerald-100 text-[10px] font-bold text-emerald-800 hover:bg-emerald-100">
-                      <Check size={10} />
-                      {t('venue.broadcast.reached', { count: broadcast.recipients ?? 0 })}
-                    </Badge>
-                  ) : broadcast.status === 'cancelled' ? (
-                    <Badge className="shrink-0 border-0 bg-red-100 text-[10px] font-bold text-red-700 hover:bg-red-100">
-                      {t('venue.broadcast.cancelled')}
-                    </Badge>
-                  ) : broadcast.scheduledAt ? (
-                    <div className="flex shrink-0 items-center gap-1">
-                      <Badge className="gap-1 border-0 bg-sky-100 text-[10px] font-bold text-sky-800 hover:bg-sky-100">
-                        <Clock size={10} />
-                        {new Date(broadcast.scheduledAt).toLocaleString(undefined, {
-                          day: 'numeric',
-                          month: 'short',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })}
-                      </Badge>
-                      <button
-                        type="button"
-                        aria-label={t('common.cancel')}
-                        onClick={() =>
-                          void venueService
-                            .cancelBroadcast(broadcast.id)
-                            .then(load)
-                            .catch(() => toast({ title: t('common.error'), variant: 'destructive' }))
-                        }
-                        className="press flex h-6 w-6 items-center justify-center rounded-full text-muted-foreground hover:bg-black/5"
-                      >
-                        <X size={13} />
-                      </button>
-                    </div>
-                  ) : (
-                    <Badge className="shrink-0 border-0 bg-amber-100 text-[10px] font-bold text-amber-800 hover:bg-amber-100">
-                      {t('venue.broadcast.pending')}
-                    </Badge>
-                  )}
+      {isLoading ? (
+        <div className="flex justify-center py-3">
+          <Loader2 className="h-4 w-4 animate-spin text-party-primary" />
+        </div>
+      ) : sent.length > 0 ? (
+        <ul className="space-y-2">
+          {sent.map((broadcast) => (
+            <li key={broadcast.id} className="rounded-xl bg-black/[0.04] p-2.5">
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <p className="truncate text-body-sm font-bold">{broadcast.title}</p>
+                  <p className="truncate text-caption text-party-gray">{broadcast.body}</p>
                 </div>
-              </li>
-            ))}
-          </ul>
-        ) : null}
-      </CardContent>
-    </Card>
+
+                {broadcast.status === 'sent' ? (
+                  <span className="flex shrink-0 items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-caption font-bold text-emerald-800">
+                    <Check size={11} />
+                    {t('venue.broadcast.reached', { count: broadcast.recipients ?? 0 })}
+                  </span>
+                ) : broadcast.status === 'cancelled' ? (
+                  <span className="shrink-0 rounded-full bg-red-100 px-2 py-0.5 text-caption font-bold text-red-700">
+                    {t('venue.broadcast.cancelled')}
+                  </span>
+                ) : broadcast.scheduledAt ? (
+                  <div className="flex shrink-0 items-center gap-1">
+                    <span className="flex items-center gap-1 rounded-full bg-sky-100 px-2 py-0.5 text-caption font-bold text-sky-800">
+                      <Clock size={11} />
+                      {new Date(broadcast.scheduledAt).toLocaleString(undefined, {
+                        day: 'numeric',
+                        month: 'short',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </span>
+                    <button
+                      type="button"
+                      aria-label={t('common.cancel')}
+                      onClick={() =>
+                        void venueService
+                          .cancelBroadcast(broadcast.id)
+                          .then(load)
+                          .catch(() => toast({ title: t('common.error'), variant: 'destructive' }))
+                      }
+                      className="press flex h-6 w-6 items-center justify-center rounded-full text-party-gray hover:bg-black/5"
+                    >
+                      <X size={13} />
+                    </button>
+                  </div>
+                ) : (
+                  <span className="shrink-0 rounded-full bg-amber-100 px-2 py-0.5 text-caption font-bold text-amber-800">
+                    {t('venue.broadcast.pending')}
+                  </span>
+                )}
+              </div>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+    </section>
   );
 };
 

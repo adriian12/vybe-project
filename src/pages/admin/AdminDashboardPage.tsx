@@ -25,6 +25,8 @@ import {
   RefreshCw,
   Search,
   Siren,
+  Store,
+  UsersRound,
   X,
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
@@ -43,6 +45,8 @@ import { useToast } from '@/components/ui/use-toast';
 import { useAppContext } from '@/context/app-context';
 import LanguageSwitcher from '@/components/language-switcher';
 import AdminMetrics from '@/components/admin/admin-metrics';
+import AdminUsers from '@/components/admin/admin-users';
+import AdminVenues from '@/components/admin/admin-venues';
 import TestLabCard from '@/components/admin/test-lab-card';
 import { VybeMark } from '@/components/brand/vybe-logo';
 import { api } from '@/services/api';
@@ -63,6 +67,8 @@ import { Report } from '@/types/user';
  */
 const SECCIONES = [
   { id: 'overview' as const, icon: LayoutGrid },
+  { id: 'users' as const, icon: UsersRound },
+  { id: 'venuesAll' as const, icon: Store },
   { id: 'venues' as const, icon: Building },
   { id: 'leads' as const, icon: Inbox },
   { id: 'photos' as const, icon: ImageIcon },
@@ -72,7 +78,7 @@ const SECCIONES = [
   { id: 'metrics' as const, icon: BarChart3 },
 ];
 
-const ORDEN_MOVIL = ['overview', 'sos', 'reports', 'photos', 'venues', 'leads', 'events', 'metrics'] as const;
+const ORDEN_MOVIL = ['overview', 'sos', 'reports', 'photos', 'users', 'venuesAll', 'venues', 'leads', 'events', 'metrics'] as const;
 
 type Seccion = (typeof SECCIONES)[number]['id'];
 
@@ -221,6 +227,8 @@ const AdminDashboardPage = () => {
   /** Lo que queda por atender en cada sección, para el menú y los contadores. */
   const porRevisar: Record<Seccion, number> = {
     overview: 0,
+    users: 0,
+    venuesAll: 0,
     venues: pendingVenues.length,
     leads: newLeads.length,
     photos: photos.length,
@@ -1196,6 +1204,10 @@ const AdminDashboardPage = () => {
           )}
 
           {/* ================================================== métricas */}
+          {seccion === 'users' && <AdminUsers />}
+
+          {seccion === 'venuesAll' && <AdminVenues />}
+
           {seccion === 'metrics' && <AdminMetrics />}
         </main>
       </div>

@@ -26,7 +26,8 @@ const PROD_APP = 'https://app.vybes.es';
  * la landing.
  */
 const enProduccion =
-  typeof window !== 'undefined' && /(^|\.)vybes\.es$/.test(window.location.hostname);
+  isNative() ||
+  (typeof window !== 'undefined' && /(^|\.)fiestea\.es$|(^|\.)vybes\.es$/.test(window.location.hostname));
 
 export const LANDING_URL = enProduccion
   ? PROD_LANDING

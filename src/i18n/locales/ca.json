@@ -1137,7 +1137,8 @@
                 "scheduleLimit": "Has arribat al límit d'avisos programats del teu pla.",
                 "scheduleInPast": "Aquesta hora ja ha passat.",
                 "scheduleAfterEvent": "La festa ja haurà acabat a aquella hora."
-            }
+            },
+            "scheduleCta": "Programar per a una altra hora"
         },
         "documents": {
             "help": "El que acredita que el local és teu. Administració ho revisa abans d'aprovar el compte.",
@@ -1398,14 +1399,16 @@
         "title": "Panell d'administració",
         "subtitle": "Gestiona locals, esdeveniments i moderació.",
         "tabs": {
-            "venues": "Locals",
+            "venues": "Altes de locals",
             "events": "Esdeveniments",
             "reports": "Reports",
             "photos": "Fotos",
             "sos": "SOS",
             "metrics": "Mètriques",
             "overview": "Resum",
-            "leads": "Sol·licituds"
+            "leads": "Sol·licituds",
+            "users": "Usuaris",
+            "venuesAll": "Locals"
         },
         "venues": {
             "title": "Locals pendents",
@@ -1561,6 +1564,29 @@
                 "won": "Client",
                 "discarded": "Descartada"
             }
+        },
+        "users": {
+            "search": "Cerca per nom, correu o mòbil",
+            "empty": "No hi ha comptes amb aquesta cerca.",
+            "meta": "{{type}} · {{checkIns}} entrades · alta {{date}}",
+            "planSaved": "Subscripció canviada",
+            "page": "{{from}}–{{to}} de {{total}}",
+            "plans": {
+                "none": "Sense Premium",
+                "monthly": "Premium mensual",
+                "lifetime": "Premium per sempre",
+                "event": "Premium d'una festa"
+            }
+        },
+        "venuesAll": {
+            "search": "Cerca local per nom, correu o ciutat",
+            "empty": "No hi ha locals amb aquesta cerca.",
+            "events": "{{total}} esdeveniments ({{upcoming}} per venir)",
+            "followers": "{{count}} seguidors",
+            "seeEvents": "Veure els seus esdeveniments",
+            "noEvents": "Aquest local no ha creat cap esdeveniment.",
+            "eventStats": "{{checkIns}} dins · {{matches}} crushes · {{intents}} hi van",
+            "planSaved": "Pla canviat"
         }
     },
     "pwa": {

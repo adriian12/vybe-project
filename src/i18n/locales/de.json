@@ -1137,7 +1137,8 @@
                 "scheduleLimit": "Du hast das Limit deines Tarifs für geplante Nachrichten erreicht.",
                 "scheduleInPast": "Dieser Zeitpunkt ist schon vorbei.",
                 "scheduleAfterEvent": "Die Party ist dann schon vorbei."
-            }
+            },
+            "scheduleCta": "Für später planen"
         },
         "documents": {
             "help": "Der Nachweis, dass das Lokal dir gehört. Die Verwaltung prüft ihn vor der Freigabe.",
@@ -1398,14 +1399,16 @@
         "title": "Admin-Dashboard",
         "subtitle": "Verwalte Lokale, Events und Moderation.",
         "tabs": {
-            "venues": "Lokale",
+            "venues": "Location-Freigaben",
             "events": "Events",
             "reports": "Meldungen",
             "photos": "Fotos",
             "sos": "SOS",
             "metrics": "Kennzahlen",
             "overview": "Übersicht",
-            "leads": "Anfragen"
+            "leads": "Anfragen",
+            "users": "Nutzer",
+            "venuesAll": "Locations"
         },
         "venues": {
             "title": "Ausstehende Lokale",
@@ -1561,6 +1564,29 @@
                 "won": "Kunde",
                 "discarded": "Verworfen"
             }
+        },
+        "users": {
+            "search": "Nach Name, E-Mail oder Handy suchen",
+            "empty": "Keine Konten für diese Suche.",
+            "meta": "{{type}} · {{checkIns}} Check-ins · seit {{date}}",
+            "planSaved": "Abo geändert",
+            "page": "{{from}}–{{to}} von {{total}}",
+            "plans": {
+                "none": "Kein Premium",
+                "monthly": "Premium monatlich",
+                "lifetime": "Premium auf Lebenszeit",
+                "event": "Premium für eine Party"
+            }
+        },
+        "venuesAll": {
+            "search": "Location nach Name, E-Mail oder Stadt suchen",
+            "empty": "Keine Locations für diese Suche.",
+            "events": "{{total}} Events ({{upcoming}} kommend)",
+            "followers": "{{count}} Follower",
+            "seeEvents": "Events ansehen",
+            "noEvents": "Diese Location hat noch keine Events.",
+            "eventStats": "{{checkIns}} drin · {{matches}} Crushes · {{intents}} kommen",
+            "planSaved": "Plan geändert"
         }
     },
     "pwa": {

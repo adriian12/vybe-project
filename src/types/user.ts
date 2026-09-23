@@ -9,6 +9,8 @@ export interface User {
   avatar?: string;
   email?: string;
   role?: UserRole;
+  /** Cuenta que sólo administra: no sale de fiesta ni aparece en tablones. */
+  staffOnly?: boolean;
   distance?: number;
   lastActive?: string;
   /** Slugs de intereses; se traducen en el cliente. */
