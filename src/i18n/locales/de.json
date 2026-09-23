@@ -1716,7 +1716,10 @@
             "mailFailed": "Das Konto existiert, aber die Mail ging nicht raus. Nutze „Passwort vergessen\".",
             "emailTaken": "Diese E-Mail hat schon ein Konto.",
             "emailInvalid": "Diese E-Mail ist ungültig.",
-            "nameRequired": "Der Name fehlt."
+            "nameRequired": "Der Name fehlt.",
+            "addUser": "Nutzer hinzufügen",
+            "addVenue": "Location hinzufügen",
+            "addEvent": "Event hinzufügen"
         },
         "newEvent": {
             "title": "Party anlegen",

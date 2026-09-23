@@ -24,6 +24,7 @@ import {
   Phone,
   RefreshCw,
   Search,
+  Plus,
   Siren,
   Store,
   UsersRound,
@@ -147,6 +148,8 @@ const AdminDashboardPage = () => {
   // El aviso «Tienes imágenes por revisar» abre directamente la sección.
   // Cambia al crear una cuenta, para volver a cargar las listas.
   const [altas, setAltas] = useState(0);
+  // Qué se está dando de alta en la ventana: persona, local o fiesta.
+  const [alta, setAlta] = useState<'user' | 'venue' | 'event' | null>(null);
   const [seccion, setSeccion] = useState<Seccion>(() =>
     new URLSearchParams(window.location.search).get('seccion') === 'photos' ? 'photos' : 'overview',
   );
@@ -1003,9 +1006,6 @@ const AdminDashboardPage = () => {
           {/* =================================================== eventos */}
           {seccion === 'events' && (
             <>
-              <AdminEventForm onCreated={() => setAltas((n) => n + 1)} />
-
-            <>
               <CabeceraSeccion
                 title={t('admin.events.title')}
                 subtitle={t('admin.events.subtitle')}
@@ -1104,7 +1104,6 @@ const AdminDashboardPage = () => {
                   </table>
                 </div>
               )}
-            </>
             </>
           )}
 
@@ -1213,21 +1212,73 @@ const AdminDashboardPage = () => {
 
           {/* ================================================== métricas */}
           {seccion === 'users' && (
-            <div className="space-y-4">
-              <AdminCreate key={`alta-${altas}`} onCreated={() => setAltas((n) => n + 1)} />
-              <AdminUsers key={`usuarios-${altas}`} />
-            </div>
+            <AdminUsers key={`usuarios-${altas}`} />
           )}
 
           {seccion === 'venuesAll' && (
-            <div className="space-y-4">
-              <AdminCreate key={`alta-local-${altas}`} onCreated={() => setAltas((n) => n + 1)} />
-              <AdminVenues key={`locales-${altas}`} />
-            </div>
+            <AdminVenues key={`locales-${altas}`} />
           )}
 
           {seccion === 'metrics' && <AdminMetrics />}
         </main>
+
+      {/* ------------------------------------------- añadir, siempre a mano */}
+      {(seccion === 'users' || seccion === 'venuesAll' || seccion === 'events') && (
+        <button
+          type="button"
+          onClick={() => setAlta(seccion === 'users' ? 'user' : seccion === 'venuesAll' ? 'venue' : 'event')}
+          className="press pb-safe fixed bottom-4 right-4 z-40 flex h-12 items-center gap-2 rounded-full bg-party-primary px-5 font-display text-title-card text-ink shadow-xl shadow-black/30"
+        >
+          <Plus size={18} />
+          {t(
+            seccion === 'users'
+              ? 'admin.create.addUser'
+              : seccion === 'venuesAll'
+                ? 'admin.create.addVenue'
+                : 'admin.create.addEvent',
+          )}
+        </button>
+      )}
+
+      <Dialog open={alta !== null} onOpenChange={(open) => !open && setAlta(null)}>
+        <DialogContent className="cards-light max-h-[88vh] overflow-y-auto sm:max-w-lg">
+          <DialogHeader className="text-left">
+            <DialogTitle>
+              {t(
+                alta === 'user'
+                  ? 'admin.create.addUser'
+                  : alta === 'venue'
+                    ? 'admin.create.addVenue'
+                    : 'admin.create.addEvent',
+              )}
+            </DialogTitle>
+            <DialogDescription>
+              {t(alta === 'event' ? 'admin.newEvent.subtitle' : 'admin.create.subtitle')}
+            </DialogDescription>
+          </DialogHeader>
+
+          {alta === 'event' ? (
+            <AdminEventForm
+              bare
+              onCreated={() => {
+                setAlta(null);
+                setAltas((n) => n + 1);
+              }}
+            />
+          ) : (
+            alta && (
+              <AdminCreate
+                bare
+                type={alta}
+                onCreated={() => {
+                  setAlta(null);
+                  setAltas((n) => n + 1);
+                }}
+              />
+            )
+          )}
+        </DialogContent>
+      </Dialog>
       </div>
 
       {/* Diálogo de suspensión */}

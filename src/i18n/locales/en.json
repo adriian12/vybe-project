@@ -1716,7 +1716,10 @@
             "mailFailed": "The account exists, but the email failed. Use \"Forgot password\".",
             "emailTaken": "That email already has an account.",
             "emailInvalid": "That email is not valid.",
-            "nameRequired": "The name is missing."
+            "nameRequired": "The name is missing.",
+            "addUser": "Add user",
+            "addVenue": "Add venue",
+            "addEvent": "Add event"
         },
         "newEvent": {
             "title": "Create a party",
