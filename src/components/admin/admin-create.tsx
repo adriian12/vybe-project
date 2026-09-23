@@ -11,6 +11,10 @@ import { cn } from '@/lib/utils';
 interface AdminCreateProps {
   /** Para refrescar la lista de debajo cuando se crea algo. */
   onCreated?: () => void;
+  /** Con un tipo fijo no se enseñan las pestañas de persona o local. */
+  type?: 'user' | 'venue';
+  /** Dentro de una ventana no hace falta ni tarjeta ni título. */
+  bare?: boolean;
 }
 
 /**
@@ -20,11 +24,11 @@ interface AdminCreateProps {
  * llega un enlace para elegirla. Así administración nunca ve la contraseña de
  * nadie y el correo sirve además para comprobar que la dirección existe.
  */
-const AdminCreate = ({ onCreated }: AdminCreateProps) => {
+const AdminCreate = ({ onCreated, type: tipoFijo, bare }: AdminCreateProps) => {
   const { t } = useTranslation();
   const { toast } = useToast();
 
-  const [tipo, setTipo] = useState<'user' | 'venue'>('user');
+  const [tipo, setTipo] = useState<'user' | 'venue'>(tipoFijo ?? 'user');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [enviando, setEnviando] = useState(false);
@@ -64,22 +68,28 @@ const AdminCreate = ({ onCreated }: AdminCreateProps) => {
     );
 
   return (
-    <section className="rounded-2xl bg-white p-4 text-ink">
-      <h3 className="font-display text-title-card uppercase tracking-wide">{t('admin.create.title')}</h3>
-      <p className="mb-3 text-caption text-ink/60">{t('admin.create.subtitle')}</p>
+    <section className={bare ? 'text-ink' : 'rounded-2xl bg-white p-4 text-ink'}>
+      {!bare && (
+        <>
+          <h3 className="font-display text-title-card uppercase tracking-wide">{t('admin.create.title')}</h3>
+          <p className="mb-3 text-caption text-ink/60">{t('admin.create.subtitle')}</p>
+        </>
+      )}
 
-      <div className="mb-3 flex gap-2">
-        <button type="button" onClick={() => setTipo('user')} className={pill(tipo === 'user')}>
-          <UserPlus size={15} />
-          {t('admin.create.user')}
-        </button>
-        <button type="button" onClick={() => setTipo('venue')} className={pill(tipo === 'venue')}>
-          <Store size={15} />
-          {t('admin.create.venue')}
-        </button>
-      </div>
+      {!tipoFijo && (
+        <div className="mb-3 flex gap-2">
+          <button type="button" onClick={() => setTipo('user')} className={pill(tipo === 'user')}>
+            <UserPlus size={15} />
+            {t('admin.create.user')}
+          </button>
+          <button type="button" onClick={() => setTipo('venue')} className={pill(tipo === 'venue')}>
+            <Store size={15} />
+            {t('admin.create.venue')}
+          </button>
+        </div>
+      )}
 
-      <div className="grid gap-2 sm:grid-cols-[1fr_1fr_auto]">
+      <div className={bare ? 'grid gap-3' : 'grid gap-2 sm:grid-cols-[1fr_1fr_auto]'}>
         <div className="space-y-1">
           <Label htmlFor="alta-nombre" className="text-caption">
             {t('admin.create.name')}
@@ -99,7 +109,7 @@ const AdminCreate = ({ onCreated }: AdminCreateProps) => {
           />
         </div>
         <PartyButton
-          className="h-10 gap-2 self-end"
+          className={bare ? 'h-11 w-full gap-2' : 'h-10 gap-2 self-end'}
           disabled={enviando || name.trim().length < 2 || !email.includes('@')}
           onClick={() => void crear()}
         >

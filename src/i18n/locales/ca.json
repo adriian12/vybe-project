@@ -1716,7 +1716,10 @@
             "mailFailed": "El compte està creat, però el correu no ha sortit. Fes servir «He oblidat la contrasenya».",
             "emailTaken": "Aquest correu ja té compte.",
             "emailInvalid": "Aquest correu no és vàlid.",
-            "nameRequired": "Falta el nom."
+            "nameRequired": "Falta el nom.",
+            "addUser": "Afegir usuari",
+            "addVenue": "Afegir local",
+            "addEvent": "Afegir esdeveniment"
         },
         "newEvent": {
             "title": "Crear una festa",

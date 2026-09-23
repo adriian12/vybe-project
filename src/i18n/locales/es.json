@@ -1716,7 +1716,10 @@
             "mailFailed": "La cuenta está creada, pero el correo no ha salido. Usa «He olvidado mi contraseña».",
             "emailTaken": "Ese correo ya tiene cuenta.",
             "emailInvalid": "Ese correo no es válido.",
-            "nameRequired": "Falta el nombre."
+            "nameRequired": "Falta el nombre.",
+            "addUser": "Añadir usuario",
+            "addVenue": "Añadir local",
+            "addEvent": "Añadir evento"
         },
         "newEvent": {
             "title": "Crear una fiesta",

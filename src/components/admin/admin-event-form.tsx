@@ -15,7 +15,7 @@ import { adminService, AdminVenue } from '@/services/admin';
  * datos cada evento cuelga de uno. Se puede asignar a un local de verdad si la
  * fiesta es suya.
  */
-const AdminEventForm = ({ onCreated }: { onCreated?: () => void }) => {
+const AdminEventForm = ({ onCreated, bare }: { onCreated?: () => void; bare?: boolean }) => {
   const { t } = useTranslation();
   const { toast } = useToast();
 
@@ -68,11 +68,13 @@ const AdminEventForm = ({ onCreated }: { onCreated?: () => void }) => {
   };
 
   return (
-    <section className="space-y-3 rounded-2xl bg-white p-4 text-ink">
-      <div>
-        <h3 className="font-display text-title-card uppercase tracking-wide">{t('admin.newEvent.title')}</h3>
-        <p className="text-caption text-ink/60">{t('admin.newEvent.subtitle')}</p>
-      </div>
+    <section className={bare ? 'space-y-3 text-ink' : 'space-y-3 rounded-2xl bg-white p-4 text-ink'}>
+      {!bare && (
+        <div>
+          <h3 className="font-display text-title-card uppercase tracking-wide">{t('admin.newEvent.title')}</h3>
+          <p className="text-caption text-ink/60">{t('admin.newEvent.subtitle')}</p>
+        </div>
+      )}
 
       <div className="grid gap-2 sm:grid-cols-2">
         <div className="space-y-1">
@@ -156,7 +158,7 @@ const AdminEventForm = ({ onCreated }: { onCreated?: () => void }) => {
       </div>
 
       <PartyButton
-        className="w-full gap-2 sm:w-auto"
+        className={bare ? 'w-full gap-2' : 'w-full gap-2 sm:w-auto'}
         disabled={enviando || name.trim().length < 2 || !date}
         onClick={() => void crear()}
       >
