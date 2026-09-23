@@ -771,6 +771,7 @@ export type Database = {
           description: string | null
           draw_at: string | null
           drawn_at: string | null
+          entries_closed_at: string | null
           event_id: string
           id: string
           prize: string
@@ -786,6 +787,7 @@ export type Database = {
           description?: string | null
           draw_at?: string | null
           drawn_at?: string | null
+          entries_closed_at?: string | null
           event_id: string
           id?: string
           prize: string
@@ -801,6 +803,7 @@ export type Database = {
           description?: string | null
           draw_at?: string | null
           drawn_at?: string | null
+          entries_closed_at?: string | null
           event_id?: string
           id?: string
           prize?: string
@@ -3078,8 +3081,10 @@ export type Database = {
           description: string
           draw_at: string
           drawn_at: string
+          entries_closed_at: string
           id: string
           is_me: boolean
+          participants: number
           prize: string
           status: string
           ticket_code: string
@@ -3610,6 +3615,16 @@ export type Database = {
         Args: { p_event_id: string }
         Returns: undefined
       }
+      raffle_participant_count: {
+        Args: { p_raffle_id: string }
+        Returns: number
+      }
+      raffle_participants: {
+        Args: { p_raffle_id: string }
+        Returns: {
+          profile_id: string
+        }[]
+      }
       recompute_my_verification: { Args: never; Returns: boolean }
       redeem_event_code: {
         Args: { p_code: string; p_latitude?: number; p_longitude?: number }
@@ -3645,6 +3660,7 @@ export type Database = {
         }
         Returns: string
       }
+      reset_raffle: { Args: { p_raffle_id: string }; Returns: boolean }
       review_photo: {
         Args: { p_approve: boolean; p_item_id: string; p_reason?: string }
         Returns: undefined
@@ -3702,6 +3718,10 @@ export type Database = {
       }
       set_face_verified: { Args: { p_profile_id: string }; Returns: undefined }
       set_my_gender: { Args: { p_gender: string }; Returns: undefined }
+      set_raffle_entries: {
+        Args: { p_closed: boolean; p_raffle_id: string }
+        Returns: string
+      }
       set_venue_avg_spend: { Args: { p_amount: number }; Returns: undefined }
       set_venue_stamp_card: {
         Args: {

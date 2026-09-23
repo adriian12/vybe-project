@@ -858,7 +858,8 @@
             "location": "Event location",
             "locationSearch": "Search for the venue's address",
             "locationMissing": "The event location is missing",
-            "locationHelp": "Drag the pin or tap the map to adjust it. This location is used to check that people are inside."
+            "locationHelp": "Drag the pin or tap the map to adjust it. This location is used to check that people are inside.",
+            "repeat": "Repeat"
         },
         "team": {
             "title": "Team",
@@ -934,7 +935,12 @@
             "reopened": "Door open again",
             "closedNow": "Door closed: no new entries with the app",
             "openNow": "The door is open",
-            "reopen": "Reopen door"
+            "reopen": "Reopen door",
+            "tabs": {
+                "inside": "People inside",
+                "notices": "Notifications",
+                "promoters": "Promoters"
+            }
         },
         "codes": {
             "title": "Codes and who brings people",
@@ -1005,7 +1011,14 @@
             "errors": {
                 "ticketNotFound": "That code doesn't exist.",
                 "exhausted": "This offer has run out of vouchers."
-            }
+            },
+            "tabs": {
+                "promos": "Promos",
+                "list": "Created",
+                "challenges": "Challenges",
+                "prizes": "Raffles & stamps"
+            },
+            "listEmpty": "You haven't created any promotion by hand yet."
         },
         "insights": {
             "demographicsTitle": "Who came",
@@ -1305,7 +1318,13 @@
             "timeHelp": "Without a time, you run it with \"Draw\".",
             "create": "Announce raffle",
             "new": "New raffle",
-            "wonByCode": "Won by {{name}} · ID {{code}}"
+            "wonByCode": "Won by {{name}} · ID {{code}}",
+            "closeEntries": "Close",
+            "reopenEntries": "Reopen",
+            "entriesOpen": "Everyone inside takes part; the number goes up as people arrive.",
+            "entriesClosedAt": "Entries closed at {{time}}: anyone arriving later is out.",
+            "resetCta": "Reset",
+            "reset": "Raffle reset: you can draw it again."
         },
         "stamps": {
             "title": "Stamp card",

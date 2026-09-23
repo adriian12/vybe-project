@@ -24,6 +24,7 @@ import {
 } from '@/services/venue-service';
 import { nightService } from '@/services/night';
 import VenuePromoTemplates from '@/components/venue/venue-promo-templates';
+import PanelTabs from '@/components/venue/panel-tabs';
 import VenueRaffles from '@/components/venue/venue-raffles';
 import VenueStampCard from '@/components/venue/venue-stamp-card';
 
@@ -35,6 +36,9 @@ interface VenuePromotionsProps {
 }
 
 /** Duraciones habituales de una oferta de barra. */
+/** Pestañas: promociones listas, las creadas, retos y premios. */
+type PestanaPromos = 'promos' | 'list' | 'challenges' | 'prizes';
+
 const DURATIONS = [30, 60, 120, 240];
 
 /**
@@ -49,6 +53,7 @@ const VenuePromotions = ({ event, venueId, plan, onUpgrade }: VenuePromotionsPro
   const eventId = event.id;
   const { t } = useTranslation();
   const [eventStamps, setEventStamps] = useState(true);
+  const [pestana, setPestana] = useState<PestanaPromos>('promos');
   const { toast } = useToast();
 
   const [promotions, setPromotions] = useState<Promotion[]>([]);
@@ -172,81 +177,33 @@ const VenuePromotions = ({ event, venueId, plan, onUpgrade }: VenuePromotionsPro
   const propias = promotions.filter((p) => !p.templateKey && p.kind !== 'prize');
 
   return (
-    <div className="grid gap-4 lg:grid-cols-2">
-      <div className="space-y-4">
+    <div className="space-y-4">
+      <PanelTabs
+        tabs={[
+          { id: 'promos', label: t('venue.promotions.tabs.promos') },
+          { id: 'list', label: t('venue.promotions.tabs.list'), count: propias.length },
+          { id: 'challenges', label: t('venue.promotions.tabs.challenges') },
+          { id: 'prizes', label: t('venue.promotions.tabs.prizes') },
+        ]}
+        value={pestana}
+        onChange={(v) => setPestana(v as PestanaPromos)}
+      />
+
+      {/* ------------------------------------ promociones listas y crear */}
+      {pestana === 'promos' && (
+        <div className="grid gap-4 lg:grid-cols-2">
+          <div className="space-y-4">
         <VenuePromoTemplates
           event={event}
           venueId={venueId}
           promotions={promotions}
           canUse={canUse}
+          only="promo"
           onUpgrade={onUpgrade}
           onChange={() => void load()}
         />
-      </div>
-      <div className="space-y-4">
-        <VenueRaffles event={event} />
-        <VenueStampCard eventId={eventId} eventStamps={eventStamps} onEventChange={() => void load()} />
-      {/* ---------------------------------------------------------------- */}
-      {/* Validar un vale en barra                                        */}
-      {/* ---------------------------------------------------------------- */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-title-card uppercase tracking-wide">
-            <ScanLine size={16} className="text-party-primary" />
-            {t('venue.promotions.validateTitle')}
-          </CardTitle>
-          <p className="text-xs text-muted-foreground">
-            {t('venue.promotions.validateSubtitle')}
-          </p>
-        </CardHeader>
-
-        <CardContent className="space-y-3">
-          <form
-            className="flex gap-2"
-            onSubmit={(event) => {
-              event.preventDefault();
-              void validate();
-            }}
-          >
-            <Input
-              value={ticket}
-              onChange={(e) => setTicket(e.target.value.toUpperCase())}
-              placeholder={t('venue.promotions.ticketPlaceholder')}
-              maxLength={8}
-              className="tracking-widest font-mono"
-              autoComplete="off"
-            />
-            <PartyButton type="submit" size="sm" disabled={isBusy || !ticket.trim()}>
-              {t('venue.promotions.validate')}
-            </PartyButton>
-          </form>
-
-          {lastValidation && (
-            <div
-              className={`flex items-start gap-2 rounded-lg p-3 ${
-                lastValidation.alreadyUsed ? 'bg-destructive/10' : 'bg-party-primary/10'
-              }`}
-            >
-              {lastValidation.alreadyUsed ? (
-                <AlertTriangle size={16} className="text-destructive shrink-0 mt-0.5" />
-              ) : (
-                <Check size={16} className="text-party-primary shrink-0 mt-0.5" />
-              )}
-              <div className="min-w-0">
-                <p className="text-sm font-medium">
-                  {lastValidation.alreadyUsed
-                    ? t('venue.promotions.alreadyUsed')
-                    : t('venue.promotions.validated')}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {lastValidation.title} · {lastValidation.holderName}
-                </p>
-              </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
+          </div>
+          <div className="space-y-4">
       {/* ---------------------------------------------------------------- */}
       {/* Crear una promoción                                             */}
       {/* ---------------------------------------------------------------- */}
@@ -368,7 +325,13 @@ const VenuePromotions = ({ event, venueId, plan, onUpgrade }: VenuePromotionsPro
           </PartyButton>
         </CardContent>
       </Card>
+          </div>
+        </div>
+      )}
 
+      {/* -------------------------------------------- las que ya existen */}
+      {pestana === 'list' && (
+        <div className="space-y-4">
       {/* ---------------------------------------------------------------- */}
       {/* Resultado de cada promoción                                     */}
       {/* ---------------------------------------------------------------- */}
@@ -445,7 +408,98 @@ const VenuePromotions = ({ event, venueId, plan, onUpgrade }: VenuePromotionsPro
           </CardContent>
         </Card>
       )}
-      </div>
+          {propias.length === 0 && (
+            <p className="py-10 text-center text-body-sm text-party-gray">{t('venue.promotions.listEmpty')}</p>
+          )}
+        </div>
+      )}
+
+      {/* ------------------------------------------------------- retos */}
+      {pestana === 'challenges' && (
+        <div className="lg:max-w-2xl">
+        <VenuePromoTemplates
+          event={event}
+          venueId={venueId}
+          promotions={promotions}
+          canUse={canUse}
+          only="challenge"
+          onUpgrade={onUpgrade}
+          onChange={() => void load()}
+        />
+        </div>
+      )}
+
+      {/* ------------------------------------- sorteos, sellos y vales */}
+      {pestana === 'prizes' && (
+        <div className="grid gap-4 lg:grid-cols-2">
+          <div className="space-y-4">
+        <VenueRaffles event={event} />
+        <VenueStampCard eventId={eventId} eventStamps={eventStamps} onEventChange={() => void load()} />
+          </div>
+          <div className="space-y-4">
+      {/* ---------------------------------------------------------------- */}
+      {/* Validar un vale en barra                                        */}
+      {/* ---------------------------------------------------------------- */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-title-card uppercase tracking-wide">
+            <ScanLine size={16} className="text-party-primary" />
+            {t('venue.promotions.validateTitle')}
+          </CardTitle>
+          <p className="text-xs text-muted-foreground">
+            {t('venue.promotions.validateSubtitle')}
+          </p>
+        </CardHeader>
+
+        <CardContent className="space-y-3">
+          <form
+            className="flex gap-2"
+            onSubmit={(event) => {
+              event.preventDefault();
+              void validate();
+            }}
+          >
+            <Input
+              value={ticket}
+              onChange={(e) => setTicket(e.target.value.toUpperCase())}
+              placeholder={t('venue.promotions.ticketPlaceholder')}
+              maxLength={8}
+              className="tracking-widest font-mono"
+              autoComplete="off"
+            />
+            <PartyButton type="submit" size="sm" disabled={isBusy || !ticket.trim()}>
+              {t('venue.promotions.validate')}
+            </PartyButton>
+          </form>
+
+          {lastValidation && (
+            <div
+              className={`flex items-start gap-2 rounded-lg p-3 ${
+                lastValidation.alreadyUsed ? 'bg-destructive/10' : 'bg-party-primary/10'
+              }`}
+            >
+              {lastValidation.alreadyUsed ? (
+                <AlertTriangle size={16} className="text-destructive shrink-0 mt-0.5" />
+              ) : (
+                <Check size={16} className="text-party-primary shrink-0 mt-0.5" />
+              )}
+              <div className="min-w-0">
+                <p className="text-sm font-medium">
+                  {lastValidation.alreadyUsed
+                    ? t('venue.promotions.alreadyUsed')
+                    : t('venue.promotions.validated')}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {lastValidation.title} · {lastValidation.holderName}
+                </p>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

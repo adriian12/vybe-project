@@ -24,6 +24,8 @@ interface Props {
   venueId: string;
   promotions: Promotion[];
   canUse: boolean;
+  /** Pinta sólo las promociones o sólo los retos; por defecto, los dos. */
+  only?: 'promo' | 'challenge';
   onUpgrade: () => void;
   onChange: () => void;
 }
@@ -53,7 +55,7 @@ const horaDelEvento = (valor: string, event: { startDate: string }): string | nu
  * interruptor para activarlo ya y la opción de programarlo a una hora. Las
  * horas límite de los retos salen del horario del evento.
  */
-const VenuePromoTemplates = ({ event, venueId, promotions, canUse, onUpgrade, onChange }: Props) => {
+const VenuePromoTemplates = ({ event, venueId, promotions, canUse, only, onUpgrade, onChange }: Props) => {
   const { t } = useTranslation();
   const { toast } = useToast();
   const [busy, setBusy] = useState<string | null>(null);
@@ -280,13 +282,15 @@ const VenuePromoTemplates = ({ event, venueId, promotions, canUse, onUpgrade, on
 
   return (
     <div className="surface-light space-y-4 rounded-2xl p-4">
-      <div>
-        <h3 className="flex items-center gap-2 font-display text-title-card uppercase tracking-wide">
-          <Sparkles size={17} className="text-party-primary" />
-          {t('venue.templates.promosTitle')}
-        </h3>
-        <p className="text-caption text-party-gray">{t('venue.templates.promosSubtitle')}</p>
-      </div>
+      {only !== 'challenge' && (
+        <div>
+          <h3 className="flex items-center gap-2 font-display text-title-card uppercase tracking-wide">
+            <Sparkles size={17} className="text-party-primary" />
+            {t('venue.templates.promosTitle')}
+          </h3>
+          <p className="text-caption text-party-gray">{t('venue.templates.promosSubtitle')}</p>
+        </div>
+      )}
 
       {!canUse && (
         <button
@@ -299,16 +303,18 @@ const VenuePromoTemplates = ({ event, venueId, promotions, canUse, onUpgrade, on
         </button>
       )}
 
-      <ul className="space-y-2">{bloque('promo').map(tarjeta)}</ul>
+      {only !== 'challenge' && <ul className="space-y-2">{bloque('promo').map(tarjeta)}</ul>}
 
-      <div className="border-t border-black/[0.06] pt-4">
-        <h3 className="flex items-center gap-2 font-display text-title-card uppercase tracking-wide">
-          <Trophy size={17} className="text-party-primary" />
-          {t('venue.templates.challengesTitle')}
-        </h3>
-        <p className="mb-3 text-caption text-party-gray">{t('venue.templates.challengesSubtitle')}</p>
-        <ul className="space-y-2">{bloque('challenge').map(tarjeta)}</ul>
-      </div>
+      {only !== 'promo' && (
+        <div className={only === 'challenge' ? '' : 'border-t border-black/[0.06] pt-4'}>
+          <h3 className="flex items-center gap-2 font-display text-title-card uppercase tracking-wide">
+            <Trophy size={17} className="text-party-primary" />
+            {t('venue.templates.challengesTitle')}
+          </h3>
+          <p className="mb-3 text-caption text-party-gray">{t('venue.templates.challengesSubtitle')}</p>
+          <ul className="space-y-2">{bloque('challenge').map(tarjeta)}</ul>
+        </div>
+      )}
 
       <Dialog open={editando !== null} onOpenChange={(open) => !open && !guardando && setEditando(null)}>
         <DialogContent className="cards-light">

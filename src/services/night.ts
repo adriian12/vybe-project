@@ -52,6 +52,10 @@ export interface Raffle {
   drawnAt: string | null;
   /** «VY-4F2A9C»: lo ven el ganador (para enseñarlo) y el local (para comprobarlo). */
   winnerCode: string | null;
+  /** Cuánta gente participa ahora mismo (sólo lo ve el local). */
+  participants: number | null;
+  /** Desde esta hora no entra nadie más en el sorteo. */
+  entriesClosedAt: string | null;
 }
 
 export type ChallengeType = 'early_bird' | 'matches' | 'group' | 'stay_until' | 'first_visit';
@@ -379,6 +383,8 @@ export const nightService = {
       ticketCode: row.ticket_code,
       drawnAt: row.drawn_at,
       winnerCode: row.winner_code ?? null,
+      participants: row.participants ?? null,
+      entriesClosedAt: row.entries_closed_at ?? null,
     }));
   },
 
@@ -394,6 +400,25 @@ export const nightService = {
 
   cancelRaffle: async (raffleId: string): Promise<void> => {
     const { error } = await supabase.rpc('cancel_raffle', { p_raffle_id: raffleId });
+    if (error) throw fail(error.message);
+  },
+
+  /**
+   * Cierra la lista: quien entre después ya no participa. Con `false` se
+   * vuelve a abrir.
+   */
+  setRaffleEntries: async (raffleId: string, closed: boolean): Promise<string | null> => {
+    const { data, error } = await supabase.rpc('set_raffle_entries', {
+      p_raffle_id: raffleId,
+      p_closed: closed,
+    });
+    if (error) throw fail(error.message);
+    return (data as string | null) ?? null;
+  },
+
+  /** Deshace un sorteo ya hecho para volver a sortearlo. */
+  resetRaffle: async (raffleId: string): Promise<void> => {
+    const { error } = await supabase.rpc('reset_raffle', { p_raffle_id: raffleId });
     if (error) throw fail(error.message);
   },
 

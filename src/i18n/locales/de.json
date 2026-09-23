@@ -858,7 +858,8 @@
             "location": "Ort des Events",
             "locationSearch": "Adresse der Location suchen",
             "locationMissing": "Der Ort des Events fehlt",
-            "locationHelp": "Zieh den Punkt oder tipp auf die Karte, um ihn anzupassen. Mit diesem Ort wird geprüft, ob die Leute drinnen sind."
+            "locationHelp": "Zieh den Punkt oder tipp auf die Karte, um ihn anzupassen. Mit diesem Ort wird geprüft, ob die Leute drinnen sind.",
+            "repeat": "Wiederholen"
         },
         "team": {
             "title": "Team",
@@ -934,7 +935,12 @@
             "reopened": "Tür wieder offen",
             "closedNow": "Tür geschlossen: niemand Neues kommt mit der App rein",
             "openNow": "Die Tür ist offen",
-            "reopen": "Tür wieder öffnen"
+            "reopen": "Tür wieder öffnen",
+            "tabs": {
+                "inside": "Leute drin",
+                "notices": "Mitteilungen",
+                "promoters": "Promoter"
+            }
         },
         "codes": {
             "title": "Codes und wer Leute bringt",
@@ -1005,7 +1011,14 @@
             "errors": {
                 "ticketNotFound": "Diesen Code gibt es nicht.",
                 "exhausted": "Die Gutscheine dieser Aktion sind aufgebraucht."
-            }
+            },
+            "tabs": {
+                "promos": "Aktionen",
+                "list": "Erstellt",
+                "challenges": "Challenges",
+                "prizes": "Verlosungen & Stempel"
+            },
+            "listEmpty": "Du hast noch keine Aktion von Hand erstellt."
         },
         "insights": {
             "demographicsTitle": "Wer da war",
@@ -1305,7 +1318,13 @@
             "timeHelp": "Ohne Uhrzeit startest du sie mit „Verlosen“.",
             "create": "Verlosung ankündigen",
             "new": "Neue Verlosung",
-            "wonByCode": "Gewonnen von {{name}} · ID {{code}}"
+            "wonByCode": "Gewonnen von {{name}} · ID {{code}}",
+            "closeEntries": "Schließen",
+            "reopenEntries": "Wieder öffnen",
+            "entriesOpen": "Alle drinnen machen mit; die Zahl steigt, wenn Leute kommen.",
+            "entriesClosedAt": "Teilnahme um {{time}} geschlossen: wer später kommt, ist raus.",
+            "resetCta": "Zurücksetzen",
+            "reset": "Verlosung zurückgesetzt: du kannst neu ziehen."
         },
         "stamps": {
             "title": "Stempelkarte",

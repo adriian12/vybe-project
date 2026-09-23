@@ -37,7 +37,21 @@ interface CreateEventFormProps {
   onClose?: () => void;
   /** Con un evento, el formulario lo edita en vez de crear uno nuevo. */
   event?: Event;
+  /**
+   * Repetir una fiesta: copia la configuración de esta y crea otra. La fecha
+   * salta a la semana siguiente, que es lo que hace un local con su sesión de
+   * todos los sábados.
+   */
+  template?: Event;
 }
+
+/** La misma fecha de la semana que viene, en formato de campo. */
+const dentroDeUnaSemana = (iso: string): string => {
+  const d = new Date(iso);
+  d.setDate(d.getDate() + 7);
+  const dos = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${dos(d.getMonth() + 1)}-${dos(d.getDate())}`;
+};
 
 /** «2026-09-20» y «23:30» en la hora del dispositivo. */
 const fechaLocal = (iso: string) => {
@@ -65,11 +79,14 @@ const combinar = (date: string, start: string, end: string) => {
  * de inicio: una fiesta de 23:30 a 06:00 es lo normal, y pedir dos fechas
  * completas hacía que media lista de eventos acabara antes de empezar.
  */
-const CreateEventForm: React.FC<CreateEventFormProps> = ({ onCreated, onClose, event }) => {
+const CreateEventForm: React.FC<CreateEventFormProps> = ({ onCreated, onClose, event, template }) => {
   const { t } = useTranslation();
   const { currentVenue, createEvent, refreshEvents } = useAppContext();
   const { toast } = useToast();
   const editando = Boolean(event);
+  // Al editar y al repetir se parte de los mismos datos; sólo cambia si se
+  // guarda sobre el evento o se crea otro.
+  const base = event ?? template;
 
   const [isLoading, setIsLoading] = useState(false);
   const [recurrence, setRecurrence] = useState<'none' | 'weekly' | 'biweekly'>('none');
@@ -77,11 +94,11 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onCreated, onClose, e
   // El cartel se guarda aparte del formulario: el fichero no viaja por
   // react-hook-form, sólo la vista previa para enseñarlo antes de crear.
   const [posterFile, setPosterFile] = useState<File | null>(null);
-  const [posterPreview, setPosterPreview] = useState<string | null>(event?.posterUrl ?? null);
+  const [posterPreview, setPosterPreview] = useState<string | null>(base?.posterUrl ?? null);
 
   // Dónde es: la del evento al editar; al crear, la del local si la tiene.
   const [ubicacion, setUbicacion] = useState<PickedLocation | null>(
-    event?.location ?? currentVenue?.location ?? null,
+    base?.location ?? currentVenue?.location ?? null,
   );
 
   const {
@@ -90,19 +107,19 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onCreated, onClose, e
     formState: { errors },
     reset,
   } = useForm<EventFormData>({
-    defaultValues: event
+    defaultValues: base
       ? {
-          name: event.name,
-          description: event.description ?? '',
-          date: fechaLocal(event.startDate).date,
-          startTime: fechaLocal(event.startDate).time,
-          endTime: fechaLocal(event.endDate).time,
-          capacity: event.maxCapacity ? String(event.maxCapacity) : '',
-          price: event.price !== undefined && event.price !== null ? String(event.price) : '',
-          minAge: String(event.minAge ?? 18),
-          theme: event.theme ?? '',
-          dressCode: event.dressCode ?? '',
-          bookingUrl: event.bookingUrl ?? '',
+          name: base.name,
+          description: base.description ?? '',
+          date: event ? fechaLocal(base.startDate).date : dentroDeUnaSemana(base.startDate),
+          startTime: fechaLocal(base.startDate).time,
+          endTime: fechaLocal(base.endDate).time,
+          capacity: base.maxCapacity ? String(base.maxCapacity) : '',
+          price: base.price !== undefined && base.price !== null ? String(base.price) : '',
+          minAge: String(base.minAge ?? 18),
+          theme: base.theme ?? '',
+          dressCode: base.dressCode ?? '',
+          bookingUrl: base.bookingUrl ?? '',
         }
       : { minAge: '18', startTime: '23:30', endTime: '06:00' },
   });

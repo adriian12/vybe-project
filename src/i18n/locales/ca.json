@@ -858,7 +858,8 @@
             "location": "Ubicació de l'esdeveniment",
             "locationSearch": "Cerca l'adreça del local",
             "locationMissing": "Falta la ubicació de l'esdeveniment",
-            "locationHelp": "Arrossega el punt o toca el mapa per ajustar-lo. Amb aquesta ubicació es comprova que la gent és a dins."
+            "locationHelp": "Arrossega el punt o toca el mapa per ajustar-lo. Amb aquesta ubicació es comprova que la gent és a dins.",
+            "repeat": "Repetir"
         },
         "team": {
             "title": "Equip",
@@ -934,7 +935,12 @@
             "reopened": "Porta oberta de nou",
             "closedNow": "Porta tancada: no entra ningú nou amb l'app",
             "openNow": "La porta és oberta",
-            "reopen": "Reobrir la porta"
+            "reopen": "Reobrir la porta",
+            "tabs": {
+                "inside": "Gent a dins",
+                "notices": "Notificacions",
+                "promoters": "RRPP"
+            }
         },
         "codes": {
             "title": "Codis i qui porta gent",
@@ -1005,7 +1011,14 @@
             "errors": {
                 "ticketNotFound": "Aquest codi no existeix.",
                 "exhausted": "S'han exhaurit els vals d'aquesta promoció."
-            }
+            },
+            "tabs": {
+                "promos": "Promocions",
+                "list": "Creades",
+                "challenges": "Reptes",
+                "prizes": "Sortejos i segells"
+            },
+            "listEmpty": "Encara no has creat cap promoció a mà."
         },
         "insights": {
             "demographicsTitle": "Qui va venir",
@@ -1305,7 +1318,13 @@
             "timeHelp": "Sense hora, el llances tu amb «Sortejar».",
             "create": "Anunciar sorteig",
             "new": "Nou sorteig",
-            "wonByCode": "Ha guanyat {{name}} · ID {{code}}"
+            "wonByCode": "Ha guanyat {{name}} · ID {{code}}",
+            "closeEntries": "Tancar",
+            "reopenEntries": "Reobrir",
+            "entriesOpen": "Hi participa qui és a dins; el número puja si entra més gent.",
+            "entriesClosedAt": "Llista tancada a les {{time}}: qui entri després no hi participa.",
+            "resetCta": "Reiniciar",
+            "reset": "Sorteig reiniciat: el pots tornar a sortejar."
         },
         "stamps": {
             "title": "Targeta de segells",

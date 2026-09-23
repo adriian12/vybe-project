@@ -858,7 +858,8 @@
             "location": "Ubicación del evento",
             "locationSearch": "Busca la dirección del local",
             "locationMissing": "Falta la ubicación del evento",
-            "locationHelp": "Arrastra el punto o toca el mapa para ajustarlo. Con esta ubicación se comprueba que la gente está dentro."
+            "locationHelp": "Arrastra el punto o toca el mapa para ajustarlo. Con esta ubicación se comprueba que la gente está dentro.",
+            "repeat": "Repetir"
         },
         "team": {
             "title": "Equipo",
@@ -934,7 +935,12 @@
             "reopened": "Puerta abierta de nuevo",
             "closedNow": "Puerta cerrada: no entra nadie nuevo con la app",
             "openNow": "La puerta está abierta",
-            "reopen": "Reabrir puerta"
+            "reopen": "Reabrir puerta",
+            "tabs": {
+                "inside": "Gente dentro",
+                "notices": "Notificaciones",
+                "promoters": "RRPP"
+            }
         },
         "codes": {
             "title": "Códigos y quién trae gente",
@@ -1005,7 +1011,14 @@
             "errors": {
                 "ticketNotFound": "Ese código no existe.",
                 "exhausted": "Se han agotado los vales de esta promoción."
-            }
+            },
+            "tabs": {
+                "promos": "Promociones",
+                "list": "Creadas",
+                "challenges": "Retos",
+                "prizes": "Sorteos y sellos"
+            },
+            "listEmpty": "Todavía no has creado ninguna promoción a mano."
         },
         "insights": {
             "demographicsTitle": "Quién vino",
@@ -1305,7 +1318,13 @@
             "timeHelp": "Sin hora, lo lanzas tú con «Sortear».",
             "create": "Anunciar sorteo",
             "new": "Nuevo sorteo",
-            "wonByCode": "Ganó {{name}} · ID {{code}}"
+            "wonByCode": "Ganó {{name}} · ID {{code}}",
+            "closeEntries": "Cerrar",
+            "reopenEntries": "Reabrir",
+            "entriesOpen": "Participa quien está dentro; el número sube si entra más gente.",
+            "entriesClosedAt": "Lista cerrada a las {{time}}: quien entre después no participa.",
+            "resetCta": "Reiniciar",
+            "reset": "Sorteo reiniciado: puedes volver a sortearlo."
         },
         "stamps": {
             "title": "Tarjeta de sellos",
