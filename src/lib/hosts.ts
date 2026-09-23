@@ -26,7 +26,8 @@ const PROD_APP = 'https://app.fiestea.es';
  * la landing.
  */
 const enProduccion =
-  typeof window !== 'undefined' && /(^|\.)fiestea\.es$/.test(window.location.hostname);
+  isNative() ||
+  (typeof window !== 'undefined' && /(^|\.)fiestea\.es$/.test(window.location.hostname));
 
 export const LANDING_URL = enProduccion
   ? PROD_LANDING

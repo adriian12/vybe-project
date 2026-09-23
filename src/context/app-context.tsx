@@ -196,6 +196,14 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       setUserType(profile.role === 'admin' ? 'admin' : 'user');
       identifyUser(profile.id, profile.role);
 
+      // La cuenta que sólo administra no sale de fiesta: ni evento activo, ni
+      // tablón, ni conexiones. Entra directamente al panel.
+      if (profile.staffOnly) {
+        setActiveEvent(null);
+        setIsLoading(false);
+        return;
+      }
+
       // Si el check-in sigue vivo en el servidor, se vuelve a entrar solo. El
       // localStorage no basta: se borra al cerrar sesión y no viaja de un
       // teléfono a otro.
@@ -427,20 +435,20 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   useEffect(() => {
-    if (userType === 'user' || userType === 'admin') {
+    if ((userType === 'user' || userType === 'admin') && !currentUser?.staffOnly) {
       void loadConnections();
       void loadMessages();
       void refreshEvents();
     } else if (userType === 'venue') {
       void refreshEvents();
     }
-  }, [userType, loadConnections, loadMessages, refreshEvents]);
+  }, [userType, currentUser?.staffOnly, loadConnections, loadMessages, refreshEvents]);
 
   useEffect(() => {
-    if (activeEvent && (userType === 'user' || userType === 'admin')) {
+    if (activeEvent && (userType === 'user' || userType === 'admin') && !currentUser?.staffOnly) {
       void loadProfiles();
     }
-  }, [activeEvent, userType, loadProfiles]);
+  }, [activeEvent, userType, currentUser?.staffOnly, loadProfiles]);
 
   // ==========================================================================
   // REALTIME
@@ -490,7 +498,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   );
 
   useEffect(() => {
-    if (!currentUser || (userType !== 'user' && userType !== 'admin')) return;
+    if (!currentUser || currentUser.staffOnly || (userType !== 'user' && userType !== 'admin')) return;
 
     const profileId = currentUser.id;
     let channel: RealtimeChannel | null = null;
@@ -529,7 +537,9 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   // segundo plano el sistema la corta y lo que llegó entretanto no se repite:
   // al volver (por ejemplo, tocando el aviso de un mensaje) la conversación
   // salía sin ese mensaje. Se recarga al volver a primer plano.
-  const sesionDeClubber = Boolean(currentUser) && (userType === 'user' || userType === 'admin');
+  // La cuenta que sólo administra no tiene parte de clubber que refrescar.
+  const sesionDeClubber =
+    Boolean(currentUser) && !currentUser?.staffOnly && (userType === 'user' || userType === 'admin');
 
   useEffect(() => {
     if (!sesionDeClubber) return;

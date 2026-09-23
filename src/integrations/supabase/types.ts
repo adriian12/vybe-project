@@ -1462,6 +1462,7 @@ export type Database = {
           photos: string[] | null
           plan_tonight: string | null
           role: string
+          staff_only: boolean
           status: string
           suspended_until: string | null
           suspension_reason: string | null
@@ -1495,6 +1496,7 @@ export type Database = {
           photos?: string[] | null
           plan_tonight?: string | null
           role?: string
+          staff_only?: boolean
           status?: string
           suspended_until?: string | null
           suspension_reason?: string | null
@@ -1528,6 +1530,7 @@ export type Database = {
           photos?: string[] | null
           plan_tonight?: string | null
           role?: string
+          staff_only?: boolean
           status?: string
           suspended_until?: string | null
           suspension_reason?: string | null
@@ -2719,6 +2722,52 @@ export type Database = {
         Args: { p_delta: number; p_event_id: string }
         Returns: number
       }
+      admin_add_supercrush: {
+        Args: { p_profile_id: string; p_quantity: number }
+        Returns: number
+      }
+      admin_is_staff_only: { Args: never; Returns: boolean }
+      admin_list_users: {
+        Args: { p_limit?: number; p_offset?: number; p_search?: string }
+        Returns: {
+          account_type: string
+          age: number
+          check_ins: number
+          created_at: string
+          email: string
+          is_verified: boolean
+          name: string
+          profile_id: string
+          role: string
+          staff_only: boolean
+          status: string
+          subscription_event_id: string
+          subscription_expires_at: string
+          subscription_type: string
+          supercrush: number
+          total_count: number
+        }[]
+      }
+      admin_list_venues: {
+        Args: { p_search?: string }
+        Returns: {
+          city: string
+          created_at: string
+          email: string
+          events_total: number
+          events_upcoming: number
+          followers: number
+          is_verified: boolean
+          members: number
+          name: string
+          plan: string
+          plan_expires_at: string
+          plan_status: string
+          type: string
+          venue_id: string
+          verification_status: string
+        }[]
+      }
       admin_reset_test_lab: {
         Args: {
           p_latitude: number
@@ -2731,6 +2780,28 @@ export type Database = {
           event_name: string
           likes_for_you: number
           people_inside: number
+        }[]
+      }
+      admin_set_subscription: {
+        Args: { p_days?: number; p_profile_id: string; p_type: string }
+        Returns: string
+      }
+      admin_set_venue_plan: {
+        Args: { p_days?: number; p_plan: string; p_venue_id: string }
+        Returns: string
+      }
+      admin_venue_events: {
+        Args: { p_venue_id: string }
+        Returns: {
+          check_ins: number
+          end_date: string
+          event_id: string
+          featured_until: string
+          intents: number
+          matches: number
+          max_capacity: number
+          name: string
+          start_date: string
         }[]
       }
       apply_event_headcount: {

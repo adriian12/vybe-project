@@ -190,6 +190,17 @@ const App = () => (
                         </RedirectIfLoggedIn>
                       }
                     />
+                    {/* Acceso de administración: app.fiestea.es/admin. Es el
+                        mismo formulario de cuenta normal, pero con su propia
+                        dirección para no tener que recordar parámetros. */}
+                    <Route
+                      path="/admin"
+                      element={
+                        <RedirectIfLoggedIn>
+                          <AuthPage />
+                        </RedirectIfLoggedIn>
+                      }
+                    />
                     <Route path="/auth/verify-email" element={<VerifyEmailPage />} />
                     <Route path="/auth/verify-email-pending" element={<VerifyEmailPage />} />
                     <Route path="/auth/reset-password" element={<ResetPasswordPage />} />

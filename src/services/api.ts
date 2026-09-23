@@ -38,6 +38,7 @@ const profileToUser = (profile: ProfileRow, distance?: number): User => ({
   avatar: profile.avatar || undefined,
   email: profile.email || undefined,
   role: profile.role === 'admin' ? 'admin' : 'user',
+  staffOnly: Boolean((profile as { staff_only?: boolean }).staff_only),
   isVerified: profile.is_verified,
   isInvisible: profile.is_invisible,
   languages: profile.languages ?? [],

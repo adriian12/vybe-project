@@ -25,13 +25,19 @@ const FullScreenLoader = () => (
  * dentro de un useEffect, que se ejecuta después de pintar y no protege nada.
  */
 const ProtectedRoute = ({ children, allow, requireEvent = false }: ProtectedRouteProps) => {
-  const { isLoading, isLoggedIn, userType, activeEvent } = useAppContext();
+  const { isLoading, isLoggedIn, userType, activeEvent, currentUser } = useAppContext();
   const location = useLocation();
 
   if (isLoading) return <FullScreenLoader />;
 
   if (!isLoggedIn || !userType) {
     return <Navigate to="/auth" state={{ from: location.pathname }} replace />;
+  }
+
+  // La cuenta de sólo administración no tiene parte de clubber: cualquier
+  // pantalla de fiesta la devuelve al panel.
+  if (currentUser?.staffOnly && !location.pathname.startsWith('/admin')) {
+    return <Navigate to="/admin/dashboard" replace />;
   }
 
   if (allow && !allow.includes(userType)) {

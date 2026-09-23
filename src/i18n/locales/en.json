@@ -1137,7 +1137,8 @@
                 "scheduleLimit": "You've reached your plan's limit of scheduled messages.",
                 "scheduleInPast": "That time has already passed.",
                 "scheduleAfterEvent": "The party will be over by then."
-            }
+            },
+            "scheduleCta": "Schedule for later"
         },
         "documents": {
             "help": "Proof that the venue is yours. Administration reviews it before approving the account.",
@@ -1398,14 +1399,16 @@
         "title": "Admin dashboard",
         "subtitle": "Manage venues, events and moderation.",
         "tabs": {
-            "venues": "Venues",
+            "venues": "Venue approvals",
             "events": "Events",
             "reports": "Reports",
             "photos": "Photos",
             "sos": "SOS",
             "metrics": "Metrics",
             "overview": "Overview",
-            "leads": "Requests"
+            "leads": "Requests",
+            "users": "Users",
+            "venuesAll": "Venues"
         },
         "venues": {
             "title": "Pending venues",
@@ -1561,6 +1564,29 @@
                 "won": "Customer",
                 "discarded": "Discarded"
             }
+        },
+        "users": {
+            "search": "Search by name, email or phone",
+            "empty": "No accounts match that search.",
+            "meta": "{{type}} · {{checkIns}} check-ins · joined {{date}}",
+            "planSaved": "Subscription changed",
+            "page": "{{from}}–{{to}} of {{total}}",
+            "plans": {
+                "none": "No Premium",
+                "monthly": "Monthly Premium",
+                "lifetime": "Lifetime Premium",
+                "event": "Party Premium"
+            }
+        },
+        "venuesAll": {
+            "search": "Search venue by name, email or city",
+            "empty": "No venues match that search.",
+            "events": "{{total}} events ({{upcoming}} upcoming)",
+            "followers": "{{count}} followers",
+            "seeEvents": "See their events",
+            "noEvents": "This venue has no events yet.",
+            "eventStats": "{{checkIns}} inside · {{matches}} crushes · {{intents}} going",
+            "planSaved": "Plan changed"
         }
     },
     "pwa": {

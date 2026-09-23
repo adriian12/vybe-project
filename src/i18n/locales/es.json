@@ -1137,7 +1137,8 @@
                 "scheduleLimit": "Has llegado al límite de avisos programados de tu plan.",
                 "scheduleInPast": "Esa hora ya ha pasado.",
                 "scheduleAfterEvent": "La fiesta ya habrá terminado a esa hora."
-            }
+            },
+            "scheduleCta": "Programar para otra hora"
         },
         "documents": {
             "help": "Lo que acredita que el local es tuyo. Administración lo revisa antes de aprobar la cuenta.",
@@ -1398,14 +1399,16 @@
         "title": "Panel de administración",
         "subtitle": "Gestiona locales, eventos y moderación.",
         "tabs": {
-            "venues": "Locales",
+            "venues": "Altas de locales",
             "events": "Eventos",
             "reports": "Reportes",
             "photos": "Fotos",
             "sos": "SOS",
             "metrics": "Métricas",
             "overview": "Resumen",
-            "leads": "Solicitudes"
+            "leads": "Solicitudes",
+            "users": "Usuarios",
+            "venuesAll": "Locales"
         },
         "venues": {
             "title": "Locales pendientes",
@@ -1561,6 +1564,29 @@
                 "won": "Cliente",
                 "discarded": "Descartada"
             }
+        },
+        "users": {
+            "search": "Buscar por nombre, correo o móvil",
+            "empty": "No hay cuentas con esa búsqueda.",
+            "meta": "{{type}} · {{checkIns}} entradas · alta {{date}}",
+            "planSaved": "Suscripción cambiada",
+            "page": "{{from}}–{{to}} de {{total}}",
+            "plans": {
+                "none": "Sin Premium",
+                "monthly": "Premium mensual",
+                "lifetime": "Premium de por vida",
+                "event": "Premium de una fiesta"
+            }
+        },
+        "venuesAll": {
+            "search": "Buscar local por nombre, correo o ciudad",
+            "empty": "No hay locales con esa búsqueda.",
+            "events": "{{total}} eventos ({{upcoming}} por venir)",
+            "followers": "{{count}} seguidores",
+            "seeEvents": "Ver sus eventos",
+            "noEvents": "Este local no ha creado ningún evento.",
+            "eventStats": "{{checkIns}} dentro · {{matches}} crushes · {{intents}} van",
+            "planSaved": "Plan cambiado"
         }
     },
     "pwa": {
