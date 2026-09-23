@@ -278,8 +278,9 @@ const HomePage = () => {
 
         {/* ------------------------------------------------------ destacados */}
         {destacados.length > 0 && (
+          // Sin título: si una fiesta está en esta fila ya se entiende que está
+          // destacada, y la llama de cada tarjeta lo dice.
           <section className="space-y-3">
-            <Seccion titulo={t('home.featured')} extra={<Flame size={20} className="text-party-gray" />} />
             <div className="no-scrollbar flex gap-4 overflow-x-auto px-margin py-1">
               {destacados.map(({ event, distance }) => (
                 <EventCard

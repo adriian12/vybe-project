@@ -700,7 +700,7 @@ const VenueDashboardPage = () => {
       </header>
 
       {/* ======================================================= contenido */}
-      <main className="cards-light mx-auto max-w-[1200px] space-y-4 px-4 pb-28 pt-4 lg:px-8 lg:pt-6">
+      <main className="cards-light mx-auto max-w-[1200px] space-y-4 overflow-x-hidden px-4 pb-28 pt-4 lg:px-8 lg:pt-6">
         {!currentVenue.isVerified && (
           <div className="flex gap-3 rounded-2xl bg-destructive/15 p-4">
             <AlertTriangle size={20} className="mt-0.5 shrink-0 text-destructive" />
@@ -814,8 +814,8 @@ const VenueDashboardPage = () => {
                           )}
                         </span>
                         <div className="min-w-0 flex-1">
-                          <p className="flex items-center gap-1.5">
-                            <span className="truncate font-display text-title-card">{event.name}</span>
+                          <p className="flex flex-wrap items-center gap-x-1.5 gap-y-1">
+                            <span className="max-w-full truncate font-display text-title-card">{event.name}</span>
                             {event.featured && (
                               <span className="flex shrink-0 items-center gap-0.5 rounded-md bg-party-accent px-1.5 py-0.5 text-[10px] font-extrabold uppercase text-white">
                                 <Sparkles size={10} />
