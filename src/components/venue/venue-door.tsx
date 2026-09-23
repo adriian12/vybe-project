@@ -26,6 +26,7 @@ import { ApiError } from '@/services/api';
 import VenueBroadcast from '@/components/venue/venue-broadcast';
 import DoorCounter from '@/components/venue/door-counter';
 import CounterLinks from '@/components/venue/counter-links';
+import PanelTabs from '@/components/venue/panel-tabs';
 import { CounterTransport } from '@/services/door-counter';
 import DoorLiveInfo from '@/components/venue/door-live-info';
 import VenueIntentList from '@/components/venue/venue-intent-list';
@@ -81,7 +82,10 @@ const Titulo: React.FC<{ children: React.ReactNode; extra?: React.ReactNode }> =
  * El aforo se refresca solo cada quince segundos. Es el dato que hoy se cuenta
  * con un clicker y que la ley obliga a controlar.
  */
+type PestanaPuerta = 'inside' | 'notices' | 'promoters';
+
 const VenueDoor = ({ eventId, plan, onUpgrade }: VenueDoorProps) => {
+  const [pestana, setPestana] = useState<PestanaPuerta>('inside');
   const { t } = useTranslation();
   const { toast } = useToast();
 
@@ -336,8 +340,20 @@ const VenueDoor = ({ eventId, plan, onUpgrade }: VenueDoorProps) => {
         </p>
       )}
 
-      <div className="grid gap-4 lg:grid-cols-12">
-        <div className="space-y-4 lg:col-span-5">
+      <PanelTabs
+        tabs={[
+          { id: 'inside', label: t('venue.door.tabs.inside') },
+          { id: 'notices', label: t('venue.door.tabs.notices') },
+          { id: 'promoters', label: t('venue.door.tabs.promoters'), count: activos.length },
+        ]}
+        value={pestana}
+        onChange={(v) => setPestana(v as PestanaPuerta)}
+      />
+
+      {/* --------------------------------------------------- gente dentro */}
+      {pestana === 'inside' && (
+        <div className="grid gap-4 lg:grid-cols-12">
+          <div className="space-y-4 lg:col-span-5">
           {/* ---------------------------------------------------- contador */}
           <div className="surface-light rounded-2xl p-4">
             {occupancy?.capacity ? (
@@ -383,10 +399,68 @@ const VenueDoor = ({ eventId, plan, onUpgrade }: VenueDoorProps) => {
               </div>
             )}
           </div>
-
           {/* ------------------------------------------ enlaces del portero */}
           {occupancy?.capacity ? <CounterLinks eventId={eventId} /> : null}
+          </div>
+          <div className="space-y-4 lg:col-span-7">
+          {/* -------------------------------------------------- denuncias */}
+          {reports.length > 0 && (
+            <div className="surface-light rounded-2xl p-4">
+              <Titulo
+                extra={<span className="text-caption font-extrabold uppercase text-destructive">{t('venue.door.priority')}</span>}
+              >
+                <span className="flex items-center gap-2 normal-case">
+                  {t('venue.door.reportsTitle')}
+                  <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1.5 text-[11px] text-white">
+                    {reports.length}
+                  </span>
+                </span>
+              </Titulo>
+              <p className="-mt-2 mb-3 text-caption text-party-gray">{t('venue.door.reportsSubtitle')}</p>
+              <ul className="space-y-2">
+                {reports.map((report) => (
+                  <li key={report.reportId} className="flex items-center gap-3 rounded-xl bg-black/[0.03] p-3">
+                    <img
+                      src={report.reportedPhoto || FALLBACK_AVATAR}
+                      alt=""
+                      className="h-10 w-10 shrink-0 rounded-full object-cover"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-body-md font-bold">{report.reportedName}</p>
+                      <p className="truncate text-caption text-party-gray">
+                        {t(`report.reasons.${report.reportType}`, { defaultValue: report.reportType })}
+                        {report.reportsTotal > 1 ? ` · ${t('venue.door.reportsTotal', { count: report.reportsTotal })}` : ''}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      disabled={isBusy}
+                      onClick={() => void revoke(report.reportedProfileId, report.reportedName)}
+                      className="press flex h-8 shrink-0 items-center gap-1 rounded-lg border border-destructive px-2.5 text-caption font-bold text-destructive disabled:opacity-50"
+                    >
+                      <UserMinus size={13} />
+                      {t('venue.door.revokeAccess')}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          </div>
+        </div>
+      )}
 
+      {/* --------------------------------------------------- notificaciones */}
+      {pestana === 'notices' && (
+        <div className="grid gap-4 lg:grid-cols-12">
+          <div className="space-y-4 lg:col-span-7">
+            {/* Avisos a quien está dentro: mover gente entre salas, avisar de un
+                cambio de sesión. */}
+            <VenueBroadcast eventId={eventId} />
+          {/* -------------------------------------------------------- DJ */}
+          <VenueSongs eventId={eventId} enabled={noche?.songs ?? false} onToggle={() => void load()} />
+          </div>
+          <div className="space-y-4 lg:col-span-5">
           {/* ------------------------------------------------- termómetro */}
           <DoorLiveInfo
             eventId={eventId}
@@ -394,11 +468,14 @@ const VenueDoor = ({ eventId, plan, onUpgrade }: VenueDoorProps) => {
             nowPlaying={noche?.nowPlaying ?? null}
             onChange={() => void load()}
           />
+          </div>
         </div>
+      )}
 
-        <div className="space-y-4 lg:col-span-7">
-          {/* Códigos y avisos, uno al lado del otro. */}
-          <div className="grid gap-4 md:grid-cols-2">
+      {/* ------------------------------------------------------------ RRPP */}
+      {pestana === 'promoters' && (
+        <div className="grid gap-4 lg:grid-cols-12">
+          <div className="space-y-4 lg:col-span-7">
             <div className="surface-light rounded-2xl p-4">
               <Titulo extra={<span className="text-caption text-party-gray">{t('venue.door.activeLists', { count: activos.length })}</span>}>
                 {t('venue.door.activeCodesTitle')}
@@ -556,63 +633,13 @@ const VenueDoor = ({ eventId, plan, onUpgrade }: VenueDoorProps) => {
                 </button>
               )}
             </div>
-
-            {/* Avisos a quien está dentro: mover gente entre salas, avisar de un
-                cambio de sesión. */}
-            <VenueBroadcast eventId={eventId} />
           </div>
-
-          {/* -------------------------------------------------- denuncias */}
-          {reports.length > 0 && (
-            <div className="surface-light rounded-2xl p-4">
-              <Titulo
-                extra={<span className="text-caption font-extrabold uppercase text-destructive">{t('venue.door.priority')}</span>}
-              >
-                <span className="flex items-center gap-2 normal-case">
-                  {t('venue.door.reportsTitle')}
-                  <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1.5 text-[11px] text-white">
-                    {reports.length}
-                  </span>
-                </span>
-              </Titulo>
-              <p className="-mt-2 mb-3 text-caption text-party-gray">{t('venue.door.reportsSubtitle')}</p>
-              <ul className="space-y-2">
-                {reports.map((report) => (
-                  <li key={report.reportId} className="flex items-center gap-3 rounded-xl bg-black/[0.03] p-3">
-                    <img
-                      src={report.reportedPhoto || FALLBACK_AVATAR}
-                      alt=""
-                      className="h-10 w-10 shrink-0 rounded-full object-cover"
-                    />
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-body-md font-bold">{report.reportedName}</p>
-                      <p className="truncate text-caption text-party-gray">
-                        {t(`report.reasons.${report.reportType}`, { defaultValue: report.reportType })}
-                        {report.reportsTotal > 1 ? ` · ${t('venue.door.reportsTotal', { count: report.reportsTotal })}` : ''}
-                      </p>
-                    </div>
-                    <button
-                      type="button"
-                      disabled={isBusy}
-                      onClick={() => void revoke(report.reportedProfileId, report.reportedName)}
-                      className="press flex h-8 shrink-0 items-center gap-1 rounded-lg border border-destructive px-2.5 text-caption font-bold text-destructive disabled:opacity-50"
-                    >
-                      <UserMinus size={13} />
-                      {t('venue.door.revokeAccess')}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
+          <div className="space-y-4 lg:col-span-5">
           {/* ------------------------------------------------- Lista Vybe */}
           <VenueIntentList eventId={eventId} paid={!deGratis} />
-
-          {/* -------------------------------------------------------- DJ */}
-          <VenueSongs eventId={eventId} enabled={noche?.songs ?? false} onToggle={() => void load()} />
+          </div>
         </div>
-      </div>
+      )}
 
       {/* ------------------------------------------ puerta, siempre a mano */}
       <div className="pb-safe fixed inset-x-0 bottom-0 z-30 border-t border-white/[0.06] bg-background/95 px-4 pt-3 backdrop-blur-lg">

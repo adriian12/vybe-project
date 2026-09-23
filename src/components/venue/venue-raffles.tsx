@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Gift, Loader2, PartyPopper, Plus, Shuffle, X } from 'lucide-react';
+import { Gift, Loader2, Lock, LockOpen, PartyPopper, Plus, RotateCcw, Shuffle, Users, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { PartyButton } from '@/components/ui-custom/party-button';
 import { useToast } from '@/components/ui/use-toast';
 import { ApiError } from '@/services/api';
 import { nightService, Raffle } from '@/services/night';
+import { cn } from '@/lib/utils';
 
 const hora = (iso: string) => new Date(iso).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
 
@@ -43,7 +44,8 @@ const VenueRaffles = ({ event }: { event: { id: string; startDate: string; endDa
 
   useEffect(() => {
     void load();
-    const interval = setInterval(() => void load(), 30_000);
+    // Mientras hay un sorteo abierto, el número de participantes cambia solo.
+    const interval = setInterval(() => void load(), 15_000);
     return () => clearInterval(interval);
   }, [load]);
 
@@ -105,6 +107,33 @@ const VenueRaffles = ({ event }: { event: { id: string; startDate: string; endDa
     }
   };
 
+  /** Cierra o reabre la lista de participantes. */
+  const cambiarEntradas = async (raffle: Raffle, cerrar: boolean) => {
+    setBusy(true);
+    try {
+      await nightService.setRaffleEntries(raffle.id, cerrar);
+      await load();
+    } catch (error) {
+      fail(error);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  /** Deshace el sorteo para repetirlo. */
+  const reiniciar = async (raffle: Raffle) => {
+    setBusy(true);
+    try {
+      await nightService.resetRaffle(raffle.id);
+      await load();
+      toast({ title: t('venue.raffles.reset') });
+    } catch (error) {
+      fail(error);
+    } finally {
+      setBusy(false);
+    }
+  };
+
   return (
     <div className="surface-light rounded-2xl p-4">
       <h3 className="flex items-center gap-2 font-display text-title-card uppercase tracking-wide">
@@ -116,11 +145,11 @@ const VenueRaffles = ({ event }: { event: { id: string; startDate: string; endDa
       {raffles.length > 0 && (
         <ul className="mb-3 space-y-2">
           {raffles.map((raffle) => (
-            <li key={raffle.id} className="flex items-center gap-3 rounded-xl bg-black/[0.03] p-3">
+            <li key={raffle.id} className="flex flex-wrap items-center gap-3 rounded-xl bg-black/[0.03] p-3">
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-party-primary text-ink">
                 {raffle.status === 'drawn' ? <PartyPopper size={16} /> : <Gift size={16} />}
               </span>
-              <div className="min-w-0 flex-1">
+              <div className="min-w-[8rem] flex-1">
                 <p className="truncate text-body-sm font-bold">{raffle.prize}</p>
                 <p className="truncate text-caption text-party-gray">
                   {raffle.status === 'drawn'
@@ -135,7 +164,37 @@ const VenueRaffles = ({ event }: { event: { id: string; startDate: string; endDa
                 </p>
               </div>
               {raffle.status === 'scheduled' && (
-                <div className="flex shrink-0 items-center gap-1">
+                <div className="flex shrink-0 flex-wrap items-center gap-1">
+                  {/* Cuánta gente participa: sube mientras entra gente, y se
+                      queda fija en cuanto se cierra la lista. */}
+                  <span
+                    className={cn(
+                      'flex h-8 items-center gap-1 rounded-lg px-2 text-caption font-bold',
+                      raffle.entriesClosedAt ? 'bg-destructive/12 text-destructive' : 'bg-black/[0.06] text-ink/70',
+                    )}
+                    title={
+                      raffle.entriesClosedAt
+                        ? t('venue.raffles.entriesClosedAt', { time: hora(raffle.entriesClosedAt) })
+                        : t('venue.raffles.entriesOpen')
+                    }
+                  >
+                    <Users size={13} />
+                    {raffle.participants ?? 0}
+                  </span>
+
+                  <button
+                    type="button"
+                    disabled={busy}
+                    onClick={() => void cambiarEntradas(raffle, !raffle.entriesClosedAt)}
+                    className={cn(
+                      'press flex h-8 items-center gap-1 rounded-lg px-2.5 text-caption font-bold',
+                      raffle.entriesClosedAt ? 'bg-black/[0.06] text-ink/70' : 'bg-destructive text-white',
+                    )}
+                  >
+                    {raffle.entriesClosedAt ? <LockOpen size={13} /> : <Lock size={13} />}
+                    {t(raffle.entriesClosedAt ? 'venue.raffles.reopenEntries' : 'venue.raffles.closeEntries')}
+                  </button>
+
                   <button
                     type="button"
                     disabled={busy}
@@ -155,6 +214,18 @@ const VenueRaffles = ({ event }: { event: { id: string; startDate: string; endDa
                     <X size={15} />
                   </button>
                 </div>
+              )}
+
+              {(raffle.status === 'drawn' || raffle.status === 'no_participants') && (
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() => void reiniciar(raffle)}
+                  className="press flex h-8 shrink-0 items-center gap-1 rounded-lg bg-black/[0.06] px-2.5 text-caption font-bold text-ink/70"
+                >
+                  <RotateCcw size={13} />
+                  {t('venue.raffles.resetCta')}
+                </button>
               )}
             </li>
           ))}

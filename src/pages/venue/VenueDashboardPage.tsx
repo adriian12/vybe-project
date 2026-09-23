@@ -9,6 +9,7 @@ import {
   BarChart3,
   Building2,
   CalendarDays,
+  CopyPlus,
   CreditCard,
   Download,
   Lock,
@@ -174,6 +175,8 @@ const VenueDashboardPage = () => {
   const [occupancy, setOccupancy] = useState<EventOccupancy | null>(null);
   const [drawer, setDrawer] = useState<Drawer>(null);
   const [creating, setCreating] = useState(false);
+  // Repetir una fiesta: el formulario se abre con su configuración.
+  const [duplicating, setDuplicating] = useState<VybeEvent | null>(null);
   const [eventFilter, setEventFilter] = useState<EventFilter>('live');
   const [toDelete, setToDelete] = useState<{ id: string; name: string } | null>(null);
   const [toBoost, setToBoost] = useState<{ id: string; name: string } | null>(null);
@@ -700,7 +703,7 @@ const VenueDashboardPage = () => {
       </header>
 
       {/* ======================================================= contenido */}
-      <main className="cards-light mx-auto max-w-[1200px] space-y-4 overflow-x-hidden px-4 pb-28 pt-4 lg:px-8 lg:pt-6">
+      <main className="cards-light mx-auto max-w-[1200px] space-y-4 px-4 pb-28 pt-4 lg:px-8 lg:pt-6">
         {!currentVenue.isVerified && (
           <div className="flex gap-3 rounded-2xl bg-destructive/15 p-4">
             <AlertTriangle size={20} className="mt-0.5 shrink-0 text-destructive" />
@@ -834,6 +837,20 @@ const VenueDashboardPage = () => {
                           </p>
                         </div>
                         <div className="flex shrink-0 flex-col items-end gap-2">
+                          {/* Repetir: los locales hacen la misma fiesta cada
+                              semana y así no vuelven a rellenarlo todo. */}
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const completo = myEvents.find((x) => x.id === event.id);
+                              if (completo) setDuplicating(completo);
+                            }}
+                            className="press flex items-center gap-1 rounded-md bg-black/[0.07] px-2 py-0.5 text-[10px] font-extrabold uppercase text-ink/70"
+                          >
+                            <CopyPlus size={11} />
+                            {t('venue.events.repeat')}
+                          </button>
                           <span
                             className={cn(
                               'rounded-md px-2 py-0.5 text-[10px] font-extrabold uppercase',
@@ -1181,6 +1198,27 @@ const VenueDashboardPage = () => {
               void loadAllSummary();
             }}
           />
+        </SheetContent>
+      </Sheet>
+
+      {/* Repetir: el mismo formulario con los datos de otra fiesta. */}
+      <Sheet open={Boolean(duplicating)} onOpenChange={(open) => !open && setDuplicating(null)}>
+        <SheetContent side="bottom" className="max-h-[92vh] overflow-y-auto border-0 bg-transparent p-2 [&>button]:hidden">
+          <SheetHeader className="sr-only">
+            <SheetTitle>{t('venue.events.repeat')}</SheetTitle>
+          </SheetHeader>
+          {duplicating && (
+            <CreateEventForm
+              key={`copia-${duplicating.id}`}
+              template={duplicating}
+              onClose={() => setDuplicating(null)}
+              onCreated={() => {
+                setDuplicating(null);
+                setEventFilter('scheduled');
+                void loadAllSummary();
+              }}
+            />
+          )}
         </SheetContent>
       </Sheet>
 

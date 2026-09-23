@@ -159,11 +159,16 @@
 @layer base {
   /* Nada se desplaza de lado: en el móvil, un elemento algo más ancho que la
      pantalla dejaba mover la página entera y se veía la mitad de las tarjetas
-     cortadas. */
+     cortadas.
+
+     Es `clip` y no `hidden` a propósito: `hidden` convierte la página en su
+     propio contenedor de desplazamiento y en escritorio dejaba las pantallas
+     sin poder bajar. `clip` recorta lo que sobra por los lados y no toca el
+     desplazamiento vertical. */
   html,
   body {
     max-width: 100%;
-    overflow-x: hidden;
+    overflow-x: clip;
   }
 }
 
