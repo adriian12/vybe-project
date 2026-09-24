@@ -14,14 +14,14 @@ import { adminClient } from '../_shared/supabase.ts';
  * Se configura en Resend, en Webhooks, apuntando a esta función.
  *
  * También recibe `email.received`: el correo que llega a cualquier dirección de
- * vybes.es (soporte@, admin@, hola@…), porque el MX del dominio apunta a Resend.
+ * fiestea.es (soporte@, admin@, hola@…), porque el MX del dominio apunta a Resend.
  * Resend no tiene buzón con IMAP, así que se reenvía a un correo de verdad con
  * `Reply-To` al remitente: contestar desde Gmail le responde a él.
  *
  * Variables:
  *   - RESEND_WEBHOOK_SECRET: el «signing secret» del webhook.
  *   - INBOUND_FORWARD_TO: a quién se reenvía (varios, separados por comas).
- *   - INBOUND_FORWARD_FROM: remitente del reenvío, p. ej. `Vybe <reenvio@vybes.es>`
+ *   - INBOUND_FORWARD_FROM: remitente del reenvío, p. ej. `Fiestea <fiestea@fiestea.es>`
  *     (si falta, AUTH_FROM_EMAIL).
  *   - RESEND_FULL_API_KEY: clave de Resend con acceso completo. La de envío
  *     (RESEND_API_KEY) no puede leer los correos recibidos.
@@ -105,7 +105,7 @@ interface CorreoRecibido {
   attachments?: { filename?: string; size?: number }[];
 }
 
-/** Reenvía un correo entrante de vybes.es al buzón configurado. */
+/** Reenvía un correo entrante de fiestea.es al buzón configurado. */
 const reenviarRecibido = async (emailId: string): Promise<void> => {
   const clave = Deno.env.get('RESEND_FULL_API_KEY') ?? Deno.env.get('RESEND_API_KEY');
   const destino = (Deno.env.get('INBOUND_FORWARD_TO') ?? '')
@@ -130,7 +130,7 @@ const reenviarRecibido = async (emailId: string): Promise<void> => {
   const correo = (await respuesta.json()) as CorreoRecibido;
   const de = correo.headers?.from ?? correo.from ?? '';
 
-  // Un reenvío que vuelve a entrar en vybes.es crearía un bucle infinito.
+  // Un reenvío que vuelve a entrar en fiestea.es crearía un bucle infinito.
   const direccionRemitente = /<([^>]+)>/.exec(remitente)?.[1] ?? remitente;
   if (de.includes(direccionRemitente)) return;
 
@@ -195,7 +195,7 @@ serve(async (req: Request): Promise<Response> => {
   try {
     const evento = JSON.parse(body) as ResendEvent;
 
-    // Correo que entra en vybes.es: se reenvía, no es un evento de un envío nuestro.
+    // Correo que entra en fiestea.es: se reenvía, no es un evento de un envío nuestro.
     if (evento.type === 'email.received') {
       if (evento.data?.email_id) await reenviarRecibido(evento.data.email_id);
       return json({ ok: true });

@@ -198,7 +198,7 @@ const fromRaffle = async (
 const configureVapid = (): boolean => {
   const publicKey = Deno.env.get('VAPID_PUBLIC_KEY');
   const privateKey = Deno.env.get('VAPID_PRIVATE_KEY');
-  const subject = Deno.env.get('VAPID_SUBJECT') ?? 'mailto:soporte@vybes.es';
+  const subject = Deno.env.get('VAPID_SUBJECT') ?? 'mailto:soporte@fiestea.es';
 
   if (!publicKey || !privateKey) return false;
 
