@@ -57,3 +57,8 @@ supabase/.temp/
 
 # SQL generado por scripts/generate-seed.py: lleva la contraseña de las cuentas de prueba
 supabase/seeds/mallorca_test_data.sql
+
+# Claves de firma de Apple: nunca al repo
+*.p8
+*.p12
+*.mobileprovision
