@@ -62,3 +62,7 @@ supabase/seeds/mallorca_test_data.sql
 *.p8
 *.p12
 *.mobileprovision
+
+# graphify: grafo de conocimiento del código (se regenera con `graphify update .`)
+graphify-out/
+.graphify_*
