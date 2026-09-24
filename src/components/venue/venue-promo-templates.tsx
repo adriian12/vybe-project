@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Clock, Crown, Loader2, Pencil, Sparkles, Trophy } from 'lucide-react';
+import { Clock, Loader2, Pencil, Sparkles, Trophy } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -281,6 +281,9 @@ const VenuePromoTemplates = ({ event, venueId, promotions, canUse, only, onUpgra
     );
   };
 
+  // Sin el plan no se enseña: las funciones de pago no ocupan el panel.
+  if (!canUse) return null;
+
   return (
     <div className="surface-light space-y-4 rounded-2xl p-4">
       {only !== 'challenge' && (
@@ -294,16 +297,6 @@ const VenuePromoTemplates = ({ event, venueId, promotions, canUse, only, onUpgra
         </div>
       )}
 
-      {!canUse && (
-        <button
-          type="button"
-          onClick={onUpgrade}
-          className="press flex w-full items-center justify-center gap-2 rounded-lg bg-party-primary py-2.5 text-caption font-bold text-ink"
-        >
-          <Crown size={14} />
-          {t('venue.promotions.needsPlan')}
-        </button>
-      )}
 
       {only !== 'challenge' && <ul className="space-y-2">{bloque('promo').map(tarjeta)}</ul>}
 

@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/components/ui/use-toast';
 import { adminService, AdminUser } from '@/services/admin';
 import { cn } from '@/lib/utils';
+import AdminNotices from '@/components/admin/admin-notices';
 
 const PAGINA = 50;
 
@@ -82,6 +83,7 @@ const AdminUsers = () => {
 
   return (
     <div className="space-y-3">
+      <AdminNotices kind="user" />
       <label className="flex h-11 items-center gap-2 rounded-xl bg-white px-3 text-ink">
         <Search size={17} className="shrink-0 text-ink/50" />
         <Input
@@ -174,8 +176,20 @@ const AdminUsers = () => {
                       </Select>
 
                       {user.subscriptionExpiresAt && user.subscription !== 'none' && (
-                        <span className="text-caption text-ink/50">
-                          {t('profile.until', { date: new Date(user.subscriptionExpiresAt).toLocaleDateString() })}
+                        <span
+                          className={cn(
+                            'text-caption',
+                            user.subscriptionRenews ? 'text-emerald-700' : 'font-bold text-amber-700',
+                          )}
+                        >
+                          {t(
+                            user.subscriptionRenews
+                              ? 'admin.subs.renews'
+                              : user.subscriptionCancelAtPeriodEnd
+                                ? 'admin.subs.endsCancelled'
+                                : 'admin.subs.ends',
+                            { date: new Date(user.subscriptionExpiresAt).toLocaleDateString() },
+                          )}
                         </span>
                       )}
 

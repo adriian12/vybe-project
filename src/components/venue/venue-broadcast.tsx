@@ -130,7 +130,7 @@ const VenueBroadcast = ({ eventId, venueId, audiences }: VenueBroadcastProps) =>
       </header>
 
       <div className="space-y-3">
-        {audiences && eventId && (
+        {audiences && eventId && segmentos && (
           <div className="space-y-1.5">
             <p className="flex items-center gap-1.5 text-caption font-bold">
               <Users size={12} />
@@ -160,7 +160,6 @@ const VenueBroadcast = ({ eventId, venueId, audiences }: VenueBroadcastProps) =>
               {t(`venue.broadcast.audience.${publico}Help`)}
               {alcance !== null && ` · ${t('venue.broadcast.audience.reach', { count: alcance })}`}
             </p>
-            {!segmentos && <p className="text-caption text-party-gray">{t('venue.broadcast.audience.locked')}</p>}
           </div>
         )}
 

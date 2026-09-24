@@ -59,7 +59,8 @@ const BOOST_PRICE_CENTS = 1900;
 /**
  * Lo que se queda la plataforma de cada venta de entradas (Connect).
  *
- *   · CONNECT_FEE_PERCENT: % sobre el total (por defecto 0).
+ *   · El % lo fija administración para cada local
+ *     (`venues.platform_fee_percent`, por defecto 0).
  *   · CONNECT_FEE_FIXED_CENTS: céntimos fijos por entrada (por defecto 0).
  *   · CONNECT_PASS_STRIPE_FEES: con cargos a destino la tarifa de Stripe la
  *     paga la plataforma; con «true» (por defecto) se le repercute al local
@@ -67,8 +68,7 @@ const BOOST_PRICE_CENTS = 1900;
  *
  * Se cambian con `secrets set`, sin desplegar.
  */
-const comisionPlataforma = (totalCents: number, unidades: number): number => {
-  const pct = Number(Deno.env.get('CONNECT_FEE_PERCENT') ?? '0') || 0;
+const comisionPlataforma = (totalCents: number, unidades: number, pct: number): number => {
   const fijo = Number(Deno.env.get('CONNECT_FEE_FIXED_CENTS') ?? '0') || 0;
   const repercutir = (Deno.env.get('CONNECT_PASS_STRIPE_FEES') ?? 'true') !== 'false';
   const stripeFee = repercutir ? Math.round(totalCents * 0.015) + 25 : 0;
@@ -223,13 +223,14 @@ serve(async (req: Request): Promise<Response> => {
       // El cobro va a la cuenta de Stripe del local (Connect, migración 069).
       const { data: orden } = await supabase
         .from('ticket_orders')
-        .select('stripe_account_id, amount_cents')
+        .select('stripe_account_id, amount_cents, venues(platform_fee_percent)')
         .eq('id', pedido.order_id)
         .single();
       const destino = orden?.stripe_account_id as string | undefined;
       if (!destino) return json({ error: 'PAYMENTS_NOT_ENABLED' }, 409);
       const total = Number(orden?.amount_cents ?? pedido.unit_cents * unidades);
-      const comision = comisionPlataforma(total, unidades);
+      const porcentaje = Number((orden?.venues as { platform_fee_percent?: number } | null)?.platform_fee_percent ?? 0);
+      const comision = comisionPlataforma(total, unidades, porcentaje);
 
       const entradas = new URLSearchParams({
         mode: 'payment',

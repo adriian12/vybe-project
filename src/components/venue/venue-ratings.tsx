@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Crown, Star, TrendingDown, TrendingUp } from 'lucide-react';
+import { Star, TrendingDown, TrendingUp } from 'lucide-react';
 import { nota, ratingsService, VenueRatings as Datos } from '@/services/ratings';
 import type { VenuePlanStatus } from '@/services/venue-service';
 import { planHas } from '@/lib/venue-plans';
@@ -14,7 +14,7 @@ import { cn } from '@/lib/utils';
  * Las valoraciones las deja quien estuvo dentro, al salir o cuando termina la
  * fiesta. En el plan gratuito se enseña qué incluye y el botón de mejorar.
  */
-const VenueRatings = ({ plan, onUpgrade }: { plan: VenuePlanStatus | null; onUpgrade: () => void }) => {
+const VenueRatings = ({ plan }: { plan: VenuePlanStatus | null }) => {
   const { t } = useTranslation();
   const disponible = planHas(plan?.plan, 'ratings');
   const [datos, setDatos] = useState<Datos | null>(null);
@@ -40,24 +40,8 @@ const VenueRatings = ({ plan, onUpgrade }: { plan: VenuePlanStatus | null; onUpg
     </h3>
   );
 
-  if (!disponible) {
-    return (
-      <div className="surface-light flex flex-wrap items-center gap-4 rounded-2xl p-4">
-        <div className="min-w-0 flex-1">
-          {Titulo}
-          <p className="mt-1 text-body-sm text-party-gray">{t('rating.venue.locked')}</p>
-        </div>
-        <button
-          type="button"
-          onClick={onUpgrade}
-          className="press flex h-10 items-center gap-1.5 rounded-xl bg-party-primary px-4 text-caption font-bold text-ink"
-        >
-          <Crown size={14} />
-          {t('rating.venue.upgrade')}
-        </button>
-      </div>
-    );
-  }
+  // Sin Pro ni Business no se enseña (antes salía un aviso de mejorar plan).
+  if (!disponible) return null;
 
   if (!datos) return null;
   const { summary, distribution, nights, comments } = datos;

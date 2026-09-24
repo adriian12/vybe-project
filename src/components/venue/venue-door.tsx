@@ -43,6 +43,7 @@ import { cn } from '@/lib/utils';
 import InfoHelp from '@/components/venue/info-help';
 import VenueForecast from '@/components/venue/venue-forecast';
 import TicketValidator from '@/components/venue/ticket-validator';
+import VenueGuestLists from '@/components/venue/venue-guest-lists';
 
 interface VenueDoorProps {
   eventId: string;
@@ -87,7 +88,7 @@ const Titulo: React.FC<{ children: React.ReactNode; extra?: React.ReactNode }> =
  * El aforo se refresca solo cada quince segundos. Es el dato que hoy se cuenta
  * con un clicker y que la ley obliga a controlar.
  */
-type PestanaPuerta = 'inside' | 'notices' | 'promoters';
+type PestanaPuerta = 'inside' | 'lists' | 'notices' | 'promoters';
 
 const VenueDoor = ({ eventId, plan, onUpgrade, startsAt }: VenueDoorProps) => {
   const [pestana, setPestana] = useState<PestanaPuerta>('inside');
@@ -351,6 +352,7 @@ const VenueDoor = ({ eventId, plan, onUpgrade, startsAt }: VenueDoorProps) => {
       <PanelTabs
         tabs={[
           { id: 'inside', label: t('venue.door.tabs.inside') },
+          { id: 'lists', label: t('venue.door.tabs.lists') },
           { id: 'notices', label: t('venue.door.tabs.notices') },
           { id: 'promoters', label: t('venue.door.tabs.promoters'), count: activos.length },
         ]}
@@ -360,10 +362,12 @@ const VenueDoor = ({ eventId, plan, onUpgrade, startsAt }: VenueDoorProps) => {
 
       {/* --------------------------------------------------- gente dentro */}
       {pestana === 'inside' && (
-        <div className="grid gap-4 lg:grid-cols-12">
-          <div className="space-y-4 lg:col-span-5">
+        <div className="space-y-4">
+        {/* Contador, enlaces del portero y validar entrada, uno al lado del
+            otro en escritorio (40 % · 40 % · 20 %). */}
+        <div className="grid items-start gap-4 lg:grid-cols-10">
           {/* ---------------------------------------------------- contador */}
-          <div className="surface-light rounded-2xl p-4">
+          <div className="surface-light rounded-2xl p-4 lg:col-span-4">
             {occupancy?.capacity ? (
               <>
                 <Titulo extra={<InfoHelp topic="counter" />}>{t('venue.counter.title')}</Titulo>
@@ -408,11 +412,12 @@ const VenueDoor = ({ eventId, plan, onUpgrade, startsAt }: VenueDoorProps) => {
             )}
           </div>
           {/* ------------------------------------------ enlaces del portero */}
-          {occupancy?.capacity ? <CounterLinks eventId={eventId} /> : null}
+          <div className="lg:col-span-4">{occupancy?.capacity ? <CounterLinks eventId={eventId} /> : null}</div>
           {/* --------------------------------- entradas compradas en la app */}
-          <TicketValidator />
+          <div className="lg:col-span-2">
+            <TicketValidator />
           </div>
-          <div className="space-y-4 lg:col-span-7">
+        </div>
           {/* -------------------------------------------------- denuncias */}
           {reports.length > 0 && (
             <div className="surface-light rounded-2xl p-4">
@@ -456,9 +461,11 @@ const VenueDoor = ({ eventId, plan, onUpgrade, startsAt }: VenueDoorProps) => {
               </ul>
             </div>
           )}
-          </div>
         </div>
       )}
+
+      {/* ------------------------------------------------ listas de invitados */}
+      {pestana === 'lists' && <VenueGuestLists eventId={eventId} />}
 
       {/* --------------------------------------------------- notificaciones */}
       {pestana === 'notices' && (
@@ -467,8 +474,6 @@ const VenueDoor = ({ eventId, plan, onUpgrade, startsAt }: VenueDoorProps) => {
             {/* Avisos a quien está dentro: mover gente entre salas, avisar de un
                 cambio de sesión. */}
             <VenueBroadcast eventId={eventId} />
-          {/* -------------------------------------------------------- DJ */}
-          <VenueSongs eventId={eventId} enabled={noche?.songs ?? false} onToggle={() => void load()} />
           </div>
           <div className="space-y-4 lg:col-span-5">
           {/* ------------------------------------------------- termómetro */}
@@ -478,6 +483,8 @@ const VenueDoor = ({ eventId, plan, onUpgrade, startsAt }: VenueDoorProps) => {
             nowPlaying={noche?.nowPlaying ?? null}
             onChange={() => void load()}
           />
+          {/* ------------------------------------ canciones, bajo el termómetro */}
+          <VenueSongs eventId={eventId} enabled={noche?.songs ?? false} onToggle={() => void load()} />
           </div>
         </div>
       )}
@@ -550,18 +557,9 @@ const VenueDoor = ({ eventId, plan, onUpgrade, startsAt }: VenueDoorProps) => {
                 </ul>
               )}
 
-              {creando ? (
+              {/* Los códigos de RRPP son de Pro y Business: sin el plan no se ofrecen. */}
+              {!canUseCodes ? null : creando ? (
                 <div className="mt-3 space-y-3 rounded-xl bg-black/[0.03] p-3">
-                  {!canUseCodes && (
-                    <button
-                      type="button"
-                      onClick={onUpgrade}
-                      className="press flex w-full items-center justify-center gap-2 rounded-lg bg-party-primary py-2 text-caption font-bold text-ink"
-                    >
-                      <Crown size={14} />
-                      {t('venue.codes.needsPlan')}
-                    </button>
-                  )}
                   <div className="grid gap-2">
                     <div className="space-y-1.5">
                       <Label htmlFor="code-kind" className="text-caption">

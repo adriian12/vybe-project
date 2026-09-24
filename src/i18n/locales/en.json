@@ -945,7 +945,8 @@
             "tabs": {
                 "inside": "People inside",
                 "notices": "Notifications",
-                "promoters": "Promoters"
+                "promoters": "Promoters",
+                "lists": "Lists"
             }
         },
         "codes": {
@@ -1246,7 +1247,11 @@
                 "notLive": "You can only count while the event is running.",
                 "invalid": "That number is not valid.",
                 "tooManyLinks": "Too many active links. Revoke one."
-            }
+            },
+            "created": "Link created. Send it to the doorman.",
+            "view": "View link",
+            "viewBody": "Copy it or share it with whoever runs the door.",
+            "viewOld": "This link was created before it could be viewed again. Revoke it and create a new one."
         },
         "liveInfo": {
             "title": "Thermometer",
@@ -1739,7 +1744,20 @@
             "seeEvents": "See their events",
             "noEvents": "This venue has no events yet.",
             "eventStats": "{{checkIns}} inside · {{matches}} crushes · {{intents}} going",
-            "planSaved": "Plan changed"
+            "planSaved": "Plan changed",
+            "feeSaved": "{{percent}} % commission saved",
+            "fee": "Your commission per ticket sold in the app",
+            "stripeActive": "Stripe payments active",
+            "stripePending": "Stripe sign-up unfinished",
+            "stripeNone": "Payments not turned on",
+            "fields": {
+                "email": "Email",
+                "phone": "Phone",
+                "address": "Address",
+                "taxId": "Tax ID",
+                "type": "Type",
+                "created": "Joined"
+            }
         },
         "create": {
             "title": "Create an account",
@@ -1779,6 +1797,30 @@
             "capacity": "Capacity",
             "create": "Publish party",
             "done": "Party published"
+        },
+        "notices": {
+            "sent_one": "{{count}} notice sent",
+            "sent_other": "{{count}} notices sent",
+            "queued": "Notification sent to all users",
+            "expiring": "Expiring soon",
+            "expiringTitle_one": "Notify {{count}} expiring subscription?",
+            "expiringTitle_other": "Notify {{count}} expiring subscriptions?",
+            "expiringBodyUsers": "Monthly Premium ending within 7 days that won't renew on its own (cancelled or granted by admin). They get a notification and an email. Auto-renewing ones get nothing, and nobody gets the same date twice.",
+            "expiringBodyVenues": "Pro or Business plans ending within 7 days that won't renew on their own (cancelled, on trial or granted by admin). They get an email. Auto-renewing ones get nothing.",
+            "send": "Send",
+            "update": "Send update",
+            "updateUsers": "Update for all users",
+            "updateVenues": "Update for all venues",
+            "updateUsersBody": "Arrives as a phone notification to everyone with notifications on.",
+            "updateVenuesBody": "Arrives by email to every venue.",
+            "titlePlaceholder": "Title",
+            "bodyPlaceholder": "Message"
+        },
+        "subs": {
+            "renews": "Renews on {{date}}",
+            "ends": "Expires on {{date}} (won't renew)",
+            "endsCancelled": "Cancelled: expires on {{date}}",
+            "trialEnds": "Free trial until {{date}}"
         }
     },
     "pwa": {
@@ -2837,5 +2879,71 @@
         "withApp_other": "{{count}} with the app",
         "fullRisk": "It may fill up: get staff and the queue ready.",
         "basis": "Based on {{intents}} \"I'm going\" and {{nights}} previous nights."
+    },
+    "guestList": {
+        "joined": "You're on the list!",
+        "joinedBody_one": "Booked for {{count}} person. Give your name at the door.",
+        "joinedBody_other": "Booked for {{count}} people. Give your name at the door.",
+        "left": "You left the list",
+        "onList": "You're on the list",
+        "lineWith_one": "{{name}} +{{count}}",
+        "lineWith_other": "{{name}} +{{count}}",
+        "inside_one": "{{count}} inside",
+        "inside_other": "{{count}} inside",
+        "change": "Change",
+        "available": "This party has a guest list",
+        "askTitle": "This event has a guest list",
+        "askBody": "Do you want to sign up?",
+        "yes": "Yes",
+        "no": "No",
+        "formTitle": "Join the list",
+        "formBody": "Give your name at the door and you get in with your plus-ones.",
+        "name": "Name",
+        "companions": "Plus-ones",
+        "total_one": "{{count}} person in total",
+        "total_other": "{{count}} people in total",
+        "save": "Save",
+        "join": "Sign me up",
+        "leave": "Leave the list",
+        "errors": {
+            "closed": "This party's guest list is closed.",
+            "name": "Write your name.",
+            "companions": "Invalid number of plus-ones (max 50).",
+            "tooManyLists": "Up to 30 lists per party."
+        },
+        "venue": {
+            "appTab": "{{app}}",
+            "appTitle": "List in the app",
+            "appHelp": "People sign up from the party page when they tap \"I'm going\".",
+            "messagePlaceholder": "E.g.: Free list before 7 pm or €15 two drinks",
+            "saved": "Saved",
+            "lines": "Signed up",
+            "people": "People",
+            "insideNow": "Inside",
+            "title": "Lists",
+            "newList": "Promoter list",
+            "listNamePlaceholder": "Promoter name",
+            "search": "Search name",
+            "deleteList": "Delete list",
+            "deleteListConfirm": "Delete {{name}}'s list with all its names?",
+            "namePlaceholder": "Name",
+            "add": "Add",
+            "noResults": "Nobody with that name on this list.",
+            "emptyApp": "Nobody has signed up from the app yet.",
+            "empty": "Add the names the promoter gives you.",
+            "allIn_one": "Inside ({{count}})",
+            "allIn_other": "All inside ({{count}})",
+            "partial": "{{inside}} inside · {{left}} left",
+            "notYet_one": "{{count}} person",
+            "notYet_other": "{{count}} people",
+            "undo": "Remove one",
+            "admit": "Admit",
+            "removeConfirm": "Remove {{name}} from the list?",
+            "howMany": "How many are coming in?",
+            "ofLeft_one": "of {{count}}",
+            "ofLeft_other": "of {{count}}",
+            "admitN_one": "Admit {{count}}",
+            "admitN_other": "Admit {{count}}"
+        }
     }
 }

@@ -945,7 +945,8 @@
             "tabs": {
                 "inside": "Gente dentro",
                 "notices": "Notificaciones",
-                "promoters": "RRPP"
+                "promoters": "RRPP",
+                "lists": "Listas"
             }
         },
         "codes": {
@@ -1246,7 +1247,11 @@
                 "notLive": "Solo se puede contar con el evento en marcha.",
                 "invalid": "Ese número no es válido.",
                 "tooManyLinks": "Hay demasiados enlaces activos. Revoca alguno."
-            }
+            },
+            "created": "Enlace creado. Pásaselo al portero.",
+            "view": "Ver enlace",
+            "viewBody": "Cópialo o compártelo con quien lleva la puerta.",
+            "viewOld": "Este enlace se creó antes de poder volver a verlo. Revócalo y crea uno nuevo."
         },
         "liveInfo": {
             "title": "Termómetro",
@@ -1739,7 +1744,20 @@
             "seeEvents": "Ver sus eventos",
             "noEvents": "Este local no ha creado ningún evento.",
             "eventStats": "{{checkIns}} dentro · {{matches}} crushes · {{intents}} van",
-            "planSaved": "Plan cambiado"
+            "planSaved": "Plan cambiado",
+            "feeSaved": "Comisión del {{percent}} % guardada",
+            "fee": "Tu comisión por entrada vendida en la app",
+            "stripeActive": "Cobros activos en Stripe",
+            "stripePending": "Alta en Stripe sin terminar",
+            "stripeNone": "Sin cobros activados",
+            "fields": {
+                "email": "Correo",
+                "phone": "Teléfono",
+                "address": "Dirección",
+                "taxId": "NIF/CIF",
+                "type": "Tipo",
+                "created": "Alta"
+            }
         },
         "create": {
             "title": "Dar de alta una cuenta",
@@ -1779,6 +1797,30 @@
             "capacity": "Aforo",
             "create": "Publicar fiesta",
             "done": "Fiesta publicada"
+        },
+        "notices": {
+            "sent_one": "{{count}} aviso enviado",
+            "sent_other": "{{count}} avisos enviados",
+            "queued": "Aviso enviado a todos los usuarios",
+            "expiring": "Caduca pronto",
+            "expiringTitle_one": "¿Avisar a {{count}} suscripción que caduca?",
+            "expiringTitle_other": "¿Avisar a {{count}} suscripciones que caducan?",
+            "expiringBodyUsers": "Premium mensual que termina en 7 días y no se renueva sola (cancelada o dada por administración). Les llega un aviso y un correo. A quien renueva sola no se le envía nada, y nadie recibe dos veces el aviso de la misma fecha.",
+            "expiringBodyVenues": "Planes Pro o Business que terminan en 7 días y no se renuevan solos (cancelados, en prueba o dados por administración). Les llega un correo. A quien renueva solo no se le envía nada.",
+            "send": "Enviar",
+            "update": "Enviar novedad",
+            "updateUsers": "Novedad para todos los usuarios",
+            "updateVenues": "Novedad para todos los locales",
+            "updateUsersBody": "Llega como aviso en el móvil a todos los que tienen activados los avisos.",
+            "updateVenuesBody": "Llega por correo a todos los locales.",
+            "titlePlaceholder": "Título",
+            "bodyPlaceholder": "Mensaje"
+        },
+        "subs": {
+            "renews": "Se renueva el {{date}}",
+            "ends": "Caduca el {{date}} (no se renueva)",
+            "endsCancelled": "Cancelada: caduca el {{date}}",
+            "trialEnds": "Prueba gratis hasta el {{date}}"
         }
     },
     "pwa": {
@@ -2837,5 +2879,71 @@
         "withApp_other": "{{count}} con la app",
         "fullRisk": "Puede llenarse: prepara personal y cola.",
         "basis": "Con {{intents}} «voy a ir» y {{nights}} noches anteriores."
+    },
+    "guestList": {
+        "joined": "¡Estás en la lista!",
+        "joinedBody_one": "Apuntado para {{count}} persona. Di tu nombre en la puerta.",
+        "joinedBody_other": "Apuntado para {{count}} personas. Di tu nombre en la puerta.",
+        "left": "Has salido de la lista",
+        "onList": "Estás en la lista",
+        "lineWith_one": "{{name}} +{{count}}",
+        "lineWith_other": "{{name}} +{{count}}",
+        "inside_one": "{{count}} dentro",
+        "inside_other": "{{count}} dentro",
+        "change": "Cambiar",
+        "available": "Esta fiesta tiene lista de invitados",
+        "askTitle": "Este evento tiene lista de invitados",
+        "askBody": "¿Quieres apuntarte?",
+        "yes": "Sí",
+        "no": "No",
+        "formTitle": "Apúntate a la lista",
+        "formBody": "Di tu nombre en la puerta y entrarás con tus acompañantes.",
+        "name": "Nombre",
+        "companions": "Acompañantes",
+        "total_one": "En total, {{count}} persona",
+        "total_other": "En total, {{count}} personas",
+        "save": "Guardar",
+        "join": "Apuntarme",
+        "leave": "Salir de la lista",
+        "errors": {
+            "closed": "La lista de esta fiesta está cerrada.",
+            "name": "Escribe tu nombre.",
+            "companions": "Número de acompañantes no válido (máximo 50).",
+            "tooManyLists": "Máximo 30 listas por fiesta."
+        },
+        "venue": {
+            "appTab": "{{app}}",
+            "appTitle": "Lista en la app",
+            "appHelp": "La gente se apunta desde la ficha al pulsar «voy a ir».",
+            "messagePlaceholder": "Ej.: Lista gratis antes de las 19:00 o 15 € dos copas",
+            "saved": "Guardado",
+            "lines": "Apuntados",
+            "people": "Personas",
+            "insideNow": "Dentro",
+            "title": "Listas",
+            "newList": "Lista de RRPP",
+            "listNamePlaceholder": "Nombre del RRPP",
+            "search": "Buscar nombre",
+            "deleteList": "Borrar lista",
+            "deleteListConfirm": "¿Borrar la lista de {{name}} con todos sus nombres?",
+            "namePlaceholder": "Nombre",
+            "add": "Añadir",
+            "noResults": "Nadie con ese nombre en esta lista.",
+            "emptyApp": "Todavía no se ha apuntado nadie desde la app.",
+            "empty": "Añade los nombres que te pase el RRPP.",
+            "allIn_one": "Dentro ({{count}})",
+            "allIn_other": "Todos dentro ({{count}})",
+            "partial": "{{inside}} dentro · quedan {{left}}",
+            "notYet_one": "{{count}} persona",
+            "notYet_other": "{{count}} personas",
+            "undo": "Quitar uno",
+            "admit": "Entra",
+            "removeConfirm": "¿Quitar a {{name}} de la lista?",
+            "howMany": "¿Cuántos entran?",
+            "ofLeft_one": "de {{count}}",
+            "ofLeft_other": "de {{count}}",
+            "admitN_one": "Entra {{count}}",
+            "admitN_other": "Entran {{count}}"
+        }
     }
 }

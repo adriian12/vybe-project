@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/components/ui/use-toast';
 import { adminService, AdminVenue, AdminVenueEvent } from '@/services/admin';
 import { cn } from '@/lib/utils';
+import AdminNotices from '@/components/admin/admin-notices';
 
 /**
  * Todos los locales: su plan, cuánta gente les sigue y los eventos que han
@@ -54,6 +55,20 @@ const AdminVenues = () => {
     }
   };
 
+  const cambiarComision = async (venue: AdminVenue, valor: string) => {
+    const pct = Number(valor);
+    setOcupado(venue.venueId);
+    try {
+      await adminService.setVenueFee(venue.venueId, pct);
+      setLocales((prev) => prev.map((v) => (v.venueId === venue.venueId ? { ...v, platformFeePercent: pct } : v)));
+      toast({ title: t('admin.venuesAll.feeSaved', { percent: pct }) });
+    } catch {
+      toast({ title: t('common.error'), variant: 'destructive' });
+    } finally {
+      setOcupado(null);
+    }
+  };
+
   const cambiarPlan = async (venue: AdminVenue, plan: string) => {
     setOcupado(venue.venueId);
     try {
@@ -71,6 +86,7 @@ const AdminVenues = () => {
 
   return (
     <div className="space-y-3">
+      <AdminNotices kind="venue" />
       <label className="flex h-11 items-center gap-2 rounded-xl bg-white px-3 text-ink">
         <Search size={17} className="shrink-0 text-ink/50" />
         <Input
@@ -127,6 +143,74 @@ const AdminVenues = () => {
 
                 {expandida && (
                   <div className="mt-3 space-y-3 border-t border-black/[0.06] pt-3">
+                    {/* Datos del local */}
+                    <dl className="grid gap-x-4 gap-y-1.5 text-caption sm:grid-cols-2 lg:grid-cols-3">
+                      {[
+                        ['email', venue.email],
+                        ['phone', venue.phone],
+                        ['address', [venue.address, venue.city].filter(Boolean).join(', ')],
+                        ['taxId', venue.taxId],
+                        ['type', venue.type ? t(`venueTypes.${venue.type}`, { defaultValue: venue.type }) : null],
+                        ['created', new Date(venue.createdAt).toLocaleDateString()],
+                      ].map(([clave, valor]) => (
+                        <div key={clave} className="min-w-0">
+                          <dt className="text-ink/50">{t(`admin.venuesAll.fields.${clave}`)}</dt>
+                          <dd className="truncate font-bold">{valor || '—'}</dd>
+                        </div>
+                      ))}
+                    </dl>
+
+                    {/* Plan: cuándo caduca o se renueva */}
+                    {venue.plan !== 'free' && venue.planExpiresAt && (
+                      <p
+                        className={cn(
+                          'text-caption',
+                          venue.planRenews ? 'text-emerald-700' : 'font-bold text-amber-700',
+                        )}
+                      >
+                        {t(
+                          venue.planRenews
+                            ? 'admin.subs.renews'
+                            : venue.planCancelAtPeriodEnd
+                              ? 'admin.subs.endsCancelled'
+                              : venue.planStatus === 'trialing'
+                                ? 'admin.subs.trialEnds'
+                                : 'admin.subs.ends',
+                          { date: new Date(venue.planExpiresAt).toLocaleDateString() },
+                        )}
+                      </p>
+                    )}
+
+                    {/* Cobros y comisión de la plataforma sobre las entradas */}
+                    <div className="flex flex-wrap items-center gap-2 rounded-xl bg-[#F5F5F7] p-2.5">
+                      <span className="min-w-0 flex-1 text-caption">
+                        <strong className="block">{t('admin.venuesAll.fee')}</strong>
+                        <span className="text-ink/60">
+                          {venue.stripeChargesEnabled
+                            ? t('admin.venuesAll.stripeActive')
+                            : venue.stripeConnected
+                              ? t('admin.venuesAll.stripePending')
+                              : t('admin.venuesAll.stripeNone')}
+                        </span>
+                      </span>
+                      <Select
+                        value={String(venue.platformFeePercent)}
+                        disabled={ocupado === venue.venueId}
+                        onValueChange={(v) => void cambiarComision(venue, v)}
+                      >
+                        <SelectTrigger className="h-9 w-[6.5rem] rounded-full border-black/10 bg-white text-ink" aria-label={t('admin.venuesAll.fee')}>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 20, 25, 30].map((n) => (
+                            <SelectItem key={n} value={String(n)}>
+                              {n} %
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
                     <div className="flex flex-wrap items-center gap-2">
                       <p className="min-w-0 flex-1 truncate text-caption text-ink/60">
                         {[venue.email, t('admin.venuesAll.events', {

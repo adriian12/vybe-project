@@ -45,7 +45,7 @@ import EventPicker from '@/components/venue/event-picker';
 import VenueWeeklyReport from '@/components/venue/venue-weekly-report';
 import VenueProfileForm from '@/components/venue/venue-profile-form';
 import { nightService } from '@/services/night';
-import { BOOST_PRICE } from '@/lib/venue-plans';
+import { BOOST_PRICE, planHas } from '@/lib/venue-plans';
 import VenueSosAlerts, { VenueSosStrip } from '@/components/venue/venue-sos-alerts';
 import VenueSosAlarm from '@/components/venue/venue-sos-alarm';
 import { useVenueSos } from '@/hooks/use-venue-sos';
@@ -59,6 +59,7 @@ import { formatHourRange } from '@/components/event-bits';
 import { PartyButton } from '@/components/ui-custom/party-button';
 import { useToast } from '@/components/ui/use-toast';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -194,7 +195,13 @@ const VenueDashboardPage = () => {
   // El papel en el local: el contexto lo sabe al entrar; `role` lo confirma la
   // base de datos. Mientras tanto, propietario (la cuenta del local).
   const papel: VenueRole = venueRole ?? role ?? 'owner';
-  const puede = useCallback((s: Section) => SECCIONES_POR_ROL[papel].includes(s), [papel]);
+  // Lo que no incluye el plan no sale en el menú (Ventas es de Business).
+  // Mientras el plan carga se deja, para no sacar a nadie de la sección.
+  const puede = useCallback(
+    (s: Section) =>
+      SECCIONES_POR_ROL[papel].includes(s) && (s !== 'sales' || plan === null || planHas(plan.plan, 'ticketSales')),
+    [papel, plan],
+  );
   const esPropietario = papel === 'owner';
   const puedeDifundir = papel === 'owner' || papel === 'marketing';
 
@@ -1015,7 +1022,7 @@ const VenueDashboardPage = () => {
                 )}
 
                 {/* Lo que opinan los clientes (Pro y Business). */}
-                <VenueRatings plan={plan} onUpgrade={() => goTo('plan')} />
+                <VenueRatings plan={plan} />
 
                 {summary.length > 0 ? (
                   <>
@@ -1064,7 +1071,7 @@ const VenueDashboardPage = () => {
         )}
 
         {/* ------------------------------------------------------- ventas */}
-        {section === 'sales' && <VenueSales events={myEvents} plan={plan} onUpgrade={() => goTo('plan')} />}
+        {section === 'sales' && <VenueSales events={myEvents} plan={plan} />}
 
         {section === 'team' && (
           <div className="mx-auto max-w-2xl">
@@ -1192,11 +1199,11 @@ const VenueDashboardPage = () => {
 
       {puedeDifundir && <VenueWeeklyReport open={reportOpen} onOpenChange={setReportOpen} />}
 
-      <Sheet open={Boolean(editing)} onOpenChange={(open) => !open && setEditing(null)}>
-        <SheetContent side="bottom" className="max-h-[92vh] overflow-y-auto border-0 bg-transparent p-2 [&>button]:hidden">
-          <SheetHeader className="sr-only">
-            <SheetTitle>{t('venue.events.editEvent')}</SheetTitle>
-          </SheetHeader>
+      <Dialog open={Boolean(editing)} onOpenChange={(open) => !open && setEditing(null)}>
+        <DialogContent className="max-h-[90vh] w-[calc(100%-2rem)] max-w-xl overflow-y-auto rounded-[20px] border-0 bg-white p-0 text-ink [&>button]:hidden">
+          <DialogHeader className="sr-only">
+            <DialogTitle>{t('venue.events.editEvent')}</DialogTitle>
+          </DialogHeader>
           {editing && (
             <CreateEventForm
               key={editing.id}
@@ -1208,14 +1215,14 @@ const VenueDashboardPage = () => {
               }}
             />
           )}
-        </SheetContent>
-      </Sheet>
+        </DialogContent>
+      </Dialog>
 
-      <Sheet open={creating} onOpenChange={setCreating}>
-        <SheetContent side="bottom" className="max-h-[92vh] overflow-y-auto border-0 bg-transparent p-2 [&>button]:hidden">
-          <SheetHeader className="sr-only">
-            <SheetTitle>{t('venue.events.newEvent')}</SheetTitle>
-          </SheetHeader>
+      <Dialog open={creating} onOpenChange={setCreating}>
+        <DialogContent className="max-h-[90vh] w-[calc(100%-2rem)] max-w-xl overflow-y-auto rounded-[20px] border-0 bg-white p-0 text-ink [&>button]:hidden">
+          <DialogHeader className="sr-only">
+            <DialogTitle>{t('venue.events.newEvent')}</DialogTitle>
+          </DialogHeader>
           <CreateEventForm
             onClose={() => setCreating(false)}
             onCreated={() => {
@@ -1224,15 +1231,15 @@ const VenueDashboardPage = () => {
               void loadAllSummary();
             }}
           />
-        </SheetContent>
-      </Sheet>
+        </DialogContent>
+      </Dialog>
 
       {/* Repetir: el mismo formulario con los datos de otra fiesta. */}
-      <Sheet open={Boolean(duplicating)} onOpenChange={(open) => !open && setDuplicating(null)}>
-        <SheetContent side="bottom" className="max-h-[92vh] overflow-y-auto border-0 bg-transparent p-2 [&>button]:hidden">
-          <SheetHeader className="sr-only">
-            <SheetTitle>{t('venue.events.repeat')}</SheetTitle>
-          </SheetHeader>
+      <Dialog open={Boolean(duplicating)} onOpenChange={(open) => !open && setDuplicating(null)}>
+        <DialogContent className="max-h-[90vh] w-[calc(100%-2rem)] max-w-xl overflow-y-auto rounded-[20px] border-0 bg-white p-0 text-ink [&>button]:hidden">
+          <DialogHeader className="sr-only">
+            <DialogTitle>{t('venue.events.repeat')}</DialogTitle>
+          </DialogHeader>
           {duplicating && (
             <CreateEventForm
               key={`copia-${duplicating.id}`}
@@ -1245,8 +1252,8 @@ const VenueDashboardPage = () => {
               }}
             />
           )}
-        </SheetContent>
-      </Sheet>
+        </DialogContent>
+      </Dialog>
 
       <AlertDialog open={Boolean(toBoost)} onOpenChange={(open) => !open && !boosting && setToBoost(null)}>
         <AlertDialogContent>

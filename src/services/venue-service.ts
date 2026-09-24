@@ -546,6 +546,13 @@ export const venueService = {
     }));
   },
 
+  /** El token de un enlace ya creado, para volver a enseñarlo (migración 071). */
+  getCounterLinkToken: async (linkId: string): Promise<string | null> => {
+    const { data, error } = await supabase.rpc('get_counter_link_token', { p_link_id: linkId });
+    if (error) throw venueError(error.message);
+    return (data as string | null) ?? null;
+  },
+
   revokeCounterLink: async (linkId: string): Promise<void> => {
     const { error } = await supabase.rpc('revoke_counter_link', { p_link_id: linkId });
     if (error) throw venueError(error.message);

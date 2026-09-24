@@ -25,6 +25,7 @@ import MapThumb from '@/components/map-thumb';
 import { LivePill, formatHourRange } from '@/components/event-bits';
 import LiveThermometer from '@/components/live-thermometer';
 import EventTickets from '@/components/event-tickets';
+import GuestListJoin from '@/components/guest-list-join';
 import { EventRatingBadge } from '@/components/rate-party';
 import { PartyButton } from '@/components/ui-custom/party-button';
 import { useToast } from '@/components/ui/use-toast';
@@ -74,11 +75,12 @@ const EventDetailPage = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { toast } = useToast();
-  const { activeEvent } = useAppContext();
+  const { activeEvent, currentUser } = useAppContext();
   const { withDistance, activity, intents, busyIntent, toggleIntent } = useEventsFeed();
 
   const [event, setEvent] = useState<Event | null>(null);
   const [estado, setEstado] = useState<'loading' | 'ready' | 'not-found'>('loading');
+  const [preguntaLista, setPreguntaLista] = useState(0);
 
   // El evento se pide directamente: puede venir de un enlace compartido y no
   // estar en la lista cargada (por ejemplo, si ya ha terminado).
@@ -120,6 +122,13 @@ const EventDetailPage = () => {
   const live = isEventLive(event);
   const terminado = new Date(event.endDate).getTime() <= Date.now();
   const going = intents.includes(event.id);
+
+  // Al marcar «voy a ir» se pregunta por la lista de invitados, si la hay.
+  const marcarVoy = async () => {
+    const iba = going;
+    await toggleIntent(event.id);
+    if (!iba) setPreguntaLista((n) => n + 1);
+  };
   const dentro = activeEvent?.eventId === event.id;
   const distancia = withDistance.find((e) => e.event.id === event.id)?.distance ?? null;
   const cifras = activity[event.id] ?? EMPTY_ACTIVITY;
@@ -176,7 +185,7 @@ const EventDetailPage = () => {
             {!terminado && (
               <button
                 type="button"
-                onClick={() => void toggleIntent(event.id)}
+                onClick={() => void marcarVoy()}
                 disabled={busyIntent === event.id}
                 aria-pressed={going}
                 aria-label={going ? t('home.notGoing') : t('home.imGoing')}
@@ -246,6 +255,10 @@ const EventDetailPage = () => {
             </p>
           )}
           <WhoIsGoing eventId={event.id} going={cifras.going} />
+          {/* Lista de invitados del local, si la tiene activada. */}
+          {!terminado && (
+            <GuestListJoin eventId={event.id} ask={preguntaLista} defaultName={currentUser?.name ?? ''} />
+          )}
           {/* Lista Vybe: el local ve quién ha dicho que va. Se avisa aquí,
               donde se decide marcarlo. */}
           {!terminado && !live && (
@@ -362,7 +375,7 @@ const EventDetailPage = () => {
           ) : (
             <button
               type="button"
-              onClick={() => void toggleIntent(event.id)}
+              onClick={() => void marcarVoy()}
               disabled={busyIntent === event.id}
               aria-pressed={going}
               className={cn(

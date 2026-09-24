@@ -29,6 +29,10 @@ export interface AdminUser {
   supercrush: number;
   checkIns: number;
   total: number;
+  /** La mensual está cancelada: acaba en `subscriptionExpiresAt`. */
+  subscriptionCancelAtPeriodEnd: boolean;
+  /** Se renueva sola en Stripe en `subscriptionExpiresAt`. */
+  subscriptionRenews: boolean;
 }
 
 export interface AdminVenue {
@@ -47,6 +51,16 @@ export interface AdminVenue {
   eventsUpcoming: number;
   members: number;
   followers: number;
+  phone: string | null;
+  address: string | null;
+  taxId: string | null;
+  planCancelAtPeriodEnd: boolean;
+  planRenews: boolean;
+  /** Lo que se queda la plataforma de cada entrada vendida en la app. */
+  platformFeePercent: number;
+  stripeConnected: boolean;
+  stripeChargesEnabled: boolean;
+  stripePayoutsEnabled: boolean;
 }
 
 export interface AdminVenueEvent {
@@ -164,6 +178,8 @@ export const adminService = {
       supercrush: row.supercrush ?? 0,
       checkIns: Number(row.check_ins ?? 0),
       total: Number(row.total_count ?? 0),
+      subscriptionCancelAtPeriodEnd: Boolean(row.subscription_cancel_at_period_end),
+      subscriptionRenews: Boolean(row.subscription_renews),
     }));
   },
 
@@ -204,6 +220,15 @@ export const adminService = {
       eventsUpcoming: Number(row.events_upcoming ?? 0),
       members: Number(row.members ?? 0),
       followers: Number(row.followers ?? 0),
+      phone: row.phone,
+      address: row.address,
+      taxId: row.tax_id,
+      planCancelAtPeriodEnd: Boolean(row.plan_cancel_at_period_end),
+      planRenews: Boolean(row.plan_renews),
+      platformFeePercent: Number(row.platform_fee_percent ?? 0),
+      stripeConnected: Boolean(row.stripe_connected),
+      stripeChargesEnabled: Boolean(row.stripe_charges_enabled),
+      stripePayoutsEnabled: Boolean(row.stripe_payouts_enabled),
     }));
   },
 
@@ -214,6 +239,19 @@ export const adminService = {
       p_days: days,
     });
     if (error) fallo(error.message);
+  },
+
+  /** % que se queda la plataforma de cada entrada que venda el local en la app. */
+  setVenueFee: async (venueId: string, percent: number): Promise<void> => {
+    const { error } = await supabase.rpc('admin_set_venue_fee', { p_venue_id: venueId, p_percent: percent });
+    if (error) fallo(error.message);
+  },
+
+  /** Avisos de administración (Edge Function `admin-notify`). */
+  notify: async <T,>(body: Record<string, unknown>): Promise<T> => {
+    const { data, error } = await supabase.functions.invoke('admin-notify', { body });
+    if (error || (data as { error?: string } | null)?.error) throw new ApiError('NOTIFY_FAILED', 'errors.generic');
+    return data as T;
   },
 
   venueEvents: async (venueId: string): Promise<AdminVenueEvent[]> => {

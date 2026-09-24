@@ -133,10 +133,8 @@ describe('valorar la fiesta', () => {
 });
 
 describe('ventas del local', () => {
-  it('fuera de Business enseña el plan', () => {
-    const onUpgrade = vi.fn();
-    render(<VenueSales events={[]} plan={{ plan: 'pro' } as never} onUpgrade={onUpgrade} />);
-    fireEvent.click(screen.getByRole('button', { name: 'sales.locked.cta' }));
-    expect(onUpgrade).toHaveBeenCalled();
+  it('fuera de Business no se enseña', () => {
+    const { container } = render(<VenueSales events={[]} plan={{ plan: 'pro' } as never} />);
+    expect(container.innerHTML).toBe('');
   });
 });

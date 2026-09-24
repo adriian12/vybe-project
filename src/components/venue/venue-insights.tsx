@@ -132,6 +132,7 @@ const VenueInsights = ({ eventId, venueId, plan, onUpgrade }: VenueInsightsProps
       {/* ---------------------------------------------------------------- */}
       {/* Quién vino                                                      */}
       {/* ---------------------------------------------------------------- */}
+      {!demographicsBlocked && (
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-title-card uppercase tracking-wide">
@@ -178,6 +179,7 @@ const VenueInsights = ({ eventId, venueId, plan, onUpgrade }: VenueInsightsProps
           )}
         </CardContent>
       </Card>
+      )}
 
       {/* ---------------------------------------------------------------- */}
       {/* Qué noche funciona                                              */}
@@ -281,6 +283,7 @@ const VenueInsights = ({ eventId, venueId, plan, onUpgrade }: VenueInsightsProps
       {/* ---------------------------------------------------------------- */}
       {/* Aforo real frente a Vybe (Pro y Business)                        */}
       {/* ---------------------------------------------------------------- */}
+      {!headcountBlocked && (
       <Card className="lg:col-span-3">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-title-card uppercase tracking-wide">
@@ -340,6 +343,7 @@ const VenueInsights = ({ eventId, venueId, plan, onUpgrade }: VenueInsightsProps
           )}
         </CardContent>
       </Card>
+      )}
 
       <p className="flex items-start gap-2 px-1 text-caption text-party-gray lg:col-span-3">
         <BarChart3 size={13} className="shrink-0 mt-0.5" />
