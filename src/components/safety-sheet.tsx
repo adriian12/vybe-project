@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ShieldAlert, Trash2, Plus, Siren } from 'lucide-react';
+import { Check, ShieldAlert, Trash2, Plus, Siren } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
@@ -67,6 +67,20 @@ const SafetySheet: React.FC<SafetySheetProps> = ({ open, onOpenChange }) => {
     if (open) void load();
   }, [open, load]);
 
+  // Con la alerta abierta, se vuelve a mirar para enseñar cuándo el personal de
+  // la fiesta la ha visto o la ha cerrado.
+  const alertaAbierta = Boolean(alert);
+  useEffect(() => {
+    if (!open || !alertaAbierta) return;
+    const interval = setInterval(() => void load(), 10_000);
+    return () => clearInterval(interval);
+  }, [open, alertaAbierta, load]);
+
+  // Dentro de una fiesta el aviso llega al personal del local aunque no haya
+  // contactos de confianza; fuera, sin contactos no llegaría a nadie.
+  const enFiesta = Boolean(activeEvent?.eventId);
+  const puedePedirAyuda = contacts.length > 0 || enFiesta;
+
   const fail = (error: unknown) => {
     const key = error instanceof ApiError ? error.message : 'errors.generic';
     toast({ title: t('common.error'), description: t(key), variant: 'destructive' });
@@ -115,7 +129,7 @@ const SafetySheet: React.FC<SafetySheetProps> = ({ open, onOpenChange }) => {
 
       track('sos_triggered', { hasLocation: Boolean(coords) });
       await load();
-      toast({ title: t('safety.sosSent'), description: t('safety.sosSentBody') });
+      toast({ title: t('safety.sosSent'), description: t(enFiesta ? 'safety.sosSentBodyVenue' : 'safety.sosSentBody') });
     } catch (error) {
       fail(error);
     } finally {
@@ -157,6 +171,12 @@ const SafetySheet: React.FC<SafetySheetProps> = ({ open, onOpenChange }) => {
                 <p className="text-xs text-party-gray mb-3">
                   {new Date(alert.createdAt).toLocaleString()}
                 </p>
+                {alert.handledAt && (
+                  <p className="mb-3 flex items-center gap-1.5 text-sm font-semibold text-emerald-500">
+                    <Check size={15} className="shrink-0" />
+                    {t('safety.venueOnTheWay')}
+                  </p>
+                )}
                 <PartyButton
                   variant="outline"
                   size="sm"
@@ -168,10 +188,13 @@ const SafetySheet: React.FC<SafetySheetProps> = ({ open, onOpenChange }) => {
               </div>
             ) : (
               <div className="space-y-3">
-                {contacts.length === 0 ? (
+                {!puedePedirAyuda ? (
                   <p className="text-sm text-destructive">{t('safety.noContacts')}</p>
                 ) : (
                   <>
+                    {contacts.length === 0 && (
+                      <p className="text-sm text-party-gray">{t('safety.venueOnly')}</p>
+                    )}
                     <div className="space-y-2">
                       <Label htmlFor="sos-note">{t('safety.note')}</Label>
                       <Textarea
@@ -269,7 +292,11 @@ const SafetySheet: React.FC<SafetySheetProps> = ({ open, onOpenChange }) => {
           <AlertDialogHeader>
             <AlertDialogTitle>{t('safety.sosConfirmTitle')}</AlertDialogTitle>
             <AlertDialogDescription>
-              {t('safety.sosConfirmBody', { count: contacts.length })}
+              {enFiesta
+                ? contacts.length > 0
+                  ? t('safety.sosConfirmBodyBoth', { count: contacts.length })
+                  : t('safety.sosConfirmBodyVenue')
+                : t('safety.sosConfirmBody', { count: contacts.length })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

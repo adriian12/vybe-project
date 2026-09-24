@@ -534,7 +534,7 @@
     "safety": {
         "title": "Safety",
         "sosTitle": "Emergency button",
-        "sosBody": "Alert your trusted contacts with your live location.",
+        "sosBody": "Alert the staff at the party you're at and your trusted contacts, with your location.",
         "sosButton": "Get help",
         "sosConfirmTitle": "Send an emergency alert?",
         "sosConfirmBody": "We'll notify your {{count}} trusted contact(s) with your current location and the event you're at.",
@@ -555,7 +555,12 @@
         "contactNeedsChannel": "Provide at least a phone number or an email.",
         "note": "Note for your contacts",
         "notePlaceholder": "I'm at… / I feel uncomfortable",
-        "shortTitle": "Help"
+        "shortTitle": "Help",
+        "sosConfirmBodyBoth": "We'll alert the party staff and your {{count}} trusted contact(s) right away, with your current location.",
+        "sosConfirmBodyVenue": "We'll alert the party staff right away with your current location.",
+        "sosSentBodyVenue": "The party staff have your alert.",
+        "venueOnly": "You don't have trusted contacts yet: we'll only alert the party staff.",
+        "venueOnTheWay": "The party staff have seen it and are on their way."
     },
     "privacy": {
         "title": "Privacy and data",
@@ -1116,7 +1121,16 @@
             "acknowledge": "I'm on my way",
             "errors": {
                 "alertNotFound": "That alert is no longer open."
-            }
+            },
+            "title": "Help requests",
+            "none": "Nobody has asked for help. If someone at the party does, it will show up here instantly with a sound alert.",
+            "resolve": "Resolved",
+            "resolved": "Alert closed",
+            "alarmTitle": "Someone needs help!",
+            "alarmBody": "{{name}} asked for help at {{event}} at {{time}}.",
+            "openDoor": "Open Door",
+            "strip_one": "{{count}} person needs help",
+            "strip_other": "{{count}} people need help"
         },
         "tv": {
             "open": "Show on the big screen",

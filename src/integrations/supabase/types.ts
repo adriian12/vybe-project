@@ -2851,6 +2851,7 @@ export type Database = {
         Returns: Json
       }
       can_count_event: { Args: { p_event_id: string }; Returns: boolean }
+      can_handle_sos: { Args: { p_event_id: string }; Returns: boolean }
       can_read_event_metrics: { Args: { p_event_id: string }; Returns: boolean }
       can_read_venue_metrics: { Args: { p_venue_id: string }; Returns: boolean }
       cancel_broadcast: { Args: { p_broadcast_id: string }; Returns: undefined }
@@ -3442,6 +3443,7 @@ export type Database = {
         Args: never
         Returns: {
           created_at: string
+          event_id: string
           event_name: string
           handled_at: string
           id: string
@@ -3680,6 +3682,7 @@ export type Database = {
         Returns: string
       }
       reset_raffle: { Args: { p_raffle_id: string }; Returns: boolean }
+      resolve_sos_alert: { Args: { p_alert_id: string }; Returns: undefined }
       review_photo: {
         Args: { p_approve: boolean; p_item_id: string; p_reason?: string }
         Returns: undefined

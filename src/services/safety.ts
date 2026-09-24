@@ -19,6 +19,8 @@ export interface SosAlert {
   note?: string;
   status: 'active' | 'resolved' | 'cancelled';
   createdAt: string;
+  /** Cuándo el personal de la fiesta pulsó «Voy para allá». */
+  handledAt?: string;
 }
 
 export interface PendingPhoto {
@@ -140,6 +142,7 @@ export const safetyService = {
       note: data.note ?? undefined,
       status: data.status as SosAlert['status'],
       createdAt: data.created_at,
+      handledAt: data.handled_at ?? undefined,
     };
   },
 
@@ -185,12 +188,13 @@ export const safetyService = {
     });
   },
 
+  /**
+   * Por RPC y no con un UPDATE directo: administración sólo puede leer
+   * `sos_alerts`, y la RLS dejaba el UPDATE en cero filas sin dar error, así que
+   * la alerta volvía a salir al recargar (migración 066).
+   */
   resolveAlert: async (alertId: string): Promise<void> => {
-    const { error } = await supabase
-      .from('sos_alerts')
-      .update({ status: 'resolved', resolved_at: new Date().toISOString() })
-      .eq('id', alertId);
-
+    const { error } = await supabase.rpc('resolve_sos_alert', { p_alert_id: alertId });
     if (error) throw new ApiError('RESOLVE_FAILED', 'errors.generic');
   },
 

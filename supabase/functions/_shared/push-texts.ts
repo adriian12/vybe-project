@@ -29,6 +29,8 @@ interface Texts {
   raffleWinner: (event: string, prize: string, winner: string) => { title: string; body: string };
   newEvent: (venue: string, event: string, when: string) => { title: string; body: string };
   photosPending: (count: number) => { title: string; body: string };
+  /** Alguien pide ayuda dentro de una fiesta: al equipo del local y a administración. */
+  sosHelp: (name: string, event: string) => { title: string; body: string };
 }
 
 const TEXTS: Record<Locale, Texts> = {
@@ -90,6 +92,10 @@ const TEXTS: Record<Locale, Texts> = {
       title: 'Tienes imágenes por revisar',
       body: `${count} foto(s) esperan revisión manual: la revisión automática no ha respondido.`,
     }),
+    sosHelp: (name, event) => ({
+      title: event ? `${name} pide ayuda en ${event}` : `${name} pide ayuda`,
+      body: 'Emergencia dentro de la fiesta. Abre Puerta en el panel del local.',
+    }),
   },
   en: {
     match: (name) => ({
@@ -146,6 +152,10 @@ const TEXTS: Record<Locale, Texts> = {
     photosPending: (count) => ({
       title: 'You have images to review',
       body: `${count} photo(s) are waiting for manual review: the automatic check didn't respond.`,
+    }),
+    sosHelp: (name, event) => ({
+      title: event ? `${name} needs help at ${event}` : `${name} needs help`,
+      body: 'Emergency inside the party. Open Door in the venue panel.',
     }),
   },
   de: {
@@ -206,6 +216,10 @@ const TEXTS: Record<Locale, Texts> = {
       title: 'Du hast Bilder zu prüfen',
       body: `${count} Foto(s) warten auf manuelle Prüfung: Die automatische Prüfung hat nicht geantwortet.`,
     }),
+    sosHelp: (name, event) => ({
+      title: event ? `${name} braucht Hilfe bei ${event}` : `${name} braucht Hilfe`,
+      body: 'Notfall auf der Party. Öffne „Tür“ im Panel des Lokals.',
+    }),
   },
   ca: {
     match: (name) => ({
@@ -264,6 +278,10 @@ const TEXTS: Record<Locale, Texts> = {
     photosPending: (count) => ({
       title: 'Tens imatges per revisar',
       body: `${count} foto(s) esperen revisió manual: la revisió automàtica no ha respost.`,
+    }),
+    sosHelp: (name, event) => ({
+      title: event ? `${name} demana ajuda a ${event}` : `${name} demana ajuda`,
+      body: 'Emergència dins la festa. Obre Porta al panell del local.',
     }),
   },
 };

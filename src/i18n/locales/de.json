@@ -534,7 +534,7 @@
     "safety": {
         "title": "Sicherheit",
         "sosTitle": "Notfallknopf",
-        "sosBody": "Benachrichtige deine Vertrauenskontakte mit deinem Live-Standort.",
+        "sosBody": "Benachrichtige das Personal der Party, auf der du bist, und deine Vertrauenskontakte mit deinem Standort.",
         "sosButton": "Hilfe anfordern",
         "sosConfirmTitle": "Notfallalarm senden?",
         "sosConfirmBody": "Wir benachrichtigen deine {{count}} Vertrauenskontakt(e) mit deinem aktuellen Standort und dem Event.",
@@ -555,7 +555,12 @@
         "contactNeedsChannel": "Gib mindestens eine Telefonnummer oder E-Mail an.",
         "note": "Notiz für deine Kontakte",
         "notePlaceholder": "Ich bin bei… / mir ist unwohl",
-        "shortTitle": "Hilfe"
+        "shortTitle": "Hilfe",
+        "sosConfirmBodyBoth": "Wir benachrichtigen sofort das Personal der Party und deine {{count}} Vertrauenskontakt(e) mit deinem aktuellen Standort.",
+        "sosConfirmBodyVenue": "Wir benachrichtigen sofort das Personal der Party mit deinem aktuellen Standort.",
+        "sosSentBodyVenue": "Das Personal der Party hat deinen Alarm erhalten.",
+        "venueOnly": "Du hast noch keine Vertrauenskontakte: Wir benachrichtigen nur das Personal der Party.",
+        "venueOnTheWay": "Das Personal der Party hat es gesehen und ist auf dem Weg."
     },
     "privacy": {
         "title": "Datenschutz und Daten",
@@ -1116,7 +1121,16 @@
             "acknowledge": "Ich gehe hin",
             "errors": {
                 "alertNotFound": "Dieser Alarm ist nicht mehr offen."
-            }
+            },
+            "title": "Hilferufe",
+            "none": "Niemand hat um Hilfe gebeten. Wenn jemand auf der Party es tut, erscheint es hier sofort mit einem Signalton.",
+            "resolve": "Erledigt",
+            "resolved": "Alarm geschlossen",
+            "alarmTitle": "Jemand braucht Hilfe!",
+            "alarmBody": "{{name}} hat um {{time}} bei {{event}} um Hilfe gebeten.",
+            "openDoor": "In „Tür“ ansehen",
+            "strip_one": "{{count}} Person braucht Hilfe",
+            "strip_other": "{{count}} Personen brauchen Hilfe"
         },
         "tv": {
             "open": "Auf dem großen Bildschirm zeigen",

@@ -136,6 +136,7 @@ export interface PromotionStats {
 
 export interface VenueSosAlert {
   id: string;
+  eventId: string;
   profileName: string;
   profilePhoto: string | null;
   eventName: string;
@@ -762,6 +763,7 @@ export const venueService = {
 
     return data.map((row) => ({
       id: row.id,
+      eventId: row.event_id,
       profileName: row.profile_name,
       profilePhoto: row.profile_photo,
       eventName: row.event_name,
@@ -775,6 +777,12 @@ export const venueService = {
 
   acknowledgeSosAlert: async (alertId: string): Promise<void> => {
     const { error } = await supabase.rpc('acknowledge_sos_alert', { p_alert_id: alertId });
+    if (error) throw venueError(error.message);
+  },
+
+  /** Cierra la alerta: deja de salir en el panel y en administración. */
+  resolveSosAlert: async (alertId: string): Promise<void> => {
+    const { error } = await supabase.rpc('resolve_sos_alert', { p_alert_id: alertId });
     if (error) throw venueError(error.message);
   },
 

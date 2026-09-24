@@ -28,8 +28,8 @@ interface PushRequest {
 }
 
 interface WebhookPayload {
-  type: 'INSERT' | 'RAFFLE_CREATED' | 'RAFFLE_DRAWN' | 'EVENT_PUBLISHED' | 'PHOTOS_PENDING';
-  table: 'connections' | 'messages' | 'raffles' | 'venue_events' | 'moderation_queue';
+  type: 'INSERT' | 'RAFFLE_CREATED' | 'RAFFLE_DRAWN' | 'EVENT_PUBLISHED' | 'PHOTOS_PENDING' | 'SOS';
+  table: 'connections' | 'messages' | 'raffles' | 'venue_events' | 'moderation_queue' | 'sos_alerts';
   record: Record<string, unknown>;
 }
 
@@ -105,6 +105,71 @@ const fromPendingPhotos = async (supabase: ReturnType<typeof adminClient>): Prom
     ...pushTexts(admin.locale).photosPending(pendientes),
     url: '/admin/dashboard?seccion=photos',
     tag: 'photos-pending',
+  }));
+};
+
+/**
+ * Alguien pide ayuda dentro de una fiesta (disparador `push_on_sos`, migración
+ * 066): al propietario y al personal del local que tienen la app, y a
+ * administración. Es de tipo `admin`, así que no se puede desactivar.
+ *
+ * La cuenta del local no tiene perfil y no recibe push: en el panel web lo ve
+ * al momento por Realtime, con sonido.
+ */
+const fromSos = async (
+  supabase: ReturnType<typeof adminClient>,
+  payload: WebhookPayload,
+): Promise<PushRequest[]> => {
+  const alertId = (payload.record as { id?: string }).id;
+  if (!alertId) return [];
+
+  const { data: alerta } = await supabase
+    .from('sos_alerts')
+    .select('id, status, event_id, profile_id, profiles(name), events(name, venue_id)')
+    .eq('id', alertId)
+    .maybeSingle();
+  if (!alerta || alerta.status !== 'active') return [];
+
+  const persona = ((alerta.profiles as { name?: string } | null)?.name ?? '').trim() || '—';
+  const evento = alerta.events as { name?: string; venue_id?: string } | null;
+  const eventName = evento?.name ?? '';
+
+  // Perfil → idioma y a qué pantalla lleva el aviso.
+  const destinatarios = new Map<string, { locale: string | null; url: string }>();
+
+  if (evento?.venue_id) {
+    const { data: miembros } = await supabase
+      .from('venue_members')
+      .select('user_id, role')
+      .eq('venue_id', evento.venue_id)
+      .in('role', ['owner', 'staff']);
+    const userIds = (miembros ?? []).map((m) => m.user_id as string);
+    if (userIds.length > 0) {
+      const { data: perfiles } = await supabase.from('profiles').select('id, locale').in('user_id', userIds);
+      for (const perfil of perfiles ?? []) {
+        destinatarios.set(perfil.id as string, { locale: perfil.locale ?? null, url: '/venue/dashboard?seccion=door' });
+      }
+    }
+  }
+
+  const { data: admins } = await supabase.from('profiles').select('id, locale').eq('role', 'admin').limit(50);
+  for (const admin of admins ?? []) {
+    destinatarios.set(admin.id as string, { locale: admin.locale ?? null, url: '/admin/dashboard?seccion=sos' });
+  }
+
+  // Quien pide ayuda no recibe su propio aviso aunque sea del equipo.
+  destinatarios.delete(alerta.profile_id as string);
+
+  if (destinatarios.size > 0) {
+    await supabase.from('sos_alerts').update({ venue_notified_at: new Date().toISOString() }).eq('id', alertId);
+  }
+
+  return [...destinatarios].map(([profileId, { locale, url }]) => ({
+    profileId,
+    kind: 'admin' as const,
+    ...pushTexts(locale).sosHelp(persona, eventName),
+    url,
+    tag: `sos-${alertId}`,
   }));
 };
 
@@ -392,7 +457,9 @@ serve(async (req: Request): Promise<Response> => {
             ? await fromVenueEvent(supabase, body)
             : body.table === 'moderation_queue'
               ? await fromPendingPhotos(supabase)
-              : await fromWebhook(supabase, body)
+              : body.table === 'sos_alerts'
+                ? await fromSos(supabase, body)
+                : await fromWebhook(supabase, body)
         : [body as PushRequest];
 
     // De veinte en veinte: un sorteo avisa a toda la sala y, uno a uno, se
