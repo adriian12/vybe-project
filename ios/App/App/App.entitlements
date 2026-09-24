@@ -3,18 +3,18 @@
 <plist version="1.0">
 <dict>
 	<!--
-		Enlaces universales: un enlace de app.vybes.es abre la aplicación instalada
+		Enlaces universales: un enlace de app.fiestea.es abre la aplicación instalada
 		en vez de Safari.
 
 		Para que funcione hay que publicar en el dominio el fichero
-		https://app.vybes.es/.well-known/apple-app-site-association con el
+		https://app.fiestea.es/.well-known/apple-app-site-association con el
 		identificador del equipo y el bundle id, y activar «Associated Domains»
 		en la capacidad del target en Xcode. Mientras no exista ese fichero,
 		iOS abre Safari sin dar ningún error.
 	-->
 	<key>com.apple.developer.associated-domains</key>
 	<array>
-		<string>applinks:app.vybes.es</string>
+		<string>applinks:app.fiestea.es</string>
 	</array>
 
 	<!-- Notificaciones push: en producción, no en el entorno de desarrollo. -->

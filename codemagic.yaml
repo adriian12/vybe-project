@@ -10,13 +10,12 @@
 #      Connect, que crea sola el certificado, el identificador y el perfil;
 #   4. genera el `.ipa` y lo sube a TestFlight.
 #
-# ANTES de la primera compilación, en Codemagic (Environment variables):
-#   · Añade la variable APP_STORE_CONNECT_PRIVATE_KEY (Secure) con el
-#     contenido del .p8. Los identificadores ya van en este fichero.
-# En App Store Connect (una vez):
-#   · Apps → + → Nueva app: iOS, nombre «Fiestea», idioma principal, el
-#     identificador es.fiestea.app y un SKU cualquiera. Sin esta ficha,
-#     TestFlight rechaza la subida.
+# En Codemagic, la variable segura APP_STORE_CONNECT_PRIVATE_KEY (grupo
+# «appstore») lleva el contenido del .p8. Los identificadores van aquí.
+#
+# La ficha «Fiestea» de App Store Connect (id 6815824600) se creó con el
+# identificador app.carefull.mobile, y Apple no deja cambiarlo: la app se
+# compila con ese identificador para que la subida entre en esa ficha.
 #
 # Las variables VITE_ de abajo son públicas (viajan en el propio bundle que
 # sirve app.fiestea.es), así que van aquí y no hace falta grupo de variables.
@@ -35,9 +34,12 @@ workflows:
     instance_type: mac_mini_m2
     max_build_duration: 60
     environment:
+      groups:
+        - appstore
       vars:
         <<: *env_vite
-        BUNDLE_ID: 'es.fiestea.app'
+        BUNDLE_ID: 'app.carefull.mobile'
+        APP_STORE_APPLE_ID: '6815824600'
         XCODE_SCHEME: 'App'
         # Firma con la clave de App Store Connect por variables de entorno. El
         # `app-store-connect` de Codemagic lee estas tres solo. Issuer y Key ID
@@ -46,7 +48,7 @@ workflows:
         # marcada como «Secure», pegando el contenido del .p8 con sus líneas
         # BEGIN/END. No se guarda en el repositorio.
         APP_STORE_CONNECT_ISSUER_ID: '0f0d99a0-ebd4-4838-bb04-a98211ea3c7c'
-        APP_STORE_CONNECT_KEY_IDENTIFIER: '3Z4W4VZC63'
+        APP_STORE_CONNECT_KEY_IDENTIFIER: '3793K45HAY'
       node: 20
       xcode: latest
       cocoapods: default
@@ -86,6 +88,13 @@ workflows:
           app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE --create
           keychain add-certificates
           xcode-project use-profiles --project vybe-project/ios/App/App.xcodeproj
+
+      - name: Número de build
+        script: |
+          # TestFlight exige un número mayor que el de la última subida.
+          ULTIMO=$(app-store-connect get-latest-testflight-build-number "$APP_STORE_APPLE_ID" 2>/dev/null || echo 0)
+          cd vybe-project/ios/App
+          agvtool new-version -all $((ULTIMO + 1))
 
       - name: Compilar el .ipa
         script: |
