@@ -9,5 +9,5 @@ export const COMPANY = {
   name: 'Adrián Rojas Martínez',
   taxId: 'NIF 43188784M',
   address: 'Calle Reina Laura, 8, 3.º, 07007 Palma de Mallorca, Illes Balears, España',
-  email: 'rojasadrian12@gmail.com',
+  email: 'soporte@fiestea.es',
 };
