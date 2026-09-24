@@ -31,12 +31,14 @@
   <script>
     (function () {
       var q = location.search || '';
-      var ok = /(checkout|supercrush)=success/.test(q);
+      var ok = /(checkout|supercrush|tickets)=success/.test(q);
       if (!ok) {
         document.getElementById('titulo').textContent = 'Pago cancelado';
         document.getElementById('texto').textContent = 'No se ha cobrado nada. Puedes volver a la app.';
       }
-      var destino = 'vybe:///profile' + q;
+      // Las entradas vuelven a «Entradas»; el resto, al perfil.
+      var pantalla = /tickets=/.test(q) ? 'tickets' : 'profile';
+      var destino = 'vybe:///' + pantalla + q;
       document.getElementById('volver').setAttribute('href', destino);
       setTimeout(function () { location.href = destino; }, 300);
     })();

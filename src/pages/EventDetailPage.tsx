@@ -24,6 +24,8 @@ import WhoIsGoing from '@/components/who-is-going';
 import MapThumb from '@/components/map-thumb';
 import { LivePill, formatHourRange } from '@/components/event-bits';
 import LiveThermometer from '@/components/live-thermometer';
+import EventTickets from '@/components/event-tickets';
+import { EventRatingBadge } from '@/components/rate-party';
 import { PartyButton } from '@/components/ui-custom/party-button';
 import { useToast } from '@/components/ui/use-toast';
 import { useAppContext } from '@/context/app-context';
@@ -206,6 +208,7 @@ const EventDetailPage = () => {
               {event.city ? ` · ${event.city}` : ''}
             </span>
           </button>
+          <EventRatingBadge eventId={event.id} />
         </div>
 
         <div className="space-y-4 px-margin">
@@ -270,6 +273,8 @@ const EventDetailPage = () => {
           )}
 
           {/* ------------------------------------------------------ entradas */}
+          {/* Las que vende el local dentro de la app (Business). */}
+          {!terminado && <EventTickets eventId={event.id} />}
           {event.bookingUrl && !terminado && (
             <button
               type="button"

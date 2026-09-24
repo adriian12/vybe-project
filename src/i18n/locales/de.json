@@ -709,7 +709,8 @@
             "promos": "Aktionen",
             "plan": "Tarif",
             "profile": "Profil",
-            "profileSubtitle": "Angaben zum Lokal, Aktionen, Team und Tarif."
+            "profileSubtitle": "Angaben zum Lokal, Aktionen, Team und Tarif.",
+            "sales": "Verkäufe"
         },
         "qr": {
             "title": "Zugangscode",
@@ -1082,7 +1083,12 @@
                 "csvExport": "CSV-Export",
                 "demographics": "Publikumsdetails",
                 "headcountCurve": "Auslastungskurve und % mit Vybes",
-                "pdfExport": "PDF-Export"
+                "pdfExport": "PDF-Export",
+                "forecast": "Besucherprognose",
+                "ratings": "Gästebewertungen",
+                "audiences": "Benachrichtigungen an Zielgruppen",
+                "ticketSales": "Verkauf von Tickets und Tischen",
+                "commissions": "Automatische Promoter-Provisionen"
             },
             "yourPlan": "Dein aktueller Tarif",
             "choose": "Wählen",
@@ -1163,9 +1169,27 @@
             "errors": {
                 "scheduleLimit": "Du hast das Limit deines Tarifs für geplante Nachrichten erreicht.",
                 "scheduleInPast": "Dieser Zeitpunkt ist schon vorbei.",
-                "scheduleAfterEvent": "Die Party ist dann schon vorbei."
+                "scheduleAfterEvent": "Die Party ist dann schon vorbei.",
+                "audienceDailyLimit": "Höchstens 5 Zielgruppen-Benachrichtigungen pro Tag.",
+                "noShowNeedsStarted": "Diese Zielgruppe gibt es erst, wenn die Party begonnen hat."
             },
-            "scheduleCta": "Für später planen"
+            "scheduleCta": "Für später planen",
+            "audience": {
+                "label": "An wen",
+                "inside": "Jetzt drinnen",
+                "followers": "Follower",
+                "regulars": "Stammgäste",
+                "no_show": "Wollten kommen",
+                "never_came": "Nie gekommen",
+                "insideHelp": "Wer gerade auf der Party ist.",
+                "followersHelp": "Alle, die der Location folgen.",
+                "regularsHelp": "Wer 3 Nächte oder öfter da war.",
+                "no_showHelp": "Haben bei dieser Party „Ich gehe hin“ markiert und sind nicht gekommen.",
+                "never_cameHelp": "Folgen der Location, waren aber nie da.",
+                "reach_one": "erreicht {{count}} Person",
+                "reach_other": "erreicht {{count}} Personen",
+                "locked": "Zielgruppen gibt es in Pro und Business."
+            }
         },
         "documents": {
             "help": "Der Nachweis, dass das Lokal dir gehört. Die Verwaltung prüft ihn vor der Freigabe.",
@@ -1181,7 +1205,8 @@
             "events": "Events",
             "stats": "Statistiken",
             "promos": "Aktionen",
-            "plan": "Tarif & Abrechnung"
+            "plan": "Tarif & Abrechnung",
+            "sales": "Verkäufe"
         },
         "live": "live",
         "noLive": "Kein Event live",
@@ -1936,7 +1961,36 @@
         "pastEmptyBody": "Partys, bei denen du drin warst, erscheinen hier mit den Leuten, die du kennengelernt hast.",
         "connections_one": "{{count}} Verbindung",
         "connections_other": "{{count}} Verbindungen",
-        "shareText": "Ich bin bei {{name}} ({{venue}}). Kommst du?"
+        "shareText": "Ich bin bei {{name}} ({{venue}}). Kommst du?",
+        "buy": {
+            "title": "Tickets und Tische",
+            "guests_one": "{{count}} Person",
+            "guests_other": "{{count}} Personen",
+            "minSpend": "Mindestverzehr {{amount}}",
+            "remaining_one": "Nur noch {{count}}!",
+            "remaining_other": "Noch {{count}}",
+            "deposit": "Anzahlung",
+            "soldOut": "Ausverkauft",
+            "reserve": "Tisch reservieren · {{amount}}",
+            "buy": "Kaufen · {{amount}}",
+            "note": "Du zahlst per Karte über eine sichere Zahlungsseite. Deine Tickets erscheinen unter „Tickets“ mit QR-Code für den Einlass.",
+            "errors": {
+                "soldOut": "Ausverkauft. Versuch ein anderes Ticket.",
+                "closed": "Der Verkauf ist geschlossen.",
+                "quantity": "Diese Menge ist nicht erlaubt.",
+                "checkout": "Die Zahlung konnte nicht geöffnet werden. Versuch es erneut."
+            }
+        },
+        "mine": {
+            "title": "Deine Tickets",
+            "cancelled": "Zahlung abgebrochen: Es wurde nichts berechnet.",
+            "paid": "Kauf abgeschlossen!",
+            "paidBody": "Deine Tickets erscheinen hier in wenigen Sekunden.",
+            "waiting": "Deine Tickets werden ausgestellt…",
+            "depositPaid": "Anzahlung bezahlt: {{amount}}",
+            "used": "Verwendet um {{time}}",
+            "showAtDoor": "Zeig es am Einlass"
+        }
     },
     "vybes": {
         "matches": "Matches ({{count}})",
@@ -2608,5 +2662,149 @@
     },
     "notFound": {
         "body": "Diese Seite gibt es nicht. Vielleicht ist der Link falsch geschrieben oder nicht mehr verfügbar."
+    },
+    "rating": {
+        "eventCount_one": "({{count}} Bewertung)",
+        "eventCount_other": "({{count}} Bewertungen)",
+        "venueCount_one": "Location ({{count}})",
+        "venueCount_other": "Location ({{count}})",
+        "yours": "Deine Bewertung: {{stars}} ★",
+        "thanks": "Danke!",
+        "thanksBody": "Deine Bewertung hilft anderen bei der Partywahl.",
+        "title": "Wie war {{event}}?",
+        "subtitle": "Deine Meinung über {{venue}}, ohne deinen Namen.",
+        "overall": "Gesamt",
+        "tapToRate": "Tipp auf die Sterne",
+        "levels": {
+            "1": "Sehr schlecht",
+            "2": "Schwach",
+            "3": "Gut",
+            "4": "Sehr gut",
+            "5": "Unglaublich!"
+        },
+        "music": "Musik",
+        "atmosphere": "Stimmung",
+        "price": "Preis",
+        "commentPlaceholder": "Noch etwas? (optional)",
+        "anonymous": "Die Location liest die Kommentare, ohne zu wissen, wer sie geschrieben hat.",
+        "later": "Jetzt nicht",
+        "send": "Senden",
+        "errors": {
+            "notAttended": "Nur wer auf der Party war, kann sie bewerten."
+        },
+        "venue": {
+            "title": "Bewertungen",
+            "locked": "Sieh, welche Note dir deine Gäste geben, Nacht für Nacht, und lies ihre Kommentare. Verfügbar in Pro und Business.",
+            "upgrade": "Tarif upgraden",
+            "empty": "Noch keine Bewertungen. Sie werden beim Verlassen der Party abgefragt.",
+            "count_one": "{{count}} Bewertung",
+            "count_other": "{{count}} Bewertungen",
+            "vsPrev": "ggü. Vormonat",
+            "byNight": "Pro Nacht",
+            "comments": "Kommentare",
+            "noComments": "Noch hat niemand einen Kommentar hinterlassen."
+        }
+    },
+    "sales": {
+        "title": "Verkäufe",
+        "event": "Event",
+        "noEvents": "Du hast keine kommenden Partys oder Partys der letzten 30 Tage.",
+        "tabs": {
+            "tickets": "Tickets und Tische",
+            "promoters": "Promoter-Provisionen"
+        },
+        "sold": "Verkauft",
+        "revenue": "Umsatz",
+        "validated": "Entwertet",
+        "types": "Im Verkauf",
+        "empty": "Du verkaufst noch nichts in der App. Füge ein Ticket oder einen Tisch hinzu.",
+        "paused": "pausiert",
+        "soldOf": "{{sold}} von {{total}}",
+        "soldCount_one": "{{count}} verkauft",
+        "soldCount_other": "{{count}} verkauft",
+        "usedCount_one": "{{count}} entwertet",
+        "usedCount_other": "{{count}} entwertet",
+        "form": {
+            "edit": "Bearbeiten",
+            "newTable": "Neuer Tisch",
+            "newEntry": "Neues Ticket",
+            "name": "Name",
+            "tablePlaceholder": "VIP-Tisch",
+            "entryPlaceholder": "Allgemeiner Eintritt",
+            "description": "Was ist inklusive (optional)",
+            "deposit": "Anzahlung (€)",
+            "price": "Preis (€)",
+            "tables": "Anzahl Tische",
+            "capacity": "Tickets im Verkauf",
+            "unlimited": "Unbegrenzt",
+            "guests": "Personen pro Tisch",
+            "minSpend": "Mindestverzehr (€)",
+            "maxPerOrder": "Max. pro Kauf",
+            "onSale": "Im Verkauf"
+        },
+        "saved": "Gespeichert",
+        "ended": "Die Party ist vorbei: Es kann nichts mehr verkauft werden.",
+        "addTable": "Tisch hinzufügen",
+        "addEntry": "Ticket hinzufügen",
+        "note": "Zahlungen laufen per Karte über Stripe. Jedes Ticket hat einen QR-Code, der unter Tür → „Ticket prüfen“ entwertet wird.",
+        "orders": "Letzte Käufe",
+        "noOrders": "Noch keine Käufe.",
+        "locked": {
+            "title": "Verkaufe Tickets und Tische in der App",
+            "body": "Kassiere Tickets und Tischanzahlungen per Karte, prüfe den QR-Code am Einlass und rechne die Provisionen deiner Promoter automatisch ab. Verfügbar im Business-Tarif.",
+            "cta": "Zu Business wechseln"
+        },
+        "errors": {
+            "planRequired": "Dein Tarif enthält diese Funktion nicht.",
+            "notAuthorized": "Du hast keine Berechtigung dafür.",
+            "eventEnded": "Die Party ist vorbei.",
+            "tablesNeedCapacity": "Gib an, wie viele Tische es gibt.",
+            "capacityBelowSold": "Es wurden schon mehr verkauft.",
+            "ticketNotFound": "Dieses Ticket existiert nicht oder gehört nicht zu dieser Location.",
+            "ticketRefunded": "Dieses Ticket wurde erstattet.",
+            "invalidCommission": "Ungültige Provision (bis 100 % oder 1.000 € pro Person).",
+            "form": "Prüfe Name, Preis und Menge."
+        },
+        "promoters": {
+            "total": "Provisionen der Nacht",
+            "pending": "Noch zu zahlen",
+            "title": "Promoter-Abrechnung",
+            "help": "Pro Person, die mit ihrem Code reinkam, oder ein % dessen, was diese Personen für Tickets zahlten.",
+            "empty": "Diese Party hat keine Promoter- oder Gästelisten-Codes.",
+            "checkIns_one": "{{count}} Eintritt",
+            "checkIns_other": "{{count}} Eintritte",
+            "spent": "{{amount}} für Tickets",
+            "type": "Provisionsart",
+            "none": "Keine Provision",
+            "perPerson": "€ pro Person",
+            "percent": "% der Tickets",
+            "value": "Betrag",
+            "paid": "Bezahlt {{amount}}",
+            "markPaid": "Als bezahlt markieren"
+        },
+        "validator": {
+            "title": "Ticket prüfen",
+            "stop": "Kamera schließen",
+            "scan": "Scannen",
+            "code": "Ticketcode",
+            "validate": "Prüfen",
+            "alreadyUsed": "Schon verwendet um {{time}}",
+            "tableOk": "Tisch gültig",
+            "entryOk": "Ticket gültig"
+        }
+    },
+    "forecast": {
+        "title": "Prognose",
+        "confidence": {
+            "low": "Grob",
+            "medium": "Zuverlässig",
+            "high": "Sehr zuverlässig"
+        },
+        "totalPeople": "erwartete Personen insgesamt",
+        "appPeople": "erwartete Personen mit der App",
+        "withApp_one": "{{count}} mit der App",
+        "withApp_other": "{{count}} mit der App",
+        "fullRisk": "Es könnte voll werden: Personal und Warteschlange vorbereiten.",
+        "basis": "Auf Basis von {{intents}} „Ich gehe hin“ und {{nights}} früheren Nächten."
     }
 }

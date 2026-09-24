@@ -22,6 +22,7 @@ import { isEventLive, isEventTonight, useEventsFeed } from '@/hooks/use-events-f
 import { Event } from '@/types/venue';
 import { isFeatured } from '@/lib/featured';
 import PartyFilters from '@/components/party-filters';
+import RatePartyPrompt from '@/components/rate-party';
 import { aplicarFiltros, Franja } from '@/lib/party-filters';
 
 /**
@@ -157,6 +158,8 @@ const HomePage = () => {
   return (
     <div className="min-h-screen pb-[calc(var(--nav-h)+2rem)] pt-[var(--header-h)]">
       <Header />
+      {/* Qué tal estuvo la última fiesta: sale al volver de ella. */}
+      <RatePartyPrompt />
 
       <main className="mx-auto max-w-2xl space-y-6 pt-3">
         {/* ------------------------------------------------------- saludo */}

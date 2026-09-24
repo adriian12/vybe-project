@@ -6,7 +6,19 @@
  * a propósito para que el panel del local y la landing pinten la comparativa
  * sin una llamada más, pero conviene no perderlo de vista.
  */
-export const PLAN_FEATURES = ['promoterCodes', 'promotions', 'csvExport', 'pdfExport', 'headcountCurve', 'demographics'] as const;
+export const PLAN_FEATURES = [
+  'forecast',
+  'promoterCodes',
+  'promotions',
+  'ratings',
+  'audiences',
+  'csvExport',
+  'pdfExport',
+  'headcountCurve',
+  'demographics',
+  'ticketSales',
+  'commissions',
+] as const;
 
 export type PlanId = 'free' | 'pro' | 'business';
 
@@ -23,20 +35,60 @@ export const TRIAL_DAYS = 30;
 export const BOOST_PRICE = 19;
 export type PlanFeature = (typeof PLAN_FEATURES)[number];
 
+/** ¿Tiene el plan esta función? Lo mismo que `venue_has_feature()` en la base de datos. */
+export const planHas = (plan: PlanId | null | undefined, feature: PlanFeature): boolean =>
+  PLANS[plan ?? 'free'].features[feature];
+
 export const PLANS: Record<PlanId, { events: number; team: number; features: Record<PlanFeature, boolean> }> = {
   free: {
     events: 1,
     team: 2,
-    features: { promoterCodes: false, promotions: false, csvExport: false, pdfExport: false, headcountCurve: false, demographics: false },
+    features: {
+      forecast: true,
+      promoterCodes: false,
+      promotions: false,
+      ratings: false,
+      audiences: false,
+      csvExport: false,
+      pdfExport: false,
+      headcountCurve: false,
+      demographics: false,
+      ticketSales: false,
+      commissions: false,
+    },
   },
   pro: {
     events: 5,
     team: 8,
-    features: { promoterCodes: true, promotions: true, csvExport: false, pdfExport: false, headcountCurve: false, demographics: false },
+    features: {
+      forecast: true,
+      promoterCodes: true,
+      promotions: true,
+      ratings: true,
+      audiences: true,
+      csvExport: false,
+      pdfExport: false,
+      headcountCurve: false,
+      demographics: false,
+      ticketSales: false,
+      commissions: false,
+    },
   },
   business: {
     events: 50,
     team: 40,
-    features: { promoterCodes: true, promotions: true, csvExport: true, pdfExport: true, headcountCurve: true, demographics: true },
+    features: {
+      forecast: true,
+      promoterCodes: true,
+      promotions: true,
+      ratings: true,
+      audiences: true,
+      csvExport: true,
+      pdfExport: true,
+      headcountCurve: true,
+      demographics: true,
+      ticketSales: true,
+      commissions: true,
+    },
   },
 };

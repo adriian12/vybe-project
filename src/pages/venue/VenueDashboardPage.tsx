@@ -30,6 +30,7 @@ import {
   Users,
   DoorOpen,
   Pencil,
+  Wallet,
 } from 'lucide-react';
 import { useAppContext } from '@/context/app-context';
 import VenueQRCode from '@/components/venue/venue-qr-code';
@@ -49,6 +50,8 @@ import VenueSosAlerts, { VenueSosStrip } from '@/components/venue/venue-sos-aler
 import VenueSosAlarm from '@/components/venue/venue-sos-alarm';
 import { useVenueSos } from '@/hooks/use-venue-sos';
 import VenueDocuments from '@/components/venue/venue-documents';
+import VenueSales from '@/components/venue/venue-sales';
+import VenueRatings from '@/components/venue/venue-ratings';
 import VenueBroadcast from '@/components/venue/venue-broadcast';
 import LanguageSwitcher from '@/components/language-switcher';
 import { VybeMark } from '@/components/brand/vybe-logo';
@@ -100,13 +103,13 @@ import { Event as VybeEvent, VenueStats } from '@/types/venue';
  * escritorio las seis van en la barra horizontal, como en los diseños de
  * escritorio de Stitch.
  */
-type Section = 'qr' | 'door' | 'events' | 'stats' | 'promos' | 'team' | 'plan';
+type Section = 'qr' | 'door' | 'events' | 'stats' | 'promos' | 'sales' | 'team' | 'plan';
 type Period = 'total' | 'year' | 'month' | 'week';
 type EventFilter = 'live' | 'scheduled' | 'past';
 type Drawer = null | 'menu' | 'venue' | 'documents' | 'broadcast';
 
 const PERIODS: Period[] = ['total', 'year', 'month', 'week'];
-const PROFILE_SECTIONS: Section[] = ['stats', 'promos', 'team', 'plan'];
+const PROFILE_SECTIONS: Section[] = ['stats', 'promos', 'sales', 'team', 'plan'];
 
 /**
  * Lo que ve cada papel del equipo. El propietario, todo; el personal, la puerta
@@ -114,7 +117,7 @@ const PROFILE_SECTIONS: Section[] = ['stats', 'promos', 'team', 'plan'];
  * base de datos pone sus propios límites: esto sólo ordena el panel.
  */
 const SECCIONES_POR_ROL: Record<VenueRole, Section[]> = {
-  owner: ['qr', 'door', 'events', 'stats', 'promos', 'team', 'plan'],
+  owner: ['qr', 'door', 'events', 'stats', 'promos', 'sales', 'team', 'plan'],
   staff: ['qr', 'door'],
   marketing: ['stats', 'promos'],
 };
@@ -449,6 +452,7 @@ const VenueDashboardPage = () => {
       { section: 'events', label: t('venue.nav.events'), icon: CalendarDays },
       { section: 'stats', label: t('venue.nav.stats'), icon: BarChart3 },
       { section: 'promos', label: t('venue.nav.promos'), icon: Tag },
+      { section: 'sales', label: t('venue.nav.sales'), icon: Wallet },
       { section: 'team', label: t('venue.tabs.team'), icon: Users },
       { section: 'plan', label: t('venue.nav.plan'), icon: CreditCard },
     ] as { section: Section; label: string; icon: typeof QrCode; also?: Section[] }[]
@@ -458,6 +462,7 @@ const VenueDashboardPage = () => {
     [
       { section: 'stats', label: t('venue.tabs.stats') },
       { section: 'promos', label: t('venue.tabs.promos') },
+      { section: 'sales', label: t('venue.tabs.sales') },
       { section: 'team', label: t('venue.tabs.team') },
       { section: 'plan', label: t('venue.tabs.plan') },
     ] as { section: Section; label: string }[]
@@ -760,6 +765,7 @@ const VenueDashboardPage = () => {
               venueId={currentVenue.id}
               plan={plan}
               onUpgrade={() => goTo('plan')}
+              startsAt={workingEvent?.startDate}
             />
           ) : (
             <Vacio icon={DoorOpen} text={t('venue.door.noEvent')} action={() => goTo('events')} actionLabel={t('venue.events.newEvent')} />
@@ -1008,6 +1014,9 @@ const VenueDashboardPage = () => {
                   </div>
                 )}
 
+                {/* Lo que opinan los clientes (Pro y Business). */}
+                <VenueRatings plan={plan} onUpgrade={() => goTo('plan')} />
+
                 {summary.length > 0 ? (
                   <>
                     {selectorEvento}
@@ -1053,6 +1062,9 @@ const VenueDashboardPage = () => {
             )}
           </div>
         )}
+
+        {/* ------------------------------------------------------- ventas */}
+        {section === 'sales' && <VenueSales events={myEvents} plan={plan} onUpgrade={() => goTo('plan')} />}
 
         {section === 'team' && (
           <div className="mx-auto max-w-2xl">
@@ -1167,7 +1179,11 @@ const VenueDashboardPage = () => {
               administración: se usa el evento con el que se está trabajando. */}
           {drawer === 'broadcast' &&
             (workingEventId ? (
-              <VenueBroadcast eventId={workingEventId} venueId={currentVenue.id} />
+              <VenueBroadcast
+                eventId={workingEventId}
+                venueId={currentVenue.id}
+                audiences={{ plan, onUpgrade: () => goTo('plan') }}
+              />
             ) : (
               <p className="py-6 text-center text-body-sm text-party-gray">{t('venue.door.noEvent')}</p>
             ))}

@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import Header from '@/components/header';
 import Footer from '@/components/footer';
+import PurchasedTickets from '@/components/purchased-tickets';
 import { VybeMark } from '@/components/brand/vybe-logo';
 import { dayAndMonth, formatHour, formatHourRange } from '@/components/event-bits';
 import { PartyButton } from '@/components/ui-custom/party-button';
@@ -36,9 +37,10 @@ type Pestana = 'upcoming' | 'past';
 /**
  * «Mis entradas», según la pantalla de Stitch.
  *
- * Vybe no vende entradas: la puerta se abre con el QR del local. Así que lo
- * que aquí se lleva en el bolsillo es lo que sí existe:
+ * Lo que aquí se lleva en el bolsillo:
  *
+ *   · **las entradas y mesas compradas en la app** (locales Business), cada
+ *     una con su QR para la puerta;
  *   · **el pase de la fiesta en la que estás**, con la hora a la que entraste y
  *     los vales que has pedido en la barra, cada uno con su QR y su código
  *     (son los que el local valida en «Validar un vale»);
@@ -168,6 +170,9 @@ const TicketsPage = () => {
 
         {pestana === 'upcoming' ? (
           <>
+            {/* ---------------------------------------- entradas compradas */}
+            <PurchasedTickets />
+
             {/* ------------------------------------------------- pase activo */}
             {activeEvent && (
               <article className="overflow-hidden rounded-2xl bg-white text-ink">

@@ -709,7 +709,8 @@
             "promos": "Offers",
             "plan": "Plan",
             "profile": "Profile",
-            "profileSubtitle": "Venue details, promotions, team and plan."
+            "profileSubtitle": "Venue details, promotions, team and plan.",
+            "sales": "Sales"
         },
         "qr": {
             "title": "Access code",
@@ -1082,7 +1083,12 @@
                 "csvExport": "CSV export",
                 "demographics": "Audience detail",
                 "headcountCurve": "Capacity curve and % on Vybes",
-                "pdfExport": "Export to PDF"
+                "pdfExport": "Export to PDF",
+                "forecast": "Attendance forecast",
+                "ratings": "Customer ratings",
+                "audiences": "Notifications to specific audiences",
+                "ticketSales": "Ticket and table sales",
+                "commissions": "Automatic promoter commissions"
             },
             "yourPlan": "Your current plan",
             "choose": "Choose",
@@ -1163,9 +1169,27 @@
             "errors": {
                 "scheduleLimit": "You've reached your plan's limit of scheduled messages.",
                 "scheduleInPast": "That time has already passed.",
-                "scheduleAfterEvent": "The party will be over by then."
+                "scheduleAfterEvent": "The party will be over by then.",
+                "audienceDailyLimit": "Up to 5 audience notifications per day.",
+                "noShowNeedsStarted": "That audience only exists once the party has started."
             },
-            "scheduleCta": "Schedule for later"
+            "scheduleCta": "Schedule for later",
+            "audience": {
+                "label": "To whom",
+                "inside": "Inside now",
+                "followers": "Followers",
+                "regulars": "Regulars",
+                "no_show": "Said they were coming",
+                "never_came": "Never came",
+                "insideHelp": "People at the party right now.",
+                "followersHelp": "Everyone who follows the venue.",
+                "regularsHelp": "People who came 3 nights or more.",
+                "no_showHelp": "Tapped \"I'm going\" for this party and haven't come in.",
+                "never_cameHelp": "Follow the venue but have never come.",
+                "reach_one": "will reach {{count}} person",
+                "reach_other": "will reach {{count}} people",
+                "locked": "Specific audiences are on Pro and Business."
+            }
         },
         "documents": {
             "help": "Proof that the venue is yours. Administration reviews it before approving the account.",
@@ -1181,7 +1205,8 @@
             "events": "Events",
             "stats": "Stats",
             "promos": "Promotions",
-            "plan": "Plan & billing"
+            "plan": "Plan & billing",
+            "sales": "Sales"
         },
         "live": "live",
         "noLive": "No event live",
@@ -1936,7 +1961,36 @@
         "pastEmptyBody": "Parties you get into will show up here with the people you met.",
         "connections_one": "{{count}} connection",
         "connections_other": "{{count}} connections",
-        "shareText": "I'm at {{name}} ({{venue}}). Coming?"
+        "shareText": "I'm at {{name}} ({{venue}}). Coming?",
+        "buy": {
+            "title": "Tickets and tables",
+            "guests_one": "{{count}} person",
+            "guests_other": "{{count}} people",
+            "minSpend": "minimum spend {{amount}}",
+            "remaining_one": "Only {{count}} left!",
+            "remaining_other": "{{count}} left",
+            "deposit": "deposit",
+            "soldOut": "Sold out",
+            "reserve": "Book table · {{amount}}",
+            "buy": "Buy · {{amount}}",
+            "note": "Pay by card on a secure checkout. Your tickets appear in \"Tickets\" with their QR for the door.",
+            "errors": {
+                "soldOut": "They've sold out. Try another ticket.",
+                "closed": "Sales are closed.",
+                "quantity": "That quantity isn't allowed.",
+                "checkout": "Couldn't open the payment. Try again."
+            }
+        },
+        "mine": {
+            "title": "Your tickets",
+            "cancelled": "Payment cancelled: nothing was charged.",
+            "paid": "Purchase complete!",
+            "paidBody": "Your tickets will appear here in a few seconds.",
+            "waiting": "We're issuing your tickets…",
+            "depositPaid": "Deposit paid: {{amount}}",
+            "used": "Used at {{time}}",
+            "showAtDoor": "Show it at the door"
+        }
     },
     "vybes": {
         "matches": "Matches ({{count}})",
@@ -2608,5 +2662,149 @@
     },
     "notFound": {
         "body": "This page doesn't exist. The link may be mistyped or no longer available."
+    },
+    "rating": {
+        "eventCount_one": "({{count}} rating)",
+        "eventCount_other": "({{count}} ratings)",
+        "venueCount_one": "venue ({{count}})",
+        "venueCount_other": "venue ({{count}})",
+        "yours": "Your rating: {{stars}} ★",
+        "thanks": "Thanks!",
+        "thanksBody": "Your rating helps others choose a party.",
+        "title": "How was {{event}}?",
+        "subtitle": "Your opinion of {{venue}}, without your name.",
+        "overall": "Overall",
+        "tapToRate": "Tap the stars",
+        "levels": {
+            "1": "Very bad",
+            "2": "Weak",
+            "3": "Good",
+            "4": "Very good",
+            "5": "Amazing!"
+        },
+        "music": "Music",
+        "atmosphere": "Atmosphere",
+        "price": "Price",
+        "commentPlaceholder": "Anything to add? (optional)",
+        "anonymous": "The venue reads comments without knowing who wrote them.",
+        "later": "Not now",
+        "send": "Send",
+        "errors": {
+            "notAttended": "Only people who were at the party can rate it."
+        },
+        "venue": {
+            "title": "Ratings",
+            "locked": "See the score customers give you, night by night, and read their comments. Available on Pro and Business.",
+            "upgrade": "Upgrade",
+            "empty": "No ratings yet. People are asked when they leave the party.",
+            "count_one": "{{count}} rating",
+            "count_other": "{{count}} ratings",
+            "vsPrev": "vs previous month",
+            "byNight": "By night",
+            "comments": "Comments",
+            "noComments": "Nobody has left a comment yet."
+        }
+    },
+    "sales": {
+        "title": "Sales",
+        "event": "Event",
+        "noEvents": "You have no upcoming parties or parties from the last 30 days.",
+        "tabs": {
+            "tickets": "Tickets and tables",
+            "promoters": "Promoter commissions"
+        },
+        "sold": "Sold",
+        "revenue": "Revenue",
+        "validated": "Validated",
+        "types": "On sale",
+        "empty": "You're not selling anything in the app yet. Add a ticket or a table.",
+        "paused": "paused",
+        "soldOf": "{{sold}} of {{total}}",
+        "soldCount_one": "{{count}} sold",
+        "soldCount_other": "{{count}} sold",
+        "usedCount_one": "{{count}} validated",
+        "usedCount_other": "{{count}} validated",
+        "form": {
+            "edit": "Edit",
+            "newTable": "New table",
+            "newEntry": "New ticket",
+            "name": "Name",
+            "tablePlaceholder": "VIP table",
+            "entryPlaceholder": "General admission",
+            "description": "What's included (optional)",
+            "deposit": "Deposit (€)",
+            "price": "Price (€)",
+            "tables": "Number of tables",
+            "capacity": "Tickets on sale",
+            "unlimited": "No limit",
+            "guests": "People per table",
+            "minSpend": "Minimum spend (€)",
+            "maxPerOrder": "Max per purchase",
+            "onSale": "On sale"
+        },
+        "saved": "Saved",
+        "ended": "The party is over: you can't sell any more.",
+        "addTable": "Add table",
+        "addEntry": "Add ticket",
+        "note": "Payments are taken by card through Stripe. Each ticket has a QR that is validated in Door → \"Validate ticket\".",
+        "orders": "Latest purchases",
+        "noOrders": "No purchases yet.",
+        "locked": {
+            "title": "Sell tickets and tables in the app",
+            "body": "Take card payments for tickets and table deposits, validate the QR at the door and settle your promoters' commissions automatically. Available on the Business plan.",
+            "cta": "Upgrade to Business"
+        },
+        "errors": {
+            "planRequired": "Your plan doesn't include this feature.",
+            "notAuthorized": "You don't have permission to do this.",
+            "eventEnded": "The party is over.",
+            "tablesNeedCapacity": "Say how many tables there are.",
+            "capacityBelowSold": "More than that have already been sold.",
+            "ticketNotFound": "That ticket doesn't exist or isn't from this venue.",
+            "ticketRefunded": "That ticket has been refunded.",
+            "invalidCommission": "Invalid commission (up to 100 % or €1,000 per person).",
+            "form": "Check the name, price and quantity."
+        },
+        "promoters": {
+            "total": "Tonight's commissions",
+            "pending": "Still to pay",
+            "title": "Promoter settlement",
+            "help": "Per person who came in with their code, or a % of what those people paid for tickets.",
+            "empty": "This party has no promoter or guest-list codes.",
+            "checkIns_one": "{{count}} entry",
+            "checkIns_other": "{{count}} entries",
+            "spent": "{{amount}} in tickets",
+            "type": "Commission type",
+            "none": "No commission",
+            "perPerson": "€ per person",
+            "percent": "% of tickets",
+            "value": "Amount",
+            "paid": "Paid {{amount}}",
+            "markPaid": "Mark as paid"
+        },
+        "validator": {
+            "title": "Validate ticket",
+            "stop": "Close camera",
+            "scan": "Scan",
+            "code": "Ticket code",
+            "validate": "Validate",
+            "alreadyUsed": "Already used at {{time}}",
+            "tableOk": "Valid table",
+            "entryOk": "Valid ticket"
+        }
+    },
+    "forecast": {
+        "title": "Forecast",
+        "confidence": {
+            "low": "Rough",
+            "medium": "Reliable",
+            "high": "Very reliable"
+        },
+        "totalPeople": "people expected in total",
+        "appPeople": "people expected with the app",
+        "withApp_one": "{{count}} with the app",
+        "withApp_other": "{{count}} with the app",
+        "fullRisk": "It may fill up: get staff and the queue ready.",
+        "basis": "Based on {{intents}} \"I'm going\" and {{nights}} previous nights."
     }
 }

@@ -18,6 +18,8 @@ const VENUE_ERROR_KEYS: Record<string, string> = {
   TOO_MANY_LINKS: 'venue.counter.errors.tooManyLinks',
   PLAN_REQUIRED: 'venue.plan.errors.upgradeRequired',
   SCHEDULE_LIMIT: 'venue.broadcast.errors.scheduleLimit',
+  AUDIENCE_DAILY_LIMIT: 'venue.broadcast.errors.audienceDailyLimit',
+  NO_SHOW_NEEDS_STARTED_EVENT: 'venue.broadcast.errors.noShowNeedsStarted',
   SCHEDULE_IN_PAST: 'venue.broadcast.errors.scheduleInPast',
   SCHEDULE_AFTER_EVENT: 'venue.broadcast.errors.scheduleAfterEvent',
 };
@@ -190,6 +192,26 @@ export interface Broadcast {
   sentAt: string | null;
   /** Hora a la que saldrá. Nulo: sale en la siguiente pasada. */
   scheduledAt: string | null;
+  audience: BroadcastAudience;
+}
+
+/**
+ * A quién va un aviso. «inside» es quien está dentro ahora (todos los planes);
+ * el resto son públicos del local, de Pro y Business (migración 068).
+ */
+export type BroadcastAudience = 'inside' | 'followers' | 'regulars' | 'no_show' | 'never_came';
+
+export interface EventForecast {
+  intents: number;
+  pastNights: number;
+  expectedCheckins: number;
+  /** Personas en total (con y sin la app), si hay recuentos de puerta anteriores. */
+  expectedTotal: number | null;
+  low: number;
+  high: number;
+  capacity: number | null;
+  confidence: 'low' | 'medium' | 'high';
+  fullRisk: boolean;
 }
 
 export interface VenuePlanStatus {
@@ -953,7 +975,7 @@ export const venueService = {
   getBroadcasts: async (eventId?: string): Promise<Broadcast[]> => {
     let query = supabase
       .from('broadcasts')
-      .select('id, title, body, status, recipients, created_at, sent_at, scheduled_at')
+      .select('id, title, body, status, recipients, created_at, sent_at, scheduled_at, audience')
       .order('created_at', { ascending: false })
       .limit(20);
 
@@ -971,7 +993,54 @@ export const venueService = {
       createdAt: row.created_at,
       sentAt: row.sent_at,
       scheduledAt: row.scheduled_at,
+      audience: (row.audience ?? 'inside') as BroadcastAudience,
     }));
+  },
+
+  /** Aviso a un público del local (Pro y Business salvo «inside»). */
+  queueAudienceBroadcast: async (
+    audience: BroadcastAudience,
+    title: string,
+    body: string,
+    eventId: string,
+    scheduledAt?: string | null,
+  ): Promise<string> => {
+    const { data, error } = await supabase.rpc('queue_audience_broadcast', {
+      p_audience: audience,
+      p_title: title,
+      p_body: body,
+      p_event_id: eventId,
+      p_scheduled_at: scheduledAt ?? null,
+    } as never);
+    if (error) throw venueError(error.message);
+    return data as string;
+  },
+
+  /** Cuántas personas recibirían un aviso a ese público. */
+  countAudience: async (audience: BroadcastAudience, eventId: string): Promise<number | null> => {
+    const { data, error } = await supabase.rpc('count_broadcast_audience', {
+      p_audience: audience,
+      p_event_id: eventId,
+    });
+    return error ? null : Number(data ?? 0);
+  },
+
+  /** Previsión de asistencia de un evento (todos los planes). */
+  getForecast: async (eventId: string): Promise<EventForecast | null> => {
+    const { data, error } = await supabase.rpc('get_event_forecast', { p_event_id: eventId });
+    const row = !error && data?.[0];
+    if (!row) return null;
+    return {
+      intents: row.intents,
+      pastNights: row.past_nights,
+      expectedCheckins: row.expected_checkins,
+      expectedTotal: row.expected_total,
+      low: row.low,
+      high: row.high,
+      capacity: row.capacity,
+      confidence: row.confidence as EventForecast['confidence'],
+      fullRisk: row.full_risk,
+    };
   },
 
   setRotation: async (venueId: string, minutes: number | null): Promise<void> => {
