@@ -1719,7 +1719,11 @@
             "nameRequired": "Falta el nom.",
             "addUser": "Afegir usuari",
             "addVenue": "Afegir local",
-            "addEvent": "Afegir esdeveniment"
+            "addEvent": "Afegir esdeveniment",
+            "venueType": "Tipus de local",
+            "city": "Ciutat",
+            "location": "Ubicació",
+            "locationHelp": "Cerca-la o arrossega el marcador. Sense ubicació, els codis QR no funcionen."
         },
         "newEvent": {
             "title": "Crear una festa",

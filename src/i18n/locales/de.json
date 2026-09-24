@@ -1719,7 +1719,11 @@
             "nameRequired": "Der Name fehlt.",
             "addUser": "Nutzer hinzufügen",
             "addVenue": "Location hinzufügen",
-            "addEvent": "Event hinzufügen"
+            "addEvent": "Event hinzufügen",
+            "venueType": "Art der Location",
+            "city": "Stadt",
+            "location": "Standort",
+            "locationHelp": "Suchen oder Marker ziehen. Ohne Standort funktionieren die QR-Codes nicht."
         },
         "newEvent": {
             "title": "Party anlegen",

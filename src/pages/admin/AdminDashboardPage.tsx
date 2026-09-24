@@ -1241,7 +1241,7 @@ const AdminDashboardPage = () => {
       )}
 
       <Dialog open={alta !== null} onOpenChange={(open) => !open && setAlta(null)}>
-        <DialogContent className="cards-light max-h-[88vh] overflow-y-auto sm:max-w-lg">
+        <DialogContent className="surface-light !bg-white max-h-[88vh] overflow-y-auto text-ink sm:max-w-lg">
           <DialogHeader className="text-left">
             <DialogTitle>
               {t(

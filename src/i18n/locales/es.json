@@ -1719,7 +1719,11 @@
             "nameRequired": "Falta el nombre.",
             "addUser": "Añadir usuario",
             "addVenue": "Añadir local",
-            "addEvent": "Añadir evento"
+            "addEvent": "Añadir evento",
+            "venueType": "Tipo de local",
+            "city": "Ciudad",
+            "location": "Ubicación",
+            "locationHelp": "Búscala o arrastra el marcador. Sin ubicación, sus códigos QR no funcionan."
         },
         "newEvent": {
             "title": "Crear una fiesta",
