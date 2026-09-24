@@ -69,11 +69,17 @@ serve(async (req: Request): Promise<Response> => {
       .maybeSingle();
     if (perfil?.role !== 'admin') return json({ error: 'NOT_AUTHORIZED' }, 403);
 
-    const { type, name, email } = (await req.json()) as {
+    const { type, name, email, venueType, city, latitude, longitude } = (await req.json()) as {
       type?: 'user' | 'venue';
       name?: string;
       email?: string;
+      venueType?: string;
+      city?: string | null;
+      latitude?: number | null;
+      longitude?: number | null;
     };
+
+    const TIPOS_LOCAL = ['discoteca', 'bar', 'festival', 'fiesta_privada', 'evento_empresarial', 'local'];
 
     const tipo = type === 'venue' ? 'venue' : 'user';
     const nombre = (name ?? '').trim();
@@ -104,14 +110,21 @@ serve(async (req: Request): Promise<Response> => {
     const userId = creado.user.id;
 
     if (tipo === 'venue') {
-      // El local nace sin verificar: se aprueba desde «Altas de locales», que
-      // es donde se miran los papeles.
+      // Lo crea administración, así que nace verificado y con su ubicación:
+      // sin coordenadas sus códigos QR no funcionarían. El tipo es obligatorio
+      // en la base de datos.
+      const tipoLocal = TIPOS_LOCAL.includes(venueType ?? '') ? venueType : 'discoteca';
+      const tieneCoords = typeof latitude === 'number' && typeof longitude === 'number';
       const { error: errorVenue } = await supabase.from('venues').insert({
         venue_id: userId,
         name: nombre,
         email: correo,
-        is_verified: false,
-        verification_status: 'pending',
+        type: tipoLocal,
+        city: city?.trim() || null,
+        latitude: tieneCoords ? latitude : null,
+        longitude: tieneCoords ? longitude : null,
+        is_verified: true,
+        verification_status: 'approved',
       });
       if (errorVenue) {
         console.error('admin-create-account venue:', errorVenue.message);

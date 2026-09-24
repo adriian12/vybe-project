@@ -74,9 +74,27 @@ export const adminService = {
     type: 'user' | 'venue',
     name: string,
     email: string,
+    venue?: {
+      venueType?: string;
+      city?: string | null;
+      latitude?: number | null;
+      longitude?: number | null;
+    },
   ): Promise<{ id: string; emailSent: boolean }> => {
     const { data, error } = await supabase.functions.invoke('admin-create-account', {
-      body: { type, name, email },
+      body: {
+        type,
+        name,
+        email,
+        ...(type === 'venue'
+          ? {
+              venueType: venue?.venueType,
+              city: venue?.city ?? null,
+              latitude: venue?.latitude ?? null,
+              longitude: venue?.longitude ?? null,
+            }
+          : {}),
+      },
     });
     if (error) {
       // El código del error viene en el cuerpo de la respuesta.

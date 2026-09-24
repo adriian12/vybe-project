@@ -1719,7 +1719,11 @@
             "nameRequired": "The name is missing.",
             "addUser": "Add user",
             "addVenue": "Add venue",
-            "addEvent": "Add event"
+            "addEvent": "Add event",
+            "venueType": "Venue type",
+            "city": "City",
+            "location": "Location",
+            "locationHelp": "Search or drag the marker. Without a location, its QR codes will not work."
         },
         "newEvent": {
             "title": "Create a party",
