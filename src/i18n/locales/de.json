@@ -217,7 +217,8 @@
         "statTonight": "Events heute Nacht",
         "featured": "Highlights",
         "upcoming": "Nächste Events",
-        "sponsored": "Hervorgehoben"
+        "sponsored": "Hervorgehoben",
+        "byPlatform": "Event von {{app}}"
     },
     "eventAccess": {
         "verifyTitle": "Nähe bestätigen",
@@ -869,7 +870,7 @@
         },
         "team": {
             "title": "Team",
-            "subtitle": "Gib deinem Personal Zugang zum Dashboard mit unterschiedlichen Rechten.",
+            "subtitle": "Konten mit Zugang zum Dashboard. Barpersonal und Promoter nutzen einen Link, ganz ohne Konto.",
             "members": "Mitglieder",
             "invite": "Mitglied hinzufügen",
             "inviteEmail": "E-Mail-Adresse der Person",
@@ -877,10 +878,11 @@
             "role": "Rolle",
             "roles": {
                 "owner": "Inhaber",
-                "staff": "Personal",
-                "marketing": "Marketing"
+                "security": "Security",
+                "waiter": "Barpersonal",
+                "promoter": "Promoter"
             },
-            "roleHelp": "Inhaber verwaltet das Team. Personal erzeugt Codes. Marketing sieht Statistiken.",
+            "roleHelp": "Inhaber: das ganze Dashboard. Security: Einlass (Kapazität, Listen, Tickets und Alarme) und QR-Code.",
             "add": "Hinzufügen",
             "added": "Mitglied hinzugefügt",
             "removed": "Mitglied entfernt",
@@ -888,7 +890,40 @@
             "onlyOwner": "Nur der Inhaber kann das Team verwalten.",
             "cannotRemoveOwner": "Du kannst den Inhaber nicht entfernen.",
             "count_one": "{{count}} Person",
-            "count_other": "{{count}} Personen"
+            "count_other": "{{count}} Personen",
+            "links": {
+                "title": "Team-Links",
+                "body": "Ohne Konto: Sie öffnen sich auf jedem Handy. Links für Security und Barpersonal gelten eine Nacht; der Link jedes Promoters gilt, bis du ihn widerrufst.",
+                "new": "Neuer Link",
+                "name": "Name",
+                "namePlaceholder": "Tür 1, Bar Laura, Adrián…",
+                "event": "Party",
+                "pickEvent": "Party wählen",
+                "noEvents": "Keine anstehenden Partys: Erstelle zuerst eine.",
+                "commission": "Provision (optional)",
+                "commissionNone": "Keine Provision",
+                "perPerson": "€ pro Person",
+                "percent": "% ihrer Tickets",
+                "create": "Link erstellen",
+                "created": "Link erstellt",
+                "view": "Link ansehen",
+                "revoke": "Widerrufen",
+                "revoked": "Link widerrufen",
+                "revokeConfirm": "Link von {{name}} widerrufen? Er funktioniert sofort nicht mehr.",
+                "expired": "Abgelaufen",
+                "revokedTag": "Widerrufen",
+                "forever": "Ohne Ablauf",
+                "until": "Bis {{date}}",
+                "lastUsed": "Genutzt {{time}}",
+                "neverUsed": "Noch nicht genutzt",
+                "empty": "Noch keine Links.",
+                "whatsappText": "Dein {{role}}-Zugang bei {{app}}: {{url}}",
+                "roleHelp": {
+                    "security": "Eine Nacht. Kapazität, Einlass öffnen und schließen, Gästelisten, Tickets, Hilfealarme und Meldungen. Kein Geld, keine Statistiken.",
+                    "waiter": "Eine Nacht. Gutscheine, Aktionen und Gewinne an der Bar einlösen, aktive Angebote sehen und Hilfealarme erhalten.",
+                    "promoter": "Dauerhaft, bis du ihn widerrufst. Für jede Party: die eigene Liste, der eigene Code mit QR, wie viele Leute gekommen sind und die Provision."
+                }
+            }
         },
         "config": {
             "title": "Zugangseinstellungen",
@@ -1787,7 +1822,7 @@
             "subtitle": "Dorffeste oder Festivals. Ohne Location erscheinen sie als Fiestea.",
             "name": "Name",
             "venue": "Location",
-            "house": "Fiestea (ohne Location)",
+            "house": "{{app}} (ohne Location)",
             "date": "Tag",
             "start": "Beginn",
             "end": "Ende",
@@ -1796,7 +1831,9 @@
             "price": "Preis (€)",
             "capacity": "Kapazität",
             "create": "Party veröffentlichen",
-            "done": "Party veröffentlicht"
+            "done": "Party veröffentlicht",
+            "searchVenue": "Location suchen…",
+            "noVenue": "Keine Location mit diesem Namen"
         },
         "notices": {
             "sent_one": "{{count}} Nachricht gesendet",
@@ -2944,6 +2981,81 @@
             "ofLeft_other": "von {{count}}",
             "admitN_one": "{{count}} einlassen",
             "admitN_other": "{{count}} einlassen"
+        }
+    },
+    "team": {
+        "share": {
+            "copy": "Kopieren",
+            "copied": "Kopiert"
+        },
+        "link": {
+            "loading": "Lädt…",
+            "invalid": "Dieser Link funktioniert nicht mehr",
+            "error": "Konnte nicht geladen werden. Prüfe deine Verbindung.",
+            "retry": "Erneut versuchen"
+        },
+        "tabs": {
+            "door": "Einlass",
+            "lists": "Listen",
+            "tickets": "Tickets",
+            "reports": "Meldungen",
+            "vouchers": "Gutscheine",
+            "offers": "Angebote",
+            "alerts": "Alarme"
+        },
+        "security": {
+            "entryOpen": "Einlass offen",
+            "entryClosed": "Einlass geschlossen: Nur wer schon drin war, kommt wieder rein",
+            "closeEntry": "Einlass schließen",
+            "openEntry": "Einlass öffnen",
+            "closed": "Einlass geschlossen",
+            "opened": "Einlass offen",
+            "noReports": "Heute Nacht wurde niemand gemeldet.",
+            "revokeConfirm": "Zugang von {{name}} entziehen? Die Person wird in der App aus dem Event entfernt."
+        },
+        "waiter": {
+            "validateTitle": "Gutschein einlösen",
+            "validateHelp": "Scanne den QR-Code des Gutscheins oder gib den Code ein. Gilt für Angebote, Challenges und Gewinne.",
+            "ok": "Gültiger Gutschein",
+            "used": "Dieser Gutschein wurde schon eingelöst",
+            "offersTitle": "Angebote heute Nacht",
+            "noOffers": "Keine aktiven Angebote.",
+            "validatedOf": "{{validated}} von {{claimed}} eingelöst",
+            "until": "bis {{time}}",
+            "rafflesTitle": "Verlosungen",
+            "winner": "Gewinner: {{name}}. Prüfe den Code.",
+            "drawAt": "Ziehung um {{time}}"
+        },
+        "promoter": {
+            "upcoming": "Kommende Partys",
+            "past": "Vergangene Partys",
+            "none": "Die Location hat keine Partys geplant.",
+            "summary": "{{people}} auf der Liste · {{admitted}} drin · {{code}} mit deinem Code",
+            "back": "Alle Partys",
+            "onList": "Auf Liste",
+            "inside": "Drin",
+            "withCode": "Mit deinem Code",
+            "codeTitle": "Dein Code",
+            "codeHelp": "Wer in der App mit diesem Code eincheckt, zählt für dich.",
+            "shareText": "Komm zu {{event}}! Nutze beim Einlass meinen Code {{code}} in {{app}}.",
+            "commissionTitle": "Deine Provision",
+            "perPerson": "{{value}} € pro Person",
+            "percent": "{{value}} % ihrer Tickets",
+            "paid": "Bezahlt",
+            "pendingPay": "Offen",
+            "listTitle": "Deine Liste",
+            "listClosed": "Die Party ist vorbei: Die Liste kann nur noch angesehen werden.",
+            "empty": "Noch niemand auf deiner Liste.",
+            "saved": "Gespeichert",
+            "edit": "Bearbeiten"
+        },
+        "errors": {
+            "name": "Gib einen Namen ein.",
+            "event": "Wähle eine Party der Location.",
+            "eventEnded": "Diese Party ist vorbei.",
+            "tooMany": "Zu viele aktive Links: Widerrufe einige.",
+            "commission": "Ungültige Provision.",
+            "entryLocked": "Jemand aus diesem Eintrag ist schon drin: Er kann nicht entfernt werden."
         }
     }
 }

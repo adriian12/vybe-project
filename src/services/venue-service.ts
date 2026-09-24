@@ -29,7 +29,8 @@ const venueError = (message: string): ApiError => {
   return new ApiError(code ?? 'VENUE_FAILED', code ? VENUE_ERROR_KEYS[code] : 'errors.generic');
 };
 
-export type VenueRole = 'owner' | 'staff' | 'marketing';
+/** Papeles con cuenta (migración 072). Camareros y RRPP van por enlace. */
+export type VenueRole = 'owner' | 'security';
 
 export interface VenueMember {
   id: string;

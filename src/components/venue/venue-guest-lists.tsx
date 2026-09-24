@@ -15,8 +15,17 @@ import { cn } from '@/lib/utils';
  * lista está activada) y una por cada RRPP, que se rellena a mano. En la
  * puerta se busca el nombre y se marca cuántos entran de esa línea: «Adrián
  * +10» con 5 dentro deja 6 huecos para más tarde.
+ *
+ * Con `door` (el enlace de Seguridad, sin cuenta) sólo se busca y se da
+ * entrada: ni ajustes, ni listas nuevas, ni añadir o quitar nombres.
  */
-const VenueGuestLists = ({ eventId }: { eventId: string }) => {
+export interface GuestListDoor {
+  load: () => Promise<{ lists: GuestList[]; entries: GuestEntry[] }>;
+  admit: (entryId: string, count: number) => Promise<void>;
+}
+
+const VenueGuestLists = ({ eventId, door }: { eventId: string; door?: GuestListDoor }) => {
+  const gestionar = !door;
   const { t } = useTranslation();
   const { toast } = useToast();
 
@@ -43,6 +52,12 @@ const VenueGuestLists = ({ eventId }: { eventId: string }) => {
 
   const load = useCallback(async () => {
     try {
+      if (door) {
+        const datos = await door.load();
+        setLists(datos.lists);
+        setEntries(datos.entries);
+        return;
+      }
       const [datos, lineas] = await Promise.all([
         guestListService.getLists(eventId),
         guestListService.getEntries(eventId),
@@ -56,7 +71,7 @@ const VenueGuestLists = ({ eventId }: { eventId: string }) => {
     } finally {
       setCargando(false);
     }
-  }, [eventId, fail]);
+  }, [eventId, fail, door]);
 
   useEffect(() => {
     void load();
@@ -109,7 +124,7 @@ const VenueGuestLists = ({ eventId }: { eventId: string }) => {
 
   const admitir = (entry: GuestEntry, count: number) =>
     void ejecutar(async () => {
-      await guestListService.admit(entry.id, count);
+      await (door ? door.admit(entry.id, count) : guestListService.admit(entry.id, count));
       setEntrando(null);
       navigator.vibrate?.(60);
     });
@@ -130,9 +145,10 @@ const VenueGuestLists = ({ eventId }: { eventId: string }) => {
   );
 
   return (
-    <div className="grid gap-4 lg:grid-cols-12">
+    <div className={cn('grid gap-4', gestionar && 'lg:grid-cols-12')}>
       {/* ------------------------------------------------ lista en la app */}
-      <div className="space-y-4 lg:col-span-4">
+      <div className={cn('space-y-4', gestionar && 'lg:col-span-4')}>
+        {gestionar && (
         <div className="surface-light space-y-3 rounded-2xl p-4">
           <label className="flex items-center justify-between gap-3">
             <span>
@@ -161,6 +177,7 @@ const VenueGuestLists = ({ eventId }: { eventId: string }) => {
             )}
           </div>
         </div>
+        )}
 
         <div className="surface-light grid grid-cols-3 gap-2 rounded-2xl p-4 text-center">
           {[
@@ -177,7 +194,7 @@ const VenueGuestLists = ({ eventId }: { eventId: string }) => {
       </div>
 
       {/* ------------------------------------------------------- listas */}
-      <div className="surface-light rounded-2xl p-4 lg:col-span-8">
+      <div className={cn('surface-light rounded-2xl p-4', gestionar && 'lg:col-span-8')}>
         <h3 className="mb-3 flex items-center gap-2 font-display text-title-card uppercase tracking-wide">
           <ClipboardList size={17} />
           {t('guestList.venue.title')}
@@ -201,7 +218,7 @@ const VenueGuestLists = ({ eventId }: { eventId: string }) => {
               </span>
             </button>
           ))}
-          {nuevaLista === null ? (
+          {!gestionar ? null : nuevaLista === null ? (
             <button
               type="button"
               onClick={() => setNuevaLista('')}
@@ -245,7 +262,7 @@ const VenueGuestLists = ({ eventId }: { eventId: string }) => {
                   className="h-full w-full bg-transparent text-body-sm outline-none"
                 />
               </label>
-              {actual.kind === 'promoter' && (
+              {gestionar && actual.kind === 'promoter' && (
                 <button
                   type="button"
                   disabled={busy}
@@ -266,6 +283,7 @@ const VenueGuestLists = ({ eventId }: { eventId: string }) => {
             </div>
 
             {/* Añadir a mano (listas de RRPP; también se puede en la de la app). */}
+            {gestionar && (
             <div className="mb-3 flex flex-wrap items-center gap-2 rounded-xl bg-black/[0.03] p-2">
               <Input
                 value={nombre}
@@ -304,6 +322,7 @@ const VenueGuestLists = ({ eventId }: { eventId: string }) => {
                 {t('guestList.venue.add')}
               </button>
             </div>
+            )}
 
             {visibles.length === 0 ? (
               <p className="py-4 text-center text-body-sm text-party-gray">
@@ -353,7 +372,7 @@ const VenueGuestLists = ({ eventId }: { eventId: string }) => {
                             {t('guestList.venue.admit')}
                           </button>
                         )}
-                        {entry.admitted === 0 && !abierta && (
+                        {gestionar && entry.admitted === 0 && !abierta && (
                           <button
                             type="button"
                             disabled={busy}

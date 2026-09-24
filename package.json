@@ -21,7 +21,7 @@
     "native:android": "npm run native:sync && npx cap open android",
     "native:ios": "npm run native:sync && npx cap open ios",
     "native:apk": "npm run native:sync && node scripts/build-apk.mjs",
-    "functions:deploy": "node scripts/run-supabase.mjs functions deploy moderate-photo send-sos-alert stripe-checkout stripe-connect stripe-webhook admin-notify delete-account venue-add-member send-push analytics-collect send-sms-verification notify-events auth-email resend-webhook venue-lead door-counter song-search likes-preview"
+    "functions:deploy": "node scripts/run-supabase.mjs functions deploy moderate-photo send-sos-alert stripe-checkout stripe-connect stripe-webhook admin-notify delete-account venue-add-member send-push analytics-collect send-sms-verification notify-events auth-email resend-webhook venue-lead door-counter team-access song-search likes-preview"
   },
   "dependencies": {
     "@capacitor/android": "^8.5.2",

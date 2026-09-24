@@ -10,8 +10,8 @@ import { adminClient, getUser } from '../_shared/supabase.ts';
  * no creamos usuarios aquí para no abrir una vía de alta sin verificación.
  */
 
-type VenueRole = 'owner' | 'staff' | 'marketing';
-const ROLES: VenueRole[] = ['owner', 'staff', 'marketing'];
+type VenueRole = 'owner' | 'security';
+const ROLES: VenueRole[] = ['owner', 'security'];
 
 serve(async (req: Request): Promise<Response> => {
   const early = preflight(req);

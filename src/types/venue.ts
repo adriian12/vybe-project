@@ -47,6 +47,8 @@ export interface Event {
   name: string;
   venueId: string;
   venueName?: string;
+  /** Creada por administración sin local: «Evento creado por Fiestea». */
+  byPlatform?: boolean;
   venueType?: VenueType;
   /** Localidad y comunidad del local, para filtrar la lista de eventos. */
   city?: string;

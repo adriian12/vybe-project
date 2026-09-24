@@ -83,10 +83,12 @@ const dbEventToEvent = (dbEvent: EventRow, venue?: VenueRow): Event => ({
   name: dbEvent.name,
   venueId: dbEvent.venue_id,
   venueName: venue?.name,
+  byPlatform: venue?.is_platform ?? false,
   venueType: venue?.type as VenueType | undefined,
   eventRadius: venue?.event_radius,
-  city: venue?.city ?? undefined,
-  region: venue?.region ?? undefined,
+  // Las fiestas de administración llevan su propia localidad (migración 072).
+  city: dbEvent.city ?? venue?.city ?? undefined,
+  region: dbEvent.region ?? venue?.region ?? undefined,
   startDate: dbEvent.start_date,
   endDate: dbEvent.end_date,
   minAge: dbEvent.min_age ?? undefined,
@@ -1138,16 +1140,16 @@ export const api = {
   },
 
   /**
-   * El local del que esta cuenta forma parte como equipo (personal o
-   * marketing), con su rol. La RLS de `venues` sólo deja leer la fila al
+   * El local del que esta cuenta forma parte como equipo (propietario o
+   * Seguridad), con su rol. La RLS de `venues` sólo deja leer la fila al
    * propietario, así que va por una función.
    */
-  getMyVenueMembership: async (): Promise<{ role: 'owner' | 'staff' | 'marketing'; venue: Venue } | null> => {
+  getMyVenueMembership: async (): Promise<{ role: 'owner' | 'security'; venue: Venue } | null> => {
     const { data, error } = await supabase.rpc('get_my_venue_membership');
     const row = data?.[0];
     if (error || !row?.venue) return null;
     return {
-      role: row.role as 'owner' | 'staff' | 'marketing',
+      role: row.role as 'owner' | 'security',
       venue: venueRowToVenue(row.venue as unknown as VenueRow),
     };
   },

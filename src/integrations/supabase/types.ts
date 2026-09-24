@@ -536,6 +536,7 @@ export type Database = {
           max_uses: number | null
           promoter_name: string | null
           rotates_every_minutes: number | null
+          team_link_id: string | null
           uses: number
           venue_id: string
         }
@@ -553,6 +554,7 @@ export type Database = {
           max_uses?: number | null
           promoter_name?: string | null
           rotates_every_minutes?: number | null
+          team_link_id?: string | null
           uses?: number
           venue_id: string
         }
@@ -570,6 +572,7 @@ export type Database = {
           max_uses?: number | null
           promoter_name?: string | null
           rotates_every_minutes?: number | null
+          team_link_id?: string | null
           uses?: number
           venue_id?: string
         }
@@ -579,6 +582,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_codes_team_link_id_fkey"
+            columns: ["team_link_id"]
+            isOneToOne: false
+            referencedRelation: "venue_team_links"
             referencedColumns: ["id"]
           },
           {
@@ -969,6 +979,7 @@ export type Database = {
         Row: {
           booking_url: string | null
           capacity_alert_ratio: number
+          city: string | null
           created_at: string | null
           description: string | null
           dress_code: string | null
@@ -994,6 +1005,7 @@ export type Database = {
           queue_updated_at: string | null
           recurrence: string
           recurrence_parent_id: string | null
+          region: string | null
           requires_location: boolean
           song_requests_enabled: boolean
           sponsor_logo_url: string | null
@@ -1011,6 +1023,7 @@ export type Database = {
         Insert: {
           booking_url?: string | null
           capacity_alert_ratio?: number
+          city?: string | null
           created_at?: string | null
           description?: string | null
           dress_code?: string | null
@@ -1036,6 +1049,7 @@ export type Database = {
           queue_updated_at?: string | null
           recurrence?: string
           recurrence_parent_id?: string | null
+          region?: string | null
           requires_location?: boolean
           song_requests_enabled?: boolean
           sponsor_logo_url?: string | null
@@ -1053,6 +1067,7 @@ export type Database = {
         Update: {
           booking_url?: string | null
           capacity_alert_ratio?: number
+          city?: string | null
           created_at?: string | null
           description?: string | null
           dress_code?: string | null
@@ -1078,6 +1093,7 @@ export type Database = {
           queue_updated_at?: string | null
           recurrence?: string
           recurrence_parent_id?: string | null
+          region?: string | null
           requires_location?: boolean
           song_requests_enabled?: boolean
           sponsor_logo_url?: string | null
@@ -1292,6 +1308,7 @@ export type Database = {
           id: string
           kind: string
           name: string
+          team_link_id: string | null
           venue_id: string
         }
         Insert: {
@@ -1301,6 +1318,7 @@ export type Database = {
           id?: string
           kind: string
           name: string
+          team_link_id?: string | null
           venue_id: string
         }
         Update: {
@@ -1310,6 +1328,7 @@ export type Database = {
           id?: string
           kind?: string
           name?: string
+          team_link_id?: string | null
           venue_id?: string
         }
         Relationships: [
@@ -1318,6 +1337,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "guest_lists_team_link_id_fkey"
+            columns: ["team_link_id"]
+            isOneToOne: false
+            referencedRelation: "venue_team_links"
             referencedColumns: ["id"]
           },
           {
@@ -3065,6 +3091,72 @@ export type Database = {
           },
         ]
       }
+      venue_team_links: {
+        Row: {
+          commission_type: string | null
+          commission_value: number | null
+          created_at: string
+          created_by: string | null
+          event_id: string | null
+          expires_at: string | null
+          id: string
+          label: string
+          last_used_at: string | null
+          revoked_at: string | null
+          role: string
+          token: string
+          token_hash: string
+          venue_id: string
+        }
+        Insert: {
+          commission_type?: string | null
+          commission_value?: number | null
+          created_at?: string
+          created_by?: string | null
+          event_id?: string | null
+          expires_at?: string | null
+          id?: string
+          label: string
+          last_used_at?: string | null
+          revoked_at?: string | null
+          role: string
+          token: string
+          token_hash: string
+          venue_id: string
+        }
+        Update: {
+          commission_type?: string | null
+          commission_value?: number | null
+          created_at?: string
+          created_by?: string | null
+          event_id?: string | null
+          expires_at?: string | null
+          id?: string
+          label?: string
+          last_used_at?: string | null
+          revoked_at?: string | null
+          role?: string
+          token?: string
+          token_hash?: string
+          venue_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "venue_team_links_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "venue_team_links_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       venue_weekly_reports: {
         Row: {
           created_at: string
@@ -3111,6 +3203,7 @@ export type Database = {
           email: string
           event_radius: number | null
           id: string
+          is_platform: boolean
           is_verified: boolean | null
           latitude: number | null
           longitude: number | null
@@ -3141,6 +3234,7 @@ export type Database = {
           email: string
           event_radius?: number | null
           id?: string
+          is_platform?: boolean
           is_verified?: boolean | null
           latitude?: number | null
           longitude?: number | null
@@ -3171,6 +3265,7 @@ export type Database = {
           email?: string
           event_radius?: number | null
           id?: string
+          is_platform?: boolean
           is_verified?: boolean | null
           latitude?: number | null
           longitude?: number | null
@@ -3497,6 +3592,19 @@ export type Database = {
           p_prize: string
         }
         Returns: string
+      }
+      create_team_link: {
+        Args: {
+          p_commission_type?: string
+          p_commission_value?: number
+          p_event_id?: string
+          p_label: string
+          p_role: string
+        }
+        Returns: {
+          id: string
+          token: string
+        }[]
       }
       create_ticket_order: {
         Args: { p_profile_id: string; p_quantity: number; p_type_id: string }
@@ -4270,6 +4378,24 @@ export type Database = {
           revoked_at: string
         }[]
       }
+      list_team_links: {
+        Args: never
+        Returns: {
+          commission_type: string
+          commission_value: number
+          created_at: string
+          event_id: string
+          event_name: string
+          event_start: string
+          expires_at: string
+          id: string
+          label: string
+          last_used_at: string
+          revoked_at: string
+          role: string
+          token: string
+        }[]
+      }
       mark_broadcast_sent: {
         Args: { p_broadcast_id: string; p_recipients: number }
         Returns: undefined
@@ -4478,6 +4604,7 @@ export type Database = {
         Args: { p_event_id: string; p_profile_id: string }
         Returns: undefined
       }
+      revoke_team_link: { Args: { p_link_id: string }; Returns: undefined }
       rotate_event_code_if_needed: {
         Args: { p_venue_id: string }
         Returns: {
@@ -4593,6 +4720,10 @@ export type Database = {
       suspend_profile: {
         Args: { p_days?: number; p_profile_id: string; p_reason?: string }
         Returns: undefined
+      }
+      team_link_action: {
+        Args: { p_action: string; p_args?: Json; p_token_hash: string }
+        Returns: Json
       }
       ticket_type_taken: { Args: { p_type_id: string }; Returns: number }
       toggle_song_vote: { Args: { p_request_id: string }; Returns: boolean }

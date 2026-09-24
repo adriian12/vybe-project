@@ -142,7 +142,7 @@ const fromSos = async (
       .from('venue_members')
       .select('user_id, role')
       .eq('venue_id', evento.venue_id)
-      .in('role', ['owner', 'staff']);
+      .in('role', ['owner', 'security']);
     const userIds = (miembros ?? []).map((m) => m.user_id as string);
     if (userIds.length > 0) {
       const { data: perfiles } = await supabase.from('profiles').select('id, locale').in('user_id', userIds);

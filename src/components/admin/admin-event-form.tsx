@@ -1,26 +1,32 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CalendarPlus, Loader2 } from 'lucide-react';
+import { CalendarPlus, Check, ChevronsUpDown, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { cn } from '@/lib/utils';
 import { PartyButton } from '@/components/ui-custom/party-button';
 import { useToast } from '@/components/ui/use-toast';
 import { adminService, AdminVenue } from '@/services/admin';
 
+const HOUSE = 'house';
+
 /**
- * Fiestas creadas por administración: verbenas, fiestas de pueblo, festivales.
+ * Fiestas creadas por administración: verbenas, fiestas de pueblo, festivales,
+ * o la de un local que pide que se la creemos.
  *
- * Sin elegir local van al local de la casa («Fiestea»), porque en la base de
- * datos cada evento cuelga de uno. Se puede asignar a un local de verdad si la
- * fiesta es suya.
+ * Por defecto van al local de la casa (`venues.is_platform`), porque en la base
+ * de datos cada evento cuelga de uno, y en la tarjeta salen como «Evento creado
+ * por Fiestea». El selector busca entre los locales para asignársela a uno.
  */
 const AdminEventForm = ({ onCreated, bare }: { onCreated?: () => void; bare?: boolean }) => {
   const { t } = useTranslation();
   const { toast } = useToast();
 
   const [venues, setVenues] = useState<AdminVenue[]>([]);
-  const [venueId, setVenueId] = useState('house');
+  const [venueId, setVenueId] = useState(HOUSE);
+  const [buscando, setBuscando] = useState(false);
   const [name, setName] = useState('');
   const [city, setCity] = useState('');
   const [date, setDate] = useState('');
@@ -35,6 +41,9 @@ const AdminEventForm = ({ onCreated, bare }: { onCreated?: () => void; bare?: bo
     void adminService.listVenues().then(setVenues).catch(() => undefined);
   }, []);
 
+  const casa = t('admin.newEvent.house', { app: t('common.appName') });
+  const nombreLocal = venueId === HOUSE ? casa : (venues.find((v) => v.venueId === venueId)?.name ?? casa);
+
   const crear = async () => {
     // La hora de fin anterior a la de inicio es de madrugada: el día siguiente.
     const inicio = new Date(`${date}T${startTime}`);
@@ -47,7 +56,7 @@ const AdminEventForm = ({ onCreated, bare }: { onCreated?: () => void; bare?: bo
         name: name.trim(),
         start: inicio.toISOString(),
         end: fin.toISOString(),
-        venueId: venueId === 'house' ? null : venueId,
+        venueId: venueId === HOUSE ? null : venueId,
         city: city.trim() || null,
         price: price ? Number(price) : null,
         capacity: capacity ? Number(capacity) : null,
@@ -87,19 +96,44 @@ const AdminEventForm = ({ onCreated, bare }: { onCreated?: () => void; bare?: bo
           <Label htmlFor="ae-venue" className="text-caption">
             {t('admin.newEvent.venue')}
           </Label>
-          <Select value={venueId} onValueChange={setVenueId}>
-            <SelectTrigger id="ae-venue">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="house">{t('admin.newEvent.house')}</SelectItem>
-              {venues.map((v) => (
-                <SelectItem key={v.venueId} value={v.venueId}>
-                  {v.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Popover open={buscando} onOpenChange={setBuscando}>
+            <PopoverTrigger asChild>
+              <button
+                id="ae-venue"
+                type="button"
+                role="combobox"
+                aria-expanded={buscando}
+                className="flex h-10 w-full items-center justify-between gap-2 rounded-md border border-input bg-background px-3 text-left text-body-sm"
+              >
+                <span className="truncate">{nombreLocal}</span>
+                <ChevronsUpDown size={15} className="shrink-0 opacity-50" />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+              <Command>
+                <CommandInput placeholder={t('admin.newEvent.searchVenue')} />
+                <CommandList>
+                  <CommandEmpty>{t('admin.newEvent.noVenue')}</CommandEmpty>
+                  <CommandGroup>
+                    {[{ venueId: HOUSE, name: casa, city: null as string | null }, ...venues].map((v) => (
+                      <CommandItem
+                        key={v.venueId}
+                        value={`${v.name} ${v.city ?? ''} ${v.venueId}`}
+                        onSelect={() => {
+                          setVenueId(v.venueId);
+                          setBuscando(false);
+                        }}
+                      >
+                        <Check size={15} className={cn('mr-2 shrink-0', venueId === v.venueId ? 'opacity-100' : 'opacity-0')} />
+                        <span className="truncate">{v.name}</span>
+                        {v.city && <span className="ml-auto pl-2 text-caption text-muted-foreground">{v.city}</span>}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
 

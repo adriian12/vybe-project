@@ -7,21 +7,36 @@ import { ApiError } from '@/services/api';
 import { ticketsService, ValidatedTicket } from '@/services/tickets';
 import { cn } from '@/lib/utils';
 
-const READER_ID = 'ticket-validator-reader';
+/** Lo que enseña el validador tras leer un código. */
+export interface CodeCheck {
+  /** Ya se había usado: sale en rojo. */
+  alreadyUsed: boolean;
+  headline: string;
+  detail: string;
+}
+
+interface CodeValidatorProps {
+  title: string;
+  placeholder: string;
+  /** Longitud mínima para poder pulsar «Validar». */
+  minLength: number;
+  maxLength: number;
+  check: (code: string) => Promise<CodeCheck>;
+}
+
+let lectores = 0;
 
 /**
- * Validar en la puerta una entrada o mesa comprada en la app.
- *
- * Se escanea el QR de «Entradas» con la cámara o se escribe el código
- * (E-XXXXXXXX). Una entrada sólo vale una vez: si ya se usó, sale en rojo con
- * la hora a la que entró. Lo pueden usar el propietario y el personal.
+ * Validar un código en la puerta o en la barra: se escanea el QR con la cámara
+ * o se escribe. Lo usan las entradas (Seguridad) y los vales (Camareros).
  */
-const TicketValidator = () => {
+export const CodeValidator = ({ title, placeholder, minLength, maxLength, check }: CodeValidatorProps) => {
   const { t } = useTranslation();
+  const [readerId] = useState(() => `code-validator-reader-${(lectores += 1)}`);
   const [codigo, setCodigo] = useState('');
   const [busy, setBusy] = useState(false);
   const [camara, setCamara] = useState(false);
-  const [resultado, setResultado] = useState<ValidatedTicket | null>(null);
+  const [resultado, setResultado] = useState<CodeCheck | null>(null);
   const [error, setError] = useState<string | null>(null);
   const scannerRef = useRef<Html5Qrcode | null>(null);
 
@@ -48,7 +63,7 @@ const TicketValidator = () => {
       setError(null);
       setResultado(null);
       try {
-        setResultado(await ticketsService.validate(limpio));
+        setResultado(await check(limpio));
         setCodigo('');
         navigator.vibrate?.(80);
       } catch (e) {
@@ -58,7 +73,7 @@ const TicketValidator = () => {
         setBusy(false);
       }
     },
-    [],
+    [check],
   );
 
   const abrirCamara = async () => {
@@ -67,7 +82,7 @@ const TicketValidator = () => {
     await new Promise((resolve) => setTimeout(resolve, 0));
     try {
       const { Html5Qrcode: Lector, Html5QrcodeSupportedFormats } = await import('html5-qrcode');
-      const scanner = new Lector(READER_ID, {
+      const scanner = new Lector(readerId, {
         formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
         verbose: false,
       });
@@ -89,15 +104,12 @@ const TicketValidator = () => {
     }
   };
 
-  const hora = (iso: string | null) =>
-    iso ? new Date(iso).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }) : '';
-
   return (
     <div className="surface-light rounded-2xl p-4">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <h3 className="flex items-center gap-2 font-display text-title-card uppercase tracking-wide">
           <ScanLine size={17} />
-          {t('sales.validator.title')}
+          {title}
         </h3>
         <button
           type="button"
@@ -109,7 +121,7 @@ const TicketValidator = () => {
         </button>
       </div>
 
-      {camara && <div id={READER_ID} className="mb-3 overflow-hidden rounded-xl bg-black" />}
+      {camara && <div id={readerId} className="mb-3 overflow-hidden rounded-xl bg-black" />}
 
       <form
         className="flex flex-col gap-2 sm:flex-row lg:flex-col"
@@ -121,15 +133,15 @@ const TicketValidator = () => {
         <Input
           value={codigo}
           onChange={(e) => setCodigo(e.target.value.toUpperCase())}
-          placeholder="E-XXXXXXXX"
+          placeholder={placeholder}
           aria-label={t('sales.validator.code')}
-          maxLength={10}
+          maxLength={maxLength}
           className="h-11 font-mono tracking-wider"
           autoCapitalize="characters"
         />
         <button
           type="submit"
-          disabled={busy || codigo.trim().length < 10}
+          disabled={busy || codigo.trim().length < minLength}
           className="press flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-xl bg-party-primary px-4 font-bold text-ink disabled:opacity-40"
         >
           {busy && <Loader2 size={15} className="animate-spin" />}
@@ -146,15 +158,8 @@ const TicketValidator = () => {
         >
           {resultado.alreadyUsed ? <XCircle size={22} className="shrink-0" /> : <CheckCircle2 size={22} className="shrink-0" />}
           <div className="min-w-0">
-            <p className="font-display text-title-card">
-              {resultado.alreadyUsed
-                ? t('sales.validator.alreadyUsed', { time: hora(resultado.usedAt) })
-                : t(resultado.kind === 'table' ? 'sales.validator.tableOk' : 'sales.validator.entryOk')}
-            </p>
-            <p className="text-body-sm text-ink">
-              {resultado.holderName} · {resultado.typeName}
-              {resultado.guests ? ` · ${t('tickets.buy.guests', { count: resultado.guests })}` : ''}
-            </p>
+            <p className="font-display text-title-card">{resultado.headline}</p>
+            <p className="text-body-sm text-ink">{resultado.detail}</p>
           </div>
         </div>
       )}
@@ -166,6 +171,45 @@ const TicketValidator = () => {
         </p>
       )}
     </div>
+  );
+};
+
+const hora = (iso: string | null) =>
+  iso ? new Date(iso).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }) : '';
+
+/**
+ * Validar en la puerta una entrada o mesa comprada en la app.
+ *
+ * Se escanea el QR de «Entradas» con la cámara o se escribe el código
+ * (E-XXXXXXXX). Una entrada sólo vale una vez: si ya se usó, sale en rojo con
+ * la hora a la que entró. Lo usan el propietario y Seguridad (con cuenta o con
+ * su enlace, que pasa su propio `validate`).
+ */
+const TicketValidator = ({ validate = ticketsService.validate }: { validate?: (code: string) => Promise<ValidatedTicket> }) => {
+  const { t } = useTranslation();
+
+  const check = useCallback(
+    async (code: string): Promise<CodeCheck> => {
+      const r = await validate(code);
+      return {
+        alreadyUsed: r.alreadyUsed,
+        headline: r.alreadyUsed
+          ? t('sales.validator.alreadyUsed', { time: hora(r.usedAt) })
+          : t(r.kind === 'table' ? 'sales.validator.tableOk' : 'sales.validator.entryOk'),
+        detail: `${r.holderName} · ${r.typeName}${r.guests ? ` · ${t('tickets.buy.guests', { count: r.guests })}` : ''}`,
+      };
+    },
+    [validate, t],
+  );
+
+  return (
+    <CodeValidator
+      title={t('sales.validator.title')}
+      placeholder="E-XXXXXXXX"
+      minLength={10}
+      maxLength={10}
+      check={check}
+    />
   );
 };
 
