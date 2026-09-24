@@ -32,6 +32,12 @@ jobs:
         run: npm run lint
 
       - name: Tests
+        # Los tests importan el cliente de Supabase, que exige la URL y la clave
+        # al crearse. En CI no hay `.env`, así que se dan de relleno: no se
+        # conecta a nada, sólo evita que `createClient()` reviente al importarlo.
+        env:
+          VITE_SUPABASE_URL: https://example.supabase.co
+          VITE_SUPABASE_ANON_KEY: ci-placeholder
         run: npm run test
 
       - name: Build
