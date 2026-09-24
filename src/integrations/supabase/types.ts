@@ -600,6 +600,7 @@ export type Database = {
           label: string | null
           last_used_at: string | null
           revoked_at: string | null
+          token: string | null
           token_hash: string
         }
         Insert: {
@@ -611,6 +612,7 @@ export type Database = {
           label?: string | null
           last_used_at?: string | null
           revoked_at?: string | null
+          token?: string | null
           token_hash: string
         }
         Update: {
@@ -622,6 +624,7 @@ export type Database = {
           label?: string | null
           last_used_at?: string | null
           revoked_at?: string | null
+          token?: string | null
           token_hash?: string
         }
         Relationships: [
@@ -973,6 +976,8 @@ export type Database = {
           entry_closed_at: string | null
           featured_until: string | null
           followers_notified_at: string | null
+          guest_list_enabled: boolean
+          guest_list_message: string | null
           id: string
           latitude: number | null
           longitude: number | null
@@ -1013,6 +1018,8 @@ export type Database = {
           entry_closed_at?: string | null
           featured_until?: string | null
           followers_notified_at?: string | null
+          guest_list_enabled?: boolean
+          guest_list_message?: string | null
           id?: string
           latitude?: number | null
           longitude?: number | null
@@ -1053,6 +1060,8 @@ export type Database = {
           entry_closed_at?: string | null
           featured_until?: string | null
           followers_notified_at?: string | null
+          guest_list_enabled?: boolean
+          guest_list_message?: string | null
           id?: string
           latitude?: number | null
           longitude?: number | null
@@ -1210,6 +1219,112 @@ export type Database = {
             columns: ["owner_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      guest_list_entries: {
+        Row: {
+          added_by: string | null
+          admitted: number
+          companions: number
+          created_at: string
+          event_id: string
+          id: string
+          list_id: string
+          name: string
+          profile_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          added_by?: string | null
+          admitted?: number
+          companions?: number
+          created_at?: string
+          event_id: string
+          id?: string
+          list_id: string
+          name: string
+          profile_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          added_by?: string | null
+          admitted?: number
+          companions?: number
+          created_at?: string
+          event_id?: string
+          id?: string
+          list_id?: string
+          name?: string
+          profile_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guest_list_entries_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "guest_list_entries_list_id_fkey"
+            columns: ["list_id"]
+            isOneToOne: false
+            referencedRelation: "guest_lists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "guest_list_entries_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      guest_lists: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          event_id: string
+          id: string
+          kind: string
+          name: string
+          venue_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          event_id: string
+          id?: string
+          kind: string
+          name: string
+          venue_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          event_id?: string
+          id?: string
+          kind?: string
+          name?: string
+          venue_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guest_lists_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "guest_lists_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
             referencedColumns: ["id"]
           },
         ]
@@ -2124,6 +2239,27 @@ export type Database = {
           },
         ]
       }
+      subscription_notices: {
+        Row: {
+          expires_at: string
+          kind: string
+          sent_at: string
+          target_id: string
+        }
+        Insert: {
+          expires_at: string
+          kind: string
+          sent_at?: string
+          target_id: string
+        }
+        Update: {
+          expires_at?: string
+          kind?: string
+          sent_at?: string
+          target_id?: string
+        }
+        Relationships: []
+      }
       supercrush_ledger: {
         Row: {
           amount_cents: number | null
@@ -2981,6 +3117,7 @@ export type Database = {
           name: string
           opening_hours: Json | null
           phone: string | null
+          platform_fee_percent: number
           region: string | null
           stripe_account_id: string | null
           stripe_charges_enabled: boolean
@@ -3010,6 +3147,7 @@ export type Database = {
           name: string
           opening_hours?: Json | null
           phone?: string | null
+          platform_fee_percent?: number
           region?: string | null
           stripe_account_id?: string | null
           stripe_charges_enabled?: boolean
@@ -3039,6 +3177,7 @@ export type Database = {
           name?: string
           opening_hours?: Json | null
           phone?: string | null
+          platform_fee_percent?: number
           region?: string | null
           stripe_account_id?: string | null
           stripe_charges_enabled?: boolean
@@ -3120,6 +3259,18 @@ export type Database = {
         }
         Returns: string
       }
+      admin_expiring_targets: {
+        Args: { p_days?: number; p_kind: string }
+        Returns: {
+          email: string
+          expires_at: string
+          locale: string
+          name: string
+          notified: boolean
+          plan: string
+          target_id: string
+        }[]
+      }
       admin_house_venue: { Args: never; Returns: string }
       admin_is_staff_only: { Args: never; Returns: boolean }
       admin_list_users: {
@@ -3136,8 +3287,10 @@ export type Database = {
           role: string
           staff_only: boolean
           status: string
+          subscription_cancel_at_period_end: boolean
           subscription_event_id: string
           subscription_expires_at: string
+          subscription_renews: boolean
           subscription_type: string
           supercrush: number
           total_count: number
@@ -3146,6 +3299,7 @@ export type Database = {
       admin_list_venues: {
         Args: { p_search?: string }
         Returns: {
+          address: string
           city: string
           created_at: string
           email: string
@@ -3155,9 +3309,17 @@ export type Database = {
           is_verified: boolean
           members: number
           name: string
+          phone: string
           plan: string
+          plan_cancel_at_period_end: boolean
           plan_expires_at: string
+          plan_renews: boolean
           plan_status: string
+          platform_fee_percent: number
+          stripe_charges_enabled: boolean
+          stripe_connected: boolean
+          stripe_payouts_enabled: boolean
+          tax_id: string
           type: string
           venue_id: string
           verification_status: string
@@ -3181,6 +3343,10 @@ export type Database = {
         Args: { p_days?: number; p_profile_id: string; p_type: string }
         Returns: string
       }
+      admin_set_venue_fee: {
+        Args: { p_percent: number; p_venue_id: string }
+        Returns: undefined
+      }
       admin_set_venue_plan: {
         Args: { p_days?: number; p_plan: string; p_venue_id: string }
         Returns: string
@@ -3199,6 +3365,14 @@ export type Database = {
           start_date: string
         }[]
       }
+      admit_guests: {
+        Args: { p_count: number; p_entry_id: string }
+        Returns: {
+          admitted: number
+          total: number
+        }[]
+      }
+      app_guest_list: { Args: { p_event_id: string }; Returns: string }
       apply_event_headcount: {
         Args: {
           p_by: string
@@ -3298,6 +3472,10 @@ export type Database = {
           join_code: string
         }[]
       }
+      create_guest_list: {
+        Args: { p_event_id: string; p_name: string }
+        Returns: string
+      }
       create_labeled_code: {
         Args: {
           p_event_id: string
@@ -3344,6 +3522,8 @@ export type Database = {
       current_profile_id: { Args: never; Returns: string }
       current_venue_id: { Args: never; Returns: string }
       current_venue_role: { Args: never; Returns: string }
+      delete_guest_entry: { Args: { p_entry_id: string }; Returns: undefined }
+      delete_guest_list: { Args: { p_list_id: string }; Returns: undefined }
       demographics_min_bucket: { Args: never; Returns: number }
       draw_raffle: { Args: { p_raffle_id: string }; Returns: string }
       event_trend: { Args: { p_event_id: string }; Returns: string }
@@ -3380,6 +3560,7 @@ export type Database = {
           still_inside: number
         }[]
       }
+      get_counter_link_token: { Args: { p_link_id: string }; Returns: string }
       get_distance: {
         Args: { lat1: number; lat2: number; lon1: number; lon2: number }
         Returns: number
@@ -3595,6 +3776,41 @@ export type Database = {
           created_at: string
           id: string
           profile_id: string
+        }[]
+      }
+      get_guest_list_entries: {
+        Args: { p_event_id: string }
+        Returns: {
+          admitted: number
+          companions: number
+          created_at: string
+          from_app: boolean
+          id: string
+          list_id: string
+          name: string
+        }[]
+      }
+      get_guest_list_info: {
+        Args: { p_event_id: string }
+        Returns: {
+          enabled: boolean
+          message: string
+          my_admitted: number
+          my_companions: number
+          my_name: string
+        }[]
+      }
+      get_guest_lists: {
+        Args: { p_event_id: string }
+        Returns: {
+          admitted: number
+          enabled: boolean
+          entries: number
+          id: string
+          kind: string
+          message: string
+          name: string
+          people: number
         }[]
       }
       get_headcount_curve: {
@@ -4022,10 +4238,15 @@ export type Database = {
         Returns: string
       }
       join_group: { Args: { p_join_code: string }; Returns: string }
+      join_guest_list: {
+        Args: { p_companions: number; p_event_id: string; p_name: string }
+        Returns: undefined
+      }
       keep_connection: { Args: { p_connection_id: string }; Returns: boolean }
       last_week_start: { Args: never; Returns: string }
       leave_event: { Args: { p_event_id: string }; Returns: undefined }
       leave_group: { Args: { p_group_id: string }; Returns: undefined }
+      leave_guest_list: { Args: { p_event_id: string }; Returns: undefined }
       likes_for_preview: {
         Args: { p_profile_id: string }
         Returns: {
@@ -4266,6 +4487,15 @@ export type Database = {
         }[]
       }
       run_due_raffles: { Args: never; Returns: number }
+      save_guest_entry: {
+        Args: {
+          p_companions: number
+          p_entry_id: string
+          p_list_id: string
+          p_name: string
+        }
+        Returns: string
+      }
       save_native_push_token: {
         Args: { p_device_model?: string; p_platform: string; p_token: string }
         Returns: undefined
@@ -4324,6 +4554,10 @@ export type Database = {
         Returns: undefined
       }
       set_face_verified: { Args: { p_profile_id: string }; Returns: undefined }
+      set_guest_list_settings: {
+        Args: { p_enabled: boolean; p_event_id: string; p_message: string }
+        Returns: undefined
+      }
       set_my_gender: { Args: { p_gender: string }; Returns: undefined }
       set_raffle_entries: {
         Args: { p_closed: boolean; p_raffle_id: string }
@@ -4396,7 +4630,7 @@ export type Database = {
       }
       venue_has_feature:
         | { Args: { p_feature: string; p_venue_id?: string }; Returns: boolean }
-        | { Args: { p_feature: string; p_venue_id: string }; Returns: boolean }
+        | { Args: { p_key: string; p_venue: string }; Returns: boolean }
       venue_plan: { Args: { p_venue_id?: string }; Returns: string }
       venue_plan_limits: {
         Args: { p_plan: string }

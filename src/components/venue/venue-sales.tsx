@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Armchair, Check, Crown, Download, Loader2, Pencil, Plus, Ticket, Undo2, X } from 'lucide-react';
+import { Armchair, Check, Download, Loader2, Pencil, Plus, Ticket, Undo2, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
@@ -36,7 +36,6 @@ import { Event as VybeEvent } from '@/types/venue';
 interface VenueSalesProps {
   events: VybeEvent[];
   plan: VenuePlanStatus | null;
-  onUpgrade: () => void;
 }
 
 type Pestana = 'tickets' | 'promoters';
@@ -86,7 +85,7 @@ const entero = (texto: string): number | null => {
  * comisiones se calculan solas: por persona que entra con el código del RRPP o
  * un porcentaje de lo que esas personas compraron en entradas.
  */
-const VenueSales = ({ events, plan, onUpgrade }: VenueSalesProps) => {
+const VenueSales = ({ events, plan }: VenueSalesProps) => {
   const { t } = useTranslation();
   const { toast } = useToast();
   const disponible = planHas(plan?.plan, 'ticketSales');
@@ -162,24 +161,8 @@ const VenueSales = ({ events, plan, onUpgrade }: VenueSalesProps) => {
     void load();
   }, [load]);
 
-  if (!disponible) {
-    return (
-      <div className="surface-light mx-auto max-w-2xl rounded-2xl p-6 text-center">
-        <span className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-party-primary text-ink">
-          <Crown size={22} />
-        </span>
-        <h2 className="font-display text-headline-md">{t('sales.locked.title')}</h2>
-        <p className="mx-auto mt-2 max-w-md text-body-sm text-party-gray">{t('sales.locked.body')}</p>
-        <button
-          type="button"
-          onClick={onUpgrade}
-          className="press mt-4 h-11 rounded-xl bg-party-primary px-5 font-bold text-ink"
-        >
-          {t('sales.locked.cta')}
-        </button>
-      </div>
-    );
-  }
+  // Sin Business la sección ni siquiera sale en el menú; por si acaso, nada.
+  if (!disponible) return null;
 
   if (lista.length === 0) {
     return <p className="surface-light rounded-2xl p-6 text-center text-body-sm text-party-gray">{t('sales.noEvents')}</p>;

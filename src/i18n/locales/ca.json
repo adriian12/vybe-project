@@ -945,7 +945,8 @@
             "tabs": {
                 "inside": "Gent a dins",
                 "notices": "Notificacions",
-                "promoters": "RRPP"
+                "promoters": "RRPP",
+                "lists": "Llistes"
             }
         },
         "codes": {
@@ -1246,7 +1247,11 @@
                 "notLive": "Només es pot comptar amb l'esdeveniment en marxa.",
                 "invalid": "Aquest número no és vàlid.",
                 "tooManyLinks": "Hi ha massa enllaços actius. Revoca'n algun."
-            }
+            },
+            "created": "Enllaç creat. Passa'l al porter.",
+            "view": "Veure l'enllaç",
+            "viewBody": "Copia'l o comparteix-lo amb qui porta la porta.",
+            "viewOld": "Aquest enllaç es va crear abans de poder tornar-lo a veure. Revoca'l i crea'n un de nou."
         },
         "liveInfo": {
             "title": "Termòmetre",
@@ -1739,7 +1744,20 @@
             "seeEvents": "Veure els seus esdeveniments",
             "noEvents": "Aquest local no ha creat cap esdeveniment.",
             "eventStats": "{{checkIns}} dins · {{matches}} crushes · {{intents}} hi van",
-            "planSaved": "Pla canviat"
+            "planSaved": "Pla canviat",
+            "feeSaved": "Comissió del {{percent}} % desada",
+            "fee": "La teva comissió per entrada venuda a l'app",
+            "stripeActive": "Cobraments actius a Stripe",
+            "stripePending": "Alta a Stripe sense acabar",
+            "stripeNone": "Sense cobraments activats",
+            "fields": {
+                "email": "Correu",
+                "phone": "Telèfon",
+                "address": "Adreça",
+                "taxId": "NIF/CIF",
+                "type": "Tipus",
+                "created": "Alta"
+            }
         },
         "create": {
             "title": "Donar d'alta un compte",
@@ -1779,6 +1797,30 @@
             "capacity": "Aforament",
             "create": "Publicar festa",
             "done": "Festa publicada"
+        },
+        "notices": {
+            "sent_one": "{{count}} avís enviat",
+            "sent_other": "{{count}} avisos enviats",
+            "queued": "Avís enviat a tots els usuaris",
+            "expiring": "Caduca aviat",
+            "expiringTitle_one": "Avisar {{count}} subscripció que caduca?",
+            "expiringTitle_other": "Avisar {{count}} subscripcions que caduquen?",
+            "expiringBodyUsers": "Premium mensual que acaba en 7 dies i no es renova sol (cancel·lat o donat per administració). Els arriba un avís i un correu. A qui renova sol no se li envia res, i ningú no rep dues vegades l'avís de la mateixa data.",
+            "expiringBodyVenues": "Plans Pro o Business que acaben en 7 dies i no es renoven sols (cancel·lats, en prova o donats per administració). Els arriba un correu. A qui renova sol no se li envia res.",
+            "send": "Enviar",
+            "update": "Enviar novetat",
+            "updateUsers": "Novetat per a tots els usuaris",
+            "updateVenues": "Novetat per a tots els locals",
+            "updateUsersBody": "Arriba com a avís al mòbil a tots els que tenen els avisos activats.",
+            "updateVenuesBody": "Arriba per correu a tots els locals.",
+            "titlePlaceholder": "Títol",
+            "bodyPlaceholder": "Missatge"
+        },
+        "subs": {
+            "renews": "Es renova el {{date}}",
+            "ends": "Caduca el {{date}} (no es renova)",
+            "endsCancelled": "Cancel·lada: caduca el {{date}}",
+            "trialEnds": "Prova gratis fins al {{date}}"
         }
     },
     "pwa": {
@@ -2837,5 +2879,71 @@
         "withApp_other": "{{count}} amb l'app",
         "fullRisk": "Es pot omplir: prepara personal i cua.",
         "basis": "Amb {{intents}} «hi vaig» i {{nights}} nits anteriors."
+    },
+    "guestList": {
+        "joined": "Ets a la llista!",
+        "joinedBody_one": "Apuntat per a {{count}} persona. Digues el teu nom a la porta.",
+        "joinedBody_other": "Apuntat per a {{count}} persones. Digues el teu nom a la porta.",
+        "left": "Has sortit de la llista",
+        "onList": "Ets a la llista",
+        "lineWith_one": "{{name}} +{{count}}",
+        "lineWith_other": "{{name}} +{{count}}",
+        "inside_one": "{{count}} dins",
+        "inside_other": "{{count}} dins",
+        "change": "Canviar",
+        "available": "Aquesta festa té llista de convidats",
+        "askTitle": "Aquest esdeveniment té llista de convidats",
+        "askBody": "Vols apuntar-t'hi?",
+        "yes": "Sí",
+        "no": "No",
+        "formTitle": "Apunta't a la llista",
+        "formBody": "Digues el teu nom a la porta i entraràs amb els teus acompanyants.",
+        "name": "Nom",
+        "companions": "Acompanyants",
+        "total_one": "En total, {{count}} persona",
+        "total_other": "En total, {{count}} persones",
+        "save": "Desar",
+        "join": "Apuntar-m'hi",
+        "leave": "Sortir de la llista",
+        "errors": {
+            "closed": "La llista d'aquesta festa és tancada.",
+            "name": "Escriu el teu nom.",
+            "companions": "Nombre d'acompanyants no vàlid (màxim 50).",
+            "tooManyLists": "Màxim 30 llistes per festa."
+        },
+        "venue": {
+            "appTab": "{{app}}",
+            "appTitle": "Llista a l'app",
+            "appHelp": "La gent s'hi apunta des de la fitxa en prémer «hi vaig».",
+            "messagePlaceholder": "Ex.: Llista gratis abans de les 19:00 o 15 € dues copes",
+            "saved": "Desat",
+            "lines": "Apuntats",
+            "people": "Persones",
+            "insideNow": "Dins",
+            "title": "Llistes",
+            "newList": "Llista de RRPP",
+            "listNamePlaceholder": "Nom del RRPP",
+            "search": "Cercar nom",
+            "deleteList": "Esborrar llista",
+            "deleteListConfirm": "Esborrar la llista de {{name}} amb tots els noms?",
+            "namePlaceholder": "Nom",
+            "add": "Afegir",
+            "noResults": "Ningú amb aquest nom en aquesta llista.",
+            "emptyApp": "Encara no s'ha apuntat ningú des de l'app.",
+            "empty": "Afegeix els noms que et passi el RRPP.",
+            "allIn_one": "Dins ({{count}})",
+            "allIn_other": "Tots dins ({{count}})",
+            "partial": "{{inside}} dins · en queden {{left}}",
+            "notYet_one": "{{count}} persona",
+            "notYet_other": "{{count}} persones",
+            "undo": "Treure'n un",
+            "admit": "Entra",
+            "removeConfirm": "Treure {{name}} de la llista?",
+            "howMany": "Quants entren?",
+            "ofLeft_one": "de {{count}}",
+            "ofLeft_other": "de {{count}}",
+            "admitN_one": "Entra {{count}}",
+            "admitN_other": "Entren {{count}}"
+        }
     }
 }

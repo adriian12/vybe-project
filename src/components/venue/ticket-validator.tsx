@@ -94,7 +94,7 @@ const TicketValidator = () => {
 
   return (
     <div className="surface-light rounded-2xl p-4">
-      <div className="mb-3 flex items-center justify-between gap-3">
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <h3 className="flex items-center gap-2 font-display text-title-card uppercase tracking-wide">
           <ScanLine size={17} />
           {t('sales.validator.title')}
@@ -112,7 +112,7 @@ const TicketValidator = () => {
       {camara && <div id={READER_ID} className="mb-3 overflow-hidden rounded-xl bg-black" />}
 
       <form
-        className="flex gap-2"
+        className="flex flex-col gap-2 sm:flex-row lg:flex-col"
         onSubmit={(e) => {
           e.preventDefault();
           void validar(codigo);
@@ -130,7 +130,7 @@ const TicketValidator = () => {
         <button
           type="submit"
           disabled={busy || codigo.trim().length < 10}
-          className="press flex h-11 shrink-0 items-center gap-1.5 rounded-xl bg-party-primary px-4 font-bold text-ink disabled:opacity-40"
+          className="press flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-xl bg-party-primary px-4 font-bold text-ink disabled:opacity-40"
         >
           {busy && <Loader2 size={15} className="animate-spin" />}
           {t('sales.validator.validate')}

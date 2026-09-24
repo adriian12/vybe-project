@@ -127,7 +127,7 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onCreated, onClose, e
   if (!currentVenue) return null;
 
   const campo =
-    'w-full rounded-xl border-0 bg-white px-3.5 py-2.5 text-body-md text-ink shadow-sm ' +
+    'w-full rounded-xl border border-black/10 bg-[#F5F5F7] px-3.5 py-2.5 text-body-md text-ink ' +
     'placeholder:text-ink/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink ' +
     'disabled:opacity-50';
   const etiqueta = 'mb-1 block text-caption font-extrabold uppercase tracking-wide text-ink';
@@ -233,7 +233,7 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onCreated, onClose, e
   };
 
   return (
-    <div className="rounded-[20px] bg-party-primary p-5 text-ink">
+    <div className="rounded-[20px] bg-white p-5 text-ink">
       <div className="mb-5 flex items-center justify-between gap-3">
         <h2 className="font-display text-headline-lg">{t(editando ? 'venue.events.editEvent' : 'venue.events.newEvent')}</h2>
         {onClose && (
@@ -241,7 +241,7 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onCreated, onClose, e
             type="button"
             onClick={onClose}
             aria-label={t('common.close')}
-            className="press flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-ink text-white"
+            className="press flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-black/[0.06] text-ink"
           >
             <X size={18} />
           </button>
@@ -403,7 +403,7 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onCreated, onClose, e
               </button>
             </div>
           ) : (
-            <div className="flex flex-col items-center gap-2 rounded-xl border-2 border-dashed border-ink/30 bg-white px-4 py-5 text-center">
+            <div className="flex flex-col items-center gap-2 rounded-xl border-2 border-dashed border-ink/20 bg-[#F5F5F7] px-4 py-5 text-center">
               <ImagePlus size={24} />
               <p className="text-body-sm">{t('venue.events.posterDrop')}</p>
               {/* El disparador es un `label`: dentro de un formulario un botón
@@ -420,7 +420,7 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onCreated, onClose, e
         </div>
 
         {!editando && (
-        <div className="space-y-3 rounded-xl bg-white p-3.5">
+        <div className="space-y-3 rounded-xl bg-[#F5F5F7] p-3.5">
           <div className="flex items-center justify-between gap-3">
             <label htmlFor="ev-recurrent" className="font-display text-title-card">
               {t('venue.events.recurrent')}
@@ -479,7 +479,7 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onCreated, onClose, e
         <button
           type="submit"
           disabled={isLoading}
-          className="press flex h-12 w-full items-center justify-center rounded-xl bg-white font-display text-title-card font-extrabold text-ink shadow-md disabled:opacity-60"
+          className="press flex h-12 w-full items-center justify-center rounded-xl bg-party-primary font-display text-title-card font-extrabold text-ink disabled:opacity-60"
         >
           {isLoading ? t('venue.events.creating') : t(editando ? 'venue.events.saveChanges' : 'venue.events.publish')}
         </button>

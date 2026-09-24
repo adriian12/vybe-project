@@ -945,7 +945,8 @@
             "tabs": {
                 "inside": "Leute drin",
                 "notices": "Mitteilungen",
-                "promoters": "Promoter"
+                "promoters": "Promoter",
+                "lists": "Listen"
             }
         },
         "codes": {
@@ -1246,7 +1247,11 @@
                 "notLive": "Gezählt werden kann nur, während das Event läuft.",
                 "invalid": "Diese Zahl ist nicht gültig.",
                 "tooManyLinks": "Zu viele aktive Links. Widerrufe einen."
-            }
+            },
+            "created": "Link erstellt. Schick ihn dem Türsteher.",
+            "view": "Link ansehen",
+            "viewBody": "Kopiere oder teile ihn mit der Person am Einlass.",
+            "viewOld": "Dieser Link wurde erstellt, bevor man ihn erneut ansehen konnte. Widerrufe ihn und erstelle einen neuen."
         },
         "liveInfo": {
             "title": "Thermometer",
@@ -1739,7 +1744,20 @@
             "seeEvents": "Events ansehen",
             "noEvents": "Diese Location hat noch keine Events.",
             "eventStats": "{{checkIns}} drin · {{matches}} Crushes · {{intents}} kommen",
-            "planSaved": "Plan geändert"
+            "planSaved": "Plan geändert",
+            "feeSaved": "Provision von {{percent}} % gespeichert",
+            "fee": "Deine Provision pro in der App verkauftem Ticket",
+            "stripeActive": "Stripe-Zahlungen aktiv",
+            "stripePending": "Stripe-Anmeldung nicht abgeschlossen",
+            "stripeNone": "Zahlungen nicht aktiviert",
+            "fields": {
+                "email": "E-Mail",
+                "phone": "Telefon",
+                "address": "Adresse",
+                "taxId": "Steuernummer",
+                "type": "Typ",
+                "created": "Seit"
+            }
         },
         "create": {
             "title": "Konto anlegen",
@@ -1779,6 +1797,30 @@
             "capacity": "Kapazität",
             "create": "Party veröffentlichen",
             "done": "Party veröffentlicht"
+        },
+        "notices": {
+            "sent_one": "{{count}} Nachricht gesendet",
+            "sent_other": "{{count}} Nachrichten gesendet",
+            "queued": "Benachrichtigung an alle Nutzer gesendet",
+            "expiring": "Läuft bald ab",
+            "expiringTitle_one": "{{count}} ablaufendes Abo benachrichtigen?",
+            "expiringTitle_other": "{{count}} ablaufende Abos benachrichtigen?",
+            "expiringBodyUsers": "Monatliches Premium, das in 7 Tagen endet und sich nicht selbst verlängert (gekündigt oder von der Verwaltung vergeben). Sie bekommen eine Benachrichtigung und eine E-Mail. Wer automatisch verlängert, bekommt nichts, und niemand bekommt dasselbe Datum zweimal.",
+            "expiringBodyVenues": "Pro- oder Business-Tarife, die in 7 Tagen enden und sich nicht selbst verlängern (gekündigt, im Test oder von der Verwaltung vergeben). Sie bekommen eine E-Mail. Wer automatisch verlängert, bekommt nichts.",
+            "send": "Senden",
+            "update": "Neuigkeit senden",
+            "updateUsers": "Neuigkeit für alle Nutzer",
+            "updateVenues": "Neuigkeit für alle Locations",
+            "updateUsersBody": "Kommt als Benachrichtigung aufs Handy bei allen mit aktivierten Benachrichtigungen.",
+            "updateVenuesBody": "Kommt per E-Mail an alle Locations.",
+            "titlePlaceholder": "Titel",
+            "bodyPlaceholder": "Nachricht"
+        },
+        "subs": {
+            "renews": "Verlängert sich am {{date}}",
+            "ends": "Läuft am {{date}} ab (keine Verlängerung)",
+            "endsCancelled": "Gekündigt: läuft am {{date}} ab",
+            "trialEnds": "Gratis-Test bis {{date}}"
         }
     },
     "pwa": {
@@ -2837,5 +2879,71 @@
         "withApp_other": "{{count}} mit der App",
         "fullRisk": "Es könnte voll werden: Personal und Warteschlange vorbereiten.",
         "basis": "Auf Basis von {{intents}} „Ich gehe hin“ und {{nights}} früheren Nächten."
+    },
+    "guestList": {
+        "joined": "Du stehst auf der Liste!",
+        "joinedBody_one": "Eingetragen für {{count}} Person. Nenne am Einlass deinen Namen.",
+        "joinedBody_other": "Eingetragen für {{count}} Personen. Nenne am Einlass deinen Namen.",
+        "left": "Du hast die Liste verlassen",
+        "onList": "Du stehst auf der Liste",
+        "lineWith_one": "{{name}} +{{count}}",
+        "lineWith_other": "{{name}} +{{count}}",
+        "inside_one": "{{count}} drinnen",
+        "inside_other": "{{count}} drinnen",
+        "change": "Ändern",
+        "available": "Diese Party hat eine Gästeliste",
+        "askTitle": "Dieses Event hat eine Gästeliste",
+        "askBody": "Möchtest du dich eintragen?",
+        "yes": "Ja",
+        "no": "Nein",
+        "formTitle": "Trag dich in die Liste ein",
+        "formBody": "Nenne am Einlass deinen Namen und du kommst mit deinen Begleitern rein.",
+        "name": "Name",
+        "companions": "Begleitpersonen",
+        "total_one": "Insgesamt {{count}} Person",
+        "total_other": "Insgesamt {{count}} Personen",
+        "save": "Speichern",
+        "join": "Eintragen",
+        "leave": "Von der Liste austragen",
+        "errors": {
+            "closed": "Die Gästeliste dieser Party ist geschlossen.",
+            "name": "Schreib deinen Namen.",
+            "companions": "Ungültige Zahl an Begleitpersonen (max. 50).",
+            "tooManyLists": "Höchstens 30 Listen pro Party."
+        },
+        "venue": {
+            "appTab": "{{app}}",
+            "appTitle": "Liste in der App",
+            "appHelp": "Die Leute tragen sich auf der Partyseite ein, wenn sie „Ich gehe hin“ tippen.",
+            "messagePlaceholder": "Z. B.: Liste gratis vor 19 Uhr oder 15 € zwei Drinks",
+            "saved": "Gespeichert",
+            "lines": "Eingetragen",
+            "people": "Personen",
+            "insideNow": "Drinnen",
+            "title": "Listen",
+            "newList": "Promoter-Liste",
+            "listNamePlaceholder": "Name des Promoters",
+            "search": "Name suchen",
+            "deleteList": "Liste löschen",
+            "deleteListConfirm": "Die Liste von {{name}} mit allen Namen löschen?",
+            "namePlaceholder": "Name",
+            "add": "Hinzufügen",
+            "noResults": "Niemand mit diesem Namen auf dieser Liste.",
+            "emptyApp": "Noch hat sich niemand über die App eingetragen.",
+            "empty": "Füge die Namen hinzu, die dir der Promoter gibt.",
+            "allIn_one": "Drinnen ({{count}})",
+            "allIn_other": "Alle drinnen ({{count}})",
+            "partial": "{{inside}} drinnen · noch {{left}}",
+            "notYet_one": "{{count}} Person",
+            "notYet_other": "{{count}} Personen",
+            "undo": "Einen abziehen",
+            "admit": "Einlassen",
+            "removeConfirm": "{{name}} von der Liste entfernen?",
+            "howMany": "Wie viele kommen rein?",
+            "ofLeft_one": "von {{count}}",
+            "ofLeft_other": "von {{count}}",
+            "admitN_one": "{{count}} einlassen",
+            "admitN_other": "{{count}} einlassen"
+        }
     }
 }

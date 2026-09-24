@@ -221,6 +221,7 @@ const VenuePromotions = ({ event, venueId, plan, onUpgrade }: VenuePromotionsPro
       {/* ---------------------------------------------------------------- */}
       {/* Crear una promoción                                             */}
       {/* ---------------------------------------------------------------- */}
+      {canUse && (
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-title-card uppercase tracking-wide">
@@ -339,6 +340,7 @@ const VenuePromotions = ({ event, venueId, plan, onUpgrade }: VenuePromotionsPro
           </PartyButton>
         </CardContent>
       </Card>
+      )}
           </div>
         </div>
       )}
