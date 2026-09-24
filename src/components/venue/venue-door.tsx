@@ -41,12 +41,16 @@ import {
 } from '@/services/venue-service';
 import { cn } from '@/lib/utils';
 import InfoHelp from '@/components/venue/info-help';
+import VenueForecast from '@/components/venue/venue-forecast';
+import TicketValidator from '@/components/venue/ticket-validator';
 
 interface VenueDoorProps {
   eventId: string;
   venueId: string;
   plan: VenuePlanStatus | null;
   onUpgrade: () => void;
+  /** Hora de inicio: antes de abrir se enseña la previsión de asistencia. */
+  startsAt?: string;
 }
 
 const FALLBACK_AVATAR = '/placeholder.svg';
@@ -85,7 +89,7 @@ const Titulo: React.FC<{ children: React.ReactNode; extra?: React.ReactNode }> =
  */
 type PestanaPuerta = 'inside' | 'notices' | 'promoters';
 
-const VenueDoor = ({ eventId, plan, onUpgrade }: VenueDoorProps) => {
+const VenueDoor = ({ eventId, plan, onUpgrade, startsAt }: VenueDoorProps) => {
   const [pestana, setPestana] = useState<PestanaPuerta>('inside');
   const { t } = useTranslation();
   const { toast } = useToast();
@@ -280,6 +284,9 @@ const VenueDoor = ({ eventId, plan, onUpgrade }: VenueDoorProps) => {
 
   return (
     <div className="space-y-4 pb-24">
+      {/* -------------------------------------------------- previsión */}
+      <VenueForecast eventId={eventId} started={startsAt ? new Date(startsAt).getTime() <= Date.now() : false} />
+
       {/* ------------------------------------------------------ cifras */}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         {/* Dentro ahora, con el aforo: una sola barra para toda la pantalla. */}
@@ -402,6 +409,8 @@ const VenueDoor = ({ eventId, plan, onUpgrade }: VenueDoorProps) => {
           </div>
           {/* ------------------------------------------ enlaces del portero */}
           {occupancy?.capacity ? <CounterLinks eventId={eventId} /> : null}
+          {/* --------------------------------- entradas compradas en la app */}
+          <TicketValidator />
           </div>
           <div className="space-y-4 lg:col-span-7">
           {/* -------------------------------------------------- denuncias */}

@@ -709,7 +709,8 @@
             "promos": "Promos",
             "plan": "Pla",
             "profile": "Perfil",
-            "profileSubtitle": "Dades del local, promocions, equip i pla."
+            "profileSubtitle": "Dades del local, promocions, equip i pla.",
+            "sales": "Vendes"
         },
         "qr": {
             "title": "Codi d'accés",
@@ -1082,7 +1083,12 @@
                 "csvExport": "Exportar a CSV",
                 "demographics": "Detall de públic",
                 "headcountCurve": "Corba d'aforament i % amb Fiestea",
-                "pdfExport": "Exportar a PDF"
+                "pdfExport": "Exportar a PDF",
+                "forecast": "Previsió d'assistència",
+                "ratings": "Valoracions de clients",
+                "audiences": "Avisos a públics concrets",
+                "ticketSales": "Venda d'entrades i taules",
+                "commissions": "Comissions de RRPP automàtiques"
             },
             "yourPlan": "El teu pla actual",
             "choose": "Triar",
@@ -1163,9 +1169,27 @@
             "errors": {
                 "scheduleLimit": "Has arribat al límit d'avisos programats del teu pla.",
                 "scheduleInPast": "Aquesta hora ja ha passat.",
-                "scheduleAfterEvent": "La festa ja haurà acabat a aquella hora."
+                "scheduleAfterEvent": "La festa ja haurà acabat a aquella hora.",
+                "audienceDailyLimit": "Màxim 5 avisos a públics al dia.",
+                "noShowNeedsStarted": "Aquest públic només existeix quan la festa ja ha començat."
             },
-            "scheduleCta": "Programar per a una altra hora"
+            "scheduleCta": "Programar per a una altra hora",
+            "audience": {
+                "label": "A qui",
+                "inside": "Dins ara",
+                "followers": "Seguidors",
+                "regulars": "Habituals",
+                "no_show": "Van dir que venien",
+                "never_came": "Mai no han vingut",
+                "insideHelp": "Qui és a la festa ara mateix.",
+                "followersHelp": "Totes les persones que segueixen el local.",
+                "regularsHelp": "Qui ha vingut 3 nits o més.",
+                "no_showHelp": "Van marcar «hi vaig» en aquesta festa i no han entrat.",
+                "never_cameHelp": "Segueixen el local però mai no hi han vingut.",
+                "reach_one": "arribarà a {{count}} persona",
+                "reach_other": "arribarà a {{count}} persones",
+                "locked": "Els públics concrets són de Pro i Business."
+            }
         },
         "documents": {
             "help": "El que acredita que el local és teu. Administració ho revisa abans d'aprovar el compte.",
@@ -1181,7 +1205,8 @@
             "events": "Esdeveniments",
             "stats": "Estadístiques",
             "promos": "Promocions",
-            "plan": "Pla i facturació"
+            "plan": "Pla i facturació",
+            "sales": "Vendes"
         },
         "live": "en directe",
         "noLive": "Cap esdeveniment en directe",
@@ -1936,7 +1961,36 @@
         "pastEmptyBody": "Les festes on entris apareixeran aquí amb la gent que hi vas conèixer.",
         "connections_one": "{{count}} connexió",
         "connections_other": "{{count}} connexions",
-        "shareText": "Soc a {{name}} ({{venue}}). Véns?"
+        "shareText": "Soc a {{name}} ({{venue}}). Véns?",
+        "buy": {
+            "title": "Entrades i taules",
+            "guests_one": "{{count}} persona",
+            "guests_other": "{{count}} persones",
+            "minSpend": "consum mínim {{amount}}",
+            "remaining_one": "Només en queda {{count}}!",
+            "remaining_other": "En queden {{count}}",
+            "deposit": "de senyal",
+            "soldOut": "Esgotades",
+            "reserve": "Reservar taula · {{amount}}",
+            "buy": "Comprar · {{amount}}",
+            "note": "Pagues amb targeta en una passarel·la segura. Les teves entrades apareixen a «Entrades» amb el QR per a la porta.",
+            "errors": {
+                "soldOut": "S'han esgotat. Prova amb una altra entrada.",
+                "closed": "La venda és tancada.",
+                "quantity": "Aquesta quantitat no està permesa.",
+                "checkout": "No s'ha pogut obrir el pagament. Torna-ho a provar."
+            }
+        },
+        "mine": {
+            "title": "Les teves entrades",
+            "cancelled": "Pagament cancel·lat: no s'ha cobrat res.",
+            "paid": "Compra feta!",
+            "paidBody": "Les teves entrades apareixeran aquí en uns segons.",
+            "waiting": "Estem emetent les teves entrades…",
+            "depositPaid": "Senyal pagada: {{amount}}",
+            "used": "Usada a les {{time}}",
+            "showAtDoor": "Ensenya-ho a la porta"
+        }
     },
     "vybes": {
         "matches": "Matches ({{count}})",
@@ -2608,5 +2662,149 @@
     },
     "notFound": {
         "body": "Aquesta pàgina no existeix. Potser l'enllaç està mal escrit o ja no està disponible."
+    },
+    "rating": {
+        "eventCount_one": "({{count}} valoració)",
+        "eventCount_other": "({{count}} valoracions)",
+        "venueCount_one": "del local ({{count}})",
+        "venueCount_other": "del local ({{count}})",
+        "yours": "La teva nota: {{stars}} ★",
+        "thanks": "Gràcies!",
+        "thanksBody": "La teva valoració ajuda altres a triar festa.",
+        "title": "Què tal va anar {{event}}?",
+        "subtitle": "La teva opinió sobre {{venue}}, sense el teu nom.",
+        "overall": "Nota general",
+        "tapToRate": "Toca les estrelles",
+        "levels": {
+            "1": "Molt dolenta",
+            "2": "Fluixa",
+            "3": "Bé",
+            "4": "Molt bona",
+            "5": "Increïble!"
+        },
+        "music": "Música",
+        "atmosphere": "Ambient",
+        "price": "Preu",
+        "commentPlaceholder": "Alguna cosa a dir? (opcional)",
+        "anonymous": "El local llegeix els comentaris sense saber qui els ha escrit.",
+        "later": "Ara no",
+        "send": "Enviar",
+        "errors": {
+            "notAttended": "Només pot valorar qui era a la festa."
+        },
+        "venue": {
+            "title": "Valoracions",
+            "locked": "Mira quina nota us posen els clients, per nit, i llegeix els seus comentaris. Disponible a Pro i Business.",
+            "upgrade": "Millorar pla",
+            "empty": "Encara no hi ha valoracions. Es demanen en sortir de la festa.",
+            "count_one": "{{count}} valoració",
+            "count_other": "{{count}} valoracions",
+            "vsPrev": "vs mes anterior",
+            "byNight": "Per nit",
+            "comments": "Comentaris",
+            "noComments": "Encara ningú no ha deixat cap comentari."
+        }
+    },
+    "sales": {
+        "title": "Vendes",
+        "event": "Esdeveniment",
+        "noEvents": "No tens festes properes ni dels últims 30 dies.",
+        "tabs": {
+            "tickets": "Entrades i taules",
+            "promoters": "Comissions RRPP"
+        },
+        "sold": "Venudes",
+        "revenue": "Ingressos",
+        "validated": "Validades",
+        "types": "A la venda",
+        "empty": "Encara no vens res a l'app. Afegeix una entrada o una taula.",
+        "paused": "pausada",
+        "soldOf": "{{sold}} de {{total}}",
+        "soldCount_one": "{{count}} venuda",
+        "soldCount_other": "{{count}} venudes",
+        "usedCount_one": "{{count}} validada",
+        "usedCount_other": "{{count}} validades",
+        "form": {
+            "edit": "Editar",
+            "newTable": "Nova taula",
+            "newEntry": "Nova entrada",
+            "name": "Nom",
+            "tablePlaceholder": "Taula VIP",
+            "entryPlaceholder": "Entrada general",
+            "description": "Què inclou (opcional)",
+            "deposit": "Senyal (€)",
+            "price": "Preu (€)",
+            "tables": "Nombre de taules",
+            "capacity": "Entrades a la venda",
+            "unlimited": "Sense límit",
+            "guests": "Persones per taula",
+            "minSpend": "Consum mínim (€)",
+            "maxPerOrder": "Màxim per compra",
+            "onSale": "A la venda"
+        },
+        "saved": "Desat",
+        "ended": "La festa ja ha acabat: no es pot vendre més.",
+        "addTable": "Afegir taula",
+        "addEntry": "Afegir entrada",
+        "note": "Els pagaments es cobren amb targeta a Stripe. Cada entrada porta un QR que es valida a Porta → «Validar entrada».",
+        "orders": "Últimes compres",
+        "noOrders": "Encara no hi ha compres.",
+        "locked": {
+            "title": "Ven entrades i taules a l'app",
+            "body": "Cobra entrades i senyals de taula amb targeta, valida el QR a la porta i liquida les comissions dels teus RRPP automàticament. Disponible al pla Business.",
+            "cta": "Passar a Business"
+        },
+        "errors": {
+            "planRequired": "El teu pla no inclou aquesta funció.",
+            "notAuthorized": "No tens permís per fer això.",
+            "eventEnded": "La festa ja ha acabat.",
+            "tablesNeedCapacity": "Indica quantes taules hi ha.",
+            "capacityBelowSold": "Ja se n'han venut més de les que indiques.",
+            "ticketNotFound": "Aquesta entrada no existeix o no és d'aquest local.",
+            "ticketRefunded": "Aquesta entrada està reemborsada.",
+            "invalidCommission": "Comissió no vàlida (fins a 100 % o 1.000 € per persona).",
+            "form": "Revisa el nom, el preu i la quantitat."
+        },
+        "promoters": {
+            "total": "Comissions de la nit",
+            "pending": "Pendent de pagar",
+            "title": "Liquidació RRPP",
+            "help": "Per persona que va entrar amb el seu codi, o un % del que aquestes persones van pagar en entrades.",
+            "empty": "Aquesta festa no té codis de RRPP ni de llista.",
+            "checkIns_one": "{{count}} entrada",
+            "checkIns_other": "{{count}} entrades",
+            "spent": "{{amount}} en entrades",
+            "type": "Tipus de comissió",
+            "none": "Sense comissió",
+            "perPerson": "€ per persona",
+            "percent": "% d'entrades",
+            "value": "Import",
+            "paid": "Pagada {{amount}}",
+            "markPaid": "Marcar pagada"
+        },
+        "validator": {
+            "title": "Validar entrada",
+            "stop": "Tancar càmera",
+            "scan": "Escanejar",
+            "code": "Codi de l'entrada",
+            "validate": "Validar",
+            "alreadyUsed": "Ja usada a les {{time}}",
+            "tableOk": "Taula vàlida",
+            "entryOk": "Entrada vàlida"
+        }
+    },
+    "forecast": {
+        "title": "Previsió",
+        "confidence": {
+            "low": "Orientativa",
+            "medium": "Fiable",
+            "high": "Molt fiable"
+        },
+        "totalPeople": "persones esperades en total",
+        "appPeople": "persones esperades amb l'app",
+        "withApp_one": "{{count}} amb l'app",
+        "withApp_other": "{{count}} amb l'app",
+        "fullRisk": "Es pot omplir: prepara personal i cua.",
+        "basis": "Amb {{intents}} «hi vaig» i {{nights}} nits anteriors."
     }
 }

@@ -1,12 +1,14 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Megaphone, Send, Loader2, Check, Clock, X } from 'lucide-react';
+import { Megaphone, Send, Loader2, Check, Clock, Crown, Users, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { PartyButton } from '@/components/ui-custom/party-button';
 import { useToast } from '@/components/ui/use-toast';
 import { ApiError } from '@/services/api';
-import { venueService, Broadcast } from '@/services/venue-service';
+import { venueService, Broadcast, BroadcastAudience, VenuePlanStatus } from '@/services/venue-service';
+import { planHas } from '@/lib/venue-plans';
+import { cn } from '@/lib/utils';
 import InfoHelp from '@/components/venue/info-help';
 
 interface VenueBroadcastProps {
@@ -14,7 +16,14 @@ interface VenueBroadcastProps {
   eventId?: string;
   /** Para saber cuántos avisos programados caben según el plan. */
   venueId?: string;
+  /**
+   * Con esto se puede elegir a quién va el aviso (seguidores, habituales…),
+   * que es de Pro y Business. Sin ello, sólo a quien está dentro.
+   */
+  audiences?: { plan: VenuePlanStatus | null; onUpgrade: () => void };
 }
+
+const PUBLICOS: BroadcastAudience[] = ['inside', 'followers', 'regulars', 'no_show', 'never_came'];
 
 /** «2026-09-20T23:45» para el campo de fecha y hora, en hora local. */
 const paraInput = (fecha: Date): string => {
@@ -37,7 +46,7 @@ const paraInput = (fecha: Date): string => {
  * (`surface-light`, títulos en mayúsculas, campos claros): antes usaba los
  * colores por defecto de shadcn y en el móvil desentonaba con todo lo demás.
  */
-const VenueBroadcast = ({ eventId, venueId }: VenueBroadcastProps) => {
+const VenueBroadcast = ({ eventId, venueId, audiences }: VenueBroadcastProps) => {
   const { t } = useTranslation();
   const { toast } = useToast();
 
@@ -49,6 +58,23 @@ const VenueBroadcast = ({ eventId, venueId }: VenueBroadcastProps) => {
   const [cuando, setCuando] = useState('');
   const [limite, setLimite] = useState(1);
   const [programar, setProgramar] = useState(false);
+  const [publico, setPublico] = useState<BroadcastAudience>('inside');
+  const [alcance, setAlcance] = useState<number | null>(null);
+  const segmentos = audiences ? planHas(audiences.plan?.plan, 'audiences') : false;
+
+  // Cuánta gente recibiría el aviso: se cuenta en el servidor con la misma
+  // definición con la que se envía.
+  useEffect(() => {
+    setAlcance(null);
+    if (!eventId || publico === 'inside' || !segmentos) return;
+    let vivo = true;
+    void venueService.countAudience(publico, eventId).then((n) => {
+      if (vivo) setAlcance(n);
+    });
+    return () => {
+      vivo = false;
+    };
+  }, [eventId, publico, segmentos]);
 
   const load = useCallback(async () => {
     setSent(await venueService.getBroadcasts(eventId));
@@ -72,7 +98,11 @@ const VenueBroadcast = ({ eventId, venueId }: VenueBroadcastProps) => {
     try {
       // Con hora, el aviso espera a esa hora; sin ella, sale al momento.
       const programado = cuando ? new Date(cuando).toISOString() : null;
-      await venueService.queueBroadcast(title.trim(), body.trim(), eventId, programado);
+      if (publico !== 'inside' && eventId) {
+        await venueService.queueAudienceBroadcast(publico, title.trim(), body.trim(), eventId, programado);
+      } else {
+        await venueService.queueBroadcast(title.trim(), body.trim(), eventId, programado);
+      }
       setTitle('');
       setBody('');
       setCuando('');
@@ -100,6 +130,40 @@ const VenueBroadcast = ({ eventId, venueId }: VenueBroadcastProps) => {
       </header>
 
       <div className="space-y-3">
+        {audiences && eventId && (
+          <div className="space-y-1.5">
+            <p className="flex items-center gap-1.5 text-caption font-bold">
+              <Users size={12} />
+              {t('venue.broadcast.audience.label')}
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {PUBLICOS.map((clave) => {
+                const bloqueado = clave !== 'inside' && !segmentos;
+                return (
+                  <button
+                    key={clave}
+                    type="button"
+                    onClick={() => (bloqueado ? audiences.onUpgrade() : setPublico(clave))}
+                    aria-pressed={publico === clave}
+                    className={cn(
+                      'press flex h-8 items-center gap-1 rounded-full px-3 text-caption font-bold',
+                      publico === clave ? 'bg-party-primary text-ink' : 'bg-black/[0.06] text-ink/70',
+                    )}
+                  >
+                    {bloqueado && <Crown size={11} />}
+                    {t(`venue.broadcast.audience.${clave}`)}
+                  </button>
+                );
+              })}
+            </div>
+            <p className="text-caption text-party-gray">
+              {t(`venue.broadcast.audience.${publico}Help`)}
+              {alcance !== null && ` · ${t('venue.broadcast.audience.reach', { count: alcance })}`}
+            </p>
+            {!segmentos && <p className="text-caption text-party-gray">{t('venue.broadcast.audience.locked')}</p>}
+          </div>
+        )}
+
         <div className="space-y-1.5">
           <Label htmlFor="broadcast-title" className="text-caption">
             {t('venue.broadcast.heading')}
@@ -189,6 +253,11 @@ const VenueBroadcast = ({ eventId, venueId }: VenueBroadcastProps) => {
             <li key={broadcast.id} className="rounded-xl bg-black/[0.04] p-2.5">
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
+                  {broadcast.audience !== 'inside' && (
+                    <p className="text-[11px] font-bold uppercase tracking-wide text-party-gray">
+                      {t(`venue.broadcast.audience.${broadcast.audience}`)}
+                    </p>
+                  )}
                   <p className="truncate text-body-sm font-bold">{broadcast.title}</p>
                   <p className="truncate text-caption text-party-gray">{broadcast.body}</p>
                 </div>

@@ -22,6 +22,7 @@ import {
   PromotionStats,
   VenuePlanStatus,
 } from '@/services/venue-service';
+import { isEventTicketCode, ticketsService } from '@/services/tickets';
 import { nightService } from '@/services/night';
 import VenuePromoTemplates from '@/components/venue/venue-promo-templates';
 import PanelTabs from '@/components/venue/panel-tabs';
@@ -153,6 +154,18 @@ const VenuePromotions = ({ event, venueId, plan, onUpgrade }: VenuePromotionsPro
     setIsBusy(true);
     setLastValidation(null);
     try {
+      // Las entradas y mesas compradas en la app (E-XXXXXXXX) se validan aquí
+      // también: en la barra se escanea lo que traiga la persona.
+      if (isEventTicketCode(ticket)) {
+        const entrada = await ticketsService.validate(ticket);
+        setLastValidation({
+          title: entrada.guests ? `${entrada.typeName} · ${t('tickets.buy.guests', { count: entrada.guests })}` : entrada.typeName,
+          holderName: entrada.holderName,
+          alreadyUsed: entrada.alreadyUsed,
+        });
+        setTicket('');
+        return;
+      }
       const result = await venueService.validateTicket(ticket.trim());
       setLastValidation(result);
       setTicket('');

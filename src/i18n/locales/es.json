@@ -709,7 +709,8 @@
             "promos": "Promos",
             "plan": "Plan",
             "profile": "Perfil",
-            "profileSubtitle": "Datos del local, promociones, equipo y plan."
+            "profileSubtitle": "Datos del local, promociones, equipo y plan.",
+            "sales": "Ventas"
         },
         "qr": {
             "title": "Código de acceso",
@@ -1082,7 +1083,12 @@
                 "csvExport": "Exportar a CSV",
                 "demographics": "Detalle de público",
                 "headcountCurve": "Curva de aforo y % con Fiestea",
-                "pdfExport": "Exportar a PDF"
+                "pdfExport": "Exportar a PDF",
+                "forecast": "Previsión de asistencia",
+                "ratings": "Valoraciones de clientes",
+                "audiences": "Avisos a públicos concretos",
+                "ticketSales": "Venta de entradas y mesas",
+                "commissions": "Comisiones de RRPP automáticas"
             },
             "yourPlan": "Tu plan actual",
             "choose": "Elegir",
@@ -1163,9 +1169,27 @@
             "errors": {
                 "scheduleLimit": "Has llegado al límite de avisos programados de tu plan.",
                 "scheduleInPast": "Esa hora ya ha pasado.",
-                "scheduleAfterEvent": "La fiesta ya habrá terminado a esa hora."
+                "scheduleAfterEvent": "La fiesta ya habrá terminado a esa hora.",
+                "audienceDailyLimit": "Máximo 5 avisos a públicos al día.",
+                "noShowNeedsStarted": "Ese público sólo existe cuando la fiesta ya ha empezado."
             },
-            "scheduleCta": "Programar para otra hora"
+            "scheduleCta": "Programar para otra hora",
+            "audience": {
+                "label": "A quién",
+                "inside": "Dentro ahora",
+                "followers": "Seguidores",
+                "regulars": "Habituales",
+                "no_show": "Dijeron que venían",
+                "never_came": "Nunca han venido",
+                "insideHelp": "Quien está en la fiesta ahora mismo.",
+                "followersHelp": "Todas las personas que siguen al local.",
+                "regularsHelp": "Quien ha venido 3 noches o más.",
+                "no_showHelp": "Marcaron «voy a ir» en esta fiesta y no han entrado.",
+                "never_cameHelp": "Siguen al local pero nunca han venido.",
+                "reach_one": "llegará a {{count}} persona",
+                "reach_other": "llegará a {{count}} personas",
+                "locked": "Los públicos concretos son de Pro y Business."
+            }
         },
         "documents": {
             "help": "Lo que acredita que el local es tuyo. Administración lo revisa antes de aprobar la cuenta.",
@@ -1181,7 +1205,8 @@
             "events": "Eventos",
             "stats": "Estadísticas",
             "promos": "Promociones",
-            "plan": "Plan y facturación"
+            "plan": "Plan y facturación",
+            "sales": "Ventas"
         },
         "live": "en directo",
         "noLive": "Ningún evento en directo",
@@ -1936,7 +1961,36 @@
         "pastEmptyBody": "Las fiestas en las que entres aparecerán aquí con la gente que conociste.",
         "connections_one": "{{count}} conexión",
         "connections_other": "{{count}} conexiones",
-        "shareText": "Estoy en {{name}} ({{venue}}). ¿Te vienes?"
+        "shareText": "Estoy en {{name}} ({{venue}}). ¿Te vienes?",
+        "buy": {
+            "title": "Entradas y mesas",
+            "guests_one": "{{count}} persona",
+            "guests_other": "{{count}} personas",
+            "minSpend": "consumo mínimo {{amount}}",
+            "remaining_one": "¡Queda {{count}}!",
+            "remaining_other": "Quedan {{count}}",
+            "deposit": "de señal",
+            "soldOut": "Agotadas",
+            "reserve": "Reservar mesa · {{amount}}",
+            "buy": "Comprar · {{amount}}",
+            "note": "Pagas con tarjeta en una pasarela segura. Tus entradas aparecen en «Entradas» con su QR para la puerta.",
+            "errors": {
+                "soldOut": "Se han agotado. Prueba con otra entrada.",
+                "closed": "La venta está cerrada.",
+                "quantity": "Esa cantidad no está permitida.",
+                "checkout": "No se ha podido abrir el pago. Inténtalo de nuevo."
+            }
+        },
+        "mine": {
+            "title": "Tus entradas",
+            "cancelled": "Pago cancelado: no se ha cobrado nada.",
+            "paid": "¡Compra hecha!",
+            "paidBody": "Tus entradas aparecen aquí en unos segundos.",
+            "waiting": "Estamos emitiendo tus entradas…",
+            "depositPaid": "Señal pagada: {{amount}}",
+            "used": "Usada a las {{time}}",
+            "showAtDoor": "Enséñalo en la puerta"
+        }
     },
     "vybes": {
         "matches": "Matches ({{count}})",
@@ -2608,5 +2662,149 @@
     },
     "notFound": {
         "body": "Esta página no existe. Puede que el enlace esté mal escrito o que ya no esté disponible."
+    },
+    "rating": {
+        "eventCount_one": "({{count}} valoración)",
+        "eventCount_other": "({{count}} valoraciones)",
+        "venueCount_one": "del local ({{count}})",
+        "venueCount_other": "del local ({{count}})",
+        "yours": "Tu nota: {{stars}} ★",
+        "thanks": "¡Gracias!",
+        "thanksBody": "Tu valoración ayuda a otros a elegir fiesta.",
+        "title": "¿Qué tal estuvo {{event}}?",
+        "subtitle": "Tu opinión sobre {{venue}}, sin tu nombre.",
+        "overall": "Nota general",
+        "tapToRate": "Toca las estrellas",
+        "levels": {
+            "1": "Muy mala",
+            "2": "Floja",
+            "3": "Bien",
+            "4": "Muy buena",
+            "5": "¡Increíble!"
+        },
+        "music": "Música",
+        "atmosphere": "Ambiente",
+        "price": "Precio",
+        "commentPlaceholder": "¿Algo que contar? (opcional)",
+        "anonymous": "El local lee los comentarios sin saber quién los escribe.",
+        "later": "Ahora no",
+        "send": "Enviar",
+        "errors": {
+            "notAttended": "Sólo puede valorar quien estuvo en la fiesta."
+        },
+        "venue": {
+            "title": "Valoraciones",
+            "locked": "Mira qué nota os ponen los clientes, por noche, y lee sus comentarios. Disponible en Pro y Business.",
+            "upgrade": "Mejorar plan",
+            "empty": "Todavía no hay valoraciones. Se piden al salir de la fiesta.",
+            "count_one": "{{count}} valoración",
+            "count_other": "{{count}} valoraciones",
+            "vsPrev": "vs mes anterior",
+            "byNight": "Por noche",
+            "comments": "Comentarios",
+            "noComments": "Todavía nadie ha dejado un comentario."
+        }
+    },
+    "sales": {
+        "title": "Ventas",
+        "event": "Evento",
+        "noEvents": "No tienes fiestas próximas ni de los últimos 30 días.",
+        "tabs": {
+            "tickets": "Entradas y mesas",
+            "promoters": "Comisiones RRPP"
+        },
+        "sold": "Vendidas",
+        "revenue": "Ingresos",
+        "validated": "Validadas",
+        "types": "A la venta",
+        "empty": "Aún no vendes nada en la app. Añade una entrada o una mesa.",
+        "paused": "pausada",
+        "soldOf": "{{sold}} de {{total}}",
+        "soldCount_one": "{{count}} vendida",
+        "soldCount_other": "{{count}} vendidas",
+        "usedCount_one": "{{count}} validada",
+        "usedCount_other": "{{count}} validadas",
+        "form": {
+            "edit": "Editar",
+            "newTable": "Nueva mesa",
+            "newEntry": "Nueva entrada",
+            "name": "Nombre",
+            "tablePlaceholder": "Mesa VIP",
+            "entryPlaceholder": "Entrada general",
+            "description": "Qué incluye (opcional)",
+            "deposit": "Señal (€)",
+            "price": "Precio (€)",
+            "tables": "Número de mesas",
+            "capacity": "Entradas a la venta",
+            "unlimited": "Sin límite",
+            "guests": "Personas por mesa",
+            "minSpend": "Consumo mínimo (€)",
+            "maxPerOrder": "Máximo por compra",
+            "onSale": "A la venta"
+        },
+        "saved": "Guardado",
+        "ended": "La fiesta ya terminó: no se puede vender más.",
+        "addTable": "Añadir mesa",
+        "addEntry": "Añadir entrada",
+        "note": "Los pagos se cobran con tarjeta en Stripe. Cada entrada lleva un QR que se valida en Puerta → «Validar entrada».",
+        "orders": "Últimas compras",
+        "noOrders": "Todavía no hay compras.",
+        "locked": {
+            "title": "Vende entradas y mesas en la app",
+            "body": "Cobra entradas y señales de mesa con tarjeta, valida el QR en la puerta y liquida las comisiones de tus RRPP automáticamente. Disponible en el plan Business.",
+            "cta": "Pasar a Business"
+        },
+        "errors": {
+            "planRequired": "Tu plan no incluye esta función.",
+            "notAuthorized": "No tienes permiso para hacer esto.",
+            "eventEnded": "La fiesta ya terminó.",
+            "tablesNeedCapacity": "Indica cuántas mesas hay.",
+            "capacityBelowSold": "Ya se han vendido más de las que indicas.",
+            "ticketNotFound": "Esa entrada no existe o no es de este local.",
+            "ticketRefunded": "Esa entrada está reembolsada.",
+            "invalidCommission": "Comisión no válida (hasta 100 % o 1.000 € por persona).",
+            "form": "Revisa el nombre, el precio y la cantidad."
+        },
+        "promoters": {
+            "total": "Comisiones de la noche",
+            "pending": "Pendiente de pagar",
+            "title": "Liquidación RRPP",
+            "help": "Por persona que entró con su código, o un % de lo que esas personas pagaron en entradas.",
+            "empty": "Esta fiesta no tiene códigos de RRPP ni de lista.",
+            "checkIns_one": "{{count}} entrada",
+            "checkIns_other": "{{count}} entradas",
+            "spent": "{{amount}} en entradas",
+            "type": "Tipo de comisión",
+            "none": "Sin comisión",
+            "perPerson": "€ por persona",
+            "percent": "% de entradas",
+            "value": "Importe",
+            "paid": "Pagada {{amount}}",
+            "markPaid": "Marcar pagada"
+        },
+        "validator": {
+            "title": "Validar entrada",
+            "stop": "Cerrar cámara",
+            "scan": "Escanear",
+            "code": "Código de la entrada",
+            "validate": "Validar",
+            "alreadyUsed": "Ya usada a las {{time}}",
+            "tableOk": "Mesa válida",
+            "entryOk": "Entrada válida"
+        }
+    },
+    "forecast": {
+        "title": "Previsión",
+        "confidence": {
+            "low": "Orientativa",
+            "medium": "Fiable",
+            "high": "Muy fiable"
+        },
+        "totalPeople": "personas esperadas en total",
+        "appPeople": "personas esperadas con la app",
+        "withApp_one": "{{count}} con la app",
+        "withApp_other": "{{count}} con la app",
+        "fullRisk": "Puede llenarse: prepara personal y cola.",
+        "basis": "Con {{intents}} «voy a ir» y {{nights}} noches anteriores."
     }
 }

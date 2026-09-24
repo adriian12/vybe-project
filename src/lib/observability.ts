@@ -104,7 +104,9 @@ export type AnalyticsEvent =
   | 'venue_event_created'
   | 'venue_event_updated'
   | 'venue_code_generated'
-  | 'account_deleted';
+  | 'account_deleted'
+  | 'tickets_checkout'
+  | 'event_rated';
 
 interface QueuedEvent {
   name: AnalyticsEvent;

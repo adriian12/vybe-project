@@ -31,9 +31,9 @@ import { adminClient, getUser, getProfileId } from '../_shared/supabase.ts';
 
 type UserPlan = 'monthly' | 'event' | 'supercrush';
 type VenuePlan = 'venue_pro' | 'venue_business';
-type Plan = UserPlan | VenuePlan | 'event_boost';
+type Plan = UserPlan | VenuePlan | 'event_boost' | 'tickets';
 
-const PRICE_ENV: Record<Exclude<Plan, 'event_boost'>, string[]> = {
+const PRICE_ENV: Record<Exclude<Plan, 'event_boost' | 'tickets'>, string[]> = {
   monthly: ['STRIPE_PRICE_MONTHLY_USER', 'STRIPE_PRICE_MONTHLY'],
   event: ['STRIPE_PRICE_EVENT'],
   supercrush: ['STRIPE_PRICE_SUPERLIKE'],
@@ -41,7 +41,7 @@ const PRICE_ENV: Record<Exclude<Plan, 'event_boost'>, string[]> = {
   venue_business: ['STRIPE_PRICE_VENUE_BUSINESS'],
 };
 
-const precio = (plan: Exclude<Plan, 'event_boost'>): string | undefined =>
+const precio = (plan: Exclude<Plan, 'event_boost' | 'tickets'>): string | undefined =>
   PRICE_ENV[plan].map((nombre) => Deno.env.get(nombre)).find(Boolean);
 
 /** Supercrush por compra: al menos 1; el tope evita cobros por error. */
@@ -85,9 +85,10 @@ serve(async (req: Request): Promise<Response> => {
     const user = await getUser(req, supabase);
     if (!user) return json({ error: 'No autenticado' }, 401);
 
-    const { plan, eventId, returnUrl, quantity, action } = (await req.json()) as {
+    const { plan, eventId, returnUrl, quantity, action, ticketTypeId } = (await req.json()) as {
       plan?: Plan;
       eventId?: string | null;
+      ticketTypeId?: string;
       returnUrl?: string;
       quantity?: number;
       action?: 'cancel';
@@ -170,9 +171,68 @@ serve(async (req: Request): Promise<Response> => {
       return json({ url: sesion.url });
     }
 
+    // Entradas o mesa de una fiesta (locales Business). Las plazas se reservan
+    // antes de ir a Stripe y la sesión caduca a los 30 minutos, que es lo que
+    // `ticket_type_taken()` tarda en liberarlas.
+    if (plan === 'tickets') {
+      if (!ticketTypeId) return json({ error: 'Falta el tipo de entrada' }, 400);
+      const profileId = await getProfileId(supabase, user.id);
+      if (!profileId) return json({ error: 'Perfil no encontrado' }, 404);
+
+      const { data: pedidos, error: errorPedido } = await supabase.rpc('create_ticket_order', {
+        p_profile_id: profileId,
+        p_type_id: ticketTypeId,
+        p_quantity: Math.floor(Number(quantity ?? 1)),
+      });
+      if (errorPedido) {
+        const codigo = ['SOLD_OUT', 'SALES_CLOSED', 'BAD_QUANTITY'].find((c) => errorPedido.message.includes(c));
+        return json({ error: codigo ?? 'ORDER_FAILED' }, 409);
+      }
+      const pedido = (Array.isArray(pedidos) ? pedidos[0] : pedidos) as {
+        order_id: string;
+        unit_cents: number;
+        type_name: string;
+        kind: string;
+        event_name: string;
+      };
+      const unidades = Math.floor(Number(quantity ?? 1));
+      const separador = base.includes('?') ? '&' : '?';
+
+      const entradas = new URLSearchParams({
+        mode: 'payment',
+        'line_items[0][quantity]': String(unidades),
+        'line_items[0][price_data][currency]': 'eur',
+        'line_items[0][price_data][unit_amount]': String(pedido.unit_cents),
+        'line_items[0][price_data][product_data][name]': `${pedido.type_name} · ${pedido.event_name}`,
+        success_url: `${base}${separador}tickets=success`,
+        cancel_url: `${base}${separador}tickets=cancelled`,
+        client_reference_id: profileId,
+        'metadata[kind]': 'tickets',
+        'metadata[order_id]': pedido.order_id,
+        'metadata[profile_id]': profileId,
+        expires_at: String(Math.floor(Date.now() / 1000) + 30 * 60 + 30),
+        locale: 'auto',
+      });
+      if (user.email) entradas.set('customer_email', user.email);
+
+      const respuesta = await fetch('https://api.stripe.com/v1/checkout/sessions', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${secretKey}`, 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: entradas,
+      });
+      if (!respuesta.ok) {
+        console.error('Stripe error:', await respuesta.text());
+        await supabase.from('ticket_orders').update({ status: 'cancelled' }).eq('id', pedido.order_id);
+        return json({ error: 'CHECKOUT_FAILED' }, 502);
+      }
+      const sesion = (await respuesta.json()) as { id: string; url?: string };
+      await supabase.from('ticket_orders').update({ stripe_session_id: sesion.id }).eq('id', pedido.order_id);
+      return json({ url: sesion.url });
+    }
+
     if (!plan || !(plan in PRICE_ENV)) return json({ error: 'Plan no válido' }, 400);
 
-    const priceId = precio(plan as Exclude<Plan, 'event_boost'>);
+    const priceId = precio(plan as Exclude<Plan, 'event_boost' | 'tickets'>);
     // Los planes de local pueden cobrarse sin precio creado en Stripe; el
     // Premium de usuario, no.
     if (!priceId && !esPlanDeLocal(plan)) return json({ error: 'STRIPE_NOT_CONFIGURED' }, 200);

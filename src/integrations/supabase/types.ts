@@ -236,6 +236,7 @@ export type Database = {
       }
       broadcasts: {
         Row: {
+          audience: string
           body: string
           created_at: string
           created_by: string | null
@@ -250,6 +251,7 @@ export type Database = {
           venue_id: string | null
         }
         Insert: {
+          audience?: string
           body: string
           created_at?: string
           created_by?: string | null
@@ -264,6 +266,7 @@ export type Database = {
           venue_id?: string | null
         }
         Update: {
+          audience?: string
           body?: string
           created_at?: string
           created_by?: string | null
@@ -522,6 +525,8 @@ export type Database = {
         Row: {
           active: boolean | null
           code: string
+          commission_type: string | null
+          commission_value: number | null
           created_at: string | null
           event_id: string | null
           expires_at: string
@@ -537,6 +542,8 @@ export type Database = {
         Insert: {
           active?: boolean | null
           code: string
+          commission_type?: string | null
+          commission_value?: number | null
           created_at?: string | null
           event_id?: string | null
           expires_at: string
@@ -552,6 +559,8 @@ export type Database = {
         Update: {
           active?: boolean | null
           code?: string
+          commission_type?: string | null
+          commission_value?: number | null
           created_at?: string | null
           event_id?: string | null
           expires_at?: string
@@ -840,6 +849,70 @@ export type Database = {
             columns: ["winner_profile_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_ratings: {
+        Row: {
+          atmosphere: number | null
+          comment: string | null
+          created_at: string
+          event_id: string
+          id: string
+          music: number | null
+          overall: number
+          price: number | null
+          profile_id: string
+          updated_at: string
+          venue_id: string
+        }
+        Insert: {
+          atmosphere?: number | null
+          comment?: string | null
+          created_at?: string
+          event_id: string
+          id?: string
+          music?: number | null
+          overall: number
+          price?: number | null
+          profile_id: string
+          updated_at?: string
+          venue_id: string
+        }
+        Update: {
+          atmosphere?: number | null
+          comment?: string | null
+          created_at?: string
+          event_id?: string
+          id?: string
+          music?: number | null
+          overall?: number
+          price?: number | null
+          profile_id?: string
+          updated_at?: string
+          venue_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_ratings_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_ratings_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_ratings_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
             referencedColumns: ["id"]
           },
         ]
@@ -1543,6 +1616,55 @@ export type Database = {
         }
         Relationships: []
       }
+      promoter_payouts: {
+        Row: {
+          amount_cents: number
+          code_id: string
+          event_id: string
+          paid_at: string
+          paid_by: string | null
+          venue_id: string
+        }
+        Insert: {
+          amount_cents: number
+          code_id: string
+          event_id: string
+          paid_at?: string
+          paid_by?: string | null
+          venue_id: string
+        }
+        Update: {
+          amount_cents?: number
+          code_id?: string
+          event_id?: string
+          paid_at?: string
+          paid_by?: string | null
+          venue_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "promoter_payouts_code_id_fkey"
+            columns: ["code_id"]
+            isOneToOne: true
+            referencedRelation: "event_codes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "promoter_payouts_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "promoter_payouts_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       promotion_redemptions: {
         Row: {
           claimed_at: string
@@ -2105,6 +2227,224 @@ export type Database = {
             columns: ["swiper_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ticket_orders: {
+        Row: {
+          amount_cents: number
+          created_at: string
+          event_id: string
+          id: string
+          paid_at: string | null
+          profile_id: string
+          quantity: number
+          status: string
+          stripe_session_id: string | null
+          ticket_type_id: string
+          unit_cents: number
+          venue_id: string
+        }
+        Insert: {
+          amount_cents: number
+          created_at?: string
+          event_id: string
+          id?: string
+          paid_at?: string | null
+          profile_id: string
+          quantity: number
+          status?: string
+          stripe_session_id?: string | null
+          ticket_type_id: string
+          unit_cents: number
+          venue_id: string
+        }
+        Update: {
+          amount_cents?: number
+          created_at?: string
+          event_id?: string
+          id?: string
+          paid_at?: string | null
+          profile_id?: string
+          quantity?: number
+          status?: string
+          stripe_session_id?: string | null
+          ticket_type_id?: string
+          unit_cents?: number
+          venue_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ticket_orders_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ticket_orders_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ticket_orders_ticket_type_id_fkey"
+            columns: ["ticket_type_id"]
+            isOneToOne: false
+            referencedRelation: "ticket_types"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ticket_orders_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ticket_types: {
+        Row: {
+          active: boolean
+          capacity: number | null
+          created_at: string
+          description: string | null
+          event_id: string
+          guests: number | null
+          id: string
+          kind: string
+          max_per_order: number
+          min_spend_cents: number | null
+          name: string
+          price_cents: number
+          updated_at: string
+          venue_id: string
+        }
+        Insert: {
+          active?: boolean
+          capacity?: number | null
+          created_at?: string
+          description?: string | null
+          event_id: string
+          guests?: number | null
+          id?: string
+          kind: string
+          max_per_order?: number
+          min_spend_cents?: number | null
+          name: string
+          price_cents: number
+          updated_at?: string
+          venue_id: string
+        }
+        Update: {
+          active?: boolean
+          capacity?: number | null
+          created_at?: string
+          description?: string | null
+          event_id?: string
+          guests?: number | null
+          id?: string
+          kind?: string
+          max_per_order?: number
+          min_spend_cents?: number | null
+          name?: string
+          price_cents?: number
+          updated_at?: string
+          venue_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ticket_types_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ticket_types_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tickets: {
+        Row: {
+          code: string
+          created_at: string
+          event_id: string
+          id: string
+          order_id: string
+          profile_id: string
+          status: string
+          ticket_type_id: string
+          used_at: string | null
+          used_by: string | null
+          venue_id: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          event_id: string
+          id?: string
+          order_id: string
+          profile_id: string
+          status?: string
+          ticket_type_id: string
+          used_at?: string | null
+          used_by?: string | null
+          venue_id: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          event_id?: string
+          id?: string
+          order_id?: string
+          profile_id?: string
+          status?: string
+          ticket_type_id?: string
+          used_at?: string | null
+          used_by?: string | null
+          venue_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tickets_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tickets_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "ticket_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tickets_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tickets_ticket_type_id_fkey"
+            columns: ["ticket_type_id"]
+            isOneToOne: false
+            referencedRelation: "ticket_types"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tickets_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
             referencedColumns: ["id"]
           },
         ]
@@ -2840,6 +3180,12 @@ export type Database = {
         Args: { p_profile_a: string; p_profile_b: string }
         Returns: boolean
       }
+      audience_members: {
+        Args: { p_audience: string; p_event_id: string; p_venue_id: string }
+        Returns: {
+          profile_id: string
+        }[]
+      }
       broadcast_recipients: {
         Args: { p_broadcast_id: string }
         Returns: {
@@ -2856,6 +3202,10 @@ export type Database = {
       can_read_venue_metrics: { Args: { p_venue_id: string }; Returns: boolean }
       cancel_broadcast: { Args: { p_broadcast_id: string }; Returns: undefined }
       cancel_raffle: { Args: { p_raffle_id: string }; Returns: undefined }
+      cancel_ticket_order: {
+        Args: { p_session_id: string }
+        Returns: undefined
+      }
       challenge_progress: {
         Args: { p_profile_id: string; p_promotion_id: string }
         Returns: {
@@ -2881,6 +3231,10 @@ export type Database = {
       consume_rate_limit: {
         Args: { p_action: string; p_max: number; p_window_seconds: number }
         Returns: boolean
+      }
+      count_broadcast_audience: {
+        Args: { p_audience: string; p_event_id?: string }
+        Returns: number
       }
       count_pending_moderation: { Args: never; Returns: number }
       counter_link_apply: {
@@ -2933,6 +3287,17 @@ export type Database = {
         }
         Returns: string
       }
+      create_ticket_order: {
+        Args: { p_profile_id: string; p_quantity: number; p_type_id: string }
+        Returns: {
+          amount_cents: number
+          event_name: string
+          kind: string
+          order_id: string
+          type_name: string
+          unit_cents: number
+        }[]
+      }
       credit_supercrush_purchase: {
         Args: {
           p_amount_cents: number
@@ -2958,6 +3323,10 @@ export type Database = {
           total: number
           updated_at: string
         }[]
+      }
+      fulfill_ticket_order: {
+        Args: { p_order_id: string; p_session_id: string }
+        Returns: number
       }
       generate_recurring_events: { Args: never; Returns: number }
       generate_weekly_report: {
@@ -3031,6 +3400,20 @@ export type Database = {
           hour: string
           left_count: number
           present: number
+        }[]
+      }
+      get_event_forecast: {
+        Args: { p_event_id: string }
+        Returns: {
+          capacity: number
+          confidence: string
+          expected_checkins: number
+          expected_total: number
+          full_risk: boolean
+          high: number
+          intents: number
+          low: number
+          past_nights: number
         }[]
       }
       get_event_funnel: {
@@ -3112,12 +3495,36 @@ export type Database = {
           winner_name: string
         }[]
       }
+      get_event_rating: {
+        Args: { p_event_id: string }
+        Returns: {
+          event_avg: number
+          event_count: number
+          my_rating: number
+          venue_avg: number
+          venue_count: number
+        }[]
+      }
       get_event_stats: {
         Args: { p_event_id: string }
         Returns: {
           active_users_count: number
           matches_count: number
           scans_count: number
+        }[]
+      }
+      get_event_ticket_types: {
+        Args: { p_event_id: string }
+        Returns: {
+          description: string
+          guests: number
+          id: string
+          kind: string
+          max_per_order: number
+          min_spend_cents: number
+          name: string
+          price_cents: number
+          remaining: number
         }[]
       }
       get_events_activity: {
@@ -3313,6 +3720,23 @@ export type Database = {
           reports_received: number
         }[]
       }
+      get_promoter_settlement: {
+        Args: { p_event_id: string }
+        Returns: {
+          check_ins: number
+          code: string
+          code_id: string
+          commission_cents: number
+          commission_type: string
+          commission_value: number
+          kind: string
+          label: string
+          paid_at: string
+          paid_cents: number
+          promoter_name: string
+          ticket_revenue_cents: number
+        }[]
+      }
       get_promotion_stats: {
         Args: { p_event_id: string }
         Returns: {
@@ -3345,6 +3769,36 @@ export type Database = {
           played_at: string
           title: string
           votes: number
+        }[]
+      }
+      get_ticket_orders: {
+        Args: { p_event_id: string }
+        Returns: {
+          amount_cents: number
+          buyer: string
+          id: string
+          kind: string
+          paid_at: string
+          quantity: number
+          type_name: string
+        }[]
+      }
+      get_ticket_sales: {
+        Args: { p_event_id: string }
+        Returns: {
+          active: boolean
+          capacity: number
+          description: string
+          guests: number
+          id: string
+          kind: string
+          max_per_order: number
+          min_spend_cents: number
+          name: string
+          price_cents: number
+          revenue_cents: number
+          sold: number
+          used: number
         }[]
       }
       get_user_conversations: {
@@ -3426,6 +3880,7 @@ export type Database = {
           type: string
         }[]
       }
+      get_venue_ratings: { Args: never; Returns: Json }
       get_venue_reports: {
         Args: { p_event_id: string }
         Returns: {
@@ -3553,6 +4008,10 @@ export type Database = {
         Args: { p_event_id: string; p_kind: string; p_profile_id: string }
         Returns: undefined
       }
+      mark_promoter_paid: {
+        Args: { p_code_id: string; p_paid: boolean }
+        Returns: undefined
+      }
       mark_song_played: { Args: { p_request_id: string }; Returns: undefined }
       mark_weekly_report_seen: {
         Args: { p_report_id: string }
@@ -3569,6 +4028,15 @@ export type Database = {
         }[]
       }
       my_boost: { Args: { p_event_id: string }; Returns: string }
+      my_pending_rating: {
+        Args: never
+        Returns: {
+          event_id: string
+          event_name: string
+          start_date: string
+          venue_name: string
+        }[]
+      }
       my_premium_status: {
         Args: never
         Returns: {
@@ -3589,12 +4057,35 @@ export type Database = {
           included_available: boolean
         }[]
       }
+      my_tickets: {
+        Args: never
+        Returns: {
+          code: string
+          end_date: string
+          event_id: string
+          event_name: string
+          guests: number
+          id: string
+          kind: string
+          min_spend_cents: number
+          start_date: string
+          status: string
+          type_name: string
+          unit_cents: number
+          used_at: string
+          venue_name: string
+        }[]
+      }
       normalize_phone: { Args: { p_phone: string }; Returns: string }
       normalize_song: {
         Args: { p_artist: string; p_title: string }
         Returns: string
       }
       notify_followers: { Args: { p_event_id: string }; Returns: boolean }
+      owner_business_for_event: {
+        Args: { p_event_id: string; p_feature: string }
+        Returns: string
+      }
       pending_event_pushes: {
         Args: never
         Returns: {
@@ -3622,6 +4113,16 @@ export type Database = {
       purge_finished_groups: { Args: never; Returns: number }
       purge_rate_limits: { Args: never; Returns: number }
       push_webhook: { Args: { p_body: Json }; Returns: undefined }
+      queue_audience_broadcast: {
+        Args: {
+          p_audience: string
+          p_body: string
+          p_event_id?: string
+          p_scheduled_at?: string
+          p_title: string
+        }
+        Returns: string
+      }
       queue_broadcast: {
         Args: {
           p_body: string
@@ -3645,6 +4146,17 @@ export type Database = {
         Returns: {
           profile_id: string
         }[]
+      }
+      rate_event: {
+        Args: {
+          p_atmosphere?: number
+          p_comment?: string
+          p_event_id: string
+          p_music?: number
+          p_overall: number
+          p_price?: number
+        }
+        Returns: undefined
       }
       recompute_my_verification: { Args: never; Returns: boolean }
       redeem_event_code: {
@@ -3705,7 +4217,27 @@ export type Database = {
         Args: { p_device_model?: string; p_platform: string; p_token: string }
         Returns: undefined
       }
+      save_ticket_type: {
+        Args: {
+          p_active?: boolean
+          p_capacity: number
+          p_description: string
+          p_event_id: string
+          p_guests?: number
+          p_id: string
+          p_kind: string
+          p_max_per_order?: number
+          p_min_spend_cents?: number
+          p_name: string
+          p_price_cents: number
+        }
+        Returns: string
+      }
       set_account_type: { Args: { p_type: string }; Returns: undefined }
+      set_code_commission: {
+        Args: { p_code_id: string; p_type: string; p_value: number }
+        Returns: undefined
+      }
       set_event_entry: {
         Args: { p_event_id: string; p_open: boolean }
         Returns: string
@@ -3775,6 +4307,7 @@ export type Database = {
         Args: { p_days?: number; p_profile_id: string; p_reason?: string }
         Returns: undefined
       }
+      ticket_type_taken: { Args: { p_type_id: string }; Returns: number }
       toggle_song_vote: { Args: { p_request_id: string }; Returns: boolean }
       toggle_venue_follow: { Args: { p_venue_id: string }; Returns: boolean }
       trigger_event_notifications: { Args: never; Returns: undefined }
@@ -3787,6 +4320,18 @@ export type Database = {
         Args: { p_latitude: number; p_longitude: number; p_profile_id: string }
         Returns: undefined
       }
+      validate_event_ticket: {
+        Args: { p_code: string }
+        Returns: {
+          already_used: boolean
+          event_name: string
+          guests: number
+          holder_name: string
+          kind: string
+          type_name: string
+          used_at: string
+        }[]
+      }
       validate_promotion_ticket: {
         Args: { p_ticket_code: string }
         Returns: {
@@ -3796,10 +4341,9 @@ export type Database = {
           title: string
         }[]
       }
-      venue_has_feature: {
-        Args: { p_feature: string; p_venue_id?: string }
-        Returns: boolean
-      }
+      venue_has_feature:
+        | { Args: { p_feature: string; p_venue_id?: string }; Returns: boolean }
+        | { Args: { p_feature: string; p_venue_id: string }; Returns: boolean }
       venue_plan: { Args: { p_venue_id?: string }; Returns: string }
       venue_plan_limits: {
         Args: { p_plan: string }

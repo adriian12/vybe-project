@@ -127,6 +127,16 @@ serve(async (req: Request): Promise<Response> => {
         const pagado = object.payment_status as string | undefined;
         if (pagado && pagado !== 'paid' && pagado !== 'no_payment_required') break;
 
+        // Entradas y mesas: se emiten una sola vez por pedido.
+        if (metadata.kind === 'tickets' && metadata.order_id) {
+          const { error } = await supabase.rpc('fulfill_ticket_order', {
+            p_order_id: metadata.order_id,
+            p_session_id: object.id as string,
+          });
+          if (error) throw error;
+          break;
+        }
+
         // Supercrush comprados: se suman al saldo una sola vez por sesión.
         if (metadata.kind === 'supercrush' && profileId) {
           const { error } = await supabase.rpc('credit_supercrush_purchase', {
@@ -217,6 +227,15 @@ serve(async (req: Request): Promise<Response> => {
           },
           { onConflict: 'user_id,event_id,subscription_type' },
         );
+        break;
+      }
+
+      // La pasarela de unas entradas caducó sin pagar: se liberan las plazas.
+      case 'checkout.session.expired': {
+        const metadata = (object.metadata ?? {}) as Record<string, string>;
+        if (metadata.kind === 'tickets') {
+          await supabase.rpc('cancel_ticket_order', { p_session_id: object.id as string });
+        }
         break;
       }
 
