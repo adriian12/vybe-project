@@ -55,6 +55,8 @@ const LandingPage = lazy(() => import('./pages/LandingPage'));
 const MobileOnlyPage = lazy(() => import('./pages/MobileOnlyPage'));
 // El contador del portero: se abre sin cuenta, desde el enlace que crea el local.
 const CounterPage = lazy(() => import('./pages/CounterPage'));
+// Seguridad, Camareros y RRPP: sin cuenta, desde el enlace que crea el local.
+const TeamLinkPage = lazy(() => import('./pages/TeamLinkPage'));
 
 /**
  * `/` es la landing en el navegador y la bienvenida dentro de la app instalada
@@ -207,6 +209,7 @@ const App = () => (
                     <Route path="/legal/:document" element={<LegalPage />} />
                     <Route path={DOWNLOAD_PATH} element={<MobileOnlyPage />} />
                     <Route path="/contador/:token" element={<CounterPage />} />
+                    <Route path="/equipo/:token" element={<TeamLinkPage />} />
 
                     {/* Clubbers */}
                     <Route path="/home" element={clubber(<HomePage />)} />

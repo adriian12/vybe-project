@@ -217,7 +217,8 @@
         "statTonight": "esdeveniments aquesta nit",
         "featured": "Destacats",
         "upcoming": "Propers esdeveniments",
-        "sponsored": "Destacat"
+        "sponsored": "Destacat",
+        "byPlatform": "Esdeveniment creat per {{app}}"
     },
     "eventAccess": {
         "verifyTitle": "Verificar proximitat",
@@ -869,7 +870,7 @@
         },
         "team": {
             "title": "Equip",
-            "subtitle": "Dona accés al panell al teu personal amb permisos diferents.",
+            "subtitle": "Comptes amb accés al tauler. Cambrers i RRPP entren amb un enllaç, sense compte.",
             "members": "Membres",
             "invite": "Afegir membre",
             "inviteEmail": "Correu de la persona",
@@ -877,10 +878,11 @@
             "role": "Rol",
             "roles": {
                 "owner": "Propietari",
-                "staff": "Personal",
-                "marketing": "Màrqueting"
+                "security": "Seguretat",
+                "waiter": "Cambrer",
+                "promoter": "RRPP"
             },
-            "roleHelp": "El propietari gestiona l'equip. El personal genera codis. Màrqueting veu estadístiques.",
+            "roleHelp": "Propietari: tot el tauler. Seguretat: Porta (aforament, llistes, entrades i alertes) i Codi QR.",
             "add": "Afegir",
             "added": "Membre afegit",
             "removed": "Membre eliminat",
@@ -888,7 +890,40 @@
             "onlyOwner": "Només el propietari pot gestionar l'equip.",
             "cannotRemoveOwner": "No pots eliminar el propietari.",
             "count_one": "{{count}} persona",
-            "count_other": "{{count}} persones"
+            "count_other": "{{count}} persones",
+            "links": {
+                "title": "Enllaços de l'equip",
+                "body": "Sense compte: s'obren a qualsevol mòbil. Els de Seguretat i Cambrers valen per a una nit; el de cada RRPP dura fins que el revoquis.",
+                "new": "Nou enllaç",
+                "name": "Nom",
+                "namePlaceholder": "Porta 1, Barra Laura, Adrián…",
+                "event": "Festa",
+                "pickEvent": "Tria la festa",
+                "noEvents": "No hi ha festes properes: crea'n una primer.",
+                "commission": "Comissió (opcional)",
+                "commissionNone": "Sense comissió",
+                "perPerson": "€ per persona",
+                "percent": "% de les seves entrades",
+                "create": "Crea l'enllaç",
+                "created": "Enllaç creat",
+                "view": "Veure l'enllaç",
+                "revoke": "Revoca",
+                "revoked": "Enllaç revocat",
+                "revokeConfirm": "Vols revocar l'enllaç de {{name}}? Deixarà de funcionar a l'instant.",
+                "expired": "Caducat",
+                "revokedTag": "Revocat",
+                "forever": "Sense caducitat",
+                "until": "Fins a {{date}}",
+                "lastUsed": "Usat {{time}}",
+                "neverUsed": "Sense fer servir",
+                "empty": "Encara no hi ha enllaços.",
+                "whatsappText": "El teu accés de {{role}} a {{app}}: {{url}}",
+                "roleHelp": {
+                    "security": "Una nit. Aforament, obrir i tancar la porta, llistes de convidats, entrades, alertes d'ajuda i denúncies. Res de diners ni estadístiques.",
+                    "waiter": "Una nit. Validar vals, promocions i premis de sorteig a la barra, veure les ofertes actives i rebre les alertes d'ajuda.",
+                    "promoter": "Fix fins que el revoquis. A cada festa: la seva llista (només la seva), el seu codi amb QR, quanta gent ha portat i la seva comissió."
+                }
+            }
         },
         "config": {
             "title": "Configuració d'accés",
@@ -1787,7 +1822,7 @@
             "subtitle": "Revetlles, festes de poble o festivals. Sense local, es publiquen com a Fiestea.",
             "name": "Nom",
             "venue": "Local",
-            "house": "Fiestea (sense local)",
+            "house": "{{app}} (sense local)",
             "date": "Dia",
             "start": "Comença",
             "end": "Acaba",
@@ -1796,7 +1831,9 @@
             "price": "Preu (€)",
             "capacity": "Aforament",
             "create": "Publicar festa",
-            "done": "Festa publicada"
+            "done": "Festa publicada",
+            "searchVenue": "Cerca un local…",
+            "noVenue": "Cap local amb aquest nom"
         },
         "notices": {
             "sent_one": "{{count}} avís enviat",
@@ -2944,6 +2981,81 @@
             "ofLeft_other": "de {{count}}",
             "admitN_one": "Entra {{count}}",
             "admitN_other": "Entren {{count}}"
+        }
+    },
+    "team": {
+        "share": {
+            "copy": "Copia",
+            "copied": "Copiat"
+        },
+        "link": {
+            "loading": "Carregant…",
+            "invalid": "Aquest enllaç ja no funciona",
+            "error": "No s'ha pogut carregar. Revisa la connexió.",
+            "retry": "Torna-ho a provar"
+        },
+        "tabs": {
+            "door": "Porta",
+            "lists": "Llistes",
+            "tickets": "Entrades",
+            "reports": "Denúncies",
+            "vouchers": "Vals",
+            "offers": "Ofertes",
+            "alerts": "Alertes"
+        },
+        "security": {
+            "entryOpen": "Porta oberta",
+            "entryClosed": "Porta tancada: només torna a entrar qui ja hi era",
+            "closeEntry": "Tanca la porta",
+            "openEntry": "Obre la porta",
+            "closed": "Porta tancada",
+            "opened": "Porta oberta",
+            "noReports": "Ningú no ha denunciat ningú aquesta nit.",
+            "revokeConfirm": "Vols retirar l'accés de {{name}}? Sortirà de l'esdeveniment a l'app."
+        },
+        "waiter": {
+            "validateTitle": "Valida un val",
+            "validateHelp": "Escaneja el QR del val o escriu-ne el codi. Serveix per a ofertes, reptes i premis de sorteig.",
+            "ok": "Val vàlid",
+            "used": "Aquest val ja s'ha fet servir",
+            "offersTitle": "Ofertes de la nit",
+            "noOffers": "No hi ha ofertes actives.",
+            "validatedOf": "{{validated}} bescanviats de {{claimed}}",
+            "until": "fins a les {{time}}",
+            "rafflesTitle": "Sortejos",
+            "winner": "Guanyador: {{name}}. Comprova el codi.",
+            "drawAt": "Se sorteja a les {{time}}"
+        },
+        "promoter": {
+            "upcoming": "Properes festes",
+            "past": "Festes passades",
+            "none": "El local no té festes programades.",
+            "summary": "{{people}} a la llista · {{admitted}} dins · {{code}} amb el teu codi",
+            "back": "Totes les festes",
+            "onList": "A la llista",
+            "inside": "Dins",
+            "withCode": "Amb el teu codi",
+            "codeTitle": "El teu codi",
+            "codeHelp": "Qui entra a l'app amb aquest codi compta com a teu.",
+            "shareText": "Vine a {{event}}! En entrar, fes servir el meu codi {{code}} a {{app}}.",
+            "commissionTitle": "La teva comissió",
+            "perPerson": "{{value}} € per persona",
+            "percent": "{{value}} % de les seves entrades",
+            "paid": "Pagada",
+            "pendingPay": "Pendent",
+            "listTitle": "La teva llista",
+            "listClosed": "La festa ja ha acabat: la llista només es pot consultar.",
+            "empty": "Encara no hi ha ningú a la teva llista.",
+            "saved": "Desat",
+            "edit": "Edita"
+        },
+        "errors": {
+            "name": "Posa-hi un nom.",
+            "event": "Tria una festa del local.",
+            "eventEnded": "Aquesta festa ja ha acabat.",
+            "tooMany": "Massa enllaços actius: revoca'n algun.",
+            "commission": "Comissió no vàlida.",
+            "entryLocked": "Ja ha entrat algú d'aquesta línia: no es pot treure."
         }
     }
 }

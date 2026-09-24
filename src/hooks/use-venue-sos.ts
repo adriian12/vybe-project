@@ -27,9 +27,32 @@ export interface VenueSos {
  * `alarm` es la primera alerta sin atender que todavía no ha saltado en esta
  * pantalla: la ventana con sonido sale una vez por alerta, no en cada consulta.
  *
- * Sin `venueId` (marketing, que no lleva la puerta) no hace nada.
+ * Sin `venueId` no hace nada.
  */
-export const useVenueSos = (venueId: string | null | undefined): VenueSos => {
+/**
+ * De dónde salen las alertas. El panel usa la sesión del local (con Realtime);
+ * los enlaces del equipo (Seguridad y Camareros, sin cuenta) las piden a
+ * `team-access` y sólo consultan cada pocos segundos.
+ */
+export interface SosSource {
+  load: () => Promise<VenueSosAlert[]>;
+  acknowledge: (alertId: string) => Promise<void>;
+  resolve: (alertId: string) => Promise<void>;
+  realtime: boolean;
+  intervalMs: number;
+}
+
+const PANEL: SosSource = {
+  load: () => venueService.getSosAlerts(),
+  acknowledge: (alertId) => venueService.acknowledgeSosAlert(alertId),
+  resolve: (alertId) => venueService.resolveSosAlert(alertId),
+  realtime: true,
+  intervalMs: 15_000,
+};
+
+export const useVenueSos = (venueId: string | null | undefined, source: SosSource = PANEL): VenueSos => {
+  const origen = useRef(source);
+  origen.current = source;
   const [alerts, setAlerts] = useState<VenueSosAlert[]>([]);
   const [alarm, setAlarm] = useState<VenueSosAlert | null>(null);
 
@@ -55,7 +78,7 @@ export const useVenueSos = (venueId: string | null | undefined): VenueSos => {
 
   const load = useCallback(async () => {
     if (!venueId) return;
-    const abiertas = await venueService.getSosAlerts();
+    const abiertas = await origen.current.load();
     alertasRef.current = abiertas;
     setAlerts(abiertas);
 
@@ -76,7 +99,8 @@ export const useVenueSos = (venueId: string | null | undefined): VenueSos => {
     }
 
     void load();
-    const interval = setInterval(() => void load(), 15_000);
+    const interval = setInterval(() => void load(), origen.current.intervalMs);
+    if (!origen.current.realtime) return () => clearInterval(interval);
 
     // Varias filas pueden cambiar a la vez: una sola lectura por ráfaga.
     let espera: ReturnType<typeof setTimeout> | null = null;
@@ -97,7 +121,7 @@ export const useVenueSos = (venueId: string | null | undefined): VenueSos => {
 
   const acknowledge = useCallback(
     async (alertId: string) => {
-      await venueService.acknowledgeSosAlert(alertId);
+      await origen.current.acknowledge(alertId);
       if (alarmaRef.current?.id === alertId) mostrar(null);
       await load();
     },
@@ -106,7 +130,7 @@ export const useVenueSos = (venueId: string | null | undefined): VenueSos => {
 
   const resolve = useCallback(
     async (alertId: string) => {
-      await venueService.resolveSosAlert(alertId);
+      await origen.current.resolve(alertId);
       alertasRef.current = alertasRef.current.filter((alerta) => alerta.id !== alertId);
       setAlerts(alertasRef.current);
       if (alarmaRef.current?.id === alertId) mostrar(null);

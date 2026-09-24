@@ -53,7 +53,7 @@ interface AppContextType {
   currentUser: User | null;
   currentVenue: Venue | null;
   /**
-   * Papel en el local: `owner` para la cuenta del local; `staff` o `marketing`
+   * Papel en el local: `owner` para la cuenta del local; `owner` o `security`
    * para el equipo, que en `app.vybes.es` entra al panel con su propia cuenta.
    */
   venueRole: VenueRole | null;
@@ -175,7 +175,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     const profile = await api.getCurrentProfile();
 
     // En app.vybes.es no hay parte de clubber: quien es del equipo de un local
-    // (personal, marketing) entra al panel de ese local con su propia cuenta.
+    // (propietario o Seguridad) entra al panel de ese local con su propia cuenta.
     // En la app del móvil sigue siendo un clubber más.
     if (profile && profile.role !== 'admin' && siteMode() === 'app') {
       const membership = await api.getMyVenueMembership();

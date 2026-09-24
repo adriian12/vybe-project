@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { ArrowRight, Bookmark, BookmarkCheck, Clock, MapPin, Music, Sparkles, Ticket } from 'lucide-react';
-import { isFeatured } from '@/lib/featured';
+import { ArrowRight, Bookmark, BookmarkCheck, Clock, MapPin, Music, Ticket } from 'lucide-react';
 import { formatDistance } from '@/services/geo';
 import { EventActivity, socialService } from '@/services/social';
 import { Event } from '@/types/venue';
@@ -64,6 +63,12 @@ const EventCard: React.FC<EventCardProps> = ({
 }) => {
   const { t } = useTranslation();
   const featured = variant === 'featured';
+  // Las fiestas que crea administración sin local firman como la app.
+  const anfitrion = event.byPlatform ? (
+    <span className="font-semibold text-ink">{t('home.byPlatform', { app: t('common.appName') })}</span>
+  ) : (
+    event.venueName
+  );
 
   const precio =
     event.price !== undefined && event.price > 0 ? `${event.price} €` : t('eventAccess.free');
@@ -152,7 +157,7 @@ const EventCard: React.FC<EventCardProps> = ({
           <>
             <h3 className="truncate font-display text-title-card text-ink">{event.name}</h3>
             <p className="mt-0.5 truncate text-body-sm text-[#66666E]">
-              {event.venueName}
+              {anfitrion}
               {event.city ? ` · ${event.city}` : ''}
             </p>
           </>
@@ -163,7 +168,7 @@ const EventCard: React.FC<EventCardProps> = ({
                 {event.name}
               </h3>
               <p className="mt-0.5 truncate text-body-sm text-[#66666E]">
-                {event.venueName}
+                {anfitrion}
                 {event.city ? ` · ${event.city}` : ''}
               </p>
             </div>
@@ -174,12 +179,6 @@ const EventCard: React.FC<EventCardProps> = ({
         )}
 
         <div className={cn('flex flex-wrap items-center gap-1.5', featured ? 'mt-2.5' : 'mt-3')}>
-          {isFeatured(event) && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-party-accent px-2.5 py-1 text-[11px] font-black text-white">
-              <Sparkles size={11} />
-              {t('home.sponsored')}
-            </span>
-          )}
           {featured && (
             <span className="rounded-full bg-party-primary px-2.5 py-1 text-[11px] font-black text-ink">
               {precio}

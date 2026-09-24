@@ -113,14 +113,14 @@ const PERIODS: Period[] = ['total', 'year', 'month', 'week'];
 const PROFILE_SECTIONS: Section[] = ['stats', 'promos', 'sales', 'team', 'plan'];
 
 /**
- * Lo que ve cada papel del equipo. El propietario, todo; el personal, la puerta
- * (contador, códigos, pantalla de entrada); marketing, datos y promociones. La
- * base de datos pone sus propios límites: esto sólo ordena el panel.
+ * Lo que ve cada cuenta del equipo (migración 072). El propietario, todo;
+ * Seguridad, la puerta (contador, listas, entradas, alertas). Camareros y RRPP
+ * no tienen cuenta: entran con su enlace en `/equipo/<token>`. La base de datos
+ * pone sus propios límites: esto sólo ordena el panel.
  */
 const SECCIONES_POR_ROL: Record<VenueRole, Section[]> = {
   owner: ['qr', 'door', 'events', 'stats', 'promos', 'sales', 'team', 'plan'],
-  staff: ['qr', 'door'],
-  marketing: ['stats', 'promos'],
+  security: ['door', 'qr'],
 };
 
 const periodStart = (period: Period): Date | undefined => {
@@ -203,13 +203,12 @@ const VenueDashboardPage = () => {
     [papel, plan],
   );
   const esPropietario = papel === 'owner';
-  const puedeDifundir = papel === 'owner' || papel === 'marketing';
+  const puedeDifundir = papel === 'owner';
 
-  // Las alertas de ayuda las lleva quien lleva la puerta: propietario y personal.
-  const sos = useVenueSos(papel === 'owner' || papel === 'staff' ? currentVenue?.id : null);
+  // Las alertas de ayuda: propietario y Seguridad.
+  const sos = useVenueSos(currentVenue?.id);
 
-  // Si la sección abierta no es de este papel (marketing entra en «qr»), a la
-  // primera que sí lo sea.
+  // Si la sección abierta no es de este papel, a la primera que sí lo sea.
   useEffect(() => {
     if (!puede(section)) setSection(SECCIONES_POR_ROL[papel][0]);
   }, [papel, puede, section]);
@@ -1075,7 +1074,12 @@ const VenueDashboardPage = () => {
 
         {section === 'team' && (
           <div className="mx-auto max-w-2xl">
-            <VenueTeam venueId={currentVenue.id} role={role} />
+            <VenueTeam
+              venueId={currentVenue.id}
+              role={papel}
+              events={myEvents}
+              canCommission={plan !== null && planHas(plan.plan, 'commissions')}
+            />
           </div>
         )}
 

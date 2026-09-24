@@ -217,7 +217,8 @@
         "statTonight": "eventos esta noche",
         "featured": "Destacados",
         "upcoming": "Próximos eventos",
-        "sponsored": "Destacado"
+        "sponsored": "Destacado",
+        "byPlatform": "Evento creado por {{app}}"
     },
     "eventAccess": {
         "verifyTitle": "Verificar proximidad",
@@ -869,7 +870,7 @@
         },
         "team": {
             "title": "Equipo",
-            "subtitle": "Da acceso al panel a tu personal con permisos distintos.",
+            "subtitle": "Cuentas con acceso al panel. Camareros y RRPP entran con un enlace, sin cuenta.",
             "members": "Miembros",
             "invite": "Añadir miembro",
             "inviteEmail": "Email de la persona",
@@ -877,10 +878,11 @@
             "role": "Rol",
             "roles": {
                 "owner": "Propietario",
-                "staff": "Personal",
-                "marketing": "Marketing"
+                "security": "Seguridad",
+                "waiter": "Camarero",
+                "promoter": "RRPP"
             },
-            "roleHelp": "Propietario gestiona el equipo. Personal genera códigos. Marketing ve estadísticas.",
+            "roleHelp": "Propietario: todo el panel. Seguridad: Puerta (aforo, listas, entradas y alertas) y Código QR.",
             "add": "Añadir",
             "added": "Miembro añadido",
             "removed": "Miembro eliminado",
@@ -888,7 +890,40 @@
             "onlyOwner": "Sólo el propietario puede gestionar el equipo.",
             "cannotRemoveOwner": "No puedes eliminar al propietario.",
             "count_one": "{{count}} persona",
-            "count_other": "{{count}} personas"
+            "count_other": "{{count}} personas",
+            "links": {
+                "title": "Enlaces del equipo",
+                "body": "Sin cuenta: se abren en cualquier móvil. Los de Seguridad y Camareros valen para una noche; el de cada RRPP dura hasta que lo revoques.",
+                "new": "Nuevo enlace",
+                "name": "Nombre",
+                "namePlaceholder": "Puerta 1, Barra Laura, Adrián…",
+                "event": "Fiesta",
+                "pickEvent": "Elige la fiesta",
+                "noEvents": "No hay fiestas próximas: crea una primero.",
+                "commission": "Comisión (opcional)",
+                "commissionNone": "Sin comisión",
+                "perPerson": "€ por persona",
+                "percent": "% de sus entradas",
+                "create": "Crear enlace",
+                "created": "Enlace creado",
+                "view": "Ver enlace",
+                "revoke": "Revocar",
+                "revoked": "Enlace revocado",
+                "revokeConfirm": "¿Revocar el enlace de {{name}}? Dejará de funcionar al momento.",
+                "expired": "Caducado",
+                "revokedTag": "Revocado",
+                "forever": "Sin caducidad",
+                "until": "Hasta {{date}}",
+                "lastUsed": "Usado {{time}}",
+                "neverUsed": "Sin usar",
+                "empty": "Todavía no hay enlaces.",
+                "whatsappText": "Tu acceso de {{role}} en {{app}}: {{url}}",
+                "roleHelp": {
+                    "security": "Una noche. Aforo, abrir y cerrar la puerta, listas de invitados, entradas, alertas de ayuda y denuncias. Nada de dinero ni estadísticas.",
+                    "waiter": "Una noche. Validar vales, promociones y premios de sorteo en la barra, ver las ofertas activas y recibir las alertas de ayuda.",
+                    "promoter": "Fijo hasta que lo revoques. En cada fiesta: su lista (sólo la suya), su código con QR, cuánta gente ha traído y su comisión."
+                }
+            }
         },
         "config": {
             "title": "Configuración de acceso",
@@ -1787,7 +1822,7 @@
             "subtitle": "Verbenas, fiestas de pueblo o festivales. Sin local, se publican como Fiestea.",
             "name": "Nombre",
             "venue": "Local",
-            "house": "Fiestea (sin local)",
+            "house": "{{app}} (sin local)",
             "date": "Día",
             "start": "Empieza",
             "end": "Termina",
@@ -1796,7 +1831,9 @@
             "price": "Precio (€)",
             "capacity": "Aforo",
             "create": "Publicar fiesta",
-            "done": "Fiesta publicada"
+            "done": "Fiesta publicada",
+            "searchVenue": "Buscar local…",
+            "noVenue": "Ningún local con ese nombre"
         },
         "notices": {
             "sent_one": "{{count}} aviso enviado",
@@ -2944,6 +2981,81 @@
             "ofLeft_other": "de {{count}}",
             "admitN_one": "Entra {{count}}",
             "admitN_other": "Entran {{count}}"
+        }
+    },
+    "team": {
+        "share": {
+            "copy": "Copiar",
+            "copied": "Copiado"
+        },
+        "link": {
+            "loading": "Cargando…",
+            "invalid": "Este enlace ya no funciona",
+            "error": "No se ha podido cargar. Revisa la conexión.",
+            "retry": "Reintentar"
+        },
+        "tabs": {
+            "door": "Puerta",
+            "lists": "Listas",
+            "tickets": "Entradas",
+            "reports": "Denuncias",
+            "vouchers": "Vales",
+            "offers": "Ofertas",
+            "alerts": "Alertas"
+        },
+        "security": {
+            "entryOpen": "Puerta abierta",
+            "entryClosed": "Puerta cerrada: sólo vuelve a entrar quien ya estaba",
+            "closeEntry": "Cerrar la puerta",
+            "openEntry": "Abrir la puerta",
+            "closed": "Puerta cerrada",
+            "opened": "Puerta abierta",
+            "noReports": "Nadie ha denunciado a nadie esta noche.",
+            "revokeConfirm": "¿Retirar el acceso de {{name}}? Saldrá del evento en la app."
+        },
+        "waiter": {
+            "validateTitle": "Validar vale",
+            "validateHelp": "Escanea el QR del vale o escribe su código. Sirve para ofertas, retos y premios de sorteo.",
+            "ok": "Vale válido",
+            "used": "Este vale ya se usó",
+            "offersTitle": "Ofertas de la noche",
+            "noOffers": "No hay ofertas activas.",
+            "validatedOf": "{{validated}} canjeados de {{claimed}}",
+            "until": "hasta las {{time}}",
+            "rafflesTitle": "Sorteos",
+            "winner": "Ganador: {{name}}. Comprueba el código.",
+            "drawAt": "Se sortea a las {{time}}"
+        },
+        "promoter": {
+            "upcoming": "Próximas fiestas",
+            "past": "Fiestas pasadas",
+            "none": "El local no tiene fiestas programadas.",
+            "summary": "{{people}} en lista · {{admitted}} dentro · {{code}} con tu código",
+            "back": "Todas las fiestas",
+            "onList": "En lista",
+            "inside": "Dentro",
+            "withCode": "Con tu código",
+            "codeTitle": "Tu código",
+            "codeHelp": "Quien entra en la app con este código cuenta como tuyo.",
+            "shareText": "¡Vente a {{event}}! Al entrar, usa mi código {{code}} en {{app}}.",
+            "commissionTitle": "Tu comisión",
+            "perPerson": "{{value}} € por persona",
+            "percent": "{{value}} % de sus entradas",
+            "paid": "Pagada",
+            "pendingPay": "Pendiente",
+            "listTitle": "Tu lista",
+            "listClosed": "La fiesta ya terminó: la lista sólo se puede consultar.",
+            "empty": "Todavía no hay nadie en tu lista.",
+            "saved": "Guardado",
+            "edit": "Editar"
+        },
+        "errors": {
+            "name": "Pon un nombre.",
+            "event": "Elige una fiesta del local.",
+            "eventEnded": "Esa fiesta ya terminó.",
+            "tooMany": "Demasiados enlaces activos: revoca alguno.",
+            "commission": "Comisión no válida.",
+            "entryLocked": "Ya ha entrado alguien de esa línea: no se puede quitar."
         }
     }
 }

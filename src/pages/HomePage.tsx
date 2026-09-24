@@ -1,22 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Bell, ChevronDown, ChevronRight, Flame, Loader2, PartyPopper, User,
-  MapPin,
-} from 'lucide-react';
+import { Bell, ChevronRight, Flame, Loader2, PartyPopper, User } from 'lucide-react';
 import { useAppContext } from '@/context/app-context';
 import Header from '@/components/header';
 import Footer from '@/components/footer';
 import EventCard from '@/components/event-card';
 import ActivitySheet, { useActivity } from '@/components/activity-sheet';
-import { PartyButton } from '@/components/ui-custom/party-button';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { track } from '@/lib/observability';
 import { isEventLive, isEventTonight, useEventsFeed } from '@/hooks/use-events-feed';
 import { Event } from '@/types/venue';
@@ -24,15 +14,6 @@ import { isFeatured } from '@/lib/featured';
 import PartyFilters from '@/components/party-filters';
 import RatePartyPrompt from '@/components/rate-party';
 import { aplicarFiltros, Franja } from '@/lib/party-filters';
-
-/**
- * Radio de «cerca de mí». Diez kilómetros cubren un área metropolitana entera
- * sin colar la fiesta de otra isla.
- */
-const NEARBY_RADIUS_METERS = 10_000;
-
-const ALL = '__all__';
-const NEARBY = '__nearby__';
 
 /** Cuántas tarjetas caben en el carrusel de destacados. */
 const DESTACADOS = 5;
@@ -55,19 +36,13 @@ const HomePage = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
-  const { withDistance, isLoading, position, locationDenied, activity, intents, busyIntent, toggleIntent } =
+  const { withDistance, isLoading, activity, intents, busyIntent, toggleIntent } =
     useEventsFeed();
 
-  const [place, setPlace] = useState<string>(ALL);
   const [theme, setTheme] = useState<string | null>(null);
   const [franja, setFranja] = useState<Franja | null>(null);
   const [avisosAbiertos, setAvisosAbiertos] = useState(false);
   const avisos = useActivity(intents);
-
-  // Sin ubicación, «cerca de mí» no puede filtrar nada: se muestra todo.
-  useEffect(() => {
-    if (locationDenied) setPlace(ALL);
-  }, [locationDenied]);
 
   const openEvent = (event: Event) => {
     if (activeEvent?.eventId === event.id) {
@@ -78,35 +53,6 @@ const HomePage = () => {
     navigate(`/event/${event.id}`);
   };
 
-  /** Zonas con eventos, agrupadas por comunidad. */
-  const places = useMemo(() => {
-    const byRegion = new Map<string, Set<string>>();
-    for (const { event } of withDistance) {
-      if (!event.city) continue;
-      const region = event.region ?? t('home.otherRegion');
-      if (!byRegion.has(region)) byRegion.set(region, new Set());
-      byRegion.get(region)?.add(event.city);
-    }
-    return [...byRegion.entries()]
-      .map(([region, cities]) => ({ region, cities: [...cities].sort() }))
-      .sort((a, b) => a.region.localeCompare(b.region));
-  }, [withDistance, t]);
-
-  const porZona = useMemo(() => {
-    if (place === ALL) return withDistance;
-
-    if (place === NEARBY) {
-      // Sin ubicación no hay nada que acercar: todo antes que una lista vacía.
-      if (!position) return withDistance;
-      return withDistance.filter((e) => e.distance !== null && e.distance <= NEARBY_RADIUS_METERS);
-    }
-
-    const [kind, value] = place.split(':');
-    return withDistance.filter((e) =>
-      kind === 'region' ? (e.event.region ?? '') === value : e.event.city === value,
-    );
-  }, [withDistance, place, position]);
-
   /**
    * Las píldoras de género salen de los eventos que hay, no de una lista fija:
    * una píldora de «Reggaetón» en una noche sin reggaetón sólo lleva a una
@@ -114,11 +60,11 @@ const HomePage = () => {
    */
   const themes = useMemo(() => {
     const encontradas = new Set<string>();
-    for (const { event } of porZona) if (event.theme) encontradas.add(event.theme);
+    for (const { event } of withDistance) if (event.theme) encontradas.add(event.theme);
     return [...encontradas].sort();
-  }, [porZona]);
+  }, [withDistance]);
 
-  const visible = useMemo(() => aplicarFiltros(porZona, theme, franja), [porZona, theme, franja]);
+  const visible = useMemo(() => aplicarFiltros(withDistance, theme, franja), [withDistance, theme, franja]);
 
   useEffect(() => {
     if (theme && !themes.includes(theme)) setTheme(null);
@@ -143,13 +89,6 @@ const HomePage = () => {
       )
       .slice(0, DESTACADOS);
   }, [visible, activity]);
-
-  const nombrePlace =
-    place === NEARBY
-      ? t('home.nearMe')
-      : place === ALL
-        ? t('home.allPlaces')
-        : place.split(':')[1];
 
   const foto = currentUser?.avatar || currentUser?.photos?.[0];
   const hora = new Date().getHours();
@@ -268,7 +207,7 @@ const HomePage = () => {
 
         {/* --------------------------------------------------------- filtros */}
         {/* Música (todos los géneros dentro) y las franjas de la fiesta. */}
-        {!isLoading && porZona.length > 0 && (
+        {!isLoading && withDistance.length > 0 && (
           <PartyFilters
             className="px-margin"
             themes={themes}
@@ -308,27 +247,6 @@ const HomePage = () => {
         <section className="space-y-4 px-margin pt-1">
           <div className="flex items-center justify-between gap-3">
             <h2 className="font-display text-headline-lg">{t('home.upcoming')}</h2>
-
-            {places.length > 0 && (
-              <Select value={place} onValueChange={setPlace}>
-                <SelectTrigger
-                  aria-label={t('home.filterPlace')}
-                  className="press h-9 w-auto max-w-[55%] gap-1.5 rounded-full border border-surface-highest bg-surface-low px-3.5 text-label-pill text-foreground focus:border-party-primary [&>svg]:hidden"
-                >
-                  <MapPin size={14} className="shrink-0 text-party-primary" />
-                  <SelectValue>{nombrePlace}</SelectValue>
-                  <ChevronDown size={14} className="shrink-0" />
-                </SelectTrigger>
-                <SelectContent align="end">
-                  {/* «Cerca de mí» está oculto: la lista sale de todas las
-                      zonas y el mapa es lo que enseña lo que tienes cerca. */}
-                  <SelectItem value={ALL}>{t('home.allPlaces')}</SelectItem>
-                  {places.map(({ region, cities }) => (
-                    <SelectGroupBlock key={region} region={region} cities={cities} />
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
           </div>
 
           {isLoading ? (
@@ -341,13 +259,8 @@ const HomePage = () => {
               <PartyPopper size={44} className="mb-4 text-party-primary" />
               <h3 className="mb-2 font-display text-headline-md">{t('home.empty')}</h3>
               <p className="mb-5 max-w-xs text-body-sm text-party-gray">
-                {place === NEARBY ? t('home.emptyNearby') : t('home.emptyBody')}
+                {t('home.emptyBody')}
               </p>
-              {place !== ALL && (
-                <PartyButton variant="outline" size="sm" onClick={() => setPlace(ALL)}>
-                  {t('home.allPlaces')}
-                </PartyButton>
-              )}
             </div>
           ) : (
             // La lista se ve una vez por sesión, así que se permite una entrada
@@ -377,24 +290,5 @@ const HomePage = () => {
     </div>
   );
 };
-
-/**
- * Una comunidad con sus localidades dentro del desplegable.
- *
- * Va aparte porque `SelectContent` no admite fragmentos con varios hijos sin
- * envolver, y anidarlo en el JSX de arriba lo hacía ilegible.
- */
-const SelectGroupBlock = ({ region, cities }: { region: string; cities: string[] }) => (
-  <>
-    <SelectItem value={`region:${region}`} className="font-semibold">
-      {region}
-    </SelectItem>
-    {cities.map((city) => (
-      <SelectItem key={city} value={`city:${city}`} className="pl-8">
-        {city}
-      </SelectItem>
-    ))}
-  </>
-);
 
 export default HomePage;

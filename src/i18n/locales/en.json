@@ -217,7 +217,8 @@
         "statTonight": "events tonight",
         "featured": "Featured",
         "upcoming": "Upcoming events",
-        "sponsored": "Featured"
+        "sponsored": "Featured",
+        "byPlatform": "Event by {{app}}"
     },
     "eventAccess": {
         "verifyTitle": "Verify you're nearby",
@@ -869,7 +870,7 @@
         },
         "team": {
             "title": "Team",
-            "subtitle": "Give your staff access to the dashboard with different permissions.",
+            "subtitle": "Accounts with access to the dashboard. Bar staff and promoters use a link, no account needed.",
             "members": "Members",
             "invite": "Add member",
             "inviteEmail": "Their email address",
@@ -877,10 +878,11 @@
             "role": "Role",
             "roles": {
                 "owner": "Owner",
-                "staff": "Staff",
-                "marketing": "Marketing"
+                "security": "Security",
+                "waiter": "Bar staff",
+                "promoter": "Promoter"
             },
-            "roleHelp": "Owner manages the team. Staff generate codes. Marketing sees analytics.",
+            "roleHelp": "Owner: the whole dashboard. Security: Door (capacity, lists, tickets and alerts) and QR code.",
             "add": "Add",
             "added": "Member added",
             "removed": "Member removed",
@@ -888,7 +890,40 @@
             "onlyOwner": "Only the owner can manage the team.",
             "cannotRemoveOwner": "You can't remove the owner.",
             "count_one": "{{count}} person",
-            "count_other": "{{count}} people"
+            "count_other": "{{count}} people",
+            "links": {
+                "title": "Team links",
+                "body": "No account: they open on any phone. Security and bar staff links last one night; each promoter's link lasts until you revoke it.",
+                "new": "New link",
+                "name": "Name",
+                "namePlaceholder": "Door 1, Bar Laura, Adrián…",
+                "event": "Party",
+                "pickEvent": "Choose the party",
+                "noEvents": "No upcoming parties: create one first.",
+                "commission": "Commission (optional)",
+                "commissionNone": "No commission",
+                "perPerson": "€ per person",
+                "percent": "% of their tickets",
+                "create": "Create link",
+                "created": "Link created",
+                "view": "View link",
+                "revoke": "Revoke",
+                "revoked": "Link revoked",
+                "revokeConfirm": "Revoke {{name}}'s link? It will stop working immediately.",
+                "expired": "Expired",
+                "revokedTag": "Revoked",
+                "forever": "No expiry",
+                "until": "Until {{date}}",
+                "lastUsed": "Used {{time}}",
+                "neverUsed": "Not used yet",
+                "empty": "No links yet.",
+                "whatsappText": "Your {{role}} access on {{app}}: {{url}}",
+                "roleHelp": {
+                    "security": "One night. Capacity, opening and closing the door, guest lists, tickets, help alerts and reports. No money or stats.",
+                    "waiter": "One night. Validate vouchers, promotions and raffle prizes at the bar, see active offers and receive help alerts.",
+                    "promoter": "Permanent until you revoke it. For each party: their own list, their code with QR, how many people they brought and their commission."
+                }
+            }
         },
         "config": {
             "title": "Access settings",
@@ -1787,7 +1822,7 @@
             "subtitle": "Town festivals or festivals. With no venue, they are published as Fiestea.",
             "name": "Name",
             "venue": "Venue",
-            "house": "Fiestea (no venue)",
+            "house": "{{app}} (no venue)",
             "date": "Day",
             "start": "Starts",
             "end": "Ends",
@@ -1796,7 +1831,9 @@
             "price": "Price (€)",
             "capacity": "Capacity",
             "create": "Publish party",
-            "done": "Party published"
+            "done": "Party published",
+            "searchVenue": "Search venue…",
+            "noVenue": "No venue with that name"
         },
         "notices": {
             "sent_one": "{{count}} notice sent",
@@ -2944,6 +2981,81 @@
             "ofLeft_other": "of {{count}}",
             "admitN_one": "Admit {{count}}",
             "admitN_other": "Admit {{count}}"
+        }
+    },
+    "team": {
+        "share": {
+            "copy": "Copy",
+            "copied": "Copied"
+        },
+        "link": {
+            "loading": "Loading…",
+            "invalid": "This link no longer works",
+            "error": "Couldn't load. Check your connection.",
+            "retry": "Try again"
+        },
+        "tabs": {
+            "door": "Door",
+            "lists": "Lists",
+            "tickets": "Tickets",
+            "reports": "Reports",
+            "vouchers": "Vouchers",
+            "offers": "Offers",
+            "alerts": "Alerts"
+        },
+        "security": {
+            "entryOpen": "Door open",
+            "entryClosed": "Door closed: only people already inside can come back in",
+            "closeEntry": "Close the door",
+            "openEntry": "Open the door",
+            "closed": "Door closed",
+            "opened": "Door open",
+            "noReports": "No one has reported anyone tonight.",
+            "revokeConfirm": "Revoke {{name}}'s access? They will be removed from the event in the app."
+        },
+        "waiter": {
+            "validateTitle": "Validate voucher",
+            "validateHelp": "Scan the voucher QR or type its code. Works for offers, challenges and raffle prizes.",
+            "ok": "Valid voucher",
+            "used": "This voucher was already used",
+            "offersTitle": "Tonight's offers",
+            "noOffers": "No active offers.",
+            "validatedOf": "{{validated}} redeemed of {{claimed}}",
+            "until": "until {{time}}",
+            "rafflesTitle": "Raffles",
+            "winner": "Winner: {{name}}. Check the code.",
+            "drawAt": "Draw at {{time}}"
+        },
+        "promoter": {
+            "upcoming": "Upcoming parties",
+            "past": "Past parties",
+            "none": "The venue has no parties scheduled.",
+            "summary": "{{people}} on list · {{admitted}} in · {{code}} with your code",
+            "back": "All parties",
+            "onList": "On list",
+            "inside": "Inside",
+            "withCode": "With your code",
+            "codeTitle": "Your code",
+            "codeHelp": "Anyone who checks in on the app with this code counts as yours.",
+            "shareText": "Come to {{event}}! When you get in, use my code {{code}} on {{app}}.",
+            "commissionTitle": "Your commission",
+            "perPerson": "€{{value}} per person",
+            "percent": "{{value}}% of their tickets",
+            "paid": "Paid",
+            "pendingPay": "Pending",
+            "listTitle": "Your list",
+            "listClosed": "The party is over: the list is read-only.",
+            "empty": "No one on your list yet.",
+            "saved": "Saved",
+            "edit": "Edit"
+        },
+        "errors": {
+            "name": "Enter a name.",
+            "event": "Choose one of the venue's parties.",
+            "eventEnded": "That party is over.",
+            "tooMany": "Too many active links: revoke some.",
+            "commission": "Invalid commission.",
+            "entryLocked": "Someone from that entry is already in: it can't be removed."
         }
     }
 }
