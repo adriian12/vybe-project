@@ -66,3 +66,9 @@ supabase/seeds/mallorca_test_data.sql
 # graphify: grafo de conocimiento del código (se regenera con `graphify update .`)
 graphify-out/
 .graphify_*
+
+# Cachés y cobertura
+.cache/
+.turbo/
+coverage/
+*.tmp
