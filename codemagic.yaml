@@ -116,4 +116,7 @@ workflows:
         api_key: $APP_STORE_CONNECT_PRIVATE_KEY
         key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
         issuer_id: $APP_STORE_CONNECT_ISSUER_ID
-        submit_to_testflight: true
+        # Sube a TestFlight para pruebas internas. Las externas exigen antes
+        # rellenar en App Store Connect la información de la beta (correo de
+        # comentarios y contacto para la revisión); entonces se pone a true.
+        submit_to_testflight: false
