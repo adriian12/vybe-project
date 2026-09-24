@@ -67,7 +67,23 @@ export interface TicketOrder {
   kind: TicketKind;
   quantity: number;
   amountCents: number;
+  /** Lo que llega al local después de la comisión de la plataforma. */
+  netCents: number;
+  status: 'paid' | 'refunded';
   paidAt: string | null;
+  refundedAt: string | null;
+  /** Entradas del pedido ya validadas en la puerta. */
+  used: number;
+  refundable: boolean;
+}
+
+/** Estado de la cuenta de Stripe del local (Connect, migración 069). */
+export interface PaymentsStatus {
+  connected: boolean;
+  chargesEnabled: boolean;
+  payoutsEnabled: boolean;
+  detailsSubmitted: boolean;
+  pendingFields: number;
 }
 
 export interface TicketTypeInput {
@@ -121,7 +137,33 @@ const ERRORES: Record<string, string> = {
   TICKET_NOT_FOUND: 'sales.errors.ticketNotFound',
   TICKET_REFUNDED: 'sales.errors.ticketRefunded',
   INVALID_COMMISSION: 'sales.errors.invalidCommission',
+  PAYMENTS_NOT_ENABLED: 'tickets.buy.errors.closed',
+  CONNECT_NOT_ENABLED: 'sales.payments.errors.connectNotEnabled',
+  ONBOARD_FAILED: 'sales.payments.errors.onboard',
+  STATUS_FAILED: 'sales.payments.errors.generic',
+  DASHBOARD_FAILED: 'sales.payments.errors.generic',
+  REFUND_FAILED: 'sales.payments.errors.refund',
+  NOT_REFUNDABLE: 'sales.payments.errors.refund',
+  ALREADY_REFUNDED: 'sales.payments.errors.alreadyRefunded',
 };
+
+/** Llama a `stripe-connect` y devuelve su respuesta o lanza su error. */
+const connect = async <T,>(body: Record<string, unknown>): Promise<T> => {
+  const { data, error } = await supabase.functions.invoke('stripe-connect', { body });
+  let code = (data as { error?: string } | null)?.error;
+  if (error) {
+    const context = (error as { context?: Response }).context;
+    try {
+      code = ((await context?.clone().json()) as { error?: string } | undefined)?.error ?? 'SERVER_ERROR';
+    } catch {
+      code = 'SERVER_ERROR';
+    }
+  }
+  if (code) throw new ApiError(code, ERRORES[code] ?? 'errors.generic');
+  return data as T;
+};
+
+const volverAlPanel = () => `${window.location.origin}/venue/dashboard`;
 
 const fallo = (message: string): ApiError => {
   const code = Object.keys(ERRORES).find((key) => message.includes(key));
@@ -249,7 +291,12 @@ export const ticketsService = {
       kind: row.kind as TicketKind,
       quantity: row.quantity,
       amountCents: row.amount_cents,
+      netCents: row.net_cents,
+      status: row.status as TicketOrder['status'],
       paidAt: row.paid_at,
+      refundedAt: row.refunded_at,
+      used: row.used,
+      refundable: row.refundable,
     }));
   },
 
@@ -269,6 +316,36 @@ export const ticketsService = {
     } as never);
     if (error) throw fallo(error.message);
     return String(data ?? '');
+  },
+
+  // ------------------------------------------------- cobros (Stripe Connect)
+  /** Lo guardado en la base de datos: rápido, sin preguntar a Stripe. */
+  getPaymentsStatus: async (): Promise<PaymentsStatus | null> => {
+    const { data, error } = await supabase.rpc('get_venue_payments_status');
+    const row = !error && data?.[0];
+    if (!row) return null;
+    return {
+      connected: row.connected,
+      chargesEnabled: row.charges_enabled,
+      payoutsEnabled: row.payouts_enabled,
+      detailsSubmitted: row.details_submitted,
+      pendingFields: row.pending_fields,
+    };
+  },
+
+  /** Pregunta a Stripe y lo guarda (al volver del alta o al abrir Ventas). */
+  refreshPayments: (): Promise<PaymentsStatus> => connect<PaymentsStatus>({ action: 'status' }),
+
+  /** Enlace al alta de Stripe: crea la cuenta si todavía no la tiene. */
+  startOnboarding: async (): Promise<string> =>
+    (await connect<{ url: string }>({ action: 'onboard', returnUrl: volverAlPanel() })).url,
+
+  /** Enlace de un solo uso al panel de pagos del local en Stripe. */
+  paymentsDashboard: async (): Promise<string> => (await connect<{ url: string }>({ action: 'dashboard' })).url,
+
+  /** Devuelve un pedido entero; sus entradas dejan de valer. */
+  refundOrder: async (orderId: string): Promise<void> => {
+    await connect({ action: 'refund', orderId });
   },
 
   // ------------------------------------------------------- comisiones RRPP

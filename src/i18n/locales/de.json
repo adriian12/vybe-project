@@ -2746,7 +2746,7 @@
         "ended": "Die Party ist vorbei: Es kann nichts mehr verkauft werden.",
         "addTable": "Tisch hinzufügen",
         "addEntry": "Ticket hinzufügen",
-        "note": "Zahlungen laufen per Karte über Stripe. Jedes Ticket hat einen QR-Code, der unter Tür → „Ticket prüfen“ entwertet wird.",
+        "note": "Das Geld jedes Verkaufs geht direkt auf dein Konto. Jedes Ticket hat einen QR-Code, der unter Tür → „Ticket prüfen“ entwertet wird.",
         "orders": "Letzte Käufe",
         "noOrders": "Noch keine Käufe.",
         "locked": {
@@ -2791,6 +2791,37 @@
             "alreadyUsed": "Schon verwendet um {{time}}",
             "tableOk": "Tisch gültig",
             "entryOk": "Ticket gültig"
+        },
+        "payments": {
+            "title": "Zahlungen",
+            "active": "Zahlungen aktiv",
+            "intro": "Aktiviere Zahlungen, um Tickets und Tische zu verkaufen: Das Geld geht direkt auf dein Bankkonto. Dauert 2-3 Minuten; wenn du Stripe schon nutzt, melde dich einfach an.",
+            "activeBody": "Jeder Verkauf geht auf dein Stripe-Konto und von dort automatisch auf deine Bank.",
+            "noPayouts": "Du kannst schon verkaufen, aber es fehlt dein Bankkonto für die Auszahlungen.",
+            "reviewing": "Stripe prüft deine Angaben. Das dauert meist ein paar Minuten.",
+            "missing_one": "Es fehlt noch {{count}} Angabe, um Zahlungen anzunehmen.",
+            "missing_other": "Es fehlen noch {{count}} Angaben, um Zahlungen anzunehmen.",
+            "activate": "Zahlungen aktivieren",
+            "complete": "Angaben vervollständigen",
+            "check": "Prüfen",
+            "dashboard": "Meine Zahlungen",
+            "back": "Wir haben dein Zahlungskonto geprüft.",
+            "hidden": "Deine Tickets werden in der App erst angezeigt, wenn du Zahlungen aktivierst.",
+            "refunded": "Erstattung erledigt",
+            "refundedTag": "Erstattet",
+            "youGet": "Du erhältst {{amount}}",
+            "refund": "Erstatten",
+            "refundTitle": "{{amount}} erstatten?",
+            "refundBody": "{{buyer}} bekommt das Geld zurück und die Tickets werden ungültig. Das lässt sich nicht rückgängig machen.",
+            "refundUsed_one": "Achtung: {{count}} Ticket wurde schon am Einlass verwendet.",
+            "refundUsed_other": "Achtung: {{count}} Tickets wurden schon am Einlass verwendet.",
+            "errors": {
+                "connectNotEnabled": "Zahlungen sind noch nicht verfügbar. Versuch es später.",
+                "onboard": "Die Anmeldung bei Stripe konnte nicht geöffnet werden. Versuch es erneut.",
+                "generic": "Keine Verbindung zu Stripe. Versuch es erneut.",
+                "refund": "Die Erstattung hat nicht geklappt.",
+                "alreadyRefunded": "Dieser Kauf wurde schon erstattet."
+            }
         }
     },
     "forecast": {

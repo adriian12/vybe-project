@@ -2746,7 +2746,7 @@
         "ended": "La festa ja ha acabat: no es pot vendre més.",
         "addTable": "Afegir taula",
         "addEntry": "Afegir entrada",
-        "note": "Els pagaments es cobren amb targeta a Stripe. Cada entrada porta un QR que es valida a Porta → «Validar entrada».",
+        "note": "Els diners de cada venda arriben directament al teu compte. Cada entrada porta un QR que es valida a Porta → «Validar entrada».",
         "orders": "Últimes compres",
         "noOrders": "Encara no hi ha compres.",
         "locked": {
@@ -2791,6 +2791,37 @@
             "alreadyUsed": "Ja usada a les {{time}}",
             "tableOk": "Taula vàlida",
             "entryOk": "Entrada vàlida"
+        },
+        "payments": {
+            "title": "Cobraments",
+            "active": "Cobraments actius",
+            "intro": "Activa els cobraments per vendre entrades i taules: els diners arriben directament al teu compte bancari. Són 2-3 minuts; si ja fas servir Stripe, entra amb el teu compte i llestos.",
+            "activeBody": "Cada venda arriba al teu compte de Stripe i d'allà al teu banc automàticament.",
+            "noPayouts": "Ja pots vendre, però falta el teu compte bancari per rebre les transferències.",
+            "reviewing": "Stripe està revisant les teves dades. Sol tardar uns minuts.",
+            "missing_one": "Falta {{count}} dada per poder cobrar.",
+            "missing_other": "Falten {{count}} dades per poder cobrar.",
+            "activate": "Activar cobraments",
+            "complete": "Completar dades",
+            "check": "Comprovar",
+            "dashboard": "Veure els meus pagaments",
+            "back": "Hem comprovat el teu compte de cobraments.",
+            "hidden": "Les teves entrades no es veuen a l'app fins que activis els cobraments.",
+            "refunded": "Devolució feta",
+            "refundedTag": "Retornat",
+            "youGet": "Reps {{amount}}",
+            "refund": "Retornar",
+            "refundTitle": "Retornar {{amount}}?",
+            "refundBody": "Es retornen els diners a {{buyer}} i les seves entrades deixen de valer. No es pot desfer.",
+            "refundUsed_one": "Compte: {{count}} entrada ja s'ha fet servir a la porta.",
+            "refundUsed_other": "Compte: {{count}} entrades ja s'han fet servir a la porta.",
+            "errors": {
+                "connectNotEnabled": "Els cobraments encara no estan disponibles. Torna-ho a provar més tard.",
+                "onboard": "No s'ha pogut obrir l'alta a Stripe. Torna-ho a provar.",
+                "generic": "No s'ha pogut connectar amb Stripe. Torna-ho a provar.",
+                "refund": "No s'ha pogut fer la devolució.",
+                "alreadyRefunded": "Aquesta compra ja estava retornada."
+            }
         }
     },
     "forecast": {

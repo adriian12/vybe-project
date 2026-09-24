@@ -89,6 +89,9 @@ verify_jwt = true
 verify_jwt = true
 
 # Stripe no envía JWT: la autenticidad la da la cabecera Stripe-Signature.
+[functions.stripe-connect]
+verify_jwt = true
+
 [functions.stripe-webhook]
 verify_jwt = false
 

@@ -7,9 +7,21 @@ import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/components/ui/use-toast';
 import PanelTabs from '@/components/venue/panel-tabs';
+import VenuePayments from '@/components/venue/venue-payments';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { ApiError } from '@/services/api';
 import {
   euros,
+  PaymentsStatus,
   PromoterSettlement,
   TicketKind,
   TicketOrder,
@@ -108,6 +120,8 @@ const VenueSales = ({ events, plan, onUpgrade }: VenueSalesProps) => {
   const [guardando, setGuardando] = useState(false);
   const [comisiones, setComisiones] = useState<Record<string, { type: string; value: string }>>({});
   const [ocupado, setOcupado] = useState<string | null>(null);
+  const [pagos, setPagos] = useState<PaymentsStatus | null>(null);
+  const [aDevolver, setADevolver] = useState<TicketOrder | null>(null);
 
   const fail = useCallback(
     (error: unknown) => {
@@ -245,6 +259,20 @@ const VenueSales = ({ events, plan, onUpgrade }: VenueSalesProps) => {
     }
   };
 
+  const devolver = async (pedido: TicketOrder) => {
+    setADevolver(null);
+    setOcupado(pedido.id);
+    try {
+      await ticketsService.refundOrder(pedido.id);
+      toast({ title: t('sales.payments.refunded') });
+      await load();
+    } catch (error) {
+      fail(error);
+    } finally {
+      setOcupado(null);
+    }
+  };
+
   const exportarCsv = () => {
     const filas = [
       ['RRPP', 'Codigo', 'Entradas', 'Gasto en entradas (EUR)', 'Comision', 'A pagar (EUR)', 'Pagada'],
@@ -314,6 +342,9 @@ const VenueSales = ({ events, plan, onUpgrade }: VenueSalesProps) => {
       {pestana === 'tickets' && !cargando && (
         <div className="grid gap-4 lg:grid-cols-12">
           <div className="space-y-4 lg:col-span-7">
+            {/* Cobros: sin cuenta de Stripe activa no se vende. */}
+            <VenuePayments onStatus={setPagos} />
+
             <div className="grid grid-cols-3 gap-3">
               {[
                 { label: t('sales.sold'), value: vendidas },
@@ -329,6 +360,11 @@ const VenueSales = ({ events, plan, onUpgrade }: VenueSalesProps) => {
 
             <div className="surface-light rounded-2xl p-4">
               <h3 className="mb-3 font-display text-title-card uppercase tracking-wide">{t('sales.types')}</h3>
+              {ventas.length > 0 && pagos && !pagos.chargesEnabled && (
+                <p className="mb-3 rounded-lg bg-amber-100 px-3 py-2 text-caption font-bold text-amber-900">
+                  {t('sales.payments.hidden')}
+                </p>
+              )}
               {ventas.length === 0 && !borrador && (
                 <p className="pb-2 text-body-sm text-party-gray">{t('sales.empty')}</p>
               )}
@@ -515,11 +551,21 @@ const VenueSales = ({ events, plan, onUpgrade }: VenueSalesProps) => {
               ) : (
                 <ul className="divide-y divide-black/[0.06]">
                   {pedidos.map((pedido) => (
-                    <li key={pedido.id} className="flex items-center justify-between gap-3 py-2.5">
+                    <li
+                      key={pedido.id}
+                      className={cn('flex items-center justify-between gap-3 py-2.5', pedido.status === 'refunded' && 'opacity-50')}
+                    >
                       <div className="min-w-0">
                         <p className="truncate text-body-sm font-bold">
                           {pedido.buyer || '—'} · {pedido.quantity} × {pedido.typeName}
                         </p>
+                        {pedido.status === 'refunded' ? (
+                          <p className="text-caption font-bold text-destructive">{t('sales.payments.refundedTag')}</p>
+                        ) : pedido.netCents !== pedido.amountCents ? (
+                          <p className="text-caption text-party-gray">
+                            {t('sales.payments.youGet', { amount: euros(pedido.netCents) })}
+                          </p>
+                        ) : null}
                         <p className="text-caption text-party-gray">
                           {pedido.paidAt
                             ? new Date(pedido.paidAt).toLocaleString(undefined, {
@@ -531,7 +577,20 @@ const VenueSales = ({ events, plan, onUpgrade }: VenueSalesProps) => {
                             : ''}
                         </p>
                       </div>
-                      <p className="shrink-0 text-body-sm font-bold tabular">{euros(pedido.amountCents)}</p>
+                      <div className="shrink-0 text-right">
+                        <p className="text-body-sm font-bold tabular">{euros(pedido.amountCents)}</p>
+                        {pedido.refundable && (
+                          <button
+                            type="button"
+                            disabled={ocupado === pedido.id}
+                            onClick={() => setADevolver(pedido)}
+                            className="press mt-0.5 inline-flex items-center gap-1 text-caption text-party-gray hover:text-destructive disabled:opacity-50"
+                          >
+                            {ocupado === pedido.id ? <Loader2 size={11} className="animate-spin" /> : <Undo2 size={11} />}
+                            {t('sales.payments.refund')}
+                          </button>
+                        )}
+                      </div>
                     </li>
                   ))}
                 </ul>
@@ -663,6 +722,28 @@ const VenueSales = ({ events, plan, onUpgrade }: VenueSalesProps) => {
           </div>
         </div>
       )}
+      <AlertDialog open={Boolean(aDevolver)} onOpenChange={(open) => !open && setADevolver(null)}>
+        <AlertDialogContent className="surface-light !bg-white text-ink">
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t('sales.payments.refundTitle', { amount: aDevolver ? euros(aDevolver.amountCents) : '' })}
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-ink/70">
+              {t('sales.payments.refundBody', { buyer: aDevolver?.buyer ?? '' })}
+              {aDevolver && aDevolver.used > 0 ? ` ${t('sales.payments.refundUsed', { count: aDevolver.used })}` : ''}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => aDevolver && void devolver(aDevolver)}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {t('sales.payments.refund')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
