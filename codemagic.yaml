@@ -48,7 +48,9 @@ workflows:
         # BEGIN/END. No se guarda en el repositorio.
         APP_STORE_CONNECT_ISSUER_ID: '0f0d99a0-ebd4-4838-bb04-a98211ea3c7c'
         APP_STORE_CONNECT_KEY_IDENTIFIER: '3793K45HAY'
-      node: 20
+      # Capacitor 8 exige Node 22: con 20, `cap sync` se niega y el .ipa sale
+      # sin la web ni su configuración.
+      node: 22
       xcode: latest
       cocoapods: default
     triggering:
@@ -65,7 +67,9 @@ workflows:
 
       - name: Preparar el proyecto de iOS
         script: |
+          set -e
           npx cap sync ios
+          test -f ios/App/App/capacitor.config.json
           cd ios/App
           pod install
 
