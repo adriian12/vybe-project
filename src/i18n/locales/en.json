@@ -2746,7 +2746,7 @@
         "ended": "The party is over: you can't sell any more.",
         "addTable": "Add table",
         "addEntry": "Add ticket",
-        "note": "Payments are taken by card through Stripe. Each ticket has a QR that is validated in Door → \"Validate ticket\".",
+        "note": "The money from each sale goes straight to your account. Each ticket has a QR that is validated in Door → \"Validate ticket\".",
         "orders": "Latest purchases",
         "noOrders": "No purchases yet.",
         "locked": {
@@ -2791,6 +2791,37 @@
             "alreadyUsed": "Already used at {{time}}",
             "tableOk": "Valid table",
             "entryOk": "Valid ticket"
+        },
+        "payments": {
+            "title": "Payments",
+            "active": "Payments active",
+            "intro": "Turn on payments to sell tickets and tables: the money goes straight to your bank account. It takes 2-3 minutes; if you already use Stripe, just log in.",
+            "activeBody": "Every sale goes to your Stripe account and from there to your bank automatically.",
+            "noPayouts": "You can sell now, but your bank account is missing to receive payouts.",
+            "reviewing": "Stripe is reviewing your details. It usually takes a few minutes.",
+            "missing_one": "{{count}} detail is missing before you can take payments.",
+            "missing_other": "{{count}} details are missing before you can take payments.",
+            "activate": "Turn on payments",
+            "complete": "Complete details",
+            "check": "Check",
+            "dashboard": "View my payments",
+            "back": "We've checked your payments account.",
+            "hidden": "Your tickets aren't shown in the app until you turn on payments.",
+            "refunded": "Refund done",
+            "refundedTag": "Refunded",
+            "youGet": "You get {{amount}}",
+            "refund": "Refund",
+            "refundTitle": "Refund {{amount}}?",
+            "refundBody": "The money goes back to {{buyer}} and their tickets stop working. This can't be undone.",
+            "refundUsed_one": "Note: {{count}} ticket was already used at the door.",
+            "refundUsed_other": "Note: {{count}} tickets were already used at the door.",
+            "errors": {
+                "connectNotEnabled": "Payments aren't available yet. Try again later.",
+                "onboard": "Couldn't open Stripe sign-up. Try again.",
+                "generic": "Couldn't connect to Stripe. Try again.",
+                "refund": "Couldn't make the refund.",
+                "alreadyRefunded": "That purchase was already refunded."
+            }
         }
     },
     "forecast": {

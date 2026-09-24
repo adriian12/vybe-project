@@ -2234,13 +2234,18 @@ export type Database = {
       ticket_orders: {
         Row: {
           amount_cents: number
+          application_fee_cents: number
           created_at: string
           event_id: string
           id: string
           paid_at: string | null
+          payment_intent_id: string | null
           profile_id: string
           quantity: number
+          refunded_at: string | null
+          refunded_by: string | null
           status: string
+          stripe_account_id: string | null
           stripe_session_id: string | null
           ticket_type_id: string
           unit_cents: number
@@ -2248,13 +2253,18 @@ export type Database = {
         }
         Insert: {
           amount_cents: number
+          application_fee_cents?: number
           created_at?: string
           event_id: string
           id?: string
           paid_at?: string | null
+          payment_intent_id?: string | null
           profile_id: string
           quantity: number
+          refunded_at?: string | null
+          refunded_by?: string | null
           status?: string
+          stripe_account_id?: string | null
           stripe_session_id?: string | null
           ticket_type_id: string
           unit_cents: number
@@ -2262,13 +2272,18 @@ export type Database = {
         }
         Update: {
           amount_cents?: number
+          application_fee_cents?: number
           created_at?: string
           event_id?: string
           id?: string
           paid_at?: string | null
+          payment_intent_id?: string | null
           profile_id?: string
           quantity?: number
+          refunded_at?: string | null
+          refunded_by?: string | null
           status?: string
+          stripe_account_id?: string | null
           stripe_session_id?: string | null
           ticket_type_id?: string
           unit_cents?: number
@@ -2967,6 +2982,12 @@ export type Database = {
           opening_hours: Json | null
           phone: string | null
           region: string | null
+          stripe_account_id: string | null
+          stripe_charges_enabled: boolean
+          stripe_details_submitted: boolean
+          stripe_payouts_enabled: boolean
+          stripe_requirements: Json | null
+          stripe_updated_at: string | null
           tax_id: string | null
           type: string
           updated_at: string | null
@@ -2990,6 +3011,12 @@ export type Database = {
           opening_hours?: Json | null
           phone?: string | null
           region?: string | null
+          stripe_account_id?: string | null
+          stripe_charges_enabled?: boolean
+          stripe_details_submitted?: boolean
+          stripe_payouts_enabled?: boolean
+          stripe_requirements?: Json | null
+          stripe_updated_at?: string | null
           tax_id?: string | null
           type: string
           updated_at?: string | null
@@ -3013,6 +3040,12 @@ export type Database = {
           opening_hours?: Json | null
           phone?: string | null
           region?: string | null
+          stripe_account_id?: string | null
+          stripe_charges_enabled?: boolean
+          stripe_details_submitted?: boolean
+          stripe_payouts_enabled?: boolean
+          stripe_requirements?: Json | null
+          stripe_updated_at?: string | null
           tax_id?: string | null
           type?: string
           updated_at?: string | null
@@ -3778,9 +3811,14 @@ export type Database = {
           buyer: string
           id: string
           kind: string
+          net_cents: number
           paid_at: string
           quantity: number
+          refundable: boolean
+          refunded_at: string
+          status: string
           type_name: string
+          used: number
         }[]
       }
       get_ticket_sales: {
@@ -3843,6 +3881,17 @@ export type Database = {
         Returns: {
           last_week: number
           total: number
+        }[]
+      }
+      get_venue_payments_status: {
+        Args: never
+        Returns: {
+          charges_enabled: boolean
+          connected: boolean
+          details_submitted: boolean
+          payouts_enabled: boolean
+          pending_fields: number
+          updated_at: string
         }[]
       }
       get_venue_plan_status: {
@@ -4013,6 +4062,10 @@ export type Database = {
         Returns: undefined
       }
       mark_song_played: { Args: { p_request_id: string }; Returns: undefined }
+      mark_ticket_order_refunded: {
+        Args: { p_by?: string; p_order_id: string }
+        Returns: undefined
+      }
       mark_weekly_report_seen: {
         Args: { p_report_id: string }
         Returns: undefined

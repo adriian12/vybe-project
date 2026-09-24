@@ -2746,7 +2746,7 @@
         "ended": "La fiesta ya terminó: no se puede vender más.",
         "addTable": "Añadir mesa",
         "addEntry": "Añadir entrada",
-        "note": "Los pagos se cobran con tarjeta en Stripe. Cada entrada lleva un QR que se valida en Puerta → «Validar entrada».",
+        "note": "El dinero de cada venta llega directamente a tu cuenta. Cada entrada lleva un QR que se valida en Puerta → «Validar entrada».",
         "orders": "Últimas compras",
         "noOrders": "Todavía no hay compras.",
         "locked": {
@@ -2791,6 +2791,37 @@
             "alreadyUsed": "Ya usada a las {{time}}",
             "tableOk": "Mesa válida",
             "entryOk": "Entrada válida"
+        },
+        "payments": {
+            "title": "Cobros",
+            "active": "Cobros activos",
+            "intro": "Activa los cobros para vender entradas y mesas: el dinero llega directamente a tu cuenta bancaria. Son 2-3 minutos; si ya usas Stripe, entra con tu cuenta y listo.",
+            "activeBody": "Cada venta llega a tu cuenta de Stripe y de ahí a tu banco automáticamente.",
+            "noPayouts": "Ya puedes vender, pero falta tu cuenta bancaria para recibir las transferencias.",
+            "reviewing": "Stripe está revisando tus datos. Suele tardar unos minutos.",
+            "missing_one": "Falta {{count}} dato para poder cobrar.",
+            "missing_other": "Faltan {{count}} datos para poder cobrar.",
+            "activate": "Activar cobros",
+            "complete": "Completar datos",
+            "check": "Comprobar",
+            "dashboard": "Ver mis pagos",
+            "back": "Hemos comprobado tu cuenta de cobros.",
+            "hidden": "Tus entradas no se ven en la app hasta que actives los cobros.",
+            "refunded": "Devolución hecha",
+            "refundedTag": "Devuelto",
+            "youGet": "Recibes {{amount}}",
+            "refund": "Devolver",
+            "refundTitle": "¿Devolver {{amount}}?",
+            "refundBody": "Se devuelve el dinero a {{buyer}} y sus entradas dejan de valer. No se puede deshacer.",
+            "refundUsed_one": "Ojo: {{count}} entrada ya se usó en la puerta.",
+            "refundUsed_other": "Ojo: {{count}} entradas ya se usaron en la puerta.",
+            "errors": {
+                "connectNotEnabled": "Los cobros todavía no están disponibles. Inténtalo más tarde.",
+                "onboard": "No se ha podido abrir el alta en Stripe. Inténtalo de nuevo.",
+                "generic": "No se ha podido conectar con Stripe. Inténtalo de nuevo.",
+                "refund": "No se ha podido hacer la devolución.",
+                "alreadyRefunded": "Esa compra ya estaba devuelta."
+            }
         }
     },
     "forecast": {

@@ -56,6 +56,26 @@ const MAX_SUPERCRUSH = 100;
 const VENUE_PRICE_CENTS: Record<VenuePlan, number> = { venue_pro: 4900, venue_business: 6999 };
 const BOOST_PRICE_CENTS = 1900;
 
+/**
+ * Lo que se queda la plataforma de cada venta de entradas (Connect).
+ *
+ *   · CONNECT_FEE_PERCENT: % sobre el total (por defecto 0).
+ *   · CONNECT_FEE_FIXED_CENTS: céntimos fijos por entrada (por defecto 0).
+ *   · CONNECT_PASS_STRIPE_FEES: con cargos a destino la tarifa de Stripe la
+ *     paga la plataforma; con «true» (por defecto) se le repercute al local
+ *     como 1,5 % + 0,25 € por pago, la tarifa de las tarjetas europeas.
+ *
+ * Se cambian con `secrets set`, sin desplegar.
+ */
+const comisionPlataforma = (totalCents: number, unidades: number): number => {
+  const pct = Number(Deno.env.get('CONNECT_FEE_PERCENT') ?? '0') || 0;
+  const fijo = Number(Deno.env.get('CONNECT_FEE_FIXED_CENTS') ?? '0') || 0;
+  const repercutir = (Deno.env.get('CONNECT_PASS_STRIPE_FEES') ?? 'true') !== 'false';
+  const stripeFee = repercutir ? Math.round(totalCents * 0.015) + 25 : 0;
+  const total = Math.round((totalCents * pct) / 100) + fijo * unidades + stripeFee;
+  return Math.max(0, Math.min(total, totalCents - 1));
+};
+
 const esPlanDeLocal = (plan: Plan): plan is VenuePlan => plan.startsWith('venue_');
 
 /** El local de quien pulsa: el suyo o aquel en cuyo equipo está. */
@@ -185,7 +205,9 @@ serve(async (req: Request): Promise<Response> => {
         p_quantity: Math.floor(Number(quantity ?? 1)),
       });
       if (errorPedido) {
-        const codigo = ['SOLD_OUT', 'SALES_CLOSED', 'BAD_QUANTITY'].find((c) => errorPedido.message.includes(c));
+        const codigo = ['SOLD_OUT', 'SALES_CLOSED', 'BAD_QUANTITY', 'PAYMENTS_NOT_ENABLED'].find((c) =>
+          errorPedido.message.includes(c),
+        );
         return json({ error: codigo ?? 'ORDER_FAILED' }, 409);
       }
       const pedido = (Array.isArray(pedidos) ? pedidos[0] : pedidos) as {
@@ -197,6 +219,17 @@ serve(async (req: Request): Promise<Response> => {
       };
       const unidades = Math.floor(Number(quantity ?? 1));
       const separador = base.includes('?') ? '&' : '?';
+
+      // El cobro va a la cuenta de Stripe del local (Connect, migración 069).
+      const { data: orden } = await supabase
+        .from('ticket_orders')
+        .select('stripe_account_id, amount_cents')
+        .eq('id', pedido.order_id)
+        .single();
+      const destino = orden?.stripe_account_id as string | undefined;
+      if (!destino) return json({ error: 'PAYMENTS_NOT_ENABLED' }, 409);
+      const total = Number(orden?.amount_cents ?? pedido.unit_cents * unidades);
+      const comision = comisionPlataforma(total, unidades);
 
       const entradas = new URLSearchParams({
         mode: 'payment',
@@ -212,7 +245,13 @@ serve(async (req: Request): Promise<Response> => {
         'metadata[profile_id]': profileId,
         expires_at: String(Math.floor(Date.now() / 1000) + 30 * 60 + 30),
         locale: 'auto',
+        // Cobro a nombre del local: sale su nombre en el extracto y el dinero
+        // llega a su cuenta; la plataforma se queda `application_fee_amount`.
+        'payment_intent_data[on_behalf_of]': destino,
+        'payment_intent_data[transfer_data][destination]': destino,
+        'payment_intent_data[metadata][order_id]': pedido.order_id,
       });
+      if (comision > 0) entradas.set('payment_intent_data[application_fee_amount]', String(comision));
       if (user.email) entradas.set('customer_email', user.email);
 
       const respuesta = await fetch('https://api.stripe.com/v1/checkout/sessions', {
@@ -226,7 +265,10 @@ serve(async (req: Request): Promise<Response> => {
         return json({ error: 'CHECKOUT_FAILED' }, 502);
       }
       const sesion = (await respuesta.json()) as { id: string; url?: string };
-      await supabase.from('ticket_orders').update({ stripe_session_id: sesion.id }).eq('id', pedido.order_id);
+      await supabase
+        .from('ticket_orders')
+        .update({ stripe_session_id: sesion.id, application_fee_cents: comision })
+        .eq('id', pedido.order_id);
       return json({ url: sesion.url });
     }
 

@@ -134,6 +134,13 @@ serve(async (req: Request): Promise<Response> => {
             p_session_id: object.id as string,
           });
           if (error) throw error;
+          // Hace falta para poder devolverlo desde Ventas.
+          if (object.payment_intent) {
+            await supabase
+              .from('ticket_orders')
+              .update({ payment_intent_id: object.payment_intent as string })
+              .eq('id', metadata.order_id);
+          }
           break;
         }
 
@@ -227,6 +234,40 @@ serve(async (req: Request): Promise<Response> => {
           },
           { onConflict: 'user_id,event_id,subscription_type' },
         );
+        break;
+      }
+
+      // Devolución hecha desde el panel de Stripe: las entradas dejan de valer.
+      case 'charge.refunded': {
+        const pi = object.payment_intent as string | null;
+        if (pi && object.refunded) {
+          const { data: pedido } = await supabase
+            .from('ticket_orders')
+            .select('id')
+            .eq('payment_intent_id', pi)
+            .maybeSingle();
+          if (pedido) await supabase.rpc('mark_ticket_order_refunded', { p_order_id: pedido.id });
+        }
+        break;
+      }
+
+      // Estado de la cuenta de un local (si el webhook escucha cuentas conectadas).
+      case 'account.updated': {
+        const requisitos = (object.requirements ?? {}) as Record<string, unknown>;
+        await supabase
+          .from('venues')
+          .update({
+            stripe_charges_enabled: Boolean(object.charges_enabled),
+            stripe_payouts_enabled: Boolean(object.payouts_enabled),
+            stripe_details_submitted: Boolean(object.details_submitted),
+            stripe_requirements: {
+              currently_due: requisitos.currently_due ?? [],
+              past_due: requisitos.past_due ?? [],
+              disabled_reason: requisitos.disabled_reason ?? null,
+            },
+            stripe_updated_at: new Date().toISOString(),
+          })
+          .eq('stripe_account_id', object.id as string);
         break;
       }
 
