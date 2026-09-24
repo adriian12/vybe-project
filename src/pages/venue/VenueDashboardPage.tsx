@@ -45,7 +45,9 @@ import VenueWeeklyReport from '@/components/venue/venue-weekly-report';
 import VenueProfileForm from '@/components/venue/venue-profile-form';
 import { nightService } from '@/services/night';
 import { BOOST_PRICE } from '@/lib/venue-plans';
-import VenueSosBanner from '@/components/venue/venue-sos-banner';
+import VenueSosAlerts, { VenueSosStrip } from '@/components/venue/venue-sos-alerts';
+import VenueSosAlarm from '@/components/venue/venue-sos-alarm';
+import { useVenueSos } from '@/hooks/use-venue-sos';
 import VenueDocuments from '@/components/venue/venue-documents';
 import VenueBroadcast from '@/components/venue/venue-broadcast';
 import LanguageSwitcher from '@/components/language-switcher';
@@ -144,8 +146,11 @@ const VenueDashboardPage = () => {
   const navigate = useNavigate();
 
   // La sección se recuerda en la sesión del navegador: al recargar o volver de
-  // otra pestaña se sigue donde estabas.
+  // otra pestaña se sigue donde estabas. Un aviso push puede pedir una
+  // (`?seccion=door` cuando alguien pide ayuda).
   const [section, setSection] = useState<Section>(() => {
+    const pedida = new URLSearchParams(window.location.search).get('seccion') as Section | null;
+    if (pedida && SECCIONES_POR_ROL.owner.includes(pedida)) return pedida;
     try {
       const guardada = window.sessionStorage.getItem('vybe_venue_section') as Section | null;
       return guardada ?? 'qr';
@@ -189,6 +194,9 @@ const VenueDashboardPage = () => {
   const puede = useCallback((s: Section) => SECCIONES_POR_ROL[papel].includes(s), [papel]);
   const esPropietario = papel === 'owner';
   const puedeDifundir = papel === 'owner' || papel === 'marketing';
+
+  // Las alertas de ayuda las lleva quien lleva la puerta: propietario y personal.
+  const sos = useVenueSos(papel === 'owner' || papel === 'staff' ? currentVenue?.id : null);
 
   // Si la sección abierta no es de este papel (marketing entra en «qr»), a la
   // primera que sí lo sea.
@@ -714,8 +722,9 @@ const VenueDashboardPage = () => {
           </div>
         )}
 
-        {/* Una emergencia no puede estar escondida en una pestaña. */}
-        <VenueSosBanner />
+        {/* Las alertas se atienden en Puerta; desde cualquier otra sección, una
+            franja roja lleva allí. */}
+        {section !== 'door' && <VenueSosStrip sos={sos} onOpen={() => goTo('door')} />}
 
         {/* ------------------------------------------------------------ QR */}
         {section === 'qr' && (
@@ -741,6 +750,7 @@ const VenueDashboardPage = () => {
         )}
 
         {/* --------------------------------------------------------- puerta */}
+        {section === 'door' && puede('door') && <VenueSosAlerts sos={sos} />}
         {section === 'door' && picker}
         {section === 'door' &&
           (workingEventId ? (
@@ -1260,6 +1270,9 @@ const VenueDashboardPage = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Alguien de la fiesta pide ayuda: salta en cualquier sección. */}
+      <VenueSosAlarm sos={sos} onOpenDoor={() => goTo('door')} />
     </div>
   );
 };

@@ -150,9 +150,11 @@ const AdminDashboardPage = () => {
   const [altas, setAltas] = useState(0);
   // Qué se está dando de alta en la ventana: persona, local o fiesta.
   const [alta, setAlta] = useState<'user' | 'venue' | 'event' | null>(null);
-  const [seccion, setSeccion] = useState<Seccion>(() =>
-    new URLSearchParams(window.location.search).get('seccion') === 'photos' ? 'photos' : 'overview',
-  );
+  // Los avisos push abren una sección concreta: fotos por revisar o una alerta.
+  const [seccion, setSeccion] = useState<Seccion>(() => {
+    const pedida = new URLSearchParams(window.location.search).get('seccion');
+    return pedida === 'photos' || pedida === 'sos' ? pedida : 'overview';
+  });
   const [menuAbierto, setMenuAbierto] = useState(false);
   const [photoFilter, setPhotoFilter] = useState<'all' | 'event_photo' | 'face_verification'>('all');
   const [eventQuery, setEventQuery] = useState('');

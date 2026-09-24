@@ -534,7 +534,7 @@
     "safety": {
         "title": "Seguretat",
         "sosTitle": "Botó d'emergència",
-        "sosBody": "Avisa els teus contactes de confiança amb la teva ubicació en temps real.",
+        "sosBody": "Avisa el personal de la festa on ets i els teus contactes de confiança, amb la teva ubicació.",
         "sosButton": "Demanar ajuda",
         "sosConfirmTitle": "Vols enviar una alerta d'emergència?",
         "sosConfirmBody": "Avisarem els teus {{count}} contacte(s) de confiança amb la teva ubicació actual i l'esdeveniment.",
@@ -555,7 +555,12 @@
         "contactNeedsChannel": "Indica com a mínim un telèfon o un correu.",
         "note": "Nota per als teus contactes",
         "notePlaceholder": "Sóc a… / no em sento còmoda",
-        "shortTitle": "Ajuda"
+        "shortTitle": "Ajuda",
+        "sosConfirmBodyBoth": "Avisarem a l'instant el personal de la festa i els teus {{count}} contacte(s) de confiança, amb la teva ubicació actual.",
+        "sosConfirmBodyVenue": "Avisarem a l'instant el personal de la festa amb la teva ubicació actual.",
+        "sosSentBodyVenue": "El personal de la festa ja té el teu avís.",
+        "venueOnly": "Encara no tens contactes de confiança: només avisarem el personal de la festa.",
+        "venueOnTheWay": "El personal de la festa ho ha vist i hi va."
     },
     "privacy": {
         "title": "Privacitat i dades",
@@ -1116,7 +1121,16 @@
             "acknowledge": "Hi vaig",
             "errors": {
                 "alertNotFound": "Aquesta alerta ja no és oberta."
-            }
+            },
+            "title": "Demanen ajuda",
+            "none": "Ningú no ha demanat ajuda. Si algú de la festa ho fa, sortirà aquí a l'instant i sonarà un avís.",
+            "resolve": "Resolta",
+            "resolved": "Alerta tancada",
+            "alarmTitle": "Algú demana ajuda!",
+            "alarmBody": "{{name}} ha demanat ajuda a {{event}} a les {{time}}.",
+            "openDoor": "Veure a Porta",
+            "strip_one": "{{count}} persona demana ajuda",
+            "strip_other": "{{count}} persones demanen ajuda"
         },
         "tv": {
             "open": "Veure en pantalla gran",

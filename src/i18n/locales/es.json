@@ -534,7 +534,7 @@
     "safety": {
         "title": "Seguridad",
         "sosTitle": "Botón de emergencia",
-        "sosBody": "Avisa a tus contactos de confianza con tu ubicación en tiempo real.",
+        "sosBody": "Avisa al personal de la fiesta en la que estás y a tus contactos de confianza, con tu ubicación.",
         "sosButton": "Pedir ayuda",
         "sosConfirmTitle": "¿Enviar alerta de emergencia?",
         "sosConfirmBody": "Avisaremos a tus {{count}} contacto(s) de confianza con tu ubicación actual y el evento en el que estás.",
@@ -555,7 +555,12 @@
         "contactNeedsChannel": "Indica al menos un teléfono o un email.",
         "note": "Nota para tus contactos",
         "notePlaceholder": "Estoy en… / me siento incómoda",
-        "shortTitle": "Ayuda"
+        "shortTitle": "Ayuda",
+        "sosConfirmBodyBoth": "Avisaremos al momento al personal de la fiesta y a tus {{count}} contacto(s) de confianza, con tu ubicación actual.",
+        "sosConfirmBodyVenue": "Avisaremos al momento al personal de la fiesta con tu ubicación actual.",
+        "sosSentBodyVenue": "El personal de la fiesta ya tiene tu aviso.",
+        "venueOnly": "Aún no tienes contactos de confianza: sólo avisaremos al personal de la fiesta.",
+        "venueOnTheWay": "El personal de la fiesta lo ha visto y va para allá."
     },
     "privacy": {
         "title": "Privacidad y datos",
@@ -1116,7 +1121,16 @@
             "acknowledge": "Voy para allá",
             "errors": {
                 "alertNotFound": "Esa alerta ya no está abierta."
-            }
+            },
+            "title": "Piden ayuda",
+            "none": "Nadie ha pedido ayuda. Si alguien de la fiesta lo hace, saldrá aquí al momento y sonará un aviso.",
+            "resolve": "Resuelta",
+            "resolved": "Alerta cerrada",
+            "alarmTitle": "¡Alguien pide ayuda!",
+            "alarmBody": "{{name}} ha pedido ayuda en {{event}} a las {{time}}.",
+            "openDoor": "Ver en Puerta",
+            "strip_one": "{{count}} persona pide ayuda",
+            "strip_other": "{{count}} personas piden ayuda"
         },
         "tv": {
             "open": "Ver en pantalla grande",
