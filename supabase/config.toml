@@ -130,3 +130,10 @@ verify_jwt = false
 
 [functions.team-access]
 verify_jwt = false
+
+[functions.apple-iap]
+verify_jwt = true
+
+# App Store Server Notifications: Apple no manda JWT; se verifica su firma.
+[functions.apple-notifications]
+verify_jwt = false

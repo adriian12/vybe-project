@@ -678,7 +678,12 @@
             "already": "Ya tienes Premium activo aquí.",
             "notAtEvent": "Tienes que estar dentro de la fiesta para comprar su pase.",
             "unavailable": "Los pagos no están disponibles ahora mismo."
-        }
+        },
+        "appleTerms": "Premium mensual: {{price}} al mes. Se cobra en tu Apple ID y se renueva solo salvo que lo canceles al menos 24 horas antes de que acabe el mes, en Ajustes › tu nombre › Suscripciones.",
+        "restore": "Restaurar compras",
+        "restored": "Compras restauradas",
+        "nothingToRestore": "No hay compras que restaurar",
+        "manageOnIphone": "Tu Premium se compró en el iPhone: cancélalo en Ajustes › tu nombre › Suscripciones."
     },
     "likes": {
         "title": "Les gustas",

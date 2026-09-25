@@ -4,20 +4,28 @@ import { Minus, Plus, Star } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
 import { PartyButton } from '@/components/ui-custom/party-button';
 import { PREMIUM_PRICES, usePremium } from '@/context/premium-context';
+import { APPLE_MAX_QUANTITY } from '@/services/iap';
 
 const MAX = 100;
 
-const euros = (value: number) =>
-  value.toLocaleString(undefined, { style: 'currency', currency: 'EUR', minimumFractionDigits: 0, maximumFractionDigits: 2 });
+const dinero = (value: number, currency = 'EUR') =>
+  value.toLocaleString(undefined, { style: 'currency', currency, minimumFractionDigits: 0, maximumFractionDigits: 2 });
 
 /**
  * Comprar supercrush: «¿Cuántos quieres?» con un contador de − y +, que nunca
- * baja de 1. El total se enseña antes de ir a Stripe, que cobra 1 € × cantidad.
+ * baja de 1. El total se enseña antes de pagar: con Stripe, 1 € × cantidad; en
+ * el iPhone, con la compra integrada de Apple a su precio (hasta 10 de una vez).
  * Los comprados valen en cualquier evento.
  */
 const SupercrushDialog = () => {
   const { t } = useTranslation();
-  const { showSupercrushDialog, setShowSupercrushDialog, buySupercrush, supercrushBalance } = usePremium();
+  const { showSupercrushDialog, setShowSupercrushDialog, buySupercrush, supercrushBalance, applePurchases, applePrices } =
+    usePremium();
+  // En el iPhone se compra con Apple: su precio y, como mucho, 10 de una vez.
+  const tope = applePurchases ? APPLE_MAX_QUANTITY : MAX;
+  const apple = applePurchases ? applePrices.supercrush : undefined;
+  const unidad = apple?.amount ?? PREMIUM_PRICES.supercrush;
+  const moneda = apple?.currency ?? 'EUR';
   const [cantidad, setCantidad] = useState(1);
   const [enviando, setEnviando] = useState(false);
 
@@ -29,7 +37,7 @@ const SupercrushDialog = () => {
     }
   }, [showSupercrushDialog]);
 
-  const total = cantidad * PREMIUM_PRICES.supercrush;
+  const total = Math.round(cantidad * unidad * 100) / 100;
 
   return (
     <Dialog open={showSupercrushDialog} onOpenChange={(open) => !enviando && setShowSupercrushDialog(open)}>
@@ -63,8 +71,8 @@ const SupercrushDialog = () => {
             </span>
             <button
               type="button"
-              onClick={() => setCantidad((c) => Math.min(MAX, c + 1))}
-              disabled={cantidad >= MAX || enviando}
+              onClick={() => setCantidad((c) => Math.min(tope, c + 1))}
+              disabled={cantidad >= tope || enviando}
               aria-label={t('supercrush.more')}
               className="press flex h-12 w-12 items-center justify-center rounded-full bg-party-primary text-ink disabled:opacity-40"
             >
@@ -75,8 +83,8 @@ const SupercrushDialog = () => {
           <p className="text-center text-body-sm text-party-gray">
             {t('supercrush.priceLine', {
               count: cantidad,
-              unit: euros(PREMIUM_PRICES.supercrush),
-              total: euros(total),
+              unit: apple?.label ?? dinero(unidad, moneda),
+              total: dinero(total, moneda),
             })}
           </p>
 
@@ -91,7 +99,7 @@ const SupercrushDialog = () => {
               });
             }}
           >
-            {enviando ? t('premium.redirecting') : t('supercrush.pay', { total: euros(total) })}
+            {enviando ? t('premium.redirecting') : t('supercrush.pay', { total: dinero(total, moneda) })}
           </PartyButton>
 
           <p className="text-center text-caption text-party-gray">

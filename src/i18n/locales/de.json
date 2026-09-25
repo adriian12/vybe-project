@@ -678,7 +678,12 @@
             "already": "Du hast hier schon Premium.",
             "notAtEvent": "Du musst auf der Party sein, um ihren Pass zu kaufen.",
             "unavailable": "Zahlungen sind gerade nicht verfügbar."
-        }
+        },
+        "appleTerms": "Premium monatlich: {{price}} pro Monat. Wird über deine Apple-ID abgerechnet und verlängert sich automatisch, wenn du nicht mindestens 24 Stunden vor Monatsende kündigst – unter Einstellungen › dein Name › Abonnements.",
+        "restore": "Käufe wiederherstellen",
+        "restored": "Käufe wiederhergestellt",
+        "nothingToRestore": "Keine Käufe zum Wiederherstellen",
+        "manageOnIphone": "Dein Premium wurde auf dem iPhone gekauft: Kündige es unter Einstellungen › dein Name › Abonnements."
     },
     "likes": {
         "title": "Du gefällst ihnen",

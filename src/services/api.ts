@@ -200,7 +200,7 @@ const parseRedeemError = (message: string): ApiError => {
 };
 
 /** El código de error (`{ error: 'X' }`) que devuelve una Edge Function. */
-const functionErrorCode = async (error: unknown): Promise<string> => {
+export const functionErrorCode = async (error: unknown): Promise<string> => {
   const context = (error as { context?: Response } | null)?.context;
   try {
     const body = (await context?.clone().json()) as { error?: string } | undefined;
@@ -1461,6 +1461,8 @@ export const api = {
     eventId: string | null;
     expiresAt: string | null;
     cancelAtPeriodEnd: boolean;
+    /** `apple` o `stripe`: dónde se gestiona la suscripción. */
+    store: string | null;
   } | null> => {
     const { data, error } = await supabase.rpc('my_premium_status');
     if (error) throw new ApiError('PREMIUM_STATUS_FAILED', error.message);
@@ -1472,6 +1474,7 @@ export const api = {
       eventId: row.event_id ?? null,
       expiresAt: row.expires_at ?? null,
       cancelAtPeriodEnd: Boolean(row.cancel_at_period_end),
+      store: row.store ?? null,
     };
   },
 

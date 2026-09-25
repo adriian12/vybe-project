@@ -4,6 +4,7 @@ import { Crown, Star, Bookmark, Users, RotateCcw, Rocket, Eye, Check } from 'luc
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { PartyButton } from './ui-custom/party-button';
 import { PREMIUM_PRICES, usePremium } from '@/context/premium-context';
+import { LANDING_URL } from '@/lib/hosts';
 import { useAppContext } from '@/context/app-context';
 
 /**
@@ -43,9 +44,14 @@ const PremiumFeatures: React.FC = () => {
     getPremiumForEvent,
     isPremium,
     setShowSupercrushDialog,
+    applePurchases,
+    applePrices,
+    restorePurchases,
   } = usePremium();
-  const precio = (value: number) =>
-    value.toLocaleString(undefined, { style: 'currency', currency: 'EUR', minimumFractionDigits: 2 });
+  // En el iPhone, el precio de la App Store de cada persona (su moneda).
+  const precio = (plan: 'monthly' | 'event') =>
+    applePrices[plan]?.label ??
+    PREMIUM_PRICES[plan].toLocaleString(undefined, { style: 'currency', currency: 'EUR', minimumFractionDigits: 2 });
   const { activeEvent } = useAppContext();
 
   const [isProcessing, setIsProcessing] = React.useState(false);
@@ -101,7 +107,7 @@ const PremiumFeatures: React.FC = () => {
                 disabled={isProcessing}
                 onClick={() => void run(upgradeToPremium)}
               >
-                {isProcessing ? t('premium.redirecting') : t('premium.monthlyPrice', { price: precio(PREMIUM_PRICES.monthly) })}
+                {isProcessing ? t('premium.redirecting') : t('premium.monthlyPrice', { price: precio('monthly') })}
               </PartyButton>
 
               <PartyButton
@@ -111,10 +117,28 @@ const PremiumFeatures: React.FC = () => {
                 onClick={() => void run(getPremiumForEvent)}
               >
                 {activeEvent
-                  ? t('premium.forEventPrice', { name: activeEvent.eventName, price: precio(PREMIUM_PRICES.event) })
+                  ? t('premium.forEventPrice', { name: activeEvent.eventName, price: precio('event') })
                   : t('premium.needEvent')}
               </PartyButton>
               <p className="text-center text-caption text-party-gray">{t('premium.eventOnlyNote')}</p>
+              {applePurchases && (
+                // Lo que Apple pide junto a una suscripción: renovación, cómo
+                // cancelarla, términos y privacidad, y restaurar compras.
+                <p className="text-center text-[11px] leading-snug text-party-gray">
+                  {t('premium.appleTerms', { price: precio('monthly') })}{' '}
+                  <a href={`${LANDING_URL}/legal/terminos`} target="_blank" rel="noreferrer" className="underline">
+                    {t('privacy.termsLink')}
+                  </a>
+                  {' · '}
+                  <a href={`${LANDING_URL}/legal/privacidad`} target="_blank" rel="noreferrer" className="underline">
+                    {t('privacy.privacyLink')}
+                  </a>
+                  {' · '}
+                  <button type="button" className="underline" onClick={() => void run(async () => (await restorePurchases(), true))}>
+                    {t('premium.restore')}
+                  </button>
+                </p>
+              )}
             </>
           )}
 
