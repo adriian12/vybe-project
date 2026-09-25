@@ -30,6 +30,11 @@ import {
  * directamente al bucket privado.
  *
  * Variables: RESEND_API_KEY, AUTH_FROM_EMAIL (o SOS_FROM_EMAIL), APP_URL.
+ *
+ * Marca: el backend es el mismo para Fiestea y Vybes, así que la app dice cuál
+ * es (`brand`) y el correo sale con su nombre, sus colores y el enlace a su
+ * web. Sin `brand` (versiones antiguas de la app), Fiestea, que es la marca
+ * principal. Las dos webs están en las «Redirect URLs» de Supabase Auth.
  */
 
 type Action = 'signup' | 'resend' | 'recover' | 'check';
@@ -48,12 +53,45 @@ interface RequestBody {
   /** Para `check`: el móvil que se quiere registrar. */
   phone?: string;
   locale?: string;
+  brand?: string;
 }
 
 const MAX_DOCUMENTS = 6;
 const MAX_DOCUMENT_BYTES = 10 * 1024 * 1024;
 
-const appUrl = (): string => (Deno.env.get('APP_URL') ?? '').replace(/\/$/, '');
+interface Brand {
+  name: string;
+  appUrl: string;
+  /** Fondo, tarjeta, borde, acento y texto del botón. */
+  bg: string;
+  card: string;
+  line: string;
+  accent: string;
+  onAccent: string;
+}
+
+const BRANDS: Record<string, Brand> = {
+  fiestea: {
+    name: 'Fiestea',
+    appUrl: 'https://app.fiestea.es',
+    bg: '#111114',
+    card: '#1C1C1F',
+    line: '#2E2E33',
+    accent: '#F8D000',
+    onAccent: '#1C1C1C',
+  },
+  vybes: {
+    name: 'Vybes',
+    appUrl: (Deno.env.get('APP_URL') ?? 'https://app.vybes.es').replace(/\/$/, ''),
+    bg: '#121832',
+    card: '#1E2449',
+    line: '#363C63',
+    accent: '#9b87f5',
+    onAccent: '#ffffff',
+  },
+};
+
+const pickBrand = (brand: string | undefined): Brand => BRANDS[(brand ?? '').toLowerCase()] ?? BRANDS.fiestea;
 
 // ============================================================================
 // Textos
@@ -66,100 +104,109 @@ type Kind = 'confirm' | 'recover' | 'exists';
 const COPY: Record<string, Record<Kind, Copy>> = {
   es: {
     confirm: {
-      subject: 'Confirma tu cuenta de Vybes',
+      subject: 'Confirma tu cuenta de {app}',
       heading: 'Ya casi estás',
-      body: 'Confirma tu correo para entrar en Vybes y empezar a conocer gente en los eventos.',
+      body: 'Confirma tu correo para entrar en {app} y empezar a descubrir fiestas.',
       cta: 'Confirmar mi cuenta',
-      ignore: 'Si no has creado ninguna cuenta en Vybes, ignora este mensaje.',
+      ignore: 'Si no has creado ninguna cuenta en {app}, ignora este mensaje.',
     },
     recover: {
-      subject: 'Cambia tu contraseña de Vybes',
+      subject: 'Cambia tu contraseña de {app}',
       heading: 'Cambia tu contraseña',
       body: 'Pulsa el botón para elegir una contraseña nueva. El enlace caduca en una hora.',
       cta: 'Cambiar la contraseña',
       ignore: 'Si no has pedido cambiarla, ignora este mensaje: tu contraseña sigue igual.',
     },
     exists: {
-      subject: 'Ya tienes una cuenta en Vybes',
+      subject: 'Ya tienes una cuenta en {app}',
       heading: 'Ya tienes cuenta',
-      body: 'Alguien ha intentado registrarse con este correo, pero ya tienes una cuenta en Vybes. Entra con tu contraseña o, si no la recuerdas, elige una nueva con este botón. El enlace caduca en una hora.',
+      body: 'Alguien ha intentado registrarse con este correo, pero ya tienes una cuenta en {app}. Entra con tu contraseña o, si no la recuerdas, elige una nueva con este botón. El enlace caduca en una hora.',
       cta: 'Elegir una contraseña nueva',
       ignore: 'Si no has sido tú, ignora este mensaje: tu cuenta sigue igual.',
     },
   },
   en: {
     confirm: {
-      subject: 'Confirm your Vybes account',
+      subject: 'Confirm your {app} account',
       heading: 'Almost there',
-      body: 'Confirm your email to get into Vybes and start meeting people at events.',
+      body: 'Confirm your email to get into {app} and start discovering parties.',
       cta: 'Confirm my account',
-      ignore: "If you didn't create a Vybes account, ignore this message.",
+      ignore: "If you didn't create a {app} account, ignore this message.",
     },
     recover: {
-      subject: 'Change your Vybes password',
+      subject: 'Change your {app} password',
       heading: 'Change your password',
       body: 'Tap the button to choose a new password. The link expires in one hour.',
       cta: 'Change password',
       ignore: "If you didn't ask for this, ignore it: your password has not changed.",
     },
     exists: {
-      subject: 'You already have a Vybes account',
+      subject: 'You already have a {app} account',
       heading: 'You already have an account',
-      body: "Someone tried to sign up with this email, but you already have a Vybes account. Log in with your password or, if you don't remember it, choose a new one with this button. The link expires in one hour.",
+      body: "Someone tried to sign up with this email, but you already have a {app} account. Log in with your password or, if you don't remember it, choose a new one with this button. The link expires in one hour.",
       cta: 'Choose a new password',
       ignore: "If it wasn't you, ignore this message: your account is unchanged.",
     },
   },
   de: {
     confirm: {
-      subject: 'Bestätige dein Vybes-Konto',
+      subject: 'Bestätige dein {app}-Konto',
       heading: 'Fast geschafft',
-      body: 'Bestätige deine E-Mail, um Vybes zu nutzen und auf Events neue Leute kennenzulernen.',
+      body: 'Bestätige deine E-Mail, um {app} zu nutzen und Partys zu entdecken.',
       cta: 'Konto bestätigen',
-      ignore: 'Wenn du kein Vybes-Konto erstellt hast, ignoriere diese Nachricht.',
+      ignore: 'Wenn du kein {app}-Konto erstellt hast, ignoriere diese Nachricht.',
     },
     recover: {
-      subject: 'Ändere dein Vybes-Passwort',
+      subject: 'Ändere dein {app}-Passwort',
       heading: 'Passwort ändern',
       body: 'Tippe auf den Button, um ein neues Passwort zu wählen. Der Link ist eine Stunde gültig.',
       cta: 'Passwort ändern',
       ignore: 'Wenn du das nicht angefordert hast, ignoriere diese Nachricht: Dein Passwort bleibt gleich.',
     },
     exists: {
-      subject: 'Du hast bereits ein Vybes-Konto',
+      subject: 'Du hast bereits ein {app}-Konto',
       heading: 'Du hast schon ein Konto',
-      body: 'Jemand wollte sich mit dieser E-Mail registrieren, aber du hast bereits ein Vybes-Konto. Melde dich mit deinem Passwort an oder wähle mit diesem Button ein neues. Der Link ist eine Stunde gültig.',
+      body: 'Jemand wollte sich mit dieser E-Mail registrieren, aber du hast bereits ein {app}-Konto. Melde dich mit deinem Passwort an oder wähle mit diesem Button ein neues. Der Link ist eine Stunde gültig.',
       cta: 'Neues Passwort wählen',
       ignore: 'Wenn du das nicht warst, ignoriere diese Nachricht: Dein Konto bleibt unverändert.',
     },
   },
   ca: {
     confirm: {
-      subject: 'Confirma el teu compte de Vybes',
+      subject: 'Confirma el teu compte de {app}',
       heading: 'Ja gairebé hi ets',
-      body: 'Confirma el teu correu per entrar a Vybes i començar a conèixer gent als esdeveniments.',
+      body: 'Confirma el teu correu per entrar a {app} i començar a descobrir festes.',
       cta: 'Confirmar el meu compte',
-      ignore: "Si no has creat cap compte a Vybes, ignora aquest missatge.",
+      ignore: "Si no has creat cap compte a {app}, ignora aquest missatge.",
     },
     recover: {
-      subject: 'Canvia la contrasenya de Vybes',
+      subject: 'Canvia la contrasenya de {app}',
       heading: 'Canvia la contrasenya',
       body: "Prem el botó per triar una contrasenya nova. L'enllaç caduca en una hora.",
       cta: 'Canviar la contrasenya',
       ignore: "Si no ho has demanat, ignora aquest missatge: la contrasenya continua igual.",
     },
     exists: {
-      subject: 'Ja tens un compte a Vybes',
+      subject: 'Ja tens un compte a {app}',
       heading: 'Ja tens compte',
-      body: "Algú ha intentat registrar-se amb aquest correu, però ja tens un compte a Vybes. Entra amb la teva contrasenya o, si no la recordes, tria'n una de nova amb aquest botó. L'enllaç caduca en una hora.",
+      body: "Algú ha intentat registrar-se amb aquest correu, però ja tens un compte a {app}. Entra amb la teva contrasenya o, si no la recordes, tria'n una de nova amb aquest botó. L'enllaç caduca en una hora.",
       cta: 'Triar una contrasenya nova',
       ignore: "Si no has estat tu, ignora aquest missatge: el teu compte continua igual.",
     },
   },
 };
 
-const pickCopy = (locale: string | undefined, kind: Kind): Copy =>
-  (COPY[(locale ?? 'es').slice(0, 2)] ?? COPY.es)[kind];
+const pickCopy = (locale: string | undefined, kind: Kind, app: string): Copy => {
+  const copy = (COPY[(locale ?? 'es').slice(0, 2)] ?? COPY.es)[kind];
+  const put = (text: string) => text.replaceAll('{app}', app);
+  return {
+    subject: put(copy.subject),
+    heading: put(copy.heading),
+    body: put(copy.body),
+    cta: put(copy.cta),
+    ignore: put(copy.ignore),
+  };
+};
 
 /** Escapa lo que va dentro del HTML: el nombre lo escribe quien se registra. */
 const escapeHtml = (value: string): string =>
@@ -174,23 +221,23 @@ const escapeHtml = (value: string): string =>
  * de correo. El enlace aparece además en texto porque hay clientes que no
  * pintan el botón.
  */
-const template = (copy: Copy, link: string): { html: string; text: string } => {
+const template = (copy: Copy, link: string, brand: Brand): { html: string; text: string } => {
   const safeLink = escapeHtml(link);
 
   const html = `<!doctype html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"></head>
-<body style="margin:0;padding:0;background:#121832;">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#121832;padding:32px 16px;">
+<body style="margin:0;padding:0;background:${brand.bg};">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${brand.bg};padding:32px 16px;">
     <tr><td align="center">
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;background:#1E2449;border-radius:16px;padding:32px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
-        <tr><td style="font-size:28px;font-weight:800;color:#9b87f5;padding-bottom:8px;">Vybes</td></tr>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;background:${brand.card};border-radius:16px;padding:32px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+        <tr><td style="font-size:28px;font-weight:800;color:${brand.accent};padding-bottom:8px;">${escapeHtml(brand.name)}</td></tr>
         <tr><td style="font-size:20px;font-weight:700;color:#ffffff;padding-bottom:12px;">${escapeHtml(copy.heading)}</td></tr>
         <tr><td style="font-size:15px;line-height:1.55;color:#c8ccd6;padding-bottom:28px;">${escapeHtml(copy.body)}</td></tr>
         <tr><td align="center" style="padding-bottom:28px;">
-          <a href="${safeLink}" style="display:inline-block;background:#9b87f5;color:#ffffff;text-decoration:none;font-size:16px;font-weight:600;padding:14px 28px;border-radius:999px;">${escapeHtml(copy.cta)}</a>
+          <a href="${safeLink}" style="display:inline-block;background:${brand.accent};color:${brand.onAccent};text-decoration:none;font-size:16px;font-weight:600;padding:14px 28px;border-radius:999px;">${escapeHtml(copy.cta)}</a>
         </td></tr>
         <tr><td style="font-size:12px;line-height:1.5;color:#8e93a3;padding-bottom:16px;word-break:break-all;">${safeLink}</td></tr>
-        <tr><td style="font-size:12px;line-height:1.5;color:#8e93a3;border-top:1px solid #363C63;padding-top:16px;">${escapeHtml(copy.ignore)}</td></tr>
+        <tr><td style="font-size:12px;line-height:1.5;color:#8e93a3;border-top:1px solid ${brand.line};padding-top:16px;">${escapeHtml(copy.ignore)}</td></tr>
       </table>
     </td></tr>
   </table>
@@ -312,13 +359,14 @@ serve(async (req: Request): Promise<Response> => {
 
     // Cada tipo aterriza donde toca: confirmar lleva a la pantalla de
     // verificación y recuperar a la de elegir contraseña nueva.
-    const resetUrl = `${appUrl()}/auth/reset-password`;
-    const redirectTo = linkType === 'recovery' ? resetUrl : `${appUrl()}/auth/verify-email`;
+    const brand = pickBrand(body.brand);
+    const resetUrl = `${brand.appUrl}/auth/reset-password`;
+    const redirectTo = linkType === 'recovery' ? resetUrl : `${brand.appUrl}/auth/verify-email`;
 
     /** Manda un correo con el enlace; devuelve la respuesta de error o null. */
     const send = async (kind: Kind, link: string): Promise<Response | null> => {
-      const copy = pickCopy(body.locale, kind);
-      const { html, text } = template(copy, link);
+      const copy = pickCopy(body.locale, kind, brand.name);
+      const { html, text } = template(copy, link, brand);
       try {
         await sendEmail({ to: email, subject: copy.subject, html, text });
         return null;

@@ -16,6 +16,12 @@ import { isNative } from '@/services/native';
 
 const clean = (value: string | undefined, fallback: string): string => (value || fallback).replace(/\/+$/, '');
 
+/**
+ * La marca de esta rama. El backend es el mismo para las dos apps y lo usa
+ * para los correos (`auth-email`): nombre, colores y enlace a su web.
+ */
+export const BRAND = 'fiestea' as const;
+
 const PROD_LANDING = 'https://fiestea.es';
 const PROD_APP = 'https://app.fiestea.es';
 

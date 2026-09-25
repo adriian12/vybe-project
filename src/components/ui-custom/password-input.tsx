@@ -24,8 +24,14 @@ const PasswordInput = forwardRef<HTMLInputElement, React.ComponentProps<'input'>
           aria-hidden
           className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-party-gray"
         />
+        {/* Con el ojo abierto el campo es de texto y el teclado del iPhone
+            ponía la primera letra en mayúscula: la contraseña guardada no
+            coincidía con la que se escribía después. */}
         <Input
           ref={ref}
+          autoCapitalize="none"
+          autoCorrect="off"
+          spellCheck={false}
           {...props}
           type={visible ? 'text' : 'password'}
           className={cn('pl-11 pr-12', className)}
