@@ -37,7 +37,7 @@
         "question": "Com vols continuar?",
         "subtitle": "Tria el tipus de compte",
         "asUser": "Continuar com a usuari",
-        "asVenue": "Continuar com a local",
+        "asVenue": "Continuar com a negoci",
         "or": "o",
         "legal": "En continuar, acceptes els <terms>Termes del servei</terms> i la <privacy>Política de privacitat</privacy>"
     },
@@ -63,12 +63,12 @@
         "toRegister": "No tens compte? Registra't",
         "backHome": "Tornar a l'inici",
         "venueName": "Nom de l'establiment",
-        "venueNamePlaceholder": "Nom del teu local",
+        "venueNamePlaceholder": "Nom del teu negoci",
         "venueType": "Tipus d'establiment",
         "venueTypeHelp": "Defineix el radi en què es veuran els perfils.",
         "phone": "Telèfon de contacte",
         "documents": "Documentació",
-        "documentsHelp": "Puja alguna cosa que acrediti que el local és teu: llicència d'activitat, contracte de lloguer o alta al cens d'activitats econòmiques.",
+        "documentsHelp": "Puja alguna cosa que acrediti que el negoci és teu: llicència d'activitat, contracte de lloguer o alta al cens d'activitats econòmiques.",
         "selectFiles": "Seleccionar fitxers",
         "maxFileSize": "Màxim 10 MB per fitxer.",
         "finishRegistration": "Completar registre",
@@ -81,7 +81,7 @@
             "ageRequired": "Introdueix la teva edat.",
             "ageMin": "Has de ser major de 18 anys per fer servir Fiestea.",
             "ageMax": "Introdueix una edat vàlida.",
-            "venueNameRequired": "El nom del local és obligatori.",
+            "venueNameRequired": "El nom del negoci és obligatori.",
             "phoneRequired": "El telèfon de contacte és obligatori.",
             "invalidCredentials": "Credencials incorrectes. Revisa el correu i la contrasenya.",
             "emailNotConfirmed": "Verifica el teu correu abans d'iniciar sessió.",
@@ -95,7 +95,7 @@
             "acceptAge": "Has de confirmar que ets major d'edat.",
             "fileTooBig": "Hi ha fitxers que superen els 10 MB",
             "taxIdInvalid": "Aquest CIF o NIF no és vàlid. Repassa’l.",
-            "addressRequired": "Escriu l'adreça completa del local.",
+            "addressRequired": "Escriu l'adreça completa del negoci.",
             "emailNotConfigured": "L'enviament de correu no està configurat. Avisa'ns i l'activem.",
             "emailSendFailed": "No hem pogut enviar-te el correu. El teu compte està creat: prova a reenviar-lo.",
             "emailTaken": "Aquest correu ja està registrat",
@@ -132,10 +132,10 @@
         },
         "phonePrefix": "Prefix del país",
         "phoneHelp": "L'utilitzem per avisar-te i per a la verificació de seguretat. No es mostra a ningú.",
-        "documentsRequired": "Cal com a mínim un document per poder verificar el local.",
+        "documentsRequired": "Cal com a mínim un document per poder verificar el negoci.",
         "taxId": "CIF / NIF del titular",
-        "taxIdHelp": "És el que ens permet comprovar que el local existeix de debò, i cal igualment per facturar-te.",
-        "venueAddress": "Adreça del local",
+        "taxIdHelp": "És el que ens permet comprovar que el negoci existeix de debò, i cal igualment per facturar-te.",
+        "venueAddress": "Adreça del negoci",
         "venueAddressPlaceholder": "Carrer, número, codi postal i població",
         "venueAddressHelp": "La de l'establiment, no la fiscal si són diferents.",
         "venuePhoneHelp": "Posa el que tens publicat (web, Google Maps): truquem a aquest número per confirmar l’alta.",
@@ -166,7 +166,7 @@
         "hidePassword": "Amagar la contrasenya",
         "adminAccess": "Accés d'administració",
         "toAdminAccess": "Ets de l'equip de Fiestea? Accés d'administració",
-        "toVenueAccess": "Tornar a l'accés de locals"
+        "toVenueAccess": "Tornar a l'accés de negocis"
     },
     "consent": {
         "title": "Abans de començar",
@@ -183,7 +183,7 @@
         "title": "Esdeveniments a la teva ciutat",
         "subtitle": "Explora les festes disponibles a Mallorca.",
         "empty": "Encara no hi ha esdeveniments",
-        "emptyBody": "Encara no hi ha festes publicades per locals verificats. Torna-hi més tard.",
+        "emptyBody": "Encara no hi ha festes publicades per negocis verificats. Torna-hi més tard.",
         "live": "En directe",
         "inEvent": "Ets a {{name}}",
         "inEventBody": "{{venue}} · Toca per seguir coneixent gent",
@@ -245,7 +245,7 @@
         "free": "Gratis",
         "enter": "Entrar",
         "tickets": "Comprar entrada",
-        "needsLocation": "Per entrar cal ser a menys de {{radius}} m del local.",
+        "needsLocation": "Per entrar cal ser a menys de {{radius}} m del negoci.",
         "mockOn": "Simular que sóc a l'esdeveniment",
         "mockOff": "Tornar a la meva ubicació real",
         "atTheDoor": "Accés a la porta",
@@ -614,7 +614,7 @@
             "cannotRemoveOwner": "No pots fer fora qui va crear el grup."
         },
         "whatTitle": "Per a què serveix un grup",
-        "whatChat": "Teniu un xat comú per no perdre-us dins del local.",
+        "whatChat": "Teniu un xat comú per no perdre-us dins de la festa.",
         "whatFind": "Els altres veuen que aneu junts i quants sou.",
         "whatExpire": "La conversa s'esborra quan acaba l'esdeveniment.",
         "whatPlans": "Crear un grup és de Premium; unir-se a un és gratis per a tothom.",
@@ -702,10 +702,10 @@
         "someone": "Algú"
     },
     "venue": {
-        "myVenue": "El meu local",
+        "myVenue": "El meu negoci",
         "exit": "Sortir",
-        "pendingTitle": "Local pendent d'aprovació",
-        "pendingBody": "Els teus esdeveniments no seran visibles i no podràs generar codis fins que l'equip de Fiestea verifiqui el local.",
+        "pendingTitle": "Negoci pendent d'aprovació",
+        "pendingBody": "Els teus esdeveniments no seran visibles i no podràs generar codis fins que l'equip de Fiestea verifiqui el negoci.",
         "tabs": {
             "qr": "Codi QR",
             "stats": "Estadístiques",
@@ -715,7 +715,7 @@
             "promos": "Promos",
             "plan": "Pla",
             "profile": "Perfil",
-            "profileSubtitle": "Dades del local, promocions, equip i pla.",
+            "profileSubtitle": "Dades del negoci, promocions, equip i pla.",
             "sales": "Vendes"
         },
         "qr": {
@@ -735,7 +735,7 @@
             "copiedBody": "Ja el pots enganxar on vulguis.",
             "shareText": "Fes servir el codi {{code}} per entrar a Fiestea.",
             "notLinked": "El codi actual no està vinculat a aquest esdeveniment. Genera'n un de nou.",
-            "notVerified": "Podràs generar codis d'accés quan el nostre equip aprovi el teu local.",
+            "notVerified": "Podràs generar codis d'accés quan el nostre equip aprovi el teu negoci.",
             "rotation": "Rotació automàtica",
             "rotationHelp": "Genera un codi nou cada X minuts perquè un de filtrat deixi de servir.",
             "rotationOff": "Desactivada",
@@ -813,12 +813,12 @@
             "bookings": "Reserves",
             "badDates": "Dates incorrectes",
             "badDatesBody": "La data de fi ha de ser posterior a la d'inici.",
-            "noLocation": "El teu local no té ubicació desada. Sense ella no podem comprovar que la gent hi sigui realment.",
+            "noLocation": "El teu negoci no té ubicació desada. Sense ella no podem comprovar que la gent hi sigui realment.",
             "useMyLocation": "Fer servir la meva ubicació actual",
             "locating": "Obtenint…",
             "locationSaved": "Ubicació desada",
             "locationSavedBody": "Ja pots crear esdeveniments amb geotanca.",
-            "locationOk": "Ubicació del local desada · radi {{radius}} m",
+            "locationOk": "Ubicació del negoci desada · radi {{radius}} m",
             "poster": "Cartell de l'esdeveniment",
             "posterAdd": "Pujar cartell",
             "posterHelp": "És el primer que es veu a la llista. Sense ell la targeta surt amb un fons de color.",
@@ -868,7 +868,7 @@
             "saveChanges": "Desar els canvis",
             "saved": "Esdeveniment desat",
             "location": "Ubicació de l'esdeveniment",
-            "locationSearch": "Cerca l'adreça del local",
+            "locationSearch": "Cerca l'adreça del negoci",
             "locationMissing": "Falta la ubicació de l'esdeveniment",
             "locationHelp": "Arrossega el punt o toca el mapa per ajustar-lo. Amb aquesta ubicació es comprova que la gent és a dins.",
             "repeat": "Repetir"
@@ -932,7 +932,7 @@
         },
         "config": {
             "title": "Configuració d'accés",
-            "type": "Tipus de local",
+            "type": "Tipus de negoci",
             "radius": "Radi d'abast",
             "location": "Ubicació",
             "locationSet": "Configurada",
@@ -940,7 +940,7 @@
             "status": "Estat",
             "verified": "Verificat",
             "pending": "Pendent",
-            "contactAdmin": "Per canviar el tipus de local o el radi, contacta amb administració."
+            "contactAdmin": "Per canviar el tipus de negoci o el radi, contacta amb administració."
         },
         "errors": {
             "notAuthorized": "No tens permís per fer això."
@@ -1157,7 +1157,7 @@
             "trialEnds": "La prova gratuïta acaba el {{date}}. Després passes al pla Gratis si no contractes.",
             "free": "Gratis",
             "perMonth": "{{price}} €/mes",
-            "trialNote": "El primer mes és gratis: {{count}} dies de Pro en aprovar el teu local.",
+            "trialNote": "El primer mes és gratis: {{count}} dies de Pro en aprovar el teu negoci.",
             "keepPlan": "Continuar amb {{plan}}",
             "boostNote": "Destacar un esdeveniment costa {{price}} € per nit en qualsevol pla: surt el primer a l'app fins que acaba."
         },
@@ -1223,17 +1223,17 @@
                 "no_show": "Van dir que venien",
                 "never_came": "Mai no han vingut",
                 "insideHelp": "Qui és a la festa ara mateix.",
-                "followersHelp": "Totes les persones que segueixen el local.",
+                "followersHelp": "Totes les persones que segueixen el negoci.",
                 "regularsHelp": "Qui ha vingut 3 nits o més.",
                 "no_showHelp": "Van marcar «hi vaig» en aquesta festa i no han entrat.",
-                "never_cameHelp": "Segueixen el local però mai no hi han vingut.",
+                "never_cameHelp": "Segueixen el negoci però mai no hi han vingut.",
                 "reach_one": "arribarà a {{count}} persona",
                 "reach_other": "arribarà a {{count}} persones",
                 "locked": "Els públics concrets són de Pro i Business."
             }
         },
         "documents": {
-            "help": "El que acredita que el local és teu. Administració ho revisa abans d'aprovar el compte.",
+            "help": "El que acredita que el negoci és teu. Administració ho revisa abans d'aprovar el compte.",
             "add": "Afegir document",
             "uploading": "Pujant…",
             "uploaded_one": "Document pujat",
@@ -1253,8 +1253,8 @@
         "noLive": "Cap esdeveniment en directe",
         "capacity": "Aforament",
         "planChip": "Pla {{plan}}",
-        "menu": "Menú del local",
-        "suiteTagline": "Tauler per a locals",
+        "menu": "Menú del negoci",
+        "suiteTagline": "Tauler per a negocis",
         "broadcastShort": "Avisar els assistents",
         "drawer": {
             "documents": "Documents",
@@ -1372,8 +1372,8 @@
             },
             "firstVisit": {
                 "title": "Primera vegada aquí",
-                "description": "La teva primera vegada en aquest local té premi.",
-                "how": "Per a qui no havia entrat mai a un esdeveniment del local amb Fiestea."
+                "description": "La teva primera vegada en aquest negoci té premi.",
+                "how": "Per a qui no havia entrat mai a un esdeveniment del negoci amb Fiestea."
             },
             "editTitle": "Editar",
             "editBody": "Canvia el text i les hores. El que deixis buit segueix la festa.",
@@ -1445,13 +1445,13 @@
             "stampCards": "Targetes de segells completades",
             "songs": "Cançons demanades",
             "readyTitle": "Ja és disponible l'informe setmanal",
-            "readyBody": "El resum de la teva setmana ({{range}}): qui va venir, qui repeteix i com et va anar davant de locals com el teu.",
+            "readyBody": "El resum de la teva setmana ({{range}}): qui va venir, qui repeteix i com et va anar davant de negocis com el teu.",
             "view": "Veure l'informe",
             "bestEvent": "Millor nit: {{name}} ({{count}} entrades amb Fiestea).",
             "peakHour": "La gent va arribar sobretot a les {{hour}}:00.",
             "topCode": "El relacions públiques que en va portar més: {{name}} ({{count}}).",
-            "benchmark": "Mitjana per esdeveniment: tu {{mine}} entrades amb Fiestea; locals com el teu, {{others}}.",
-            "noBenchmark": "Encara no hi ha prou locals semblants per comparar.",
+            "benchmark": "Mitjana per esdeveniment: tu {{mine}} entrades amb Fiestea; negocis com el teu, {{others}}.",
+            "noBenchmark": "Encara no hi ha prou negocis semblants per comparar.",
             "revenueTitle": "El que t'ha portat Fiestea",
             "brought_one": "{{count}} persona va venir per Fiestea",
             "brought_other": "{{count}} persones van venir per Fiestea",
@@ -1460,7 +1460,7 @@
             "broughtCode": "{{count}} van entrar amb un codi de RRPP",
             "broughtFollow": "{{count}} et segueixen i van venir",
             "revenueHow": "Estimació: persones × ({{spend}} de despesa mitjana + entrada).",
-            "askSpend": "Quant gasta de mitjana una persona al teu local? Amb això calculem els euros.",
+            "askSpend": "Quant gasta de mitjana una persona al teu negoci? Amb això calculem els euros.",
             "followers": "Seguidors",
             "followersNew": "+{{count}} aquesta setmana",
             "boosts": "Esdeveniments destacats"
@@ -1476,7 +1476,7 @@
             "paidBody": "Ja surt el primer a l'app. Gràcies."
         },
         "followers": {
-            "title": "Seguidors del local",
+            "title": "Seguidors del negoci",
             "thisWeek": "+{{count}} aquesta setmana",
             "hint": "Reben un avís cada vegada que publiques una festa.",
             "notify": "Avisar els meus seguidors",
@@ -1485,8 +1485,8 @@
             "alreadyNotified": "Ja s'ha avisat els teus seguidors d'aquest esdeveniment"
         },
         "profileForm": {
-            "title": "Fitxa del local",
-            "hint": "El que veu la gent en obrir el teu local a l'app.",
+            "title": "Fitxa del negoci",
+            "hint": "El que veu la gent en obrir el teu negoci a l'app.",
             "descriptionPlaceholder": "Quina música sona, quin ambient hi ha, què us fa diferents…",
             "hours": "Horari d'obertura",
             "opens": "Obre",
@@ -1539,7 +1539,7 @@
             },
             "stamps": {
                 "title": "Tarjeta de sellos",
-                "body": "Un sello por cada noche que alguien entra en tu local con la app. Al llenar la tarjeta recibe el premio que elijas. Es lo que hace que vuelvan.",
+                "body": "Un sello por cada noche que alguien entra en tu negoci con la app. Al llenar la tarjeta recibe el premio que elijas. Es lo que hace que vuelvan.",
                 "steps": [
                     "Eliges cuántos sellos hacen falta y qué premio das.",
                     "Cada check-in en una fiesta tuya suma un sello.",
@@ -1584,7 +1584,7 @@
             },
             "thermometer": {
                 "title": "Termómetro de la noche",
-                "body": "Lo que la gente ve antes de venir: si hay cola, qué suena ahora y cómo está de lleno. Cuanto más al día lo tengas, más fácil es que se decidan por tu local.",
+                "body": "Lo que la gente ve antes de venir: si hay cola, qué suena ahora y cómo está de lleno. Cuanto más al día lo tengas, más fácil es que se decidan por tu negoci.",
                 "steps": [
                     "Marcas la cola y lo que está sonando.",
                     "Se publica en la ficha de tu fiesta.",
@@ -1595,9 +1595,9 @@
     },
     "admin": {
         "title": "Panell d'administració",
-        "subtitle": "Gestiona locals, esdeveniments i moderació.",
+        "subtitle": "Gestiona negocis, esdeveniments i moderació.",
         "tabs": {
-            "venues": "Altes de locals",
+            "venues": "Altes de negocis",
             "events": "Esdeveniments",
             "reports": "Reports",
             "photos": "Fotos",
@@ -1606,22 +1606,22 @@
             "overview": "Resum",
             "leads": "Sol·licituds",
             "users": "Usuaris",
-            "venuesAll": "Locals"
+            "venuesAll": "Negocis"
         },
         "venues": {
-            "title": "Locals pendents",
-            "subtitle": "Revisa la documentació abans d'aprovar. Un local sense aprovar no pot publicar esdeveniments ni generar codis.",
-            "empty": "No hi ha locals pendents.",
+            "title": "Negocis pendents",
+            "subtitle": "Revisa la documentació abans d'aprovar. Un negoci sense aprovar no pot publicar esdeveniments ni generar codis.",
+            "empty": "No hi ha negocis pendents.",
             "requestedOn": "sol·licitat el {{date}}",
             "documents": "{{count}} document(s) adjunt(s)",
             "approve": "Aprovar",
             "reject": "Rebutjar",
-            "approved": "Local aprovat",
+            "approved": "Negoci aprovat",
             "approvedBody": "Ja pot publicar esdeveniments i generar codis.",
-            "rejected": "Local rebutjat",
-            "rejectedBody": "El local no podrà operar a Fiestea.",
+            "rejected": "Negoci rebutjat",
+            "rejectedBody": "El negoci no podrà operar a Fiestea.",
             "noDocuments": "Sense documentació. Demana-la abans d'aprovar.",
-            "colVenue": "Local",
+            "colVenue": "Negoci",
             "colCity": "Ciutat",
             "colDocs": "Documents",
             "colRequested": "Sol·licitat",
@@ -1632,7 +1632,7 @@
             "title": "Esdeveniments",
             "subtitle": "Els últims 100 esdeveniments publicats.",
             "empty": "Encara no hi ha esdeveniments.",
-            "search": "Cercar esdeveniment o local",
+            "search": "Cercar esdeveniment o negoci",
             "colEvent": "Esdeveniment",
             "colDate": "Data",
             "colStatus": "Estat"
@@ -1722,7 +1722,7 @@
             "photos": "Fotos pendents",
             "photosHelp": "Esperen aprovació abans de publicar-se",
             "urgent": "{{count}} prioritàries",
-            "venues": "Locals pendents",
+            "venues": "Negocis pendents",
             "venuesHelp": "Sense aprovar no poden publicar esdeveniments",
             "live": "Esdeveniments en directe",
             "liveHelp": "Festes en marxa ara mateix",
@@ -1732,12 +1732,12 @@
             "allClear": "No hi ha res pendent. Bon torn.",
             "sosItem": "{{name}} ha demanat ajuda",
             "leads": "Sol·licituds",
-            "leadsHelp": "Locals que demanen una demo",
+            "leadsHelp": "Negocis que demanen una demo",
             "leadItem": "{{name}} demana una demo"
         },
         "testLab": {
             "title": "Sala de proves",
-            "body": "Porta on ets ara el local de prova, amb la festa en marxa i 35 persones a dins, per provar l'accés, el tauler i els matches sense anar enlloc.",
+            "body": "Porta on ets ara el negoci de prova, amb la festa en marxa i 35 persones a dins, per provar l'accés, el tauler i els matches sense anar enlloc.",
             "move": "Portar la sala a la meva ubicació",
             "resetSwipes": "Esborrar els meus swipes d'aquesta festa per tornar a veure tothom",
             "help": "Fa servir el GPS d'aquest dispositiu. Després entra a la festa «Vybes Test Night» amb el codi LAB777.",
@@ -1749,7 +1749,7 @@
             "notFound": "No existeix la sala de proves. Executa abans el seed de dades de prova."
         },
         "leads": {
-            "title": "Sol·licituds de locals",
+            "title": "Sol·licituds de negocis",
             "subtitle": "El que arriba des del formulari de la landing.",
             "empty": "Encara no ha arribat cap sol·licitud.",
             "all": "Totes",
@@ -1777,12 +1777,12 @@
             }
         },
         "venuesAll": {
-            "search": "Cerca local per nom, correu o ciutat",
-            "empty": "No hi ha locals amb aquesta cerca.",
+            "search": "Cerca negoci per nom, correu o ciutat",
+            "empty": "No hi ha negocis amb aquesta cerca.",
             "events": "{{total}} esdeveniments ({{upcoming}} per venir)",
             "followers": "{{count}} seguidors",
             "seeEvents": "Veure els seus esdeveniments",
-            "noEvents": "Aquest local no ha creat cap esdeveniment.",
+            "noEvents": "Aquest negoci no ha creat cap esdeveniment.",
             "eventStats": "{{checkIns}} dins · {{matches}} crushes · {{intents}} hi van",
             "planSaved": "Pla canviat",
             "feeSaved": "Comissió del {{percent}} % desada",
@@ -1803,31 +1803,31 @@
             "title": "Donar d'alta un compte",
             "subtitle": "Només nom i correu. A aquella adreça li arriba un enllaç per triar la contrasenya.",
             "user": "Persona",
-            "venue": "Local",
+            "venue": "Negoci",
             "name": "Nom",
             "email": "Correu electrònic",
             "send": "Crear i enviar",
             "userDone": "Compte creat",
-            "venueDone": "Local creat",
+            "venueDone": "Negoci creat",
             "mailSent": "Li hem enviat l'enllaç per triar contrasenya.",
             "mailFailed": "El compte està creat, però el correu no ha sortit. Fes servir «He oblidat la contrasenya».",
             "emailTaken": "Aquest correu ja té compte.",
             "emailInvalid": "Aquest correu no és vàlid.",
             "nameRequired": "Falta el nom.",
             "addUser": "Afegir usuari",
-            "addVenue": "Afegir local",
+            "addVenue": "Afegir negoci",
             "addEvent": "Afegir esdeveniment",
-            "venueType": "Tipus de local",
+            "venueType": "Tipus de negoci",
             "city": "Ciutat",
             "location": "Ubicació",
             "locationHelp": "Cerca-la o arrossega el marcador. Sense ubicació, els codis QR no funcionen."
         },
         "newEvent": {
             "title": "Crear una festa",
-            "subtitle": "Revetlles, festes de poble o festivals. Sense local, es publiquen com a Fiestea.",
+            "subtitle": "Revetlles, festes de poble o festivals. Sense negoci, es publiquen com a Fiestea.",
             "name": "Nom",
-            "venue": "Local",
-            "house": "{{app}} (sense local)",
+            "venue": "Negoci",
+            "house": "{{app}} (sense negoci)",
             "date": "Dia",
             "start": "Comença",
             "end": "Acaba",
@@ -1837,8 +1837,8 @@
             "capacity": "Aforament",
             "create": "Publicar festa",
             "done": "Festa publicada",
-            "searchVenue": "Cerca un local…",
-            "noVenue": "Cap local amb aquest nom"
+            "searchVenue": "Cerca un negoci…",
+            "noVenue": "Cap negoci amb aquest nom"
         },
         "notices": {
             "sent_one": "{{count}} avís enviat",
@@ -1852,9 +1852,9 @@
             "send": "Enviar",
             "update": "Enviar novetat",
             "updateUsers": "Novetat per a tots els usuaris",
-            "updateVenues": "Novetat per a tots els locals",
+            "updateVenues": "Novetat per a tots els negocis",
             "updateUsersBody": "Arriba com a avís al mòbil a tots els que tenen els avisos activats.",
-            "updateVenuesBody": "Arriba per correu a tots els locals.",
+            "updateVenuesBody": "Arriba per correu a tots els negocis.",
             "titlePlaceholder": "Títol",
             "bodyPlaceholder": "Missatge"
         },
@@ -1910,7 +1910,7 @@
         "networking": "Networking"
     },
     "offers": {
-        "title": "Ofertes del local",
+        "title": "Ofertes del negoci",
         "short": "Ofertes",
         "subtitle": "Només per a qui és a dins aquesta nit.",
         "empty": "Ara mateix no hi ha cap oferta.",
@@ -1969,14 +1969,14 @@
         "date": "Data",
         "distance": "Distància",
         "description": "Descripció",
-        "ticketsBody": "S'obre la web del local",
+        "ticketsBody": "S'obre la web del negoci",
         "directions": "Com arribar-hi",
         "route": "Veure ruta",
         "share": "Compartir esdeveniment",
         "ended": "Aquest esdeveniment ja ha acabat",
         "enterNow": "Entrar ara",
         "confirmed": "Confirmat!",
-        "intentNote": "En marcar «hi vaig», el local et veurà a la seva Llista Fiestea (nom, edat i foto)."
+        "intentNote": "En marcar «hi vaig», el negoci et veurà a la seva Llista Fiestea (nom, edat i foto)."
     },
     "venueTypes": {
         "discoteca": "Discoteca",
@@ -2010,7 +2010,7 @@
         "filtersHelp": "Tria què vols veure al mapa.",
         "when": "Quan",
         "partyType": "Tipus de festa",
-        "venueType": "Tipus de local",
+        "venueType": "Tipus de negoci",
         "showResults_one": "Veure {{count}} festa",
         "showResults_other": "Veure {{count}} festes"
     },
@@ -2028,7 +2028,7 @@
         "vouchers": "Vals",
         "showAtBar": "Ensenya-ho a la barra · vàlid aquesta nit",
         "insideSince": "Ja ets dins",
-        "noVouchers": "Quan demanis una oferta del local, el seu val apareixerà aquí amb el QR.",
+        "noVouchers": "Quan demanis una oferta del negoci, el seu val apareixerà aquí amb el QR.",
         "nextEvents": "Propers esdeveniments",
         "inDays_one": "Demà",
         "inDays_other": "D'aquí a {{count}} dies",
@@ -2131,12 +2131,12 @@
     "landing": {
         "nav": {
             "users": "Per a fiester@s",
-            "venues": "Per a locals",
+            "venues": "Per a negocis",
             "how": "Com funciona",
             "plans": "Plans",
             "faq": "Preguntes",
-            "login": "Accés locals",
-            "registerVenue": "Registrar el meu local",
+            "login": "Accés negocis",
+            "registerVenue": "Registrar el meu negoci",
             "openApp": "Obrir Fiestea",
             "menu": "Obrir el menú",
             "close": "Tancar el menú"
@@ -2146,9 +2146,9 @@
             "titleStart": "La nit es viu a la pista.",
             "titleBrand": "Fiestea",
             "titleEnd": "connecta fiester@s i sales en temps real.",
-            "body": "Descobreix les festes de la teva zona, entra amb el QR del local i fes Fiestea Check només amb qui és a dins amb tu. I si tens un local: aforament en directe, codis per als teus RRPP i promocions per a qui ja és a la pista.",
+            "body": "Descobreix les festes de la teva zona, entra amb el QR del negoci i fes Fiestea Check només amb qui és a dins amb tu. I si tens un negoci: aforament en directe, codis per als teus RRPP i promocions per a qui ja és a la pista.",
             "ctaUser": "Descarregar l'app",
-            "ctaVenue": "Fiestea per a locals",
+            "ctaVenue": "Fiestea per a negocis",
             "imageAlt": "Gent ballant en una discoteca amb llums grogues",
             "imageTag": "Mallorca",
             "imageCaption": "Festes verificades, gent real a dins",
@@ -2164,8 +2164,8 @@
             "aside": "Res de perfils d'una altra ciutat ni de fa una setmana: només veus qui ha entrat a la mateixa festa que tu.",
             "steps": {
                 "access": {
-                    "title": "Entra amb el QR del local",
-                    "body": "Escaneges el codi a la porta. Fiestea comprova al servidor que el codi és vàlid i que ets dins del radi del local.",
+                    "title": "Entra amb el QR del negoci",
+                    "body": "Escaneges el codi a la porta. Fiestea comprova al servidor que el codi és vàlid i que ets dins del radi del negoci.",
                     "tag": "Codi validat al servidor i geotanca"
                 },
                 "check": {
@@ -2186,7 +2186,7 @@
             "body": "El que busca qui surt de festa i el que necessita qui omple la sala, a la mateixa app.",
             "tabs": {
                 "users": "Fiester@s",
-                "venues": "Locals"
+                "venues": "Negocis"
             },
             "users": {
                 "eyebrow": "Per a fiester@s",
@@ -2195,7 +2195,7 @@
                 "items": {
                     "matches": {
                         "title": "Matches reals a la pista",
-                        "body": "Només apareix qui ha entrat amb el codi del local. Les fotos es fan amb la càmera en el moment i es revisen."
+                        "body": "Només apareix qui ha entrat amb el codi del negoci. Les fotos es fan amb la càmera en el moment i es revisen."
                     },
                     "chats": {
                         "title": "Xats efímers",
@@ -2203,11 +2203,11 @@
                     },
                     "offers": {
                         "title": "Vals i promocions a la barra",
-                        "body": "Els locals llancen ofertes només per a qui ja és a dins. Les guardes a Entrades i les ensenyes a la barra."
+                        "body": "Els negocis llancen ofertes només per a qui ja és a dins. Les guardes a Entrades i les ensenyes a la barra."
                     },
                     "sos": {
                         "title": "Botó d'ajuda",
-                        "body": "Si et sents incòmode, avises l'equip del local amb un toc i sense que ningú ho vegi."
+                        "body": "Si et sents incòmode, avises l'equip del negoci amb un toc i sense que ningú ho vegi."
                     },
                     "map": {
                         "title": "Mapa de la nit",
@@ -2216,14 +2216,14 @@
                 }
             },
             "venues": {
-                "eyebrow": "Per a locals",
+                "eyebrow": "Per a negocis",
                 "title": "El control de la teva sala, en directe",
                 "cta": "Sol·licitar una demo",
-                "ctaSecondary": "Registrar el meu local",
+                "ctaSecondary": "Registrar el meu negoci",
                 "items": {
                     "access": {
                         "title": "Accés amb QR i geotanca",
-                        "body": "Genera el codi de la nit, imprimeix-lo en un cartell o posa'l a la pantalla de la porta. Només entra qui és al local."
+                        "body": "Genera el codi de la nit, imprimeix-lo en un cartell o posa'l a la pantalla de la porta. Només entra qui és al negoci."
                     },
                     "capacity": {
                         "title": "Aforament real i ambient en directe",
@@ -2247,7 +2247,7 @@
                     },
                     "followers": {
                         "title": "El teu propi públic",
-                        "body": "La gent segueix el teu local i rep un avís al mòbil cada vegada que publiques una festa."
+                        "body": "La gent segueix el teu negoci i rep un avís al mòbil cada vegada que publiques una festa."
                     },
                     "night": {
                         "title": "Sortejos, reptes i segells",
@@ -2280,7 +2280,7 @@
                 "expires": "El xat caduca en acabar la festa"
             },
             "panel": {
-                "title": "Tauler del local · en directe",
+                "title": "Tauler del negoci · en directe",
                 "subtitle": "Dissabte nit",
                 "live": "En directe",
                 "capacity": "Aforament",
@@ -2304,11 +2304,11 @@
                 },
                 "server": {
                     "title": "Accés validat al servidor",
-                    "body": "El codi i el radi del local es comproven al servidor, no al mòbil."
+                    "body": "El codi i el radi del negoci es comproven al servidor, no al mòbil."
                 },
                 "location": {
                     "title": "Ubicació només per entrar",
-                    "body": "S'utilitza amb l'app oberta per comprovar que ets al local i no s'ensenya mai a ningú."
+                    "body": "S'utilitza amb l'app oberta per comprovar que ets al negoci i no s'ensenya mai a ningú."
                 },
                 "gdpr": {
                     "title": "Les teves dades, sota el teu control",
@@ -2317,9 +2317,9 @@
             }
         },
         "plans": {
-            "eyebrow": "Plans per a locals",
+            "eyebrow": "Plans per a negocis",
             "title": "Comença gratis i creix quan ho necessitis",
-            "body": "Dona d'alta el teu local i estrena Pro gratis el primer mes. Sense permanència: canvia de pla des del tauler.",
+            "body": "Dona d'alta el teu negoci i estrena Pro gratis el primer mes. Sense permanència: canvia de pla des del tauler.",
             "free": "0 €",
             "custom": "Consulta'ns",
             "recommended": "Recomanat",
@@ -2339,41 +2339,41 @@
             "items": {
                 "price": {
                     "q": "Quant costa Fiestea?",
-                    "a": "Per sortir de festa és gratis. Fiestea Premium afegeix extres com veure a qui li agrades o destacar el teu perfil una hora. Els locals tenen un pla Gratis i els plans Pro (49 €/mes, el primer mes gratis) i Business (129 €/mes), sense IVA i sense permanència."
+                    "a": "Per sortir de festa és gratis. Fiestea Premium afegeix extres com veure a qui li agrades o destacar el teu perfil una hora. Els negocis tenen un pla Gratis i els plans Pro (49 €/mes, el primer mes gratis) i Business (129 €/mes), sense IVA i sense permanència."
                 },
                 "location": {
                     "q": "Per què em demana la ubicació?",
-                    "a": "Per comprovar que ets dins del local quan entres a una festa. Només s'utilitza amb l'app oberta i no s'ensenya mai a altres persones."
+                    "a": "Per comprovar que ets dins de la festa quan entres a una festa. Només s'utilitza amb l'app oberta i no s'ensenya mai a altres persones."
                 },
                 "visibility": {
                     "q": "Qui em pot veure?",
                     "a": "Només la gent que ha entrat a la mateixa festa que tu. Pots bloquejar o denunciar qualsevol persona, i amb Premium tens mode invisible."
                 },
                 "venueStart": {
-                    "q": "Què necessita el meu local per començar?",
-                    "a": "Un compte de local aprovat pel nostre equip. No cal instal·lar res: el codi s'imprimeix en un cartell o es mostra en una pantalla."
+                    "q": "Què necessita el meu negoci per començar?",
+                    "a": "Un compte de negoci aprovat pel nostre equip. No cal instal·lar res: el codi s'imprimeix en un cartell o es mostra en una pantalla."
                 },
                 "where": {
                     "q": "On funciona?",
-                    "a": "Comencem a Mallorca. Si el teu local és en una altra zona, escriu-nos i t'avisarem quan hi arribem."
+                    "a": "Comencem a Mallorca. Si el teu negoci és en una altra zona, escriu-nos i t'avisarem quan hi arribem."
                 },
                 "apps": {
                     "q": "On descarrego Fiestea?",
-                    "a": "Fiestea per sortir de festa és una app per a iPhone i Android, i l'estem publicant a App Store i Google Play. El web app.fiestea.es és només per a locals i el seu equip."
+                    "a": "Fiestea per sortir de festa és una app per a iPhone i Android, i l'estem publicant a App Store i Google Play. El web app.fiestea.es és només per a negocis i el seu equip."
                 }
             }
         },
         "cta": {
             "eyebrow": "Comença la nit",
             "title": "A punt per viure la nit d'una altra manera?",
-            "body": "Descarrega Fiestea i entra a la propera festa. Si tens un local, explica'ns-ho i te l'ensenyem."
+            "body": "Descarrega Fiestea i entra a la propera festa. Si tens un negoci, explica'ns-ho i te l'ensenyem."
         },
         "form": {
             "title": "Tens una discoteca, un bar o un festival?",
             "body": "Deixa'ns les teves dades i t'ensenyem Fiestea en una trucada de 15 minuts.",
-            "venueName": "Nom del local",
+            "venueName": "Nom del negoci",
             "city": "Ciutat o zona (p. ex. Palma, Magaluf)",
-            "type": "Tipus de local",
+            "type": "Tipus de negoci",
             "types": {
                 "discoteca": "Discoteca",
                 "bar": "Bar o pub",
@@ -2384,7 +2384,7 @@
             },
             "contact": "Correu o telèfon",
             "message": "Hi ha res que hàgim de saber? (opcional)",
-            "consent": "Accepto que Fiestea utilitzi aquestes dades per contactar-me sobre el meu local, segons la <privacy>política de privadesa</privacy>.",
+            "consent": "Accepto que Fiestea utilitzi aquestes dades per contactar-me sobre el meu negoci, segons la <privacy>política de privadesa</privacy>.",
             "submit": "Sol·licitar demo",
             "sending": "Enviant…",
             "successTitle": "Rebut!",
@@ -2393,20 +2393,20 @@
             "orEmail": "Prefereixes correu? Escriu-nos a {{email}}",
             "errors": {
                 "contact": "Escriu un correu o un telèfon vàlid.",
-                "fields": "Revisa el nom del local i la ciutat.",
+                "fields": "Revisa el nom del negoci i la ciutat.",
                 "consent": "Necessitem el teu permís per contactar-te.",
                 "tooMany": "Has enviat diverses sol·licituds seguides. Torna-ho a provar d'aquí a una estona.",
                 "generic": "No s'ha pogut enviar. Torna-ho a provar o escriu-nos per correu."
             }
         },
         "footer": {
-            "tagline": "L'app que connecta la gent que és a la mateixa festa i ajuda els locals a omplir la sala.",
+            "tagline": "L'app que connecta la gent que és a la mateixa festa i ajuda els negocis a omplir la sala.",
             "users": "Fiester@s",
-            "venues": "Locals",
+            "venues": "Negocis",
             "legal": "Legal",
             "signup": "Descarregar l'app",
-            "registerVenue": "Registrar el meu local",
-            "venueLogin": "Accés per a locals",
+            "registerVenue": "Registrar el meu negoci",
+            "venueLogin": "Accés per a negocis",
             "demo": "Sol·licitar demo",
             "privacy": "Privadesa",
             "terms": "Termes",
@@ -2426,10 +2426,10 @@
     },
     "mobileOnly": {
         "title": "Fiestea es viu des del mòbil",
-        "body": "Aquest web és per a locals i administració. Per descobrir festes, entrar amb el QR i fer Fiestea Check, descarrega l'app.",
-        "venueAccess": "Tens un local? Accedeix aquí",
+        "body": "Aquest web és per a negocis i administració. Per descobrir festes, entrar amb el QR i fer Fiestea Check, descarrega l'app.",
+        "venueAccess": "Tens un negoci? Accedeix aquí",
         "reason": {
-            "clubber": "Aquesta web és només per a locals i administració. El teu compte de Fiestea s'utilitza des de l'app, al local.",
+            "clubber": "Aquesta web és només per a negocis i administració. El teu compte de Fiestea s'utilitza des de l'app, al negoci.",
             "verified": "Email verificat. Ja pots entrar des de l'app.",
             "password": "Contrasenya canviada. Entra-hi des de l'app."
         }
@@ -2442,15 +2442,15 @@
             "full": "Ple"
         },
         "withVybe": "{{level}} · {{count}} festers dins",
-        "source": "Segons el local · fa {{minutes}} min",
-        "sourceNow": "Segons el local · ara",
+        "source": "Segons el negoci · fa {{minutes}} min",
+        "sourceNow": "Segons el negoci · ara",
         "friendsGoing_one": "{{count}} dels teus crushes hi va",
         "friendsGoing_other": "{{count}} dels teus crushes hi van"
     },
     "counter": {
         "title": "Comptador de porta",
         "hint": "Prem +1 per cada persona que entra i −1 per cada una que surt.",
-        "askVenue": "Demana al local un enllaç nou.",
+        "askVenue": "Demana al negoci un enllaç nou.",
         "ofCapacity": "de {{capacity}}",
         "percent": "{{percent}} % de l'aforament",
         "withVybe": "{{count}} amb Fiestea ({{percent}} %)",
@@ -2469,7 +2469,7 @@
         "errors": {
             "INVALID_LINK": "Aquest enllaç ja no és vàlid",
             "EVENT_NOT_LIVE": "L'esdeveniment no està en marxa",
-            "CAPACITY_REQUIRED": "El local ha de posar l'aforament abans de comptar",
+            "CAPACITY_REQUIRED": "El negoci ha de posar l'aforament abans de comptar",
             "INVALID_TOTAL": "Aquest total no és vàlid",
             "INVALID_DELTA": "No s'ha pogut comptar. Torna-ho a provar.",
             "generic": "No s'ha pogut comptar. Torna-ho a provar."
@@ -2479,7 +2479,7 @@
     "night": {
         "title": "La nit",
         "short": "Ofertes",
-        "subtitle": "Ofertes, reptes, sortejos i més d'aquest local. Només per a qui és a dins.",
+        "subtitle": "Ofertes, reptes, sortejos i més d'aquest negoci. Només per a qui és a dins.",
         "tabs": {
             "offers": "Ofertes",
             "challenges": "Reptes",
@@ -2491,10 +2491,10 @@
             "notAtEvent": "Has de ser dins de l'esdeveniment.",
             "eventEnded": "L'esdeveniment ja ha acabat.",
             "drawAfterEnd": "L'hora del sorteig és després del final de l'esdeveniment.",
-            "songsDisabled": "El local no ha obert les peticions de cançons.",
+            "songsDisabled": "El negoci no ha obert les peticions de cançons.",
             "tooManySongs": "Ja has demanat tres cançons aquesta nit. Vota les que ja hi són.",
             "invalidSong": "Escriu el nom de la cançó.",
-            "stampsDisabled": "Aquest local no té targeta de segells.",
+            "stampsDisabled": "Aquest negoci no té targeta de segells.",
             "notEnoughStamps": "Encara no tens la targeta completa.",
             "challengeNotDone": "Encara no has completat el repte.",
             "alreadyClaimed": "Ja ho has demanat.",
@@ -2509,19 +2509,19 @@
                 "matches": "Aconsegueix {{count}} crushes aquesta nit.",
                 "group": "Entreu {{count}} del teu grup.",
                 "stay_until": "Continua a dins a les {{time}}.",
-                "first_visit": "La teva primera vegada en aquest local."
+                "first_visit": "La teva primera vegada en aquest negoci."
             }
         },
         "raffles": {
             "empty": "Aquesta nit no hi ha sortejos.",
             "at": "Sorteig a les {{time}}",
-            "live": "Sorteig en directe: el local el llança durant la nit",
+            "live": "Sorteig en directe: el negoci el llança durant la nit",
             "stayInside": "Hi participes només per ser a dins a l'hora del sorteig.",
             "youWon": "Has guanyat!",
             "wonBy": "Ha guanyat {{name}}",
             "showAtBar": "Ensenyar a la barra",
             "winnerTitle": "Guanyador/a del sorteig",
-            "showHint": "Ensenya aquesta pantalla a la barra: el local comprova el codi al seu tauler."
+            "showHint": "Ensenya aquesta pantalla a la barra: el negoci comprova el codi al seu tauler."
         },
         "stamps": {
             "title": "Targeta de {{venue}}",
@@ -2570,8 +2570,8 @@
         "until": "fins a les {{time}}"
     },
     "venuePage": {
-        "notFound": "No hem trobat aquest local",
-        "vybeVenue": "Local amb Fiestea",
+        "notFound": "No hem trobat aquest negoci",
+        "vybeVenue": "Negoci amb Fiestea",
         "follow": "Seguir",
         "following": "Seguint",
         "followers_one": "{{count}} seguidor",
@@ -2643,15 +2643,15 @@
         "guest": {
             "title": "Convidat",
             "short": "Mode convidat",
-            "body": "Sense foto. Veus les ofertes i els avisos del local, però no veus el tauler ni hi surts.",
+            "body": "Sense foto. Veus les ofertes i els avisos del negoci, però no veus el tauler ni hi surts.",
             "hereBody": "Hi ets com a convidat: ningú et veu al tauler. Gaudeix de les ofertes de la casa."
         },
         "until": "La festa és de {{time}}",
         "guestPerks": "El que sí que tens",
         "perks": {
-            "offers": "Ofertes i vals del local",
+            "offers": "Ofertes i vals del negoci",
             "raffles": "Sortejos i reptes de la nit",
-            "alerts": "Avisos del local mentre hi ets",
+            "alerts": "Avisos del negoci mentre hi ets",
             "private": "No surts al tauler de ningú"
         },
         "switchTitle": "Vols canviar al mode {{mode}}?",
@@ -2671,7 +2671,7 @@
             "short": "Festes i conèixer gent",
             "infoCta": "Què és un Fiester@ i què hi puc fer?",
             "infoTitle": "Què és un Fiester@?",
-            "infoBody": "Un Fiester@ surt de festa i, a més, vol conèixer qui hi ha aquella nit al local.",
+            "infoBody": "Un Fiester@ surt de festa i, a més, vol conèixer qui hi ha aquella nit al negoci.",
             "switched": "Ja ets Fiester@",
             "switchBody": "Et demanarem una foto del moment la propera vegada que entris en una festa.",
             "points": {
@@ -2680,7 +2680,7 @@
                 "board": "Surts al tauler de la festa i veus qui hi ha",
                 "match": "Llisques, fas m'agrada i fas match",
                 "chat": "Xat amb els teus matches mentre dura l'esdeveniment",
-                "offers": "Ofertes, sortejos i reptes del local",
+                "offers": "Ofertes, sortejos i reptes del negoci",
                 "switch": "Pots entrar en una festa solta en mode convidat"
             }
         },
@@ -2695,10 +2695,10 @@
             "points": {
                 "events": "Totes les festes, amb horaris, preus i cartells",
                 "map": "Mapa amb el que hi ha a prop i cercador per zona",
-                "access": "Entres a les festes amb el codi o el QR del local",
-                "offers": "Ofertes, vals, sortejos i reptes del local",
-                "push": "Avisos al mòbil del que canvia: festes noves, canvis d'hora i avisos del local",
-                "follow": "Segueixes els teus locals i t’assabentes el primer",
+                "access": "Entres a les festes amb el codi o el QR del negoci",
+                "offers": "Ofertes, vals, sortejos i reptes del negoci",
+                "push": "Avisos al mòbil del que canvia: festes noves, canvis d'hora i avisos del negoci",
+                "follow": "Segueixes els teus negocis i t’assabentes el primer",
                 "private": "No surts a cap tauler i ningú et pot lliscar"
             }
         },
@@ -2716,7 +2716,7 @@
             "rows": {
                 "events": "Festes, mapa i preus",
                 "tickets": "Entrades",
-                "follow": "Avisos i seguir locals",
+                "follow": "Avisos i seguir negocis",
                 "qr": "Entrar amb QR",
                 "offers": "Ofertes i vals",
                 "raffles": "Sortejos de la nit",
@@ -2753,8 +2753,8 @@
     "rating": {
         "eventCount_one": "({{count}} valoració)",
         "eventCount_other": "({{count}} valoracions)",
-        "venueCount_one": "del local ({{count}})",
-        "venueCount_other": "del local ({{count}})",
+        "venueCount_one": "del negoci ({{count}})",
+        "venueCount_other": "del negoci ({{count}})",
         "yours": "La teva nota: {{stars}} ★",
         "thanks": "Gràcies!",
         "thanksBody": "La teva valoració ajuda altres a triar festa.",
@@ -2773,7 +2773,7 @@
         "atmosphere": "Ambient",
         "price": "Preu",
         "commentPlaceholder": "Alguna cosa a dir? (opcional)",
-        "anonymous": "El local llegeix els comentaris sense saber qui els ha escrit.",
+        "anonymous": "El negoci llegeix els comentaris sense saber qui els ha escrit.",
         "later": "Ara no",
         "send": "Enviar",
         "errors": {
@@ -2847,7 +2847,7 @@
             "eventEnded": "La festa ja ha acabat.",
             "tablesNeedCapacity": "Indica quantes taules hi ha.",
             "capacityBelowSold": "Ja se n'han venut més de les que indiques.",
-            "ticketNotFound": "Aquesta entrada no existeix o no és d'aquest local.",
+            "ticketNotFound": "Aquesta entrada no existeix o no és d'aquest negoci.",
             "ticketRefunded": "Aquesta entrada està reemborsada.",
             "invalidCommission": "Comissió no vàlida (fins a 100 % o 1.000 € per persona).",
             "form": "Revisa el nom, el preu i la quantitat."
@@ -3037,7 +3037,7 @@
         "promoter": {
             "upcoming": "Properes festes",
             "past": "Festes passades",
-            "none": "El local no té festes programades.",
+            "none": "El negoci no té festes programades.",
             "summary": "{{people}} a la llista · {{admitted}} dins · {{code}} amb el teu codi",
             "back": "Totes les festes",
             "onList": "A la llista",
@@ -3059,7 +3059,7 @@
         },
         "errors": {
             "name": "Posa-hi un nom.",
-            "event": "Tria una festa del local.",
+            "event": "Tria una festa del negoci.",
             "eventEnded": "Aquesta festa ja ha acabat.",
             "tooMany": "Massa enllaços actius: revoca'n algun.",
             "commission": "Comissió no vàlida.",

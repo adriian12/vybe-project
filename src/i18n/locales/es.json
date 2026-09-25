@@ -37,7 +37,7 @@
         "question": "¿Cómo quieres continuar?",
         "subtitle": "Selecciona tu tipo de cuenta",
         "asUser": "Continuar como usuario",
-        "asVenue": "Continuar como local",
+        "asVenue": "Continuar como negocio",
         "or": "o",
         "legal": "Al continuar, aceptas nuestros <terms>Términos de servicio</terms> y la <privacy>Política de privacidad</privacy>"
     },
@@ -63,12 +63,12 @@
         "toRegister": "¿No tienes cuenta? Regístrate",
         "backHome": "Volver al inicio",
         "venueName": "Nombre del establecimiento",
-        "venueNamePlaceholder": "Nombre de tu local",
+        "venueNamePlaceholder": "Nombre de tu negocio",
         "venueType": "Tipo de establecimiento",
         "venueTypeHelp": "Define el radio en el que se verán los perfiles.",
         "phone": "Teléfono de contacto",
         "documents": "Documentación",
-        "documentsHelp": "Sube algo que acredite que el local es tuyo: licencia de actividad, contrato de alquiler o alta en el censo de actividades económicas.",
+        "documentsHelp": "Sube algo que acredite que el negocio es tuyo: licencia de actividad, contrato de alquiler o alta en el censo de actividades económicas.",
         "selectFiles": "Seleccionar archivos",
         "maxFileSize": "Máximo 10 MB por archivo.",
         "finishRegistration": "Completar registro",
@@ -81,7 +81,7 @@
             "ageRequired": "Introduce tu edad.",
             "ageMin": "Debes ser mayor de 18 años para usar Fiestea.",
             "ageMax": "Introduce una edad válida.",
-            "venueNameRequired": "El nombre del local es obligatorio.",
+            "venueNameRequired": "El nombre del negocio es obligatorio.",
             "phoneRequired": "El teléfono de contacto es obligatorio.",
             "invalidCredentials": "Credenciales incorrectas. Revisa tu email y contraseña.",
             "emailNotConfirmed": "Verifica tu email antes de iniciar sesión.",
@@ -95,7 +95,7 @@
             "acceptAge": "Tienes que confirmar que eres mayor de edad.",
             "fileTooBig": "Hay archivos que pasan de 10 MB",
             "taxIdInvalid": "Ese CIF o NIF no es válido. Repásalo.",
-            "addressRequired": "Escribe la dirección completa del local.",
+            "addressRequired": "Escribe la dirección completa del negocio.",
             "emailNotConfigured": "El envío de correo no está configurado. Avísanos y lo activamos.",
             "emailSendFailed": "No hemos podido enviarte el correo. Tu cuenta está creada: prueba a reenviarlo.",
             "emailTaken": "Este correo ya está registrado",
@@ -132,10 +132,10 @@
         },
         "phonePrefix": "Prefijo del país",
         "phoneHelp": "Lo usamos para avisarte y para la verificación de seguridad. No se muestra a nadie.",
-        "documentsRequired": "Hace falta al menos un documento para poder verificar el local.",
+        "documentsRequired": "Hace falta al menos un documento para poder verificar el negocio.",
         "taxId": "CIF / NIF del titular",
-        "taxIdHelp": "Es lo que nos permite comprobar que el local existe de verdad, y hace falta igualmente para facturarte.",
-        "venueAddress": "Dirección del local",
+        "taxIdHelp": "Es lo que nos permite comprobar que el negocio existe de verdad, y hace falta igualmente para facturarte.",
+        "venueAddress": "Dirección del negocio",
         "venueAddressPlaceholder": "Calle, número, código postal y población",
         "venueAddressHelp": "La del establecimiento, no la fiscal si son distintas.",
         "venuePhoneHelp": "Pon el que tienes publicado (web, Google Maps): llamamos a ese número para confirmar el alta.",
@@ -166,7 +166,7 @@
         "hidePassword": "Ocultar contraseña",
         "adminAccess": "Acceso de administración",
         "toAdminAccess": "¿Eres del equipo de Fiestea? Acceso de administración",
-        "toVenueAccess": "Volver al acceso de locales"
+        "toVenueAccess": "Volver al acceso de negocios"
     },
     "consent": {
         "title": "Antes de empezar",
@@ -183,7 +183,7 @@
         "title": "Eventos en tu ciudad",
         "subtitle": "Explora las fiestas disponibles en Mallorca.",
         "empty": "Todavía no hay eventos",
-        "emptyBody": "Aún no hay fiestas publicadas por locales verificados. Vuelve a mirar más tarde.",
+        "emptyBody": "Aún no hay fiestas publicadas por negocios verificados. Vuelve a mirar más tarde.",
         "live": "En directo",
         "inEvent": "Estás en {{name}}",
         "inEventBody": "{{venue}} · Toca para seguir descubriendo gente",
@@ -245,7 +245,7 @@
         "free": "Gratis",
         "enter": "Entrar",
         "tickets": "Comprar entrada",
-        "needsLocation": "Para entrar hay que estar a menos de {{radius}} m del local.",
+        "needsLocation": "Para entrar hay que estar a menos de {{radius}} m del negocio.",
         "mockOn": "Simular que estoy en el evento",
         "mockOff": "Volver a mi ubicación real",
         "atTheDoor": "Acceso en puerta",
@@ -614,7 +614,7 @@
             "cannotRemoveOwner": "No puedes echar a quien creó el grupo."
         },
         "whatTitle": "Para qué sirve un grupo",
-        "whatChat": "Tenéis un chat común para no perderos dentro del local.",
+        "whatChat": "Tenéis un chat común para no perderos en la fiesta.",
         "whatFind": "Los demás ven que vais juntos y a cuántos sois.",
         "whatExpire": "La conversación se borra al acabar el evento.",
         "whatPlans": "Crear un grupo es de Premium; unirse a uno es gratis para todos.",
@@ -702,10 +702,10 @@
         "someone": "Alguien"
     },
     "venue": {
-        "myVenue": "Mi Local",
+        "myVenue": "Mi Negocio",
         "exit": "Salir",
-        "pendingTitle": "Local pendiente de aprobación",
-        "pendingBody": "Tus eventos no serán visibles y no podrás generar códigos hasta que el equipo de Fiestea verifique tu local.",
+        "pendingTitle": "Negocio pendiente de aprobación",
+        "pendingBody": "Tus eventos no serán visibles y no podrás generar códigos hasta que el equipo de Fiestea verifique tu negocio.",
         "tabs": {
             "qr": "Código QR",
             "stats": "Estadísticas",
@@ -715,7 +715,7 @@
             "promos": "Promos",
             "plan": "Plan",
             "profile": "Perfil",
-            "profileSubtitle": "Datos del local, promociones, equipo y plan.",
+            "profileSubtitle": "Datos del negocio, promociones, equipo y plan.",
             "sales": "Ventas"
         },
         "qr": {
@@ -735,7 +735,7 @@
             "copiedBody": "Ya puedes pegarlo donde quieras.",
             "shareText": "Usa el código {{code}} para entrar en Fiestea.",
             "notLinked": "El código actual no está vinculado a este evento. Genera uno nuevo.",
-            "notVerified": "Podrás generar códigos de acceso en cuanto nuestro equipo apruebe tu local.",
+            "notVerified": "Podrás generar códigos de acceso en cuanto nuestro equipo apruebe tu negocio.",
             "rotation": "Rotación automática",
             "rotationHelp": "Genera un código nuevo cada X minutos para que uno filtrado deje de servir.",
             "rotationOff": "Desactivada",
@@ -813,12 +813,12 @@
             "bookings": "Reservas",
             "badDates": "Fechas incorrectas",
             "badDatesBody": "La fecha de fin debe ser posterior a la de inicio.",
-            "noLocation": "Tu local no tiene ubicación guardada. Sin ella no podemos comprobar que la gente esté realmente en el evento.",
+            "noLocation": "Tu negocio no tiene ubicación guardada. Sin ella no podemos comprobar que la gente esté realmente en el evento.",
             "useMyLocation": "Usar mi ubicación actual",
             "locating": "Obteniendo…",
             "locationSaved": "Ubicación guardada",
             "locationSavedBody": "Ya puedes crear eventos con geocerca.",
-            "locationOk": "Ubicación del local guardada · radio {{radius}} m",
+            "locationOk": "Ubicación del negocio guardada · radio {{radius}} m",
             "poster": "Cartel del evento",
             "posterAdd": "Subir cartel",
             "posterHelp": "Es lo primero que se ve en la lista. Sin él la tarjeta sale con un fondo de color.",
@@ -868,7 +868,7 @@
             "saveChanges": "Guardar cambios",
             "saved": "Evento guardado",
             "location": "Ubicación del evento",
-            "locationSearch": "Busca la dirección del local",
+            "locationSearch": "Busca la dirección del negocio",
             "locationMissing": "Falta la ubicación del evento",
             "locationHelp": "Arrastra el punto o toca el mapa para ajustarlo. Con esta ubicación se comprueba que la gente está dentro.",
             "repeat": "Repetir"
@@ -932,7 +932,7 @@
         },
         "config": {
             "title": "Configuración de acceso",
-            "type": "Tipo de local",
+            "type": "Tipo de negocio",
             "radius": "Radio de alcance",
             "location": "Ubicación",
             "locationSet": "Configurada",
@@ -940,7 +940,7 @@
             "status": "Estado",
             "verified": "Verificado",
             "pending": "Pendiente",
-            "contactAdmin": "Para cambiar el tipo de local o el radio, contacta con administración."
+            "contactAdmin": "Para cambiar el tipo de negocio o el radio, contacta con administración."
         },
         "errors": {
             "notAuthorized": "No tienes permiso para hacer eso."
@@ -1157,7 +1157,7 @@
             "trialEnds": "La prueba gratis termina el {{date}}. Después pasas al plan Gratis si no contratas.",
             "free": "Gratis",
             "perMonth": "{{price}} €/mes",
-            "trialNote": "El primer mes es gratis: {{count}} días de Pro al aprobar tu local.",
+            "trialNote": "El primer mes es gratis: {{count}} días de Pro al aprobar tu negocio.",
             "keepPlan": "Seguir con {{plan}}",
             "boostNote": "Destacar un evento cuesta {{price}} € por noche en cualquier plan: sale primero en la app hasta que termina."
         },
@@ -1223,17 +1223,17 @@
                 "no_show": "Dijeron que venían",
                 "never_came": "Nunca han venido",
                 "insideHelp": "Quien está en la fiesta ahora mismo.",
-                "followersHelp": "Todas las personas que siguen al local.",
+                "followersHelp": "Todas las personas que siguen al negocio.",
                 "regularsHelp": "Quien ha venido 3 noches o más.",
                 "no_showHelp": "Marcaron «voy a ir» en esta fiesta y no han entrado.",
-                "never_cameHelp": "Siguen al local pero nunca han venido.",
+                "never_cameHelp": "Siguen al negocio pero nunca han venido.",
                 "reach_one": "llegará a {{count}} persona",
                 "reach_other": "llegará a {{count}} personas",
                 "locked": "Los públicos concretos son de Pro y Business."
             }
         },
         "documents": {
-            "help": "Lo que acredita que el local es tuyo. Administración lo revisa antes de aprobar la cuenta.",
+            "help": "Lo que acredita que el negocio es tuyo. Administración lo revisa antes de aprobar la cuenta.",
             "add": "Añadir documento",
             "uploading": "Subiendo…",
             "uploaded_one": "Documento subido",
@@ -1253,8 +1253,8 @@
         "noLive": "Ningún evento en directo",
         "capacity": "Aforo",
         "planChip": "Plan {{plan}}",
-        "menu": "Menú del local",
-        "suiteTagline": "Panel para locales",
+        "menu": "Menú del negocio",
+        "suiteTagline": "Panel para negocios",
         "broadcastShort": "Avisar a los asistentes",
         "drawer": {
             "documents": "Documentos",
@@ -1372,8 +1372,8 @@
             },
             "firstVisit": {
                 "title": "Primera vez aquí",
-                "description": "Tu primera vez en este local tiene premio.",
-                "how": "Para quien nunca había entrado en un evento del local con Fiestea."
+                "description": "Tu primera vez en este negocio tiene premio.",
+                "how": "Para quien nunca había entrado en un evento del negocio con Fiestea."
             },
             "editTitle": "Editar",
             "editBody": "Cambia el texto y las horas. Lo que dejes vacío toma lo de la fiesta.",
@@ -1445,13 +1445,13 @@
             "stampCards": "Tarjetas de sellos completadas",
             "songs": "Canciones pedidas",
             "readyTitle": "Ya disponible el informe semanal",
-            "readyBody": "El resumen de tu semana ({{range}}): quién vino, quién repite y cómo te fue frente a locales como el tuyo.",
+            "readyBody": "El resumen de tu semana ({{range}}): quién vino, quién repite y cómo te fue frente a negocios como el tuyo.",
             "view": "Ver informe",
             "bestEvent": "Mejor noche: {{name}} ({{count}} entradas con Fiestea).",
             "peakHour": "La gente llegó sobre todo a las {{hour}}:00.",
             "topCode": "El relaciones públicas que más trajo: {{name}} ({{count}}).",
-            "benchmark": "Media por evento: tú {{mine}} entradas con Fiestea; locales como el tuyo, {{others}}.",
-            "noBenchmark": "Todavía no hay suficientes locales parecidos para comparar.",
+            "benchmark": "Media por evento: tú {{mine}} entradas con Fiestea; negocios como el tuyo, {{others}}.",
+            "noBenchmark": "Todavía no hay suficientes negocios parecidos para comparar.",
             "revenueTitle": "Lo que te ha traído Fiestea",
             "brought_one": "{{count}} persona vino por Fiestea",
             "brought_other": "{{count}} personas vinieron por Fiestea",
@@ -1460,7 +1460,7 @@
             "broughtCode": "{{count}} entraron con un código de RRPP",
             "broughtFollow": "{{count}} te siguen y vinieron",
             "revenueHow": "Estimación: personas × ({{spend}} de gasto medio + entrada).",
-            "askSpend": "¿Cuánto gasta de media una persona en tu local? Con eso calculamos los euros.",
+            "askSpend": "¿Cuánto gasta de media una persona en tu negocio? Con eso calculamos los euros.",
             "followers": "Seguidores",
             "followersNew": "+{{count}} esta semana",
             "boosts": "Eventos destacados"
@@ -1476,7 +1476,7 @@
             "paidBody": "Ya sale el primero en la app. Gracias."
         },
         "followers": {
-            "title": "Seguidores del local",
+            "title": "Seguidores del negocio",
             "thisWeek": "+{{count}} esta semana",
             "hint": "Reciben un aviso cada vez que publicas una fiesta.",
             "notify": "Avisar a mis seguidores",
@@ -1485,8 +1485,8 @@
             "alreadyNotified": "Ya se avisó de este evento a tus seguidores"
         },
         "profileForm": {
-            "title": "Ficha del local",
-            "hint": "Lo que ve la gente al abrir tu local en la app.",
+            "title": "Ficha del negocio",
+            "hint": "Lo que ve la gente al abrir tu negocio en la app.",
             "descriptionPlaceholder": "Qué música suena, qué ambiente hay, qué os hace diferentes…",
             "hours": "Horario de apertura",
             "opens": "Abre",
@@ -1539,7 +1539,7 @@
             },
             "stamps": {
                 "title": "Tarjeta de sellos",
-                "body": "Un sello por cada noche que alguien entra en tu local con la app. Al llenar la tarjeta recibe el premio que elijas. Es lo que hace que vuelvan.",
+                "body": "Un sello por cada noche que alguien entra en tu negocio con la app. Al llenar la tarjeta recibe el premio que elijas. Es lo que hace que vuelvan.",
                 "steps": [
                     "Eliges cuántos sellos hacen falta y qué premio das.",
                     "Cada check-in en una fiesta tuya suma un sello.",
@@ -1584,7 +1584,7 @@
             },
             "thermometer": {
                 "title": "Termómetro de la noche",
-                "body": "Lo que la gente ve antes de venir: si hay cola, qué suena ahora y cómo está de lleno. Cuanto más al día lo tengas, más fácil es que se decidan por tu local.",
+                "body": "Lo que la gente ve antes de venir: si hay cola, qué suena ahora y cómo está de lleno. Cuanto más al día lo tengas, más fácil es que se decidan por tu negocio.",
                 "steps": [
                     "Marcas la cola y lo que está sonando.",
                     "Se publica en la ficha de tu fiesta.",
@@ -1595,9 +1595,9 @@
     },
     "admin": {
         "title": "Panel de administración",
-        "subtitle": "Gestiona locales, eventos y moderación.",
+        "subtitle": "Gestiona negocios, eventos y moderación.",
         "tabs": {
-            "venues": "Altas de locales",
+            "venues": "Altas de negocios",
             "events": "Eventos",
             "reports": "Reportes",
             "photos": "Fotos",
@@ -1606,22 +1606,22 @@
             "overview": "Resumen",
             "leads": "Solicitudes",
             "users": "Usuarios",
-            "venuesAll": "Locales"
+            "venuesAll": "Negocios"
         },
         "venues": {
-            "title": "Locales pendientes",
-            "subtitle": "Revisa la documentación antes de aprobar. Un local sin aprobar no puede publicar eventos ni generar códigos de acceso.",
-            "empty": "No hay locales pendientes.",
+            "title": "Negocios pendientes",
+            "subtitle": "Revisa la documentación antes de aprobar. Un negocio sin aprobar no puede publicar eventos ni generar códigos de acceso.",
+            "empty": "No hay negocios pendientes.",
             "requestedOn": "solicitado el {{date}}",
             "documents": "{{count}} documento(s) adjunto(s)",
             "approve": "Aprobar",
             "reject": "Rechazar",
-            "approved": "Local aprobado",
+            "approved": "Negocio aprobado",
             "approvedBody": "Ya puede publicar eventos y generar códigos.",
-            "rejected": "Local rechazado",
-            "rejectedBody": "El local no podrá operar en Fiestea.",
+            "rejected": "Negocio rechazado",
+            "rejectedBody": "El negocio no podrá operar en Fiestea.",
             "noDocuments": "Sin documentación. Pídesela antes de aprobar.",
-            "colVenue": "Local",
+            "colVenue": "Negocio",
             "colCity": "Ciudad",
             "colDocs": "Documentos",
             "colRequested": "Solicitado",
@@ -1632,7 +1632,7 @@
             "title": "Eventos",
             "subtitle": "Últimos 100 eventos publicados en la plataforma.",
             "empty": "Todavía no hay eventos.",
-            "search": "Buscar evento o local",
+            "search": "Buscar evento o negocio",
             "colEvent": "Evento",
             "colDate": "Fecha",
             "colStatus": "Estado"
@@ -1722,7 +1722,7 @@
             "photos": "Fotos pendientes",
             "photosHelp": "Esperan aprobación antes de publicarse",
             "urgent": "{{count}} prioritarias",
-            "venues": "Locales pendientes",
+            "venues": "Negocios pendientes",
             "venuesHelp": "Sin aprobar no pueden publicar eventos",
             "live": "Eventos en directo",
             "liveHelp": "Fiestas en marcha ahora mismo",
@@ -1732,12 +1732,12 @@
             "allClear": "No hay nada pendiente. Buen turno.",
             "sosItem": "{{name}} ha pedido ayuda",
             "leads": "Solicitudes",
-            "leadsHelp": "Locales que piden una demo",
+            "leadsHelp": "Negocios que piden una demo",
             "leadItem": "{{name}} pide una demo"
         },
         "testLab": {
             "title": "Sala de pruebas",
-            "body": "Lleva a donde estás ahora el local de prueba, con su fiesta en marcha y 35 personas dentro, para probar acceso, tablón y matches sin ir a ningún sitio.",
+            "body": "Lleva a donde estás ahora el negocio de prueba, con su fiesta en marcha y 35 personas dentro, para probar acceso, tablón y matches sin ir a ningún sitio.",
             "move": "Traer la sala a mi ubicación",
             "resetSwipes": "Borrar mis swipes de esa fiesta para volver a ver a todo el mundo",
             "help": "Usa el GPS de este dispositivo. Después entra en la fiesta «Vybes Test Night» con el código LAB777.",
@@ -1749,7 +1749,7 @@
             "notFound": "No existe la sala de pruebas. Ejecuta antes el seed de datos de prueba."
         },
         "leads": {
-            "title": "Solicitudes de locales",
+            "title": "Solicitudes de negocios",
             "subtitle": "Lo que llega desde el formulario de la landing.",
             "empty": "Todavía no ha llegado ninguna solicitud.",
             "all": "Todas",
@@ -1777,12 +1777,12 @@
             }
         },
         "venuesAll": {
-            "search": "Buscar local por nombre, correo o ciudad",
-            "empty": "No hay locales con esa búsqueda.",
+            "search": "Buscar negocio por nombre, correo o ciudad",
+            "empty": "No hay negocios con esa búsqueda.",
             "events": "{{total}} eventos ({{upcoming}} por venir)",
             "followers": "{{count}} seguidores",
             "seeEvents": "Ver sus eventos",
-            "noEvents": "Este local no ha creado ningún evento.",
+            "noEvents": "Este negocio no ha creado ningún evento.",
             "eventStats": "{{checkIns}} dentro · {{matches}} crushes · {{intents}} van",
             "planSaved": "Plan cambiado",
             "feeSaved": "Comisión del {{percent}} % guardada",
@@ -1803,31 +1803,31 @@
             "title": "Dar de alta una cuenta",
             "subtitle": "Sólo nombre y correo. A esa dirección le llega un enlace para elegir la contraseña.",
             "user": "Persona",
-            "venue": "Local",
+            "venue": "Negocio",
             "name": "Nombre",
             "email": "Correo electrónico",
             "send": "Crear y enviar",
             "userDone": "Cuenta creada",
-            "venueDone": "Local creado",
+            "venueDone": "Negocio creado",
             "mailSent": "Le hemos enviado el enlace para elegir contraseña.",
             "mailFailed": "La cuenta está creada, pero el correo no ha salido. Usa «He olvidado mi contraseña».",
             "emailTaken": "Ese correo ya tiene cuenta.",
             "emailInvalid": "Ese correo no es válido.",
             "nameRequired": "Falta el nombre.",
             "addUser": "Añadir usuario",
-            "addVenue": "Añadir local",
+            "addVenue": "Añadir negocio",
             "addEvent": "Añadir evento",
-            "venueType": "Tipo de local",
+            "venueType": "Tipo de negocio",
             "city": "Ciudad",
             "location": "Ubicación",
             "locationHelp": "Búscala o arrastra el marcador. Sin ubicación, sus códigos QR no funcionan."
         },
         "newEvent": {
             "title": "Crear una fiesta",
-            "subtitle": "Verbenas, fiestas de pueblo o festivales. Sin local, se publican como Fiestea.",
+            "subtitle": "Verbenas, fiestas de pueblo o festivales. Sin negocio, se publican como Fiestea.",
             "name": "Nombre",
-            "venue": "Local",
-            "house": "{{app}} (sin local)",
+            "venue": "Negocio",
+            "house": "{{app}} (sin negocio)",
             "date": "Día",
             "start": "Empieza",
             "end": "Termina",
@@ -1837,8 +1837,8 @@
             "capacity": "Aforo",
             "create": "Publicar fiesta",
             "done": "Fiesta publicada",
-            "searchVenue": "Buscar local…",
-            "noVenue": "Ningún local con ese nombre"
+            "searchVenue": "Buscar negocio…",
+            "noVenue": "Ningún negocio con ese nombre"
         },
         "notices": {
             "sent_one": "{{count}} aviso enviado",
@@ -1852,9 +1852,9 @@
             "send": "Enviar",
             "update": "Enviar novedad",
             "updateUsers": "Novedad para todos los usuarios",
-            "updateVenues": "Novedad para todos los locales",
+            "updateVenues": "Novedad para todos los negocios",
             "updateUsersBody": "Llega como aviso en el móvil a todos los que tienen activados los avisos.",
-            "updateVenuesBody": "Llega por correo a todos los locales.",
+            "updateVenuesBody": "Llega por correo a todos los negocios.",
             "titlePlaceholder": "Título",
             "bodyPlaceholder": "Mensaje"
         },
@@ -1910,7 +1910,7 @@
         "networking": "Networking"
     },
     "offers": {
-        "title": "Ofertas del local",
+        "title": "Ofertas del negocio",
         "short": "Ofertas",
         "subtitle": "Sólo para quien está dentro esta noche.",
         "empty": "Ahora mismo no hay ninguna oferta.",
@@ -1969,14 +1969,14 @@
         "date": "Fecha",
         "distance": "Distancia",
         "description": "Descripción",
-        "ticketsBody": "Se abre la web del local",
+        "ticketsBody": "Se abre la web del negocio",
         "directions": "Cómo llegar",
         "route": "Ver ruta",
         "share": "Compartir evento",
         "ended": "Este evento ya ha terminado",
         "enterNow": "Entrar ahora",
         "confirmed": "¡Confirmado!",
-        "intentNote": "Al marcar «voy a ir», el local te verá en su Lista Fiestea (nombre, edad y foto)."
+        "intentNote": "Al marcar «voy a ir», el negocio te verá en su Lista Fiestea (nombre, edad y foto)."
     },
     "venueTypes": {
         "discoteca": "Discoteca",
@@ -2010,7 +2010,7 @@
         "filtersHelp": "Elige lo que quieres ver en el mapa.",
         "when": "Cuándo",
         "partyType": "Tipo de fiesta",
-        "venueType": "Tipo de local",
+        "venueType": "Tipo de negocio",
         "showResults_one": "Ver {{count}} fiesta",
         "showResults_other": "Ver {{count}} fiestas"
     },
@@ -2028,7 +2028,7 @@
         "vouchers": "Vales",
         "showAtBar": "Enséñalo en la barra · válido esta noche",
         "insideSince": "Ya estás dentro",
-        "noVouchers": "Cuando pidas una oferta del local, su vale aparecerá aquí con su QR.",
+        "noVouchers": "Cuando pidas una oferta del negocio, su vale aparecerá aquí con su QR.",
         "nextEvents": "Próximos eventos",
         "inDays_one": "Mañana",
         "inDays_other": "En {{count}} días",
@@ -2131,12 +2131,12 @@
     "landing": {
         "nav": {
             "users": "Para fiester@s",
-            "venues": "Para locales",
+            "venues": "Para negocios",
             "how": "Cómo funciona",
             "plans": "Planes",
             "faq": "Preguntas",
-            "login": "Acceso locales",
-            "registerVenue": "Registrar mi local",
+            "login": "Acceso negocios",
+            "registerVenue": "Registrar mi negocio",
             "openApp": "Abrir Fiestea",
             "menu": "Abrir menú",
             "close": "Cerrar menú"
@@ -2146,9 +2146,9 @@
             "titleStart": "La noche se vive en la pista.",
             "titleBrand": "Fiestea",
             "titleEnd": "conecta fiester@s y salas en tiempo real.",
-            "body": "Descubre las fiestas de tu zona, entra con el QR del local y haz Fiestea Check sólo con quien está dentro contigo. Y si tienes un local: aforo en directo, códigos para tus RRPP y promociones para quien ya está en la pista.",
+            "body": "Descubre las fiestas de tu zona, entra con el QR del negocio y haz Fiestea Check sólo con quien está dentro contigo. Y si tienes un negocio: aforo en directo, códigos para tus RRPP y promociones para quien ya está en la pista.",
             "ctaUser": "Descargar la app",
-            "ctaVenue": "Fiestea para locales",
+            "ctaVenue": "Fiestea para negocios",
             "imageAlt": "Gente bailando en una discoteca con luces amarillas",
             "imageTag": "Mallorca",
             "imageCaption": "Fiestas verificadas, gente real dentro",
@@ -2164,8 +2164,8 @@
             "aside": "Nada de perfiles de otra ciudad ni de hace una semana: sólo ves a quien ha entrado en la misma fiesta que tú.",
             "steps": {
                 "access": {
-                    "title": "Entra con el QR del local",
-                    "body": "Escaneas el código en la puerta. Fiestea comprueba en el servidor que el código es válido y que estás dentro del radio del local.",
+                    "title": "Entra con el QR del negocio",
+                    "body": "Escaneas el código en la puerta. Fiestea comprueba en el servidor que el código es válido y que estás dentro del radio del negocio.",
                     "tag": "Código validado en el servidor y geocerca"
                 },
                 "check": {
@@ -2186,7 +2186,7 @@
             "body": "Lo que busca quien sale de fiesta y lo que necesita quien llena la sala, en la misma app.",
             "tabs": {
                 "users": "Fiester@s",
-                "venues": "Locales"
+                "venues": "Negocios"
             },
             "users": {
                 "eyebrow": "Para fiester@s",
@@ -2195,7 +2195,7 @@
                 "items": {
                     "matches": {
                         "title": "Matches reales en la pista",
-                        "body": "Sólo aparece quien ha entrado con el código del local. Las fotos se hacen con la cámara en el momento y se revisan."
+                        "body": "Sólo aparece quien ha entrado con el código del negocio. Las fotos se hacen con la cámara en el momento y se revisan."
                     },
                     "chats": {
                         "title": "Chats efímeros",
@@ -2203,11 +2203,11 @@
                     },
                     "offers": {
                         "title": "Vales y promociones en la barra",
-                        "body": "Los locales lanzan ofertas sólo para quien ya está dentro. Las guardas en Entradas y las enseñas en la barra."
+                        "body": "Los negocios lanzan ofertas sólo para quien ya está dentro. Las guardas en Entradas y las enseñas en la barra."
                     },
                     "sos": {
                         "title": "Botón de ayuda",
-                        "body": "Si te sientes incómodo, avisas al equipo del local con un toque y sin que nadie lo vea."
+                        "body": "Si te sientes incómodo, avisas al equipo del negocio con un toque y sin que nadie lo vea."
                     },
                     "map": {
                         "title": "Mapa de la noche",
@@ -2216,14 +2216,14 @@
                 }
             },
             "venues": {
-                "eyebrow": "Para locales",
+                "eyebrow": "Para negocios",
                 "title": "El control de tu sala, en directo",
                 "cta": "Solicitar una demo",
-                "ctaSecondary": "Registrar mi local",
+                "ctaSecondary": "Registrar mi negocio",
                 "items": {
                     "access": {
                         "title": "Acceso con QR y geocerca",
-                        "body": "Genera el código de la noche, imprímelo en un cartel o ponlo en la pantalla de la puerta. Sólo entra quien está en el local."
+                        "body": "Genera el código de la noche, imprímelo en un cartel o ponlo en la pantalla de la puerta. Sólo entra quien está en la fiesta."
                     },
                     "capacity": {
                         "title": "Aforo real y ambiente en directo",
@@ -2247,7 +2247,7 @@
                     },
                     "followers": {
                         "title": "Tu propio público",
-                        "body": "La gente sigue a tu local y recibe un aviso en el móvil cada vez que publicas una fiesta."
+                        "body": "La gente sigue a tu negocio y recibe un aviso en el móvil cada vez que publicas una fiesta."
                     },
                     "night": {
                         "title": "Sorteos, retos y sellos",
@@ -2280,7 +2280,7 @@
                 "expires": "El chat caduca al acabar la fiesta"
             },
             "panel": {
-                "title": "Panel del local · en directo",
+                "title": "Panel del negocio · en directo",
                 "subtitle": "Sábado noche",
                 "live": "En directo",
                 "capacity": "Aforo",
@@ -2304,11 +2304,11 @@
                 },
                 "server": {
                     "title": "Acceso validado en el servidor",
-                    "body": "El código y el radio del local se comprueban en el servidor, no en el móvil."
+                    "body": "El código y el radio del negocio se comprueban en el servidor, no en el móvil."
                 },
                 "location": {
                     "title": "Ubicación sólo para entrar",
-                    "body": "Se usa con la app abierta para comprobar que estás en el local y nunca se enseña a nadie."
+                    "body": "Se usa con la app abierta para comprobar que estás en la fiesta y nunca se enseña a nadie."
                 },
                 "gdpr": {
                     "title": "Tus datos, bajo tu control",
@@ -2317,9 +2317,9 @@
             }
         },
         "plans": {
-            "eyebrow": "Planes para locales",
+            "eyebrow": "Planes para negocios",
             "title": "Empieza gratis y crece cuando lo necesites",
-            "body": "Da de alta tu local y estrena Pro gratis el primer mes. Sin permanencia: cambia de plan desde el panel.",
+            "body": "Da de alta tu negocio y estrena Pro gratis el primer mes. Sin permanencia: cambia de plan desde el panel.",
             "free": "0 €",
             "custom": "Consúltanos",
             "recommended": "Recomendado",
@@ -2339,41 +2339,41 @@
             "items": {
                 "price": {
                     "q": "¿Cuánto cuesta Fiestea?",
-                    "a": "Para salir de fiesta es gratis. Fiestea Premium añade extras como ver a quién le gustas o destacar tu perfil una hora. Los locales tienen un plan Gratis y los planes Pro (49 €/mes, el primer mes gratis) y Business (129 €/mes), sin IVA y sin permanencia."
+                    "a": "Para salir de fiesta es gratis. Fiestea Premium añade extras como ver a quién le gustas o destacar tu perfil una hora. Los negocios tienen un plan Gratis y los planes Pro (49 €/mes, el primer mes gratis) y Business (129 €/mes), sin IVA y sin permanencia."
                 },
                 "location": {
                     "q": "¿Por qué me pide la ubicación?",
-                    "a": "Para comprobar que estás dentro del local cuando entras en una fiesta. Sólo se usa con la app abierta y nunca se enseña a otras personas."
+                    "a": "Para comprobar que estás dentro de la fiesta cuando entras en una fiesta. Sólo se usa con la app abierta y nunca se enseña a otras personas."
                 },
                 "visibility": {
                     "q": "¿Quién puede verme?",
                     "a": "Sólo la gente que ha entrado en la misma fiesta que tú. Puedes bloquear o denunciar a cualquiera, y con Premium tienes modo invisible."
                 },
                 "venueStart": {
-                    "q": "¿Qué necesita mi local para empezar?",
-                    "a": "Crear una cuenta de local y que nuestro equipo la apruebe. No hay que instalar nada: el código se imprime en un cartel o se muestra en una pantalla."
+                    "q": "¿Qué necesita mi negocio para empezar?",
+                    "a": "Crear una cuenta de negocio y que nuestro equipo la apruebe. No hay que instalar nada: el código se imprime en un cartel o se muestra en una pantalla."
                 },
                 "where": {
                     "q": "¿Dónde funciona?",
-                    "a": "Empezamos en Mallorca. Si tu local está en otra zona, escríbenos y te avisamos cuando lleguemos."
+                    "a": "Empezamos en Mallorca. Si tu negocio está en otra zona, escríbenos y te avisamos cuando lleguemos."
                 },
                 "apps": {
                     "q": "¿Dónde descargo Fiestea?",
-                    "a": "Fiestea para salir de fiesta es una app para iPhone y Android, y la estamos publicando en App Store y Google Play. La web app.fiestea.es es sólo para locales y su equipo."
+                    "a": "Fiestea para salir de fiesta es una app para iPhone y Android, y la estamos publicando en App Store y Google Play. La web app.fiestea.es es sólo para negocios y su equipo."
                 }
             }
         },
         "cta": {
             "eyebrow": "Empieza la noche",
             "title": "¿Listo para vivir la noche de otra forma?",
-            "body": "Descarga Fiestea y entra en tu próxima fiesta. Si tienes un local, cuéntanos y te lo enseñamos."
+            "body": "Descarga Fiestea y entra en tu próxima fiesta. Si tienes un negocio, cuéntanos y te lo enseñamos."
         },
         "form": {
             "title": "¿Tienes una discoteca, bar o festival?",
             "body": "Déjanos tus datos y te enseñamos Fiestea en una llamada de 15 minutos.",
-            "venueName": "Nombre del local",
+            "venueName": "Nombre del negocio",
             "city": "Ciudad o zona (ej. Palma, Magaluf)",
-            "type": "Tipo de local",
+            "type": "Tipo de negocio",
             "types": {
                 "discoteca": "Discoteca",
                 "bar": "Bar o pub",
@@ -2384,7 +2384,7 @@
             },
             "contact": "Email o teléfono",
             "message": "¿Algo que debamos saber? (opcional)",
-            "consent": "Acepto que Fiestea use estos datos para contactarme sobre mi local, según la <privacy>política de privacidad</privacy>.",
+            "consent": "Acepto que Fiestea use estos datos para contactarme sobre mi negocio, según la <privacy>política de privacidad</privacy>.",
             "submit": "Solicitar demo",
             "sending": "Enviando…",
             "successTitle": "¡Recibido!",
@@ -2393,20 +2393,20 @@
             "orEmail": "¿Prefieres correo? Escríbenos a {{email}}",
             "errors": {
                 "contact": "Escribe un email o un teléfono válido.",
-                "fields": "Revisa el nombre del local y la ciudad.",
+                "fields": "Revisa el nombre del negocio y la ciudad.",
                 "consent": "Necesitamos tu permiso para contactarte.",
                 "tooMany": "Has enviado varias solicitudes seguidas. Prueba dentro de un rato.",
                 "generic": "No se ha podido enviar. Inténtalo de nuevo o escríbenos por correo."
             }
         },
         "footer": {
-            "tagline": "La app que conecta a la gente que está en la misma fiesta y ayuda a los locales a llenar su sala.",
+            "tagline": "La app que conecta a la gente que está en la misma fiesta y ayuda a los negocios a llenar su sala.",
             "users": "Fiester@s",
-            "venues": "Locales",
+            "venues": "Negocios",
             "legal": "Legal",
             "signup": "Descargar la app",
-            "registerVenue": "Registrar mi local",
-            "venueLogin": "Acceso para locales",
+            "registerVenue": "Registrar mi negocio",
+            "venueLogin": "Acceso para negocios",
             "demo": "Solicitar demo",
             "privacy": "Privacidad",
             "terms": "Términos",
@@ -2426,10 +2426,10 @@
     },
     "mobileOnly": {
         "title": "Fiestea se vive desde el móvil",
-        "body": "Esta web es para locales y administración. Para descubrir fiestas, entrar con el QR y hacer Fiestea Check, descarga la app.",
-        "venueAccess": "¿Tienes un local? Accede aquí",
+        "body": "Esta web es para negocios y administración. Para descubrir fiestas, entrar con el QR y hacer Fiestea Check, descarga la app.",
+        "venueAccess": "¿Tienes un negocio? Accede aquí",
         "reason": {
-            "clubber": "Esta web es sólo para locales y administración. Tu cuenta de Fiestea se usa desde la app, en el local.",
+            "clubber": "Esta web es sólo para negocios y administración. Tu cuenta de Fiestea se usa desde la app, en la fiesta.",
             "verified": "Email verificado. Ya puedes entrar desde la app.",
             "password": "Contraseña cambiada. Entra con ella desde la app."
         }
@@ -2442,15 +2442,15 @@
             "full": "Lleno"
         },
         "withVybe": "{{level}} · {{count}} fiesteros dentro",
-        "source": "Según el local · hace {{minutes}} min",
-        "sourceNow": "Según el local · ahora",
+        "source": "Según el negocio · hace {{minutes}} min",
+        "sourceNow": "Según el negocio · ahora",
         "friendsGoing_one": "{{count}} de tus crushes va a ir",
         "friendsGoing_other": "{{count}} de tus crushes van a ir"
     },
     "counter": {
         "title": "Contador de puerta",
         "hint": "Pulsa +1 por cada persona que entra y −1 por cada una que sale.",
-        "askVenue": "Pide al local un enlace nuevo.",
+        "askVenue": "Pide al negocio un enlace nuevo.",
         "ofCapacity": "de {{capacity}}",
         "percent": "{{percent}} % del aforo",
         "withVybe": "{{count}} con Fiestea ({{percent}} %)",
@@ -2469,7 +2469,7 @@
         "errors": {
             "INVALID_LINK": "Este enlace ya no vale",
             "EVENT_NOT_LIVE": "El evento no está en marcha",
-            "CAPACITY_REQUIRED": "El local tiene que poner el aforo antes de contar",
+            "CAPACITY_REQUIRED": "El negocio tiene que poner el aforo antes de contar",
             "INVALID_TOTAL": "Ese total no es válido",
             "INVALID_DELTA": "No se pudo contar. Prueba otra vez.",
             "generic": "No se pudo contar. Prueba otra vez."
@@ -2479,7 +2479,7 @@
     "night": {
         "title": "La noche",
         "short": "Ofertas",
-        "subtitle": "Ofertas, retos, sorteos y más de este local. Solo para quien está dentro.",
+        "subtitle": "Ofertas, retos, sorteos y más de este negocio. Solo para quien está dentro.",
         "tabs": {
             "offers": "Ofertas",
             "challenges": "Retos",
@@ -2491,10 +2491,10 @@
             "notAtEvent": "Tienes que estar dentro del evento.",
             "eventEnded": "El evento ya ha terminado.",
             "drawAfterEnd": "La hora del sorteo es después del final del evento.",
-            "songsDisabled": "El local no ha abierto las peticiones de canciones.",
+            "songsDisabled": "El negocio no ha abierto las peticiones de canciones.",
             "tooManySongs": "Ya has pedido tres canciones esta noche. Vota las que ya están.",
             "invalidSong": "Escribe el nombre de la canción.",
-            "stampsDisabled": "Este local no tiene tarjeta de sellos.",
+            "stampsDisabled": "Este negocio no tiene tarjeta de sellos.",
             "notEnoughStamps": "Aún no tienes la tarjeta completa.",
             "challengeNotDone": "Aún no has completado el reto.",
             "alreadyClaimed": "Ya lo has pedido.",
@@ -2509,19 +2509,19 @@
                 "matches": "Consigue {{count}} crushes esta noche.",
                 "group": "Entrad {{count}} de tu grupo.",
                 "stay_until": "Sigue dentro a las {{time}}.",
-                "first_visit": "Tu primera vez en este local."
+                "first_visit": "Tu primera vez en este negocio."
             }
         },
         "raffles": {
             "empty": "Esta noche no hay sorteos.",
             "at": "Sorteo a las {{time}}",
-            "live": "Sorteo en directo: el local lo lanza durante la noche",
+            "live": "Sorteo en directo: el negocio lo lanza durante la noche",
             "stayInside": "Participas solo por seguir dentro a la hora del sorteo.",
             "youWon": "¡Has ganado!",
             "wonBy": "Ha ganado {{name}}",
             "showAtBar": "Enseñar en la barra",
             "winnerTitle": "Ganador/a del sorteo",
-            "showHint": "Enseña esta pantalla en la barra: el local comprueba el código en su panel."
+            "showHint": "Enseña esta pantalla en la barra: el negocio comprueba el código en su panel."
         },
         "stamps": {
             "title": "Tarjeta de {{venue}}",
@@ -2570,8 +2570,8 @@
         "until": "hasta las {{time}}"
     },
     "venuePage": {
-        "notFound": "No encontramos este local",
-        "vybeVenue": "Local con Fiestea",
+        "notFound": "No encontramos este negocio",
+        "vybeVenue": "Negocio con Fiestea",
         "follow": "Seguir",
         "following": "Siguiendo",
         "followers_one": "{{count}} seguidor",
@@ -2643,15 +2643,15 @@
         "guest": {
             "title": "Invitado",
             "short": "Modo invitado",
-            "body": "Sin foto. Ves las ofertas y los avisos del local, pero no ves el tablón ni apareces en él.",
+            "body": "Sin foto. Ves las ofertas y los avisos del negocio, pero no ves el tablón ni apareces en él.",
             "hereBody": "Estás dentro como invitado: nadie te ve en el tablón. Disfruta de las ofertas de la casa."
         },
         "until": "La fiesta es de {{time}}",
         "guestPerks": "Lo que sí tienes",
         "perks": {
-            "offers": "Ofertas y vales del local",
+            "offers": "Ofertas y vales del negocio",
             "raffles": "Sorteos y retos de la noche",
-            "alerts": "Avisos del local mientras estás dentro",
+            "alerts": "Avisos del negocio mientras estás dentro",
             "private": "No sales en el tablón de nadie"
         },
         "switchTitle": "¿Quieres cambiar al modo {{mode}}?",
@@ -2671,7 +2671,7 @@
             "short": "Fiestas y conocer gente",
             "infoCta": "¿Qué es un Fiester@ y qué puedo hacer?",
             "infoTitle": "¿Qué es un Fiester@?",
-            "infoBody": "Un Fiester@ sale de fiesta y además quiere conocer a quien está esa noche en el local.",
+            "infoBody": "Un Fiester@ sale de fiesta y además quiere conocer a quien está esa noche en la fiesta.",
             "switched": "Ya eres Fiester@",
             "switchBody": "Te pediremos una foto del momento la próxima vez que entres en una fiesta.",
             "points": {
@@ -2680,7 +2680,7 @@
                 "board": "Sales en el tablón de esa fiesta y ves quién está",
                 "match": "Deslizas, das me gusta y haces match",
                 "chat": "Chat con tus matches mientras dura el evento",
-                "offers": "Ofertas, sorteos y retos del local",
+                "offers": "Ofertas, sorteos y retos del negocio",
                 "switch": "Puedes entrar en una fiesta suelta en modo invitado"
             }
         },
@@ -2695,10 +2695,10 @@
             "points": {
                 "events": "Todas las fiestas, con sus horarios, precios y carteles",
                 "map": "Mapa con lo que hay cerca y buscador por zona",
-                "access": "Entras en las fiestas con el código o el QR del local",
-                "offers": "Ofertas, vales, sorteos y retos del local",
-                "push": "Avisos en el móvil de lo que cambia: fiestas nuevas, cambios de hora y avisos del local",
-                "follow": "Sigues a tus locales y te enteras el primero",
+                "access": "Entras en las fiestas con el código o el QR del negocio",
+                "offers": "Ofertas, vales, sorteos y retos del negocio",
+                "push": "Avisos en el móvil de lo que cambia: fiestas nuevas, cambios de hora y avisos del negocio",
+                "follow": "Sigues a tus negocios y te enteras el primero",
                 "private": "No apareces en ningún tablón y nadie puede deslizarte"
             }
         },
@@ -2716,7 +2716,7 @@
             "rows": {
                 "events": "Fiestas, mapa y precios",
                 "tickets": "Entradas",
-                "follow": "Avisos y seguir locales",
+                "follow": "Avisos y seguir negocios",
                 "qr": "Entrar con QR",
                 "offers": "Ofertas y vales",
                 "raffles": "Sorteos de la noche",
@@ -2753,8 +2753,8 @@
     "rating": {
         "eventCount_one": "({{count}} valoración)",
         "eventCount_other": "({{count}} valoraciones)",
-        "venueCount_one": "del local ({{count}})",
-        "venueCount_other": "del local ({{count}})",
+        "venueCount_one": "del negocio ({{count}})",
+        "venueCount_other": "del negocio ({{count}})",
         "yours": "Tu nota: {{stars}} ★",
         "thanks": "¡Gracias!",
         "thanksBody": "Tu valoración ayuda a otros a elegir fiesta.",
@@ -2773,7 +2773,7 @@
         "atmosphere": "Ambiente",
         "price": "Precio",
         "commentPlaceholder": "¿Algo que contar? (opcional)",
-        "anonymous": "El local lee los comentarios sin saber quién los escribe.",
+        "anonymous": "El negocio lee los comentarios sin saber quién los escribe.",
         "later": "Ahora no",
         "send": "Enviar",
         "errors": {
@@ -2847,7 +2847,7 @@
             "eventEnded": "La fiesta ya terminó.",
             "tablesNeedCapacity": "Indica cuántas mesas hay.",
             "capacityBelowSold": "Ya se han vendido más de las que indicas.",
-            "ticketNotFound": "Esa entrada no existe o no es de este local.",
+            "ticketNotFound": "Esa entrada no existe o no es de este negocio.",
             "ticketRefunded": "Esa entrada está reembolsada.",
             "invalidCommission": "Comisión no válida (hasta 100 % o 1.000 € por persona).",
             "form": "Revisa el nombre, el precio y la cantidad."
@@ -3037,7 +3037,7 @@
         "promoter": {
             "upcoming": "Próximas fiestas",
             "past": "Fiestas pasadas",
-            "none": "El local no tiene fiestas programadas.",
+            "none": "El negocio no tiene fiestas programadas.",
             "summary": "{{people}} en lista · {{admitted}} dentro · {{code}} con tu código",
             "back": "Todas las fiestas",
             "onList": "En lista",
@@ -3059,7 +3059,7 @@
         },
         "errors": {
             "name": "Pon un nombre.",
-            "event": "Elige una fiesta del local.",
+            "event": "Elige una fiesta del negocio.",
             "eventEnded": "Esa fiesta ya terminó.",
             "tooMany": "Demasiados enlaces activos: revoca alguno.",
             "commission": "Comisión no válida.",
