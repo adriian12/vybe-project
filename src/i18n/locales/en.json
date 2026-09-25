@@ -2407,7 +2407,10 @@
             "terms": "Terms",
             "contact": "Contact",
             "rights": "© {{year}} Vybes. All rights reserved.",
-            "made": "Made in Palma de Mallorca"
+            "made": "Made in Palma de Mallorca",
+            "cookies": "Cookies",
+            "notice": "Legal notice",
+            "allLegal": "All legal documents"
         },
         "download": {
             "googlePlay": "Google Play",

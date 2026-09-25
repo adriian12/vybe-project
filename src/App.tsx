@@ -165,6 +165,7 @@ const App = () => (
                 {MODE === 'landing' ? (
                   <Routes>
                     <Route path="/" element={<LandingPage />} />
+                    <Route path="/legal" element={<LegalPage />} />
                     <Route path="/legal/:document" element={<LegalPage />} />
                     <Route path="*" element={<GoToApp />} />
                   </Routes>
@@ -206,6 +207,7 @@ const App = () => (
                     <Route path="/auth/verify-email" element={<VerifyEmailPage />} />
                     <Route path="/auth/verify-email-pending" element={<VerifyEmailPage />} />
                     <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
+                    <Route path="/legal" element={<LegalPage />} />
                     <Route path="/legal/:document" element={<LegalPage />} />
                     <Route path={DOWNLOAD_PATH} element={<MobileOnlyPage />} />
                     <Route path="/contador/:token" element={<CounterPage />} />
