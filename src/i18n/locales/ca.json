@@ -235,7 +235,9 @@
         "featured": "Destacats",
         "upcoming": "Propers esdeveniments",
         "sponsored": "Destacat",
-        "byPlatform": "Esdeveniment creat per {{app}}"
+        "byPlatform": "Esdeveniment creat per {{app}}",
+        "noPartiesThatDay": "No hi ha festes per a {{day}}: aquestes són les properes.",
+        "nearDate": "A prop d'aquesta data"
     },
     "eventAccess": {
         "verifyTitle": "Verificar proximitat",
@@ -275,7 +277,9 @@
         "farBody": "Apropa't a menys de {{radius}} m de {{venue}} per poder entrar.",
         "noLocationTitle": "No veiem la teva ubicació",
         "locationReady": "Ubicació llesta",
-        "notStarted": "Comença a les {{time}}. El codi només funciona mentre dura la festa."
+        "notStarted": "Comença a les {{time}}. El codi només funciona mentre dura la festa.",
+        "platformHelp": "És una festa de {{app}}: no cal codi, només ser-hi.",
+        "enterHere": "Soc aquí, entra"
     },
     "scanner": {
         "title": "Escaneja el QR de l'esdeveniment",
@@ -358,6 +362,23 @@
             "tardeo": "Tardeo",
             "nocheo": "Nit",
             "after": "After"
+        },
+        "dates": {
+            "title": "Quin dia?",
+            "help": "El dia de festa va fins a les 6:00: la matinada compta com la nit anterior.",
+            "today": "Avui",
+            "tomorrow": "Demà",
+            "weekend": "Aquest cap de setmana",
+            "week": "Propers 7 dies",
+            "date": "Data"
+        },
+        "schedule": "Horari",
+        "scheduleHelp": "Segons l'hora a què comença la festa.",
+        "allSchedules": "Qualsevol hora",
+        "franjaHours": {
+            "tardeo": "Comença entre les 17:00 i les 23:00",
+            "nocheo": "Comença entre les 23:00 i les 5:00",
+            "after": "Comença entre les 5:00 i les 14:00"
         }
     },
     "match": {
@@ -1855,7 +1876,11 @@
             "create": "Publicar festa",
             "done": "Festa publicada",
             "searchVenue": "Cerca un negoci…",
-            "noVenue": "Cap negoci amb aquest nom"
+            "noVenue": "Cap negoci amb aquest nom",
+            "location": "Ubicació",
+            "optional": "opcional",
+            "locationHouseHelp": "Obligatòria: a les festes de {{app}} s'entra estant a prop, sense codi.",
+            "locationVenueHelp": "Si la deixes buida, s'usa la del negoci."
         },
         "notices": {
             "sent_one": "{{count}} avís enviat",

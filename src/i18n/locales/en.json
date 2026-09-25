@@ -235,7 +235,9 @@
         "featured": "Featured",
         "upcoming": "Upcoming events",
         "sponsored": "Featured",
-        "byPlatform": "Event by {{app}}"
+        "byPlatform": "Event by {{app}}",
+        "noPartiesThatDay": "No parties for {{day}}: here are the next ones.",
+        "nearDate": "Around that date"
     },
     "eventAccess": {
         "verifyTitle": "Verify you're nearby",
@@ -275,7 +277,9 @@
         "farBody": "Get within {{radius}} m of {{venue}} to get in.",
         "noLocationTitle": "We can't see your location",
         "locationReady": "Location ready",
-        "notStarted": "Starts at {{time}}. The code only works while the party is on."
+        "notStarted": "Starts at {{time}}. The code only works while the party is on.",
+        "platformHelp": "It's a {{app}} party: no code needed, just be there.",
+        "enterHere": "I'm here, get in"
     },
     "scanner": {
         "title": "Scan the event QR",
@@ -358,6 +362,23 @@
             "tardeo": "Afternoon",
             "nocheo": "Night",
             "after": "After"
+        },
+        "dates": {
+            "title": "Which day?",
+            "help": "The party day runs until 6:00: after midnight counts as the night before.",
+            "today": "Today",
+            "tomorrow": "Tomorrow",
+            "weekend": "This weekend",
+            "week": "Next 7 days",
+            "date": "Date"
+        },
+        "schedule": "Time",
+        "scheduleHelp": "By the time the party starts.",
+        "allSchedules": "Any time",
+        "franjaHours": {
+            "tardeo": "Starts between 17:00 and 23:00",
+            "nocheo": "Starts between 23:00 and 5:00",
+            "after": "Starts between 5:00 and 14:00"
         }
     },
     "match": {
@@ -1855,7 +1876,11 @@
             "create": "Publish party",
             "done": "Party published",
             "searchVenue": "Search venue…",
-            "noVenue": "No venue with that name"
+            "noVenue": "No venue with that name",
+            "location": "Location",
+            "optional": "optional",
+            "locationHouseHelp": "Required: people get into {{app}} parties by being nearby, no code.",
+            "locationVenueHelp": "If empty, the business location is used."
         },
         "notices": {
             "sent_one": "{{count}} notice sent",

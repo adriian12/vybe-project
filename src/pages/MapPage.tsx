@@ -18,6 +18,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useAppContext } from '@/context/app-context';
 import { EventWithDistance, isEventLive, isEventTonight, useEventsFeed } from '@/hooks/use-events-feed';
+import { DateFilter } from '@/components/party-filters';
+import { matchesDate, nightOf, useDateSelection } from '@/lib/date-filter';
 import { formatDistance } from '@/services/geo';
 import { cn } from '@/lib/utils';
 import { VenueType } from '@/types/venue';
@@ -84,7 +86,8 @@ const MapPage = () => {
   const [busqueda, setBusqueda] = useState('');
   const [tipo, setTipo] = useState<VenueType | null>(null);
   const [soloDirecto, setSoloDirecto] = useState(false);
-  const [soloEstaNoche, setSoloEstaNoche] = useState(false);
+  // La fecha es la misma que en inicio (por defecto, hoy).
+  const fecha = useDateSelection();
   const [soloGratis, setSoloGratis] = useState(false);
   const [seleccion, setSeleccion] = useState<string | null>(null);
   const [lista, setLista] = useState(false);
@@ -102,6 +105,7 @@ const MapPage = () => {
   }, [params]);
 
   const conPunto = useMemo(() => withDistance.filter(({ event }) => event.location), [withDistance]);
+  const noches = useMemo(() => [...new Set(conPunto.map(({ event }) => nightOf(event.startDate)))], [conPunto]);
 
   const tiposPresentes = useMemo(
     () => TIPOS.filter((tp) => conPunto.some(({ event }) => event.venueType === tp)),
@@ -118,7 +122,7 @@ const MapPage = () => {
     return featuredFirst(aplicarFiltros(conPunto, theme, franja).filter(({ event }) => {
       if (tipo && event.venueType !== tipo) return false;
       if (soloDirecto && !isEventLive(event)) return false;
-      if (soloEstaNoche && !isEventTonight(event)) return false;
+      if (!matchesDate(event, fecha)) return false;
       if (soloGratis && (event.price ?? 0) > 0) return false;
       if (
         desde &&
@@ -136,7 +140,7 @@ const MapPage = () => {
         .replace(/\p{Diacritic}/gu, '');
       return texto.includes(q);
     }));
-  }, [conPunto, busqueda, tipo, soloDirecto, soloEstaNoche, soloGratis, desde, theme, franja]);
+  }, [conPunto, busqueda, tipo, soloDirecto, fecha, soloGratis, desde, theme, franja]);
 
   const temasMapa = useMemo(() => {
     const encontrados = new Set<string>();
@@ -256,7 +260,7 @@ const MapPage = () => {
   const abrir = (id: string) =>
     navigate(activeEvent?.eventId === id ? `/event/${id}/live` : `/event/${id}`);
 
-  const filtrosActivos = [soloDirecto, soloEstaNoche, soloGratis, tipo !== null, theme !== null, franja !== null].filter(
+  const filtrosActivos = [soloDirecto, soloGratis, tipo !== null, theme !== null, franja !== null].filter(
     Boolean,
   ).length;
   const cercanos = visibles.filter((e) => e.distance !== null && e.distance <= 10_000).length;
@@ -308,6 +312,10 @@ const MapPage = () => {
             </button>
           </div>
 
+          <div className="pointer-events-auto flex">
+            <DateFilter nights={noches} className="shadow-lg shadow-black/30" />
+          </div>
+
           {desde && (
             <button
               type="button"
@@ -336,8 +344,6 @@ const MapPage = () => {
           onTheme={setTheme}
           live={soloDirecto}
           onLive={setSoloDirecto}
-          tonight={soloEstaNoche}
-          onTonight={setSoloEstaNoche}
           free={soloGratis}
           onFree={setSoloGratis}
           results={visibles.length}
@@ -346,7 +352,6 @@ const MapPage = () => {
             setTheme(null);
             setFranja(null);
             setSoloDirecto(false);
-            setSoloEstaNoche(false);
             setSoloGratis(false);
           }}
         />

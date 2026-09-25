@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { PartyButton } from '@/components/ui-custom/party-button';
 import { useToast } from '@/components/ui/use-toast';
 import { adminService, AdminVenue } from '@/services/admin';
+import LocationPicker, { PickedLocation } from '@/components/venue/location-picker';
 
 const HOUSE = 'house';
 
@@ -35,6 +36,8 @@ const AdminEventForm = ({ onCreated, bare }: { onCreated?: () => void; bare?: bo
   const [price, setPrice] = useState('');
   const [capacity, setCapacity] = useState('');
   const [theme, setTheme] = useState('');
+  const [lugar, setLugar] = useState<PickedLocation | null>(null);
+  const deLaCasa = venueId === HOUSE;
   const [enviando, setEnviando] = useState(false);
 
   useEffect(() => {
@@ -61,12 +64,15 @@ const AdminEventForm = ({ onCreated, bare }: { onCreated?: () => void; bare?: bo
         price: price ? Number(price) : null,
         capacity: capacity ? Number(capacity) : null,
         theme: theme.trim() || null,
+        latitude: lugar?.latitude ?? null,
+        longitude: lugar?.longitude ?? null,
       });
       setName('');
       setCity('');
       setPrice('');
       setCapacity('');
       setTheme('');
+      setLugar(null);
       onCreated?.();
       toast({ title: t('admin.newEvent.done') });
     } catch {
@@ -191,9 +197,21 @@ const AdminEventForm = ({ onCreated, bare }: { onCreated?: () => void; bare?: bo
         </div>
       </div>
 
+      {/* Las fiestas de Fiestea se entran con la ubicación: sin punto en el
+          mapa no se podría comprobar que la gente está allí. */}
+      <div className="space-y-1">
+        <Label className="text-caption">
+          {t('admin.newEvent.location')} {deLaCasa ? '*' : `(${t('admin.newEvent.optional')})`}
+        </Label>
+        <p className="text-caption text-ink/60">
+          {t(deLaCasa ? 'admin.newEvent.locationHouseHelp' : 'admin.newEvent.locationVenueHelp', { app: t('common.appName') })}
+        </p>
+        <LocationPicker value={lugar} onChange={setLugar} />
+      </div>
+
       <PartyButton
         className={bare ? 'w-full gap-2' : 'w-full gap-2 sm:w-auto'}
-        disabled={enviando || name.trim().length < 2 || !date}
+        disabled={enviando || name.trim().length < 2 || !date || (deLaCasa && !lugar)}
         onClick={() => void crear()}
       >
         {enviando ? <Loader2 size={15} className="animate-spin" /> : <CalendarPlus size={15} />}

@@ -235,7 +235,9 @@
         "featured": "Destacados",
         "upcoming": "Próximos eventos",
         "sponsored": "Destacado",
-        "byPlatform": "Evento creado por {{app}}"
+        "byPlatform": "Evento creado por {{app}}",
+        "noPartiesThatDay": "No hay fiestas para {{day}}: estas son las próximas.",
+        "nearDate": "Cerca de esa fecha"
     },
     "eventAccess": {
         "verifyTitle": "Verificar proximidad",
@@ -275,7 +277,9 @@
         "farBody": "Acércate a menos de {{radius}} m de {{venue}} para poder entrar.",
         "noLocationTitle": "No vemos tu ubicación",
         "locationReady": "Ubicación lista",
-        "notStarted": "Empieza a las {{time}}. El código sólo funciona mientras dura la fiesta."
+        "notStarted": "Empieza a las {{time}}. El código sólo funciona mientras dura la fiesta.",
+        "platformHelp": "Es una fiesta de {{app}}: no hace falta código, sólo estar allí.",
+        "enterHere": "Estoy aquí, entrar"
     },
     "scanner": {
         "title": "Escanea el QR del evento",
@@ -358,6 +362,23 @@
             "tardeo": "Tardeo",
             "nocheo": "Nocheo",
             "after": "After"
+        },
+        "dates": {
+            "title": "¿Qué día?",
+            "help": "El día de fiesta va hasta las 6:00: lo de madrugada cuenta como la noche anterior.",
+            "today": "Hoy",
+            "tomorrow": "Mañana",
+            "weekend": "Este finde",
+            "week": "Próximos 7 días",
+            "date": "Fecha"
+        },
+        "schedule": "Horario",
+        "scheduleHelp": "Según la hora a la que empieza la fiesta.",
+        "allSchedules": "Cualquier hora",
+        "franjaHours": {
+            "tardeo": "Empieza entre las 17:00 y las 23:00",
+            "nocheo": "Empieza entre las 23:00 y las 5:00",
+            "after": "Empieza entre las 5:00 y las 14:00"
         }
     },
     "match": {
@@ -1855,7 +1876,11 @@
             "create": "Publicar fiesta",
             "done": "Fiesta publicada",
             "searchVenue": "Buscar negocio…",
-            "noVenue": "Ningún negocio con ese nombre"
+            "noVenue": "Ningún negocio con ese nombre",
+            "location": "Ubicación",
+            "optional": "opcional",
+            "locationHouseHelp": "Obligatoria: a las fiestas de {{app}} se entra estando cerca, sin código.",
+            "locationVenueHelp": "Si la dejas vacía, se usa la del negocio."
         },
         "notices": {
             "sent_one": "{{count}} aviso enviado",

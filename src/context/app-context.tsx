@@ -70,6 +70,8 @@ interface AppContextType {
   events: Event[];
 
   redeemEventCode: (code: string, coords?: Coordinates) => Promise<EventAccess>;
+  /** Fiestas de Fiestea: se entra con la ubicación (migración 076). */
+  enterPlatformEvent: (eventId: string, coords?: Coordinates) => Promise<EventAccess>;
   leaveEvent: () => void;
   refreshActiveEvent: () => Promise<void>;
   refreshLocation: () => Promise<Coordinates>;
@@ -318,6 +320,13 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     },
     [],
   );
+
+  const enterPlatformEvent = useCallback(async (eventId: string, coords?: Coordinates): Promise<EventAccess> => {
+    const position = coords ?? lastKnownPosition.current ?? undefined;
+    const access = await api.enterPlatformEvent(eventId, position?.latitude, position?.longitude);
+    setActiveEvent(access);
+    return access;
+  }, []);
 
   /** Vuelve a preguntar al servidor por el evento en curso y su foto. */
   const refreshActiveEvent = useCallback(async () => {
@@ -727,6 +736,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     messages,
     events,
     redeemEventCode,
+    enterPlatformEvent,
     leaveEvent,
     refreshActiveEvent,
     refreshLocation,

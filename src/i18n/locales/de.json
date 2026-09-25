@@ -235,7 +235,9 @@
         "featured": "Highlights",
         "upcoming": "Nächste Events",
         "sponsored": "Hervorgehoben",
-        "byPlatform": "Event von {{app}}"
+        "byPlatform": "Event von {{app}}",
+        "noPartiesThatDay": "Keine Partys für {{day}}: Hier sind die nächsten.",
+        "nearDate": "Rund um dieses Datum"
     },
     "eventAccess": {
         "verifyTitle": "Nähe bestätigen",
@@ -275,7 +277,9 @@
         "farBody": "Komm näher als {{radius}} m an {{venue}} heran, um reinzukommen.",
         "noLocationTitle": "Wir sehen deinen Standort nicht",
         "locationReady": "Standort bereit",
-        "notStarted": "Beginnt um {{time}}. Der Code funktioniert nur während der Party."
+        "notStarted": "Beginnt um {{time}}. Der Code funktioniert nur während der Party.",
+        "platformHelp": "Das ist eine {{app}}-Party: Kein Code nötig, du musst nur dort sein.",
+        "enterHere": "Ich bin da, rein"
     },
     "scanner": {
         "title": "Event-QR scannen",
@@ -358,6 +362,23 @@
             "tardeo": "Nachmittag",
             "nocheo": "Nacht",
             "after": "After"
+        },
+        "dates": {
+            "title": "Welcher Tag?",
+            "help": "Der Partytag geht bis 6:00 Uhr: Was nach Mitternacht ist, zählt zur Nacht davor.",
+            "today": "Heute",
+            "tomorrow": "Morgen",
+            "weekend": "Dieses Wochenende",
+            "week": "Nächste 7 Tage",
+            "date": "Datum"
+        },
+        "schedule": "Uhrzeit",
+        "scheduleHelp": "Nach der Startzeit der Party.",
+        "allSchedules": "Jederzeit",
+        "franjaHours": {
+            "tardeo": "Beginnt zwischen 17 und 23 Uhr",
+            "nocheo": "Beginnt zwischen 23 und 5 Uhr",
+            "after": "Beginnt zwischen 5 und 14 Uhr"
         }
     },
     "match": {
@@ -1855,7 +1876,11 @@
             "create": "Party veröffentlichen",
             "done": "Party veröffentlicht",
             "searchVenue": "Location suchen…",
-            "noVenue": "Keine Location mit diesem Namen"
+            "noVenue": "Keine Location mit diesem Namen",
+            "location": "Ort",
+            "optional": "optional",
+            "locationHouseHelp": "Pflicht: In {{app}}-Partys kommt man rein, wenn man in der Nähe ist, ohne Code.",
+            "locationVenueHelp": "Leer lassen, um den Ort des Betriebs zu nutzen."
         },
         "notices": {
             "sent_one": "{{count}} Nachricht gesendet",

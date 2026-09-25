@@ -22,8 +22,6 @@ interface MapFiltersSheetProps {
   onTheme: (value: string | null) => void;
   live: boolean;
   onLive: (value: boolean) => void;
-  tonight: boolean;
-  onTonight: (value: boolean) => void;
   free: boolean;
   onFree: (value: boolean) => void;
   /** Cuántos eventos quedan con lo elegido. */
@@ -52,8 +50,6 @@ const MapFiltersSheet = ({
   onTheme,
   live,
   onLive,
-  tonight,
-  onTonight,
   free,
   onFree,
   results,
@@ -89,10 +85,6 @@ const MapFiltersSheet = ({
               <button type="button" onClick={() => onLive(!live)} aria-pressed={live} className={pill(live)}>
                 {live && <Check size={14} />}
                 {t('map.liveOnly')}
-              </button>
-              <button type="button" onClick={() => onTonight(!tonight)} aria-pressed={tonight} className={pill(tonight)}>
-                {tonight && <Check size={14} />}
-                {t('map.tonightOnly')}
               </button>
               <button type="button" onClick={() => onFree(!free)} aria-pressed={free} className={pill(free)}>
                 {free && <Check size={14} />}

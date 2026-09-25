@@ -3713,6 +3713,20 @@ export type Database = {
       delete_guest_list: { Args: { p_list_id: string }; Returns: undefined }
       demographics_min_bucket: { Args: never; Returns: number }
       draw_raffle: { Args: { p_raffle_id: string }; Returns: string }
+      enter_platform_event: {
+        Args: { p_event_id: string; p_latitude: number; p_longitude: number }
+        Returns: {
+          distance_meters: number
+          end_date: string
+          event_id: string
+          event_name: string
+          event_radius: number
+          start_date: string
+          venue_id: string
+          venue_name: string
+          venue_type: string
+        }[]
+      }
       event_trend: { Args: { p_event_id: string }; Returns: string }
       event_women_share: { Args: { p_event_id: string }; Returns: number }
       export_my_data: { Args: never; Returns: Json }

@@ -191,6 +191,10 @@ const REDEEM_ERRORS: Record<string, string> = {
   TOO_FAR: 'Estás demasiado lejos del evento. Acércate para poder entrar.',
   ENTRY_CLOSED: 'El local ha cerrado la entrada: ya no entra nadie más esta noche.',
   CODE_EXHAUSTED: 'Esta lista ya está completa.',
+  EVENT_NOT_STARTED: 'Todavía no ha empezado: podrás entrar una hora antes.',
+  LOCATION_REQUIRED: 'Activa la ubicación para entrar.',
+  EVENT_WITHOUT_LOCATION: 'Esta fiesta todavía no tiene ubicación.',
+  CODE_REQUIRED: 'Para entrar hace falta el código del negocio.',
 };
 
 const parseRedeemError = (message: string): ApiError => {
@@ -374,6 +378,32 @@ export const api = {
       startDate: row.start_date,
       endDate: row.end_date,
       distanceMeters: row.distance_meters,
+    };
+  },
+
+  /**
+   * Fiestas de Fiestea (migración 076): se entra con la ubicación, sin código.
+   * El servidor comprueba que la fiesta es de la casa y que estás en su radio.
+   */
+  enterPlatformEvent: async (eventId: string, latitude?: number, longitude?: number): Promise<EventAccess> => {
+    const { data, error } = await supabase.rpc('enter_platform_event', {
+      p_event_id: eventId,
+      p_latitude: latitude ?? null,
+      p_longitude: longitude ?? null,
+    } as never);
+    if (error) throw parseRedeemError(error.message);
+    const row = (data as { event_id: string; event_name: string; venue_id: string; venue_name: string; venue_type: string; event_radius: number; start_date: string; end_date: string; distance_meters: number | null }[] | null)?.[0];
+    if (!row) throw new ApiError('NO_ACTIVE_EVENT', REDEEM_ERRORS.NO_ACTIVE_EVENT);
+    return {
+      eventId: row.event_id,
+      eventName: row.event_name,
+      venueId: row.venue_id,
+      venueName: row.venue_name,
+      venueType: row.venue_type as VenueType,
+      eventRadius: row.event_radius,
+      startDate: row.start_date,
+      endDate: row.end_date,
+      distanceMeters: row.distance_meters ?? null,
     };
   },
 

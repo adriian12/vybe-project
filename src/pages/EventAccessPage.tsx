@@ -46,7 +46,7 @@ const EventAccessPage = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { toast } = useToast();
-  const { redeemEventCode } = useAppContext();
+  const { redeemEventCode, enterPlatformEvent } = useAppContext();
 
   const [event, setEvent] = useState<Event | null>(null);
   const [cargando, setCargando] = useState(true);
@@ -169,6 +169,22 @@ const EventAccessPage = () => {
     [eventId, coords, redeemEventCode, navigate, t, toast],
   );
 
+  /** Fiestas de Fiestea: sin código, basta con estar dentro del radio. */
+  const entrarSinCodigo = useCallback(async () => {
+    if (!eventId) return;
+    setIsValidating(true);
+    setScanError(null);
+    try {
+      const access = await enterPlatformEvent(eventId, coords ?? undefined);
+      track('code_redeemed', { eventId: access.eventId });
+      navigate(`/event/${access.eventId}/live`, { replace: true });
+    } catch (error) {
+      setScanError(error instanceof ApiError ? error.message : t('errors.generic'));
+    } finally {
+      setIsValidating(false);
+    }
+  }, [eventId, coords, enterPlatformEvent, navigate, t]);
+
   if (cargando) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -278,13 +294,30 @@ const EventAccessPage = () => {
           </p>
         )}
 
-        <QRScanner
-          onScanSuccess={(code) => void handleCode(code)}
-          isValidating={isValidating}
-          error={scanError}
-          disabled={ubicacion.estado !== 'inside'}
-          status={tarjeta}
-        />
+        {event.byPlatform ? (
+          <div className="space-y-3">
+            {tarjeta}
+            <p className="text-body-sm text-party-gray">{t('eventAccess.platformHelp', { app: t('common.appName') })}</p>
+            {scanError && <p className="rounded-xl bg-destructive/15 px-4 py-3 text-body-sm font-bold text-destructive">{scanError}</p>}
+            <PartyButton
+              size="lg"
+              className="w-full"
+              disabled={ubicacion.estado !== 'inside' || isValidating}
+              onClick={() => void entrarSinCodigo()}
+            >
+              {isValidating && <Loader2 size={16} className="animate-spin" />}
+              {t('eventAccess.enterHere')}
+            </PartyButton>
+          </div>
+        ) : (
+          <QRScanner
+            onScanSuccess={(code) => void handleCode(code)}
+            isValidating={isValidating}
+            error={scanError}
+            disabled={ubicacion.estado !== 'inside'}
+            status={tarjeta}
+          />
+        )}
 
         {import.meta.env.DEV && event.location && (
           <button

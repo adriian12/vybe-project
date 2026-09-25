@@ -138,6 +138,8 @@ export const adminService = {
     price?: number | null;
     capacity?: number | null;
     theme?: string | null;
+    latitude?: number | null;
+    longitude?: number | null;
   }): Promise<string> => {
     const { data, error } = await supabase.rpc('admin_create_event', {
       p_name: event.name,
@@ -149,6 +151,10 @@ export const adminService = {
       p_price: event.price ?? null,
       p_capacity: event.capacity ?? null,
       p_theme: event.theme ?? null,
+      p_latitude: event.latitude ?? null,
+      p_longitude: event.longitude ?? null,
+      // Con punto en el mapa, se comprueba que la gente está allí al entrar.
+      p_requires_location: event.latitude != null && event.longitude != null,
     });
     if (error) fallo(error.message);
     return String(data ?? '');

@@ -11,7 +11,8 @@ import { track } from '@/lib/observability';
 import { isEventLive, isEventTonight, useEventsFeed } from '@/hooks/use-events-feed';
 import { Event } from '@/types/venue';
 import { isFeatured } from '@/lib/featured';
-import PartyFilters from '@/components/party-filters';
+import PartyFilters, { useDateLabel } from '@/components/party-filters';
+import { isNearDate, matchesDate, nightOf, useDateSelection } from '@/lib/date-filter';
 import RatePartyPrompt from '@/components/rate-party';
 import { aplicarFiltros, Franja } from '@/lib/party-filters';
 
@@ -64,13 +65,22 @@ const HomePage = () => {
     return [...encontradas].sort();
   }, [withDistance]);
 
-  const visible = useMemo(() => aplicarFiltros(withDistance, theme, franja), [withDistance, theme, franja]);
+  // Música y horario; después, la fecha (por defecto, hoy).
+  const filtrados = useMemo(() => aplicarFiltros(withDistance, theme, franja), [withDistance, theme, franja]);
+  const fecha = useDateSelection();
+  const etiquetaFecha = useDateLabel();
+  const delDia = useMemo(() => filtrados.filter(({ event }) => matchesDate(event, fecha)), [filtrados, fecha]);
+  const cercaDeLaFecha = useMemo(() => filtrados.filter(({ event }) => isNearDate(event, fecha)), [filtrados, fecha]);
+  // Sin fiestas ese día no se enseña la pantalla vacía: las próximas.
+  const sinFiestas = !isLoading && delDia.length === 0 && cercaDeLaFecha.length === 0;
+  const visible = sinFiestas ? filtrados : delDia;
+  const noches = useMemo(() => [...new Set(withDistance.map(({ event }) => nightOf(event.startDate)))], [withDistance]);
 
   useEffect(() => {
     if (theme && !themes.includes(theme)) setTheme(null);
   }, [themes, theme]);
 
-  const enDirecto = useMemo(() => visible.filter(({ event }) => isEventLive(event)), [visible]);
+  const enDirecto = useMemo(() => filtrados.filter(({ event }) => isEventLive(event)), [filtrados]);
 
   /**
    * Destacados: primero los que el local ha pagado por destacar, y después los
@@ -215,6 +225,7 @@ const HomePage = () => {
             onTheme={setTheme}
             franja={franja}
             onFranja={setFranja}
+            nights={noches}
           />
         )}
 
@@ -246,15 +257,23 @@ const HomePage = () => {
         {/* ------------------------------------------------------------ lista */}
         <section className="space-y-4 px-margin pt-1">
           <div className="flex items-center justify-between gap-3">
-            <h2 className="font-display text-headline-lg">{t('home.upcoming')}</h2>
+            <h2 className="font-display text-headline-lg first-letter:uppercase">
+              {sinFiestas ? t('home.upcoming') : etiquetaFecha(fecha)}
+            </h2>
           </div>
+
+          {sinFiestas && filtrados.length > 0 && (
+            <p className="rounded-2xl bg-card px-4 py-3 text-body-sm text-party-gray">
+              {t('home.noPartiesThatDay', { day: etiquetaFecha(fecha).toLocaleLowerCase() })}
+            </p>
+          )}
 
           {isLoading ? (
             <div className="flex flex-col items-center justify-center gap-3 py-16">
               <Loader2 className="h-8 w-8 animate-spin text-party-primary" />
               <p className="text-sm text-party-gray">{t('common.loading')}</p>
             </div>
-          ) : visible.length === 0 ? (
+          ) : visible.length === 0 && cercaDeLaFecha.length === 0 ? (
             <div className="flex flex-col items-center justify-center rounded-2xl bg-card px-6 py-12 text-center">
               <PartyPopper size={44} className="mb-4 text-party-primary" />
               <h3 className="mb-2 font-display text-headline-md">{t('home.empty')}</h3>
@@ -279,6 +298,26 @@ const HomePage = () => {
                     onToggleIntent={() => void toggleIntent(event.id)}
                   />
                 </div>
+              ))}
+            </div>
+          )}
+
+          {/* Día elegido en el calendario: también las de dos días antes y después. */}
+          {cercaDeLaFecha.length > 0 && (
+            <div className="space-y-4 pt-2">
+              <h3 className="font-display text-headline-md text-party-gray">{t('home.nearDate')}</h3>
+              {cercaDeLaFecha.map(({ event, distance }) => (
+                <EventCard
+                  key={event.id}
+                  event={event}
+                  distance={distance}
+                  activity={activity[event.id]}
+                  going={intents.includes(event.id)}
+                  busy={busyIntent === event.id}
+                  live={isEventLive(event)}
+                  onOpen={() => openEvent(event)}
+                  onToggleIntent={() => void toggleIntent(event.id)}
+                />
               ))}
             </div>
           )}
