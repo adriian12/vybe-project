@@ -19,7 +19,10 @@ import { MemoryRouter } from 'react-router-dom';
 const signUp = vi.fn();
 
 vi.mock('@/services/auth-email', () => ({
-  authEmailService: { signUp: (...args: unknown[]) => signUp(...args) },
+  authEmailService: {
+    signUp: (...args: unknown[]) => signUp(...args),
+    checkAvailability: async () => ({ emailTaken: false, phoneTaken: false }),
+  },
   authEmailMessage: () => 'errors.generic',
   AuthEmailFailure: class extends Error {
     accountCreated = false;
@@ -65,39 +68,35 @@ beforeEach(() => {
 });
 
 describe('registro de usuario', () => {
-  it('pregunta el género y las preferencias una sola vez', () => {
+  it('sólo pide nombre, correo y contraseña', () => {
     renderRegistro();
 
-    // Cada opción aparece en un único botón. Con el bloque duplicado había dos
-    // de cada, y rellenar el primero no servía de nada.
-    expect(screen.getAllByText('auth.genders.woman')).toHaveLength(1);
-    expect(screen.getAllByText('auth.genders.man')).toHaveLength(1);
-    expect(screen.getAllByText('auth.wantsOptions.all')).toHaveLength(1);
+    expect(screen.getByText('auth.name')).toBeInTheDocument();
+    expect(screen.getByText('auth.email')).toBeInTheDocument();
+    expect(screen.getByText('auth.password')).toBeInTheDocument();
+    // La edad, el género, a quién quiere ver y el móvil ya no se piden aquí:
+    // los pide la ficha de fiester@ al entrar.
+    expect(screen.queryByText('auth.genders.woman')).not.toBeInTheDocument();
+    expect(screen.queryByText('auth.phone')).not.toBeInTheDocument();
+    expect(screen.queryByText('auth.repeatPassword')).not.toBeInTheDocument();
   });
 
-  it('pide el teléfono con su prefijo', () => {
+  it('enseña una sola confirmación legal', () => {
     renderRegistro();
 
-    expect(screen.getByText('auth.phone')).toBeInTheDocument();
-    // El prefijo por defecto está puesto: escribirlo a mano era lo que hacía
-    // que la mitad de los números quedaran sin él.
-    expect(screen.getByText('+34')).toBeInTheDocument();
+    expect(screen.getByText('consent.all')).toBeInTheDocument();
   });
 
-  it('enseña las tres confirmaciones legales en el propio formulario', () => {
-    renderRegistro();
-
-    expect(screen.getByText('consent.terms')).toBeInTheDocument();
-    expect(screen.getByText('consent.privacy')).toBeInTheDocument();
-    expect(screen.getByText('consent.age')).toBeInTheDocument();
-  });
-
-  it('no crea la cuenta si faltan las confirmaciones', async () => {
+  it('no crea la cuenta sin la confirmación', async () => {
     const user = userEvent.setup();
     renderRegistro();
 
+    await user.type(screen.getByPlaceholderText('auth.namePlaceholder'), 'Ana');
+    await user.type(screen.getByPlaceholderText('tu@email.com'), 'ana@example.com');
+    await user.type(screen.getByPlaceholderText('••••••••'), 'contraseña-larga');
     await user.click(screen.getByRole('button', { name: 'auth.register' }));
 
     await waitFor(() => expect(signUp).not.toHaveBeenCalled());
   });
 });
+

@@ -30,6 +30,7 @@ import LikesPage from './pages/LikesPage';
 import ChatPage from './pages/ChatPage';
 import ProfilePage from './pages/ProfilePage';
 import VerifyEmailPage from './pages/VerifyEmailPage';
+import CompleteProfileDialog from '@/components/complete-profile-dialog';
 
 /**
  * Pantallas que se cargan cuando hacen falta.
@@ -153,6 +154,7 @@ const App = () => (
             <Sonner />
             <PwaPrompt />
             <PremiumFeatures />
+            <CompleteProfileDialog />
             <SupercrushDialog />
             <DevSentryCheck />
             <DeepLinks />

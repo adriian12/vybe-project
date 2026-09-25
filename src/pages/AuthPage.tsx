@@ -45,6 +45,9 @@ import { isValidNif, normalizeNif } from '@/lib/nif';
 import { track } from '@/lib/observability';
 import { DOWNLOAD_PATH, DownloadReason, landingHref, siteMode } from '@/lib/hosts';
 import { VENUE_RADIUS, VenueType } from '@/types/venue';
+import SocialLoginButtons from '@/components/social-login-buttons';
+import PhoneAuthForm from '@/components/phone-auth-form';
+import { PHONE_SIGNUP } from '@/lib/features';
 
 const VENUE_TYPES: VenueType[] = [
   'discoteca',
@@ -115,45 +118,21 @@ const buildPhoneSchema = (t: Translate) =>
       message: t('auth.errors.phoneRequired'),
     });
 
-const buildUserRegisterSchema = (t: Translate, kind: AccountKind = 'vyber') =>
-  z
-    .object({
-      name: z.string().min(2, { message: t('auth.errors.nameRequired') }).max(60),
-      age: z.coerce
-        .number({ invalid_type_error: t('auth.errors.ageRequired') })
-        .int()
-        .min(18, { message: t('auth.errors.ageMin') })
-        .max(100, { message: t('auth.errors.ageMax') }),
-      // El género no se puede cambiar después, así que se pide aquí y de forma
-      // explícita en vez de deducirlo del nombre.
-      // La cuenta de invitado no sale en el tablón, así que no se le pregunta
-      // ni el género ni a quién quiere ver. Si algún día se pasa a Vyber, se
-      // le piden entonces.
-      gender: kind === 'vyber'
-        ? z.enum(['man', 'woman'], { required_error: t('auth.errors.genderRequired') })
-        : z.enum(['man', 'woman']).optional(),
-      wants: z.enum(['men', 'women', 'all']).optional(),
-      phone: buildPhoneSchema(t),
-      email: z.string().email({ message: t('auth.errors.invalidEmail') }),
-      password: z.string().min(8, { message: t('auth.errors.passwordShort') }),
-      confirmPassword: z.string(),
-      // El consentimiento se recoge aquí, en el mismo gesto de crear la cuenta,
-      // y no en una pantalla posterior: quien acepta tiene que poder leer qué
-      // acepta antes de entregar sus datos, no después.
-      acceptTerms: z.literal(true, {
-        errorMap: () => ({ message: t('auth.errors.acceptTerms') }),
-      }),
-      acceptPrivacy: z.literal(true, {
-        errorMap: () => ({ message: t('auth.errors.acceptPrivacy') }),
-      }),
-      acceptAge: z.literal(true, {
-        errorMap: () => ({ message: t('auth.errors.acceptAge') }),
-      }),
-    })
-    .refine((data) => data.password === data.confirmPassword, {
-      message: t('auth.errors.passwordMismatch'),
-      path: ['confirmPassword'],
-    });
+/**
+ * El alta de usuario: nombre, correo y contraseña, y una sola casilla. La
+ * edad, el género, a quién quiere ver y el plan de la noche los pide la ficha
+ * de fiester@ al entrar (`complete-profile-dialog.tsx`); el invitado no los
+ * necesita. Quien entra con Google o Apple no pasa por aquí.
+ */
+const buildUserRegisterSchema = (t: Translate) =>
+  z.object({
+    name: z.string().trim().min(2, { message: t('auth.errors.nameRequired') }).max(60),
+    email: z.string().trim().email({ message: t('auth.errors.invalidEmail') }),
+    password: z.string().min(8, { message: t('auth.errors.passwordShort') }),
+    // Una casilla para las tres cosas (edad, términos y privacidad): se
+    // guardan igual, documento a documento, con la misma fecha.
+    acceptAll: z.literal(true, { errorMap: () => ({ message: t('auth.errors.acceptAll') }) }),
+  });
 
 const buildVenueRegisterSchema = (t: Translate) =>
   z
@@ -266,7 +245,7 @@ const legalLinkProps = {
  */
 const ConsentField: React.FC<{
   control: Control<UserRegisterValues>;
-  name: 'acceptTerms' | 'acceptPrivacy' | 'acceptAge';
+  name: 'acceptAll';
   id: string;
   i18nKey: string;
   components?: Record<string, React.ReactElement>;
@@ -423,21 +402,10 @@ const UserRegisterForm = ({ kind }: { kind: AccountKind }) => {
   const onError = useValidationToast();
   const [isLoading, setIsLoading] = useState(false);
 
-  const schema = useMemo(() => buildUserRegisterSchema(t, kind), [t, kind]);
+  const schema = useMemo(() => buildUserRegisterSchema(t), [t]);
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
-    defaultValues: {
-      name: '',
-      age: 18,
-      wants: 'all' as const,
-      phone: '+34',
-      email: '',
-      password: '',
-      confirmPassword: '',
-      acceptTerms: false as unknown as true,
-      acceptPrivacy: false as unknown as true,
-      acceptAge: false as unknown as true,
-    },
+    defaultValues: { name: '', email: '', password: '', acceptAll: false as unknown as true },
   });
 
   const comprobarOcupado = useTakenCheck(form, t);
@@ -451,16 +419,12 @@ const UserRegisterForm = ({ kind }: { kind: AccountKind }) => {
       // metadatos. Insertarlo desde el cliente fallaba porque todavía no hay
       // sesión y la policy exige auth.uid() = user_id.
       await authEmailService.signUp({
-        email: values.email.trim(),
+        email: values.email,
         password: values.password,
         metadata: {
           account_type: 'user',
           name: values.name,
-          age: values.age,
           profile_kind: kind,
-          gender: values.gender,
-          wants: values.wants,
-          phone: values.phone,
           // Queda anotado en la cuenta para que la pantalla de consentimiento
           // no vuelva a preguntar lo que ya se aceptó aquí, y lo registre en
           // la base de datos en cuanto haya sesión.
@@ -492,108 +456,8 @@ const UserRegisterForm = ({ kind }: { kind: AccountKind }) => {
             <FormItem>
               <FormLabel>{t('auth.name')}</FormLabel>
               <FormControl>
-                <Input placeholder={t('auth.namePlaceholder')} {...field} />
+                <Input autoComplete="given-name" placeholder={t('auth.namePlaceholder')} {...field} />
               </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="age"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t('auth.age')}</FormLabel>
-              <FormControl>
-                <Input type="number" min={18} max={100} {...field} />
-              </FormControl>
-              <FormDescription>{t('auth.ageHelp')}</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        {kind === 'vyber' && (
-          <>
-        <FormField
-            control={form.control}
-            name="gender"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t('auth.gender')}</FormLabel>
-                <FormControl>
-                  <div className="grid grid-cols-2 gap-1 rounded-xl bg-card p-1">
-                    {(['woman', 'man'] as const).map((option) => (
-                      <button
-                        key={option}
-                        type="button"
-                        onClick={() => field.onChange(option)}
-                        aria-pressed={field.value === option}
-                        className={`press h-10 rounded-lg text-sm font-bold ${
-                          field.value === option
-                            ? 'bg-party-primary text-ink'
-                            : 'text-party-gray hover:text-foreground'
-                        }`}
-                      >
-                        {t(`auth.genders.${option}`)}
-                      </button>
-                    ))}
-                  </div>
-                </FormControl>
-                <FormDescription>{t('auth.genderHelp')}</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="wants"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t('auth.wants')}</FormLabel>
-                <FormControl>
-                  <div className="grid grid-cols-3 gap-1 rounded-xl bg-card p-1">
-                    {(['women', 'men', 'all'] as const).map((option) => (
-                      <button
-                        key={option}
-                        type="button"
-                        onClick={() => field.onChange(option)}
-                        aria-pressed={field.value === option}
-                        className={`press h-10 rounded-lg text-sm font-bold ${
-                          field.value === option
-                            ? 'bg-party-primary text-ink'
-                            : 'text-party-gray hover:text-foreground'
-                        }`}
-                      >
-                        {t(`auth.wantsOptions.${option}`)}
-                      </button>
-                    ))}
-                  </div>
-                </FormControl>
-                <FormDescription>{t('auth.wantsHelp')}</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-  </>
-        )}
-        <FormField
-          control={form.control}
-          name="phone"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t('auth.phone')}</FormLabel>
-              <FormControl>
-                <PhoneInput
-                  value={field.value}
-                  onChange={field.onChange}
-                  onBlur={() => {
-                    field.onBlur();
-                    void comprobarOcupado('phone');
-                  }}
-                  id="user-phone"
-                />
-              </FormControl>
-              <FormDescription>{t('auth.phoneHelp')}</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -626,43 +490,21 @@ const UserRegisterForm = ({ kind }: { kind: AccountKind }) => {
               <FormControl>
                 <PasswordInput autoComplete="new-password" placeholder="••••••••" {...field} />
               </FormControl>
+              <FormDescription>{t('auth.passwordHelp')}</FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name="confirmPassword"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t('auth.repeatPassword')}</FormLabel>
-              <FormControl>
-                <PasswordInput autoComplete="new-password" placeholder="••••••••" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <div className="space-y-3 pt-1">
+        <div className="pt-1">
           <ConsentField
             control={form.control}
-            name="acceptTerms"
-            id="accept-terms"
-            i18nKey="consent.terms"
-            components={{ terms: <Link to="/legal/terms" {...legalLinkProps} /> }}
-          />
-          <ConsentField
-            control={form.control}
-            name="acceptPrivacy"
-            id="accept-privacy"
-            i18nKey="consent.privacy"
-            components={{ privacy: <Link to="/legal/privacy" {...legalLinkProps} /> }}
-          />
-          <ConsentField
-            control={form.control}
-            name="acceptAge"
-            id="accept-age"
-            i18nKey="consent.age"
+            name="acceptAll"
+            id="accept-all"
+            i18nKey="consent.all"
+            components={{
+              terms: <Link to="/legal/terminos" {...legalLinkProps} />,
+              privacy: <Link to="/legal/privacidad" {...legalLinkProps} />,
+            }}
           />
         </div>
 
@@ -1210,7 +1052,15 @@ const AuthPage = () => {
     if (accountType === 'venue') {
       return authMode === 'login' ? <VenueLoginForm /> : <VenueRegisterForm />;
     }
-    if (authMode === 'login') return <UserLoginForm />;
+    if (authMode === 'login') {
+      return (
+        <div className="space-y-4">
+          {!soloEmpresas && <SocialLoginButtons />}
+          {!soloEmpresas && PHONE_SIGNUP && <PhoneAuthForm />}
+          <UserLoginForm />
+        </div>
+      );
+    }
 
     // Dos formas de estar en Vybe, y se eligen aquí: no es lo mismo venir a
     // conocer gente que venir a enterarte de dónde se sale.
@@ -1243,6 +1093,8 @@ const AuthPage = () => {
           </span>
         </button>
 
+        <SocialLoginButtons kind={kind} />
+        {PHONE_SIGNUP && <PhoneAuthForm kind={kind} />}
         <UserRegisterForm kind={kind} />
 
         <AccountKindInfo kind={info} onClose={() => setInfo(null)} />

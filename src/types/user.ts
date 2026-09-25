@@ -25,6 +25,8 @@ export interface User {
   wants?: 'men' | 'women' | 'all';
   /** `vyber` (tablón) o `guest` (sólo fiestas, ofertas y avisos). */
   accountType?: 'vyber' | 'guest';
+  /** Ha rellenado la ficha de fiester@ (edad, género, a quién ve…). */
+  profileCompleted?: boolean;
   status?: 'active' | 'suspended' | 'pending_deletion' | 'deleted';
   notifyMatches?: boolean;
   notifyMessages?: boolean;

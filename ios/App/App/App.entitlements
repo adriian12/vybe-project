@@ -17,6 +17,12 @@
 		<string>applinks:app.fiestea.es</string>
 	</array>
 
+	<!-- Iniciar sesión con Apple (migración 075). -->
+	<key>com.apple.developer.applesignin</key>
+	<array>
+		<string>Default</string>
+	</array>
+
 	<!-- Notificaciones push: en producción, no en el entorno de desarrollo. -->
 	<key>aps-environment</key>
 	<string>production</string>

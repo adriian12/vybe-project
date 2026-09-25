@@ -46,6 +46,7 @@ const profileToUser = (profile: ProfileRow, distance?: number): User => ({
   gender: (profile.gender as User['gender']) ?? undefined,
   wants: (profile.wants as User['wants']) ?? 'all',
   accountType: (profile.account_type as User['accountType']) ?? 'vyber',
+  profileCompleted: Boolean(profile.profile_completed_at),
   status: profile.status as User['status'],
   notifyMatches: profile.notify_matches,
   notifyMessages: profile.notify_messages,
@@ -268,6 +269,24 @@ export const api = {
    * Cambia el tipo de cuenta. A invitado siempre; a vyber, con el límite del
    * plan y con el perfil completo (género y a quién quiere ver).
    */
+  /** La ficha de fiester@ (migración 075): se rellena una vez al entrar. */
+  completeProfile: async (input: {
+    age: number;
+    gender: 'man' | 'woman';
+    wants: 'men' | 'women' | 'all';
+    planTonight?: string;
+    bio?: string;
+  }): Promise<void> => {
+    const { error } = await supabase.rpc('complete_my_profile', {
+      p_age: input.age,
+      p_gender: input.gender,
+      p_wants: input.wants,
+      p_tonight_plan: input.planTonight ?? null,
+      p_bio: input.bio ?? null,
+    } as never);
+    if (error) throw new ApiError('PROFILE_FAILED', 'errors.generic');
+  },
+
   setAccountType: async (type: 'vyber' | 'guest'): Promise<void> => {
     const { error } = await supabase.rpc('set_account_type', { p_type: type });
     if (!error) return;

@@ -99,7 +99,8 @@
             "emailNotConfigured": "Der E-Mail-Versand ist nicht eingerichtet. Sag uns Bescheid, dann schalten wir ihn frei.",
             "emailSendFailed": "Wir konnten dir die E-Mail nicht schicken. Dein Konto existiert: versuche es erneut zu senden.",
             "emailTaken": "Diese E-Mail ist bereits registriert",
-            "phoneTaken": "Diese Handynummer ist bereits registriert"
+            "phoneTaken": "Diese Handynummer ist bereits registriert",
+            "acceptAll": "Du musst zustimmen, um dein Konto zu erstellen."
         },
         "verify": {
             "verifying": "E-Mail wird bestätigt…",
@@ -166,7 +167,22 @@
         "hidePassword": "Passwort verbergen",
         "adminAccess": "Admin-Zugang",
         "toAdminAccess": "Gehörst du zum Fiestea-Team? Admin-Zugang",
-        "toVenueAccess": "Zurück zum Login für Locations"
+        "toVenueAccess": "Zurück zum Login für Locations",
+        "passwordHelp": "Mindestens 8 Zeichen.",
+        "social": {
+            "apple": "Mit Apple fortfahren",
+            "google": "Mit Google fortfahren",
+            "orEmail": "oder mit deiner E-Mail",
+            "failed": "Anmeldung fehlgeschlagen. Versuche es erneut."
+        },
+        "phoneAuth": {
+            "send": "Code senden",
+            "sent": "Wir haben einen Code an {{phone}} gesendet.",
+            "code": "Code",
+            "verify": "Anmelden",
+            "change": "Nummer ändern",
+            "failed": "Handynummer konnte nicht bestätigt werden."
+        }
     },
     "consent": {
         "title": "Bevor es losgeht",
@@ -177,7 +193,8 @@
         "marketing": "Ich möchte Neuigkeiten zu Events erhalten. (optional)",
         "accept": "Akzeptieren und fortfahren",
         "required": "Du musst die ersten drei Punkte akzeptieren, um Fiestea zu nutzen.",
-        "readDocs": "Du kannst die vollständigen Dokumente jederzeit in deinem Profil einsehen."
+        "readDocs": "Du kannst die vollständigen Dokumente jederzeit in deinem Profil einsehen.",
+        "all": "Ich bin mindestens 18 Jahre alt und akzeptiere die <terms>AGB</terms> und die <privacy>Datenschutzerklärung</privacy>."
     },
     "home": {
         "title": "Events in deiner Stadt",
@@ -3065,5 +3082,27 @@
             "commission": "Ungültige Provision.",
             "entryLocked": "Jemand aus diesem Eintrag ist schon drin: Er kann nicht entfernt werden."
         }
+    },
+    "completeProfile": {
+        "title": "Vervollständige dein Profil",
+        "body": "Nur einmal: So zeigen wir dich auf jeder Party den richtigen Leuten.",
+        "age": "Dein Alter",
+        "gender": "Ich bin",
+        "genderHelp": "Kann später nicht geändert werden.",
+        "wants": "Ich möchte sehen",
+        "plan": "Mein Plan für heute Nacht",
+        "plans": {
+            "dance": "Tanzen",
+            "meet": "Leute kennenlernen",
+            "drinks": "Was trinken",
+            "friends": "Mit Freunden",
+            "whatever": "Mal sehen"
+        },
+        "planPlaceholder": "Oder schreib es selbst…",
+        "bio": "Über dich",
+        "bioPlaceholder": "Etwas, das andere über dich wissen sollen",
+        "optional": "optional",
+        "save": "Speichern und weiter",
+        "done": "Profil fertig!"
     }
 }

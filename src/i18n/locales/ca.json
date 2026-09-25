@@ -99,7 +99,8 @@
             "emailNotConfigured": "L'enviament de correu no està configurat. Avisa'ns i l'activem.",
             "emailSendFailed": "No hem pogut enviar-te el correu. El teu compte està creat: prova a reenviar-lo.",
             "emailTaken": "Aquest correu ja està registrat",
-            "phoneTaken": "Aquest mòbil ja està registrat"
+            "phoneTaken": "Aquest mòbil ja està registrat",
+            "acceptAll": "Has d'acceptar per crear el compte."
         },
         "verify": {
             "verifying": "Verificant el teu correu…",
@@ -166,7 +167,22 @@
         "hidePassword": "Amagar la contrasenya",
         "adminAccess": "Accés d'administració",
         "toAdminAccess": "Ets de l'equip de Fiestea? Accés d'administració",
-        "toVenueAccess": "Tornar a l'accés de negocis"
+        "toVenueAccess": "Tornar a l'accés de negocis",
+        "passwordHelp": "Mínim 8 caràcters.",
+        "social": {
+            "apple": "Continua amb Apple",
+            "google": "Continua amb Google",
+            "orEmail": "o amb el teu correu",
+            "failed": "No s'ha pogut iniciar la sessió. Torna-ho a provar."
+        },
+        "phoneAuth": {
+            "send": "Envia'm el codi",
+            "sent": "T'hem enviat un codi al {{phone}}.",
+            "code": "Codi",
+            "verify": "Entra",
+            "change": "Canvia el número",
+            "failed": "No s'ha pogut verificar el mòbil."
+        }
     },
     "consent": {
         "title": "Abans de començar",
@@ -177,7 +193,8 @@
         "marketing": "Vull rebre novetats sobre esdeveniments. (opcional)",
         "accept": "Accepto i continuo",
         "required": "Has d'acceptar els tres primers punts per fer servir Fiestea.",
-        "readDocs": "Pots consultar els documents complets en qualsevol moment des del teu perfil."
+        "readDocs": "Pots consultar els documents complets en qualsevol moment des del teu perfil.",
+        "all": "Tinc 18 anys o més i accepto els <terms>Termes</terms> i la <privacy>Política de privacitat</privacy>."
     },
     "home": {
         "title": "Esdeveniments a la teva ciutat",
@@ -3065,5 +3082,27 @@
             "commission": "Comissió no vàlida.",
             "entryLocked": "Ja ha entrat algú d'aquesta línia: no es pot treure."
         }
+    },
+    "completeProfile": {
+        "title": "Completa el teu perfil",
+        "body": "Només una vegada: així et podem mostrar a la gent adequada a cada festa.",
+        "age": "La teva edat",
+        "gender": "Sóc",
+        "genderHelp": "No es pot canviar després.",
+        "wants": "Vull veure",
+        "plan": "El meu pla d'aquesta nit",
+        "plans": {
+            "dance": "Ballar",
+            "meet": "Conèixer gent",
+            "drinks": "Prendre alguna cosa",
+            "friends": "Sortir amb amics",
+            "whatever": "El que sorgeixi"
+        },
+        "planPlaceholder": "O escriu-lo tu…",
+        "bio": "Sobre tu",
+        "bioPlaceholder": "Alguna cosa que vulguis que sàpiguen de tu",
+        "optional": "opcional",
+        "save": "Desa i entra",
+        "done": "Perfil a punt!"
     }
 }

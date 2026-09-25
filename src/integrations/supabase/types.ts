@@ -1744,6 +1744,7 @@ export type Database = {
           phone_verified: boolean | null
           photos: string[] | null
           plan_tonight: string | null
+          profile_completed_at: string | null
           role: string
           staff_only: boolean
           status: string
@@ -1778,6 +1779,7 @@ export type Database = {
           phone_verified?: boolean | null
           photos?: string[] | null
           plan_tonight?: string | null
+          profile_completed_at?: string | null
           role?: string
           staff_only?: boolean
           status?: string
@@ -1812,6 +1814,7 @@ export type Database = {
           phone_verified?: boolean | null
           photos?: string[] | null
           plan_tonight?: string | null
+          profile_completed_at?: string | null
           role?: string
           staff_only?: boolean
           status?: string
@@ -3591,6 +3594,16 @@ export type Database = {
       }
       claim_stamp_reward: { Args: { p_event_id: string }; Returns: string }
       cleanup_expired_event_codes: { Args: never; Returns: number }
+      complete_my_profile: {
+        Args: {
+          p_age: number
+          p_bio?: string
+          p_gender: string
+          p_tonight_plan?: string
+          p_wants: string
+        }
+        Returns: undefined
+      }
       confirm_phone_code: { Args: { p_code: string }; Returns: boolean }
       consume_anon_rate_limit: {
         Args: { p_key: string; p_max: number; p_window_seconds: number }

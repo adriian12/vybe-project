@@ -99,7 +99,8 @@
             "emailNotConfigured": "El envío de correo no está configurado. Avísanos y lo activamos.",
             "emailSendFailed": "No hemos podido enviarte el correo. Tu cuenta está creada: prueba a reenviarlo.",
             "emailTaken": "Este correo ya está registrado",
-            "phoneTaken": "Este móvil ya está registrado"
+            "phoneTaken": "Este móvil ya está registrado",
+            "acceptAll": "Tienes que aceptar para crear la cuenta."
         },
         "verify": {
             "verifying": "Verificando tu email…",
@@ -166,7 +167,22 @@
         "hidePassword": "Ocultar contraseña",
         "adminAccess": "Acceso de administración",
         "toAdminAccess": "¿Eres del equipo de Fiestea? Acceso de administración",
-        "toVenueAccess": "Volver al acceso de negocios"
+        "toVenueAccess": "Volver al acceso de negocios",
+        "passwordHelp": "Mínimo 8 caracteres.",
+        "social": {
+            "apple": "Continuar con Apple",
+            "google": "Continuar con Google",
+            "orEmail": "o con tu correo",
+            "failed": "No se ha podido iniciar sesión. Inténtalo de nuevo."
+        },
+        "phoneAuth": {
+            "send": "Enviarme el código",
+            "sent": "Te hemos enviado un código a {{phone}}.",
+            "code": "Código",
+            "verify": "Entrar",
+            "change": "Cambiar el número",
+            "failed": "No se ha podido verificar el móvil."
+        }
     },
     "consent": {
         "title": "Antes de empezar",
@@ -177,7 +193,8 @@
         "marketing": "Quiero recibir novedades sobre eventos. (opcional)",
         "accept": "Acepto y continúo",
         "required": "Debes aceptar los tres primeros puntos para usar Fiestea.",
-        "readDocs": "Puedes consultar los documentos completos en cualquier momento desde tu perfil."
+        "readDocs": "Puedes consultar los documentos completos en cualquier momento desde tu perfil.",
+        "all": "Tengo 18 años o más y acepto los <terms>Términos</terms> y la <privacy>Política de privacidad</privacy>."
     },
     "home": {
         "title": "Eventos en tu ciudad",
@@ -3065,5 +3082,27 @@
             "commission": "Comisión no válida.",
             "entryLocked": "Ya ha entrado alguien de esa línea: no se puede quitar."
         }
+    },
+    "completeProfile": {
+        "title": "Completa tu perfil",
+        "body": "Sólo una vez: así podemos enseñarte a la gente adecuada en cada fiesta.",
+        "age": "Tu edad",
+        "gender": "Soy",
+        "genderHelp": "No se puede cambiar después.",
+        "wants": "Quiero ver",
+        "plan": "Mi plan de esta noche",
+        "plans": {
+            "dance": "Bailar",
+            "meet": "Conocer gente",
+            "drinks": "Tomar algo",
+            "friends": "Salir con amigos",
+            "whatever": "Lo que surja"
+        },
+        "planPlaceholder": "O escríbelo tú…",
+        "bio": "Sobre ti",
+        "bioPlaceholder": "Algo que quieras que sepan de ti",
+        "optional": "opcional",
+        "save": "Guardar y entrar",
+        "done": "¡Perfil listo!"
     }
 }

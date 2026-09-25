@@ -99,7 +99,8 @@
             "emailNotConfigured": "Email sending is not configured. Let us know and we will turn it on.",
             "emailSendFailed": "We could not send you the email. Your account exists: try resending it.",
             "emailTaken": "This email is already registered",
-            "phoneTaken": "This mobile number is already registered"
+            "phoneTaken": "This mobile number is already registered",
+            "acceptAll": "You need to accept to create your account."
         },
         "verify": {
             "verifying": "Verifying your email…",
@@ -166,7 +167,22 @@
         "hidePassword": "Hide password",
         "adminAccess": "Admin access",
         "toAdminAccess": "Part of the Fiestea team? Admin access",
-        "toVenueAccess": "Back to venue login"
+        "toVenueAccess": "Back to venue login",
+        "passwordHelp": "At least 8 characters.",
+        "social": {
+            "apple": "Continue with Apple",
+            "google": "Continue with Google",
+            "orEmail": "or with your email",
+            "failed": "Could not sign in. Please try again."
+        },
+        "phoneAuth": {
+            "send": "Send me the code",
+            "sent": "We sent a code to {{phone}}.",
+            "code": "Code",
+            "verify": "Sign in",
+            "change": "Change number",
+            "failed": "Could not verify the phone."
+        }
     },
     "consent": {
         "title": "Before you start",
@@ -177,7 +193,8 @@
         "marketing": "I want to receive news about events. (optional)",
         "accept": "Accept and continue",
         "required": "You must accept the first three items to use Fiestea.",
-        "readDocs": "You can read the full documents any time from your profile."
+        "readDocs": "You can read the full documents any time from your profile.",
+        "all": "I am 18 or older and accept the <terms>Terms</terms> and the <privacy>Privacy Policy</privacy>."
     },
     "home": {
         "title": "Events in your city",
@@ -3065,5 +3082,27 @@
             "commission": "Invalid commission.",
             "entryLocked": "Someone from that entry is already in: it can't be removed."
         }
+    },
+    "completeProfile": {
+        "title": "Complete your profile",
+        "body": "Just once: so we can show you to the right people at each party.",
+        "age": "Your age",
+        "gender": "I am",
+        "genderHelp": "It cannot be changed later.",
+        "wants": "I want to see",
+        "plan": "My plan for tonight",
+        "plans": {
+            "dance": "Dance",
+            "meet": "Meet people",
+            "drinks": "Grab a drink",
+            "friends": "Out with friends",
+            "whatever": "Whatever happens"
+        },
+        "planPlaceholder": "Or write your own…",
+        "bio": "About you",
+        "bioPlaceholder": "Something you want people to know",
+        "optional": "optional",
+        "save": "Save and continue",
+        "done": "Profile ready!"
     }
 }
