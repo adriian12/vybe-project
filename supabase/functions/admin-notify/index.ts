@@ -2,6 +2,7 @@ import { serve } from 'https://deno.land/std@0.193.0/http/server.ts';
 import { json, preflight } from '../_shared/cors.ts';
 import { adminClient, getUser } from '../_shared/supabase.ts';
 import { isResendConfigured, sendEmail } from '../_shared/resend.ts';
+import { renderEmail } from '../_shared/email.ts';
 
 /**
  * Avisos de administración a usuarios y locales (migración 071).
@@ -48,18 +49,14 @@ const TEXTOS: Record<Locale, (fecha: string) => { title: string; body: string }>
   }),
 };
 
-const escapar = (texto: string) =>
-  texto.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c] ?? c);
-
-const correoHtml = (titulo: string, cuerpo: string, cta?: { texto: string; url: string }) => `<!doctype html>
-<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"></head>
-<body style="margin:0;background:#111114;color:#ffffff;font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif">
-  <div style="max-width:520px;margin:0 auto;padding:32px 24px">
-    <h1 style="font-size:22px;margin:0 0 12px">${escapar(titulo)}</h1>
-    <p style="color:#b8b8bd;line-height:1.6;margin:0 0 24px;white-space:pre-line">${escapar(cuerpo)}</p>
-    ${cta ? `<p style="margin:0 0 24px"><a href="${cta.url}" style="display:inline-block;background:#f8d000;color:#1c1c1c;font-weight:700;text-decoration:none;padding:14px 24px;border-radius:14px">${escapar(cta.texto)}</a></p>` : ''}
-  </div>
-</body></html>`;
+/** Los correos de administración, con el diseño común de Fiestea. */
+const correoHtml = (titulo: string, cuerpo: string, cta?: { texto: string; url: string }) =>
+  renderEmail({
+    preheader: cuerpo.split('\n').find(Boolean) ?? titulo,
+    heading: titulo,
+    paragraphs: cuerpo.split('\n\n'),
+    buttons: cta ? [{ text: cta.texto, url: cta.url }] : [],
+  }).html;
 
 const fecha = (iso: string, locale: string) =>
   new Date(iso).toLocaleDateString(locale, { day: 'numeric', month: 'long', timeZone: 'Europe/Madrid' });
@@ -151,7 +148,7 @@ serve(async (req: Request): Promise<Response> => {
         } else if (row.email) {
           const plan = row.plan === 'business' ? 'Business' : 'Pro';
           const titulo = 'Tu suscripción está a punto de caducar';
-          const cuerpo = `Hola ${row.name ?? ''}.\n\nTu plan ${plan} termina el ${fecha(row.expires_at, 'es')} y no se renovará solo. Si no lo renuevas, el panel volverá al plan gratuito y dejarás de tener sus funciones.\n\nPuedes renovarlo desde el panel del local, en Plan.`;
+          const cuerpo = `Hola ${row.name ?? ''}.\n\nTu plan ${plan} termina el ${fecha(row.expires_at, 'es')} y no se renovará solo. Si no lo renuevas, el panel volverá al plan gratuito y dejarás de tener sus funciones.\n\nPuedes renovarlo desde el panel del negocio, en Plan.`;
           ok = await correo(row.email, titulo, correoHtml(titulo, cuerpo, { texto: 'Renovar mi plan', url: `${appUrl}/venue/dashboard?seccion=plan` }), cuerpo);
         }
         if (ok) {

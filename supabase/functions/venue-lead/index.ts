@@ -2,6 +2,7 @@ import { serve } from 'https://deno.land/std@0.193.0/http/server.ts';
 import { json, preflight } from '../_shared/cors.ts';
 import { adminClient } from '../_shared/supabase.ts';
 import { isResendConfigured, sendEmail } from '../_shared/resend.ts';
+import { renderEmail } from '../_shared/email.ts';
 
 /**
  * Formulario «Solicitar demo» de la landing.
@@ -110,31 +111,30 @@ serve(async (req: Request): Promise<Response> => {
 
   if (isResendConfigured()) {
     const rows: [string, string][] = [
-      ['Local', venueName],
+      ['Negocio', venueName],
       ['Tipo', venueType ?? '—'],
       ['Ciudad', city],
       ['Contacto', contact],
       ['Idioma', locale],
       ['Mensaje', message || '—'],
     ];
-    const html = `
-      <div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;color:#111114">
-        <p style="font-size:22px;font-weight:800;margin:0 0 4px">Vybes</p>
-        <p style="font-size:16px;margin:0 0 16px">Nueva solicitud de demo desde la landing</p>
-        <table style="border-collapse:collapse;width:100%">
-          ${rows
-            .map(
-              ([k, v]) =>
-                `<tr><td style="padding:6px 12px 6px 0;color:#6b6b70;vertical-align:top">${k}</td><td style="padding:6px 0;white-space:pre-wrap">${escapeHtml(v)}</td></tr>`,
-            )
-            .join('')}
-        </table>
-        <p style="margin-top:20px;font-size:13px;color:#6b6b70">Gestiónala en /admin/dashboard → Solicitudes.</p>
-      </div>`;
+    const tabla = `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">${rows
+      .map(
+        ([k, v]) =>
+          `<tr><td style="padding:6px 12px 6px 0;color:#A6A6AE;font-size:13px;vertical-align:top;">${k}</td><td style="padding:6px 0;color:#FFFFFF;font-size:14px;white-space:pre-wrap;">${escapeHtml(v)}</td></tr>`,
+      )
+      .join('')}</table>`;
+    const { html } = renderEmail({
+      eyebrow: 'Nueva solicitud',
+      heading: `Demo para ${venueName}`,
+      paragraphs: ['Un negocio ha pedido una demo desde la web.'],
+      blockHtml: tabla,
+      buttons: [{ text: 'Ver solicitudes', url: 'https://app.fiestea.es/admin/dashboard' }],
+    });
     const text = ['Nueva solicitud de demo desde la landing', '', ...rows.map(([k, v]) => `${k}: ${v}`)].join('\n');
 
     try {
-      await sendEmail({ to: notifyTo(), subject: `Vybes · Solicitud de ${venueName} (${city})`, html, text });
+      await sendEmail({ to: notifyTo(), subject: `Fiestea · Solicitud de ${venueName} (${city})`, html, text });
     } catch (mailError) {
       // La solicitud ya está guardada: el aviso por correo es un extra.
       console.error('venue-lead email', mailError);

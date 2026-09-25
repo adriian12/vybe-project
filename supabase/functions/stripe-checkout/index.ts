@@ -165,7 +165,7 @@ serve(async (req: Request): Promise<Response> => {
         'line_items[0][quantity]': '1',
         'line_items[0][price_data][currency]': 'eur',
         'line_items[0][price_data][unit_amount]': String(BOOST_PRICE_CENTS),
-        'line_items[0][price_data][product_data][name]': `Destacar «${evento.name}» en Vybes`,
+        'line_items[0][price_data][product_data][name]': `Destacar «${evento.name}» en Fiestea`,
         success_url: `${base}?boost=success`,
         cancel_url: `${base}?boost=cancelled`,
         client_reference_id: venue.id,
@@ -296,7 +296,7 @@ serve(async (req: Request): Promise<Response> => {
       params.set('line_items[0][price_data][recurring][interval]', 'month');
       params.set(
         'line_items[0][price_data][product_data][name]',
-        plan === 'venue_pro' ? 'Vybes Pro para locales' : 'Vybes Business para locales',
+        plan === 'venue_pro' ? 'Fiestea Pro para negocios' : 'Fiestea Business para negocios',
       );
     }
 

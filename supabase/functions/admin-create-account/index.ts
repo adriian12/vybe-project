@@ -2,6 +2,7 @@ import { serve } from 'https://deno.land/std@0.193.0/http/server.ts';
 import { json, preflight } from '../_shared/cors.ts';
 import { adminClient, getUser } from '../_shared/supabase.ts';
 import { isResendConfigured, sendEmail } from '../_shared/resend.ts';
+import { renderEmail } from '../_shared/email.ts';
 
 /**
  * Alta de cuentas desde administración: una persona o un local, con nombre y
@@ -27,8 +28,8 @@ const TEXTOS = {
     cta: 'Elegir contraseña',
   },
   venue: {
-    subject: 'Tu local ya está dado de alta',
-    title: 'Te hemos creado el acceso de tu local',
+    subject: 'Tu negocio ya está dado de alta',
+    title: 'Te hemos creado el acceso de tu negocio',
     body: 'Elige tu contraseña para entrar al panel y empezar a crear fiestas.',
     cta: 'Elegir contraseña',
   },
@@ -36,18 +37,14 @@ const TEXTOS = {
 
 const plantilla = (tipo: 'user' | 'venue', nombre: string, link: string) => {
   const c = TEXTOS[tipo];
-  const html = `<!doctype html>
-<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"></head>
-<body style="margin:0;background:#111114;color:#ffffff;font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif">
-  <div style="max-width:520px;margin:0 auto;padding:32px 24px">
-    <h1 style="font-size:22px;margin:0 0 8px">${c.title}</h1>
-    <p style="color:#b8b8bd;line-height:1.5;margin:0 0 8px">Hola ${nombre || ''}.</p>
-    <p style="color:#b8b8bd;line-height:1.5;margin:0 0 24px">${c.body}</p>
-    <p style="margin:0 0 24px"><a href="${link}" style="display:inline-block;background:#f8d000;color:#1c1c1c;font-weight:700;text-decoration:none;padding:14px 24px;border-radius:14px">${c.cta}</a></p>
-    <p style="color:#6f6f78;font-size:12px;line-height:1.5;margin:0">Si no esperabas este correo, puedes ignorarlo.</p>
-  </div>
-</body></html>`;
-  const text = `${c.title}\n\n${c.body}\n\n${link}`;
+  const { html, text } = renderEmail({
+    preheader: c.body,
+    heading: c.title,
+    paragraphs: [`Hola ${nombre || ''}.`, c.body],
+    buttons: [{ text: c.cta, url: link }],
+    showLink: link,
+    note: 'Si no esperabas este correo, puedes ignorarlo.',
+  });
   return { html, text, subject: c.subject };
 };
 

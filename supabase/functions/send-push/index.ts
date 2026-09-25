@@ -69,7 +69,7 @@ const fromVenueEvent = async (
     .maybeSingle();
   if (!evento) return [];
 
-  const venueName = (evento.venues as { name?: string } | null)?.name ?? 'Vybes';
+  const venueName = (evento.venues as { name?: string } | null)?.name ?? 'Fiestea';
   const { data: seguidores } = await supabase
     .from('venue_followers')
     .select('profile_id, profiles(locale)')
@@ -191,7 +191,7 @@ const fromRaffle = async (
     .maybeSingle();
 
   if (!raffle) return [];
-  const eventName = (raffle.events as { name?: string } | null)?.name ?? 'Vybes';
+  const eventName = (raffle.events as { name?: string } | null)?.name ?? 'Fiestea';
 
   if (payload.type === 'RAFFLE_DRAWN') {
     if (!raffle.winner_profile_id) return [];
@@ -200,7 +200,7 @@ const fromRaffle = async (
       .select('locale, name')
       .eq('id', raffle.winner_profile_id)
       .maybeSingle();
-    const winnerName = (winner?.name ?? '').trim() || 'Vybes';
+    const winnerName = (winner?.name ?? '').trim() || 'Fiestea';
 
     // A quien ha ganado, «¡Has ganado el sorteo!»; a todos los demás que
     // siguen dentro (vyber o invitado), quién ha sido.
@@ -384,7 +384,7 @@ const fromWebhook = async (
       {
         profileId: record.receiver_id,
         kind: 'message',
-        title: sender?.name ?? 'Vybes',
+        title: sender?.name ?? 'Fiestea',
         body: (record.content ?? '').slice(0, 120),
         url: `/chat/${record.sender_id}`,
         // Mismo `tag` por conversación: el aviso nuevo sustituye al anterior
@@ -410,7 +410,7 @@ const fromWebhook = async (
   return [record.user_id_1, record.user_id_2].map((id) => {
     const otherId = id === record.user_id_1 ? record.user_id_2 : record.user_id_1;
     const texts = pushTexts(profileOf(id)?.locale);
-    const name = profileOf(otherId)?.name ?? 'Vybes';
+    const name = profileOf(otherId)?.name ?? 'Fiestea';
     const { title, body } =
       record.connection_type === 'vybe_check' ? texts.vybeCheck(name) : texts.match(name);
 
