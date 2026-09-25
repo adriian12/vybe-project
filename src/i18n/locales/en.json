@@ -754,7 +754,8 @@
             "plan": "Plan",
             "profile": "Profile",
             "profileSubtitle": "Venue details, promotions, team and plan.",
-            "sales": "Sales"
+            "sales": "Sales",
+            "business": "Business"
         },
         "qr": {
             "title": "Access code",
@@ -1227,8 +1228,8 @@
             "raffleSoon": "Raffle tonight: {{prize}}"
         },
         "broadcast": {
-            "title": "Message people inside",
-            "subtitle": "Only reaches people who checked in during the last few hours.",
+            "title": "Send a notice",
+            "subtitle": "A notice to the phones of whoever you pick in \"To whom\", now or at the time you set.",
             "subtitleGlobal": "This goes to everybody. Use it sparingly.",
             "heading": "Title",
             "headingPlaceholder": "Room change",
@@ -1285,7 +1286,8 @@
             "stats": "Stats",
             "promos": "Promotions",
             "plan": "Plan & billing",
-            "sales": "Sales"
+            "sales": "Sales",
+            "business": "Business"
         },
         "live": "live",
         "noLive": "No event live",
@@ -1293,11 +1295,11 @@
         "planChip": "{{plan}} plan",
         "menu": "Venue menu",
         "suiteTagline": "Dashboard for venues",
-        "broadcastShort": "Notify attendees",
+        "broadcastShort": "Send a notice",
         "drawer": {
             "documents": "Documents",
             "billing": "Billing",
-            "broadcast": "Attendee notices",
+            "broadcast": "Send notices",
             "help": "Help"
         },
         "counter": {
@@ -1612,12 +1614,12 @@
                 ]
             },
             "broadcast": {
-                "title": "Avisar a quien está dentro",
-                "body": "Un aviso al móvil de la gente que ha entrado en las últimas horas: cambio de sala, invitados, última hora de barra. Llega al momento, o a la hora que le pongas.",
+                "title": "Send a notice",
+                "body": "A notice to your audience's phones: room change, guests, last call at the bar or the next party. It arrives right away, or at the time you set.",
                 "steps": [
-                    "Escribes título y mensaje.",
-                    "Sin hora sale al momento; con hora, espera a esa hora.",
-                    "Sólo lo recibe quien está dentro de esta fiesta."
+                    "In \"To whom\" you choose who gets it: \"Inside now\" is the people who entered this party.",
+                    "Write a title and a message.",
+                    "Without a time it goes out now; with a time, it waits until then."
                 ]
             },
             "thermometer": {
@@ -1628,6 +1630,41 @@
                     "Se publica en la ficha de tu fiesta.",
                     "Caduca solo: si no lo tocas, deja de salir."
                 ]
+            }
+        },
+        "business": {
+            "title": "Business profile",
+            "hint": "What the public sees on your page, when buying tickets and on the PDF ticket.",
+            "logo": "Logo",
+            "logoHelp": "PNG, JPG or WebP up to 2 MB. Square with a background works best.",
+            "uploadLogo": "Upload logo",
+            "changeLogo": "Change logo",
+            "removeLogo": "Remove",
+            "logoSaved": "Logo updated",
+            "name": "Business name",
+            "nameLocked": "The name is locked after verification. Contact us to change it.",
+            "address": "Address",
+            "city": "City",
+            "map": "Location on the map",
+            "mapHelp": "Search the address or drag the pin to the entrance.",
+            "phone": "Phone (optional)",
+            "contactEmail": "Contact email (optional)",
+            "contactEmailHelp": "Shown on your page. It can differ from your login email.",
+            "website": "Website (optional)",
+            "instagram": "Instagram (optional)",
+            "terms": "Sales conditions",
+            "termsHelp": "Buyers must accept them: right of admission, refunds, minimum age, etc.",
+            "termsPlaceholder": "E.g.: Right of admission reserved. No refunds unless the event is cancelled…",
+            "saved": "Profile saved",
+            "errors": {
+                "logoType": "The logo must be PNG, JPG or WebP.",
+                "logoSize": "The logo cannot exceed 2 MB.",
+                "logoUpload": "The logo could not be uploaded.",
+                "name": "Enter the business name.",
+                "website": "The website is not valid.",
+                "instagram": "The Instagram username is not valid.",
+                "email": "The contact email is not valid.",
+                "phone": "The phone number is not valid."
             }
         }
     },
@@ -2105,7 +2142,9 @@
                 "closed": "Sales are closed.",
                 "quantity": "That quantity isn't allowed.",
                 "checkout": "Couldn't open the payment. Try again."
-            }
+            },
+            "free": "Free",
+            "getFree": "Get ticket"
         },
         "mine": {
             "title": "Your tickets",
@@ -2116,6 +2155,65 @@
             "depositPaid": "Deposit paid: {{amount}}",
             "used": "Used at {{time}}",
             "showAtDoor": "Show it at the door"
+        },
+        "checkout": {
+            "notFound": "This ticket is no longer on sale",
+            "includes": "Includes",
+            "minAge": "Minimum age: {{age}}",
+            "dressCode": "Dress code: {{code}}",
+            "quantity": "Quantity",
+            "holder": "Your details",
+            "holderN": "Ticket {{n}}",
+            "holderTable": "Booking details",
+            "otherHolderHelp": "Add their email and they will get their own ticket.",
+            "fullName": "Full name",
+            "email": "Email",
+            "emailOptional": "Email (optional)",
+            "emailConfirm": "Repeat email",
+            "phone": "Phone",
+            "phoneOptional": "Phone (optional)",
+            "birthdate": "Date of birth",
+            "acceptFiestea": "I accept Fiestea's <terms>terms of use</terms>, <purchases>purchase conditions</purchases> and <privacy>privacy policy</privacy>.",
+            "acceptVenue": "I accept the <open>conditions of {{venue}}</open>.",
+            "marketing": "I want to receive news and offers from {{venue}} (optional).",
+            "addToAccount": "Add this ticket to my Fiestea account",
+            "summary": "Summary",
+            "total": "Total",
+            "freeNote": "Free ticket: you will get the QR in the app and by email.",
+            "paidNote": "Secure payment with Stripe. Sold by {{venue}}; your PDF ticket will be emailed to you.",
+            "getFree": "Get free ticket",
+            "pay": "Pay {{amount}}",
+            "venueTerms": "Conditions of {{venue}}",
+            "errors": {
+                "terms": "You must accept the conditions to buy.",
+                "holders": "Check the details of each ticket.",
+                "fullName": "Enter first and last name.",
+                "email": "Enter a valid email.",
+                "emailMatch": "Emails don't match.",
+                "phone": "Enter a valid phone number.",
+                "birthdate": "Enter the date of birth.",
+                "minAge": "You must be {{age}} or older for this party.",
+                "review": "Check the fields marked in red."
+            }
+        },
+        "order": {
+            "waiting": "Confirming payment…",
+            "waitingBody": "It takes a few seconds. Keep this screen open.",
+            "refunded": "Order refunded",
+            "notCompleted": "The purchase was not completed",
+            "stillPending": "We haven't received the payment confirmation yet. If you paid, your tickets will appear in Tickets and in your email within a few minutes.",
+            "notCompletedBody": "You have not been charged. You can try again from the party page.",
+            "goTickets": "Go to Tickets",
+            "done": "All done",
+            "doneBody_one": "You have your ticket for {{event}}.",
+            "doneBody_other": "You have your {{count}} tickets for {{event}}.",
+            "emailSent": "We've sent a PDF copy to {{email}}. If you can't see it, check your spam folder."
+        },
+        "download": {
+            "pdfOne": "Download ticket (PDF)",
+            "pdfAll": "Download tickets (PDF)",
+            "wallet": "Add to Apple Wallet",
+            "walletCode": "Apple Wallet · {{code}}"
         }
     },
     "vybes": {
@@ -2634,7 +2732,9 @@
         "noUpcoming": "No parties announced yet. Follow them and we'll tell you about the next one.",
         "noUpcomingFollowing": "No parties announced yet. We'll tell you about the next one.",
         "promptTitle": "Want {{name}} to tell you about their parties?",
-        "promptBody": "Follow them and you'll get a notification when they post a new party. You can unfollow any time from their page."
+        "promptBody": "Follow them and you'll get a notification when they post a new party. You can unfollow any time from their page.",
+        "email": "Email",
+        "website": "Website"
     },
     "photoCheck": {
         "titleSingle": "The photo doesn't meet the requirements",
@@ -2855,7 +2955,7 @@
         "usedCount_other": "{{count}} validated",
         "form": {
             "edit": "Edit",
-            "newTable": "New table",
+            "newTable": "New VIP table",
             "newEntry": "New ticket",
             "name": "Name",
             "tablePlaceholder": "VIP table",
@@ -2869,11 +2969,16 @@
             "guests": "People per table",
             "minSpend": "Minimum spend (€)",
             "maxPerOrder": "Max per purchase",
-            "onSale": "On sale"
+            "onSale": "On sale",
+            "newVip": "New VIP ticket",
+            "vipPlaceholder": "VIP ticket",
+            "includes": "Includes",
+            "includesPlaceholder": "One drink, VIP area access, cloakroom…",
+            "priceHelp": "€0 for a free ticket. Otherwise, from €0.50."
         },
         "saved": "Saved",
         "ended": "The party is over: you can't sell any more.",
-        "addTable": "Add table",
+        "addTable": "Add VIP table",
         "addEntry": "Add ticket",
         "note": "The money from each sale goes straight to your account. Each ticket has a QR that is validated in Door → \"Validate ticket\".",
         "orders": "Latest purchases",
@@ -2951,7 +3056,8 @@
                 "refund": "Couldn't make the refund.",
                 "alreadyRefunded": "That purchase was already refunded."
             }
-        }
+        },
+        "addVip": "Add VIP ticket"
     },
     "forecast": {
         "title": "Forecast",

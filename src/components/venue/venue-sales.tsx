@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Armchair, Check, Download, Loader2, Pencil, Plus, Ticket, Undo2, X } from 'lucide-react';
+import { Armchair, Check, Crown, Download, Loader2, Pencil, Plus, Ticket, Undo2, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -70,6 +71,17 @@ const aCentimos = (texto: string): number | null => {
   const n = Number(texto.replace(',', '.'));
   return Number.isFinite(n) && n > 0 ? Math.round(n * 100) : null;
 };
+
+/** Precio de venta: 0 (gratis) o desde 0,50 €, que es lo mínimo que cobra Stripe. */
+const aPrecio = (texto: string): number | null => {
+  if (!texto.trim()) return null;
+  const n = Number(texto.replace(',', '.'));
+  if (!Number.isFinite(n) || n < 0) return null;
+  const cents = Math.round(n * 100);
+  return cents === 0 || cents >= 50 ? cents : null;
+};
+
+const ICONOS: Record<TicketKind, typeof Ticket> = { entry: Ticket, vip: Crown, table: Armchair };
 
 const entero = (texto: string): number | null => {
   const n = Number(texto);
@@ -170,9 +182,9 @@ const VenueSales = ({ events, plan }: VenueSalesProps) => {
 
   const guardar = async () => {
     if (!borrador || !actual) return;
-    const precio = aCentimos(borrador.price);
+    const precio = aPrecio(borrador.price);
     const capacidad = borrador.capacity.trim() ? entero(borrador.capacity) : null;
-    if (borrador.name.trim().length < 2 || !precio || (borrador.capacity.trim() && !capacidad)) {
+    if (borrador.name.trim().length < 2 || precio === null || (borrador.capacity.trim() && !capacidad)) {
       toast({ title: t('common.error'), description: t('sales.errors.form'), variant: 'destructive' });
       return;
     }
@@ -353,7 +365,7 @@ const VenueSales = ({ events, plan }: VenueSalesProps) => {
               )}
               <ul className="divide-y divide-black/[0.06]">
                 {ventas.map((venta) => {
-                  const Icono = venta.kind === 'table' ? Armchair : Ticket;
+                  const Icono = ICONOS[venta.kind] ?? Ticket;
                   const pct = venta.capacity ? Math.min(Math.round((venta.sold / venta.capacity) * 100), 100) : null;
                   return (
                     <li key={venta.id} className={cn('py-3', !venta.active && 'opacity-50')}>
@@ -367,8 +379,8 @@ const VenueSales = ({ events, plan }: VenueSalesProps) => {
                             {!venta.active && <span className="ml-2 text-caption font-normal">({t('sales.paused')})</span>}
                           </p>
                           <p className="text-caption text-party-gray">
-                            {euros(venta.priceCents)}
-                            {venta.kind === 'table' ? ` ${t('tickets.buy.deposit')}` : ''} ·{' '}
+                            {venta.priceCents ? euros(venta.priceCents) : t('tickets.buy.free')}
+                            {venta.kind === 'table' && venta.priceCents ? ` ${t('tickets.buy.deposit')}` : ''} ·{' '}
                             {venta.capacity
                               ? t('sales.soldOf', { sold: venta.sold, total: venta.capacity })
                               : t('sales.soldCount', { count: venta.sold })}{' '}
@@ -403,7 +415,15 @@ const VenueSales = ({ events, plan }: VenueSalesProps) => {
               {borrador ? (
                 <div className="mt-3 space-y-3 rounded-xl bg-black/[0.03] p-3">
                   <p className="font-bold">
-                    {t(borrador.id ? 'sales.form.edit' : borrador.kind === 'table' ? 'sales.form.newTable' : 'sales.form.newEntry')}
+                    {t(
+                      borrador.id
+                        ? 'sales.form.edit'
+                        : borrador.kind === 'table'
+                          ? 'sales.form.newTable'
+                          : borrador.kind === 'vip'
+                            ? 'sales.form.newVip'
+                            : 'sales.form.newEntry',
+                    )}
                   </p>
                   <div className="grid gap-3 sm:grid-cols-2">
                     <div className="space-y-1 sm:col-span-2">
@@ -412,18 +432,27 @@ const VenueSales = ({ events, plan }: VenueSalesProps) => {
                         id="tt-name"
                         value={borrador.name}
                         maxLength={60}
-                        placeholder={t(borrador.kind === 'table' ? 'sales.form.tablePlaceholder' : 'sales.form.entryPlaceholder')}
+                        placeholder={t(
+                          borrador.kind === 'table'
+                            ? 'sales.form.tablePlaceholder'
+                            : borrador.kind === 'vip'
+                              ? 'sales.form.vipPlaceholder'
+                              : 'sales.form.entryPlaceholder',
+                        )}
                         onChange={(e) => setBorrador({ ...borrador, name: e.target.value })}
                       />
                     </div>
                     <div className="space-y-1 sm:col-span-2">
-                      <Label htmlFor="tt-desc" className="text-caption">{t('sales.form.description')}</Label>
-                      <Input
+                      <Label htmlFor="tt-desc" className="text-caption">{t('sales.form.includes')}</Label>
+                      <Textarea
                         id="tt-desc"
                         value={borrador.description}
-                        maxLength={280}
+                        maxLength={1500}
+                        rows={4}
+                        placeholder={t('sales.form.includesPlaceholder')}
                         onChange={(e) => setBorrador({ ...borrador, description: e.target.value })}
                       />
+                      <p className="text-right text-caption text-party-gray tabular">{borrador.description.length}/1500</p>
                     </div>
                     <div className="space-y-1">
                       <Label htmlFor="tt-price" className="text-caption">
@@ -433,8 +462,10 @@ const VenueSales = ({ events, plan }: VenueSalesProps) => {
                         id="tt-price"
                         inputMode="decimal"
                         value={borrador.price}
+                        placeholder="0"
                         onChange={(e) => setBorrador({ ...borrador, price: e.target.value })}
                       />
+                      <p className="text-caption text-party-gray">{t('sales.form.priceHelp')}</p>
                     </div>
                     <div className="space-y-1">
                       <Label htmlFor="tt-cap" className="text-caption">
@@ -508,8 +539,8 @@ const VenueSales = ({ events, plan }: VenueSalesProps) => {
               ) : terminado ? (
                 <p className="mt-3 text-caption text-party-gray">{t('sales.ended')}</p>
               ) : (
-                <div className="mt-3 grid grid-cols-2 gap-2">
-                  {(['entry', 'table'] as const).map((kind) => (
+                <div className="mt-3 grid gap-2 sm:grid-cols-3">
+                  {(['entry', 'vip', 'table'] as const).map((kind) => (
                     <button
                       key={kind}
                       type="button"
@@ -517,7 +548,7 @@ const VenueSales = ({ events, plan }: VenueSalesProps) => {
                       className="press flex h-11 items-center justify-center gap-2 rounded-xl border-2 border-dashed border-black/15 text-body-sm font-bold hover:bg-black/[0.03]"
                     >
                       <Plus size={16} />
-                      {t(kind === 'table' ? 'sales.addTable' : 'sales.addEntry')}
+                      {t(kind === 'table' ? 'sales.addTable' : kind === 'vip' ? 'sales.addVip' : 'sales.addEntry')}
                     </button>
                   ))}
                 </div>

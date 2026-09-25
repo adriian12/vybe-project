@@ -1,26 +1,22 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Armchair, Loader2, Minus, Plus, Ticket } from 'lucide-react';
-import { useToast } from '@/components/ui/use-toast';
-import { ApiError } from '@/services/api';
-import { openExternal } from '@/services/native';
+import { Armchair, Crown, Minus, Plus, Ticket } from 'lucide-react';
 import { euros, ticketsService, TicketType } from '@/services/tickets';
-import { track } from '@/lib/observability';
 import { cn } from '@/lib/utils';
 
 /**
  * Entradas y mesas que vende el local dentro de la app (locales Business).
  *
  * Si el local no vende nada aquí, no se pinta: la ficha sigue enseñando su
- * enlace de reservas externo, si lo tiene. El pago se hace en Stripe y las
- * entradas aparecen en «Entradas» cuando se confirma el cobro.
+ * enlace de reservas externo, si lo tiene. Al elegir una se abre la pantalla
+ * de compra (`/tickets/buy/:typeId`), con los datos de cada asistente.
  */
 const EventTickets = ({ eventId }: { eventId: string }) => {
   const { t } = useTranslation();
-  const { toast } = useToast();
+  const navigate = useNavigate();
   const [types, setTypes] = useState<TicketType[]>([]);
   const [cantidades, setCantidades] = useState<Record<string, number>>({});
-  const [comprando, setComprando] = useState<string | null>(null);
 
   useEffect(() => {
     let vivo = true;
@@ -34,22 +30,8 @@ const EventTickets = ({ eventId }: { eventId: string }) => {
 
   if (types.length === 0) return null;
 
-  const comprar = async (tipo: TicketType) => {
-    const cantidad = cantidades[tipo.id] ?? 1;
-    setComprando(tipo.id);
-    try {
-      const url = await ticketsService.startCheckout(tipo.id, cantidad);
-      track('tickets_checkout', { kind: tipo.kind, quantity: cantidad });
-      await openExternal(url, { system: true });
-    } catch (error) {
-      const key = error instanceof ApiError ? error.message : 'tickets.buy.errors.checkout';
-      toast({ title: t('common.error'), description: t(key), variant: 'destructive' });
-      // Puede que se haya agotado mientras tanto: se vuelve a mirar.
-      void ticketsService.getEventTypes(eventId).then(setTypes);
-    } finally {
-      setComprando(null);
-    }
-  };
+  const comprar = (tipo: TicketType, cantidad: number) =>
+    navigate(`/tickets/buy/${tipo.id}${tipo.kind === 'table' ? '' : `?qty=${cantidad}`}`);
 
   return (
     <section className="flex flex-col gap-2">
@@ -60,7 +42,7 @@ const EventTickets = ({ eventId }: { eventId: string }) => {
           const tope = Math.max(1, Math.min(tipo.maxPerOrder, tipo.remaining ?? tipo.maxPerOrder));
           const cantidad = Math.min(cantidades[tipo.id] ?? 1, tope);
           const esMesa = tipo.kind === 'table';
-          const Icono = esMesa ? Armchair : Ticket;
+          const Icono = esMesa ? Armchair : tipo.kind === 'vip' ? Crown : Ticket;
           return (
             <li key={tipo.id} className={cn('rounded-xl bg-white p-3 text-ink', agotada && 'opacity-60')}>
               <div className="flex items-start gap-3">
@@ -79,7 +61,9 @@ const EventTickets = ({ eventId }: { eventId: string }) => {
                         .join(' · ')}
                     </p>
                   )}
-                  {tipo.description && <p className="mt-0.5 text-caption text-ink/60">{tipo.description}</p>}
+                  {tipo.description && (
+                    <p className="mt-0.5 line-clamp-3 whitespace-pre-line text-caption text-ink/60">{tipo.description}</p>
+                  )}
                   {tipo.remaining !== null && !agotada && tipo.remaining <= 20 && (
                     <p className="mt-0.5 text-caption font-bold text-destructive">
                       {t('tickets.buy.remaining', { count: tipo.remaining })}
@@ -87,8 +71,10 @@ const EventTickets = ({ eventId }: { eventId: string }) => {
                   )}
                 </div>
                 <div className="shrink-0 text-right">
-                  <p className="font-display text-title-card">{euros(tipo.priceCents)}</p>
-                  {esMesa && <p className="text-caption text-ink/60">{t('tickets.buy.deposit')}</p>}
+                  <p className="font-display text-title-card">
+                    {tipo.priceCents ? euros(tipo.priceCents) : t('tickets.buy.free')}
+                  </p>
+                  {esMesa && tipo.priceCents > 0 && <p className="text-caption text-ink/60">{t('tickets.buy.deposit')}</p>}
                 </div>
               </div>
 
@@ -123,14 +109,14 @@ const EventTickets = ({ eventId }: { eventId: string }) => {
                   )}
                   <button
                     type="button"
-                    disabled={comprando !== null}
-                    onClick={() => void comprar(tipo)}
-                    className="press flex h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-ink px-4 font-bold text-white disabled:opacity-50"
+                    onClick={() => comprar(tipo, cantidad)}
+                    className="press flex h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-ink px-4 font-bold text-white"
                   >
-                    {comprando === tipo.id && <Loader2 size={16} className="animate-spin" />}
-                    {esMesa
-                      ? t('tickets.buy.reserve', { amount: euros(tipo.priceCents) })
-                      : t('tickets.buy.buy', { amount: euros(tipo.priceCents * cantidad) })}
+                    {tipo.priceCents === 0
+                      ? t('tickets.buy.getFree')
+                      : esMesa
+                        ? t('tickets.buy.reserve', { amount: euros(tipo.priceCents) })
+                        : t('tickets.buy.buy', { amount: euros(tipo.priceCents * cantidad) })}
                   </button>
                 </div>
               )}

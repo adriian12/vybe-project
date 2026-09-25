@@ -4,8 +4,8 @@ import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 /**
  * Entradas, valoraciones y ventas (migración 068), por dentro:
  *
- *   · la ficha no pinta nada si el local no vende entradas, y al comprar pide
- *     la pasarela con la cantidad elegida;
+ *   · la ficha no pinta nada si el local no vende entradas, y al comprar lleva
+ *     a la pantalla de compra con la cantidad elegida;
  *   · valorar exige elegir estrellas y manda la nota;
  *   · «Ventas» se bloquea fuera de Business.
  */
@@ -24,6 +24,11 @@ vi.mock('react-i18next', async () => {
 });
 
 const openExternal = vi.fn(async () => undefined);
+const navigate = vi.fn();
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom');
+  return { ...actual, useNavigate: () => navigate };
+});
 vi.mock('@/services/native', () => ({ openExternal, isNative: () => false }));
 
 let tipos: import('@/services/tickets').TicketType[] = [];
@@ -83,8 +88,8 @@ describe('entradas en la ficha', () => {
     fireEvent.click(screen.getByRole('button', { name: '+1' }));
     fireEvent.click(screen.getByRole('button', { name: 'tickets.buy.buy' }));
 
-    await waitFor(() => expect(startCheckout).toHaveBeenCalledWith('t1', 2));
-    expect(openExternal).toHaveBeenCalledWith('https://checkout.stripe.test/x', { system: true });
+    await waitFor(() => expect(navigate).toHaveBeenCalledWith('/tickets/buy/t1?qty=2'));
+    expect(startCheckout).not.toHaveBeenCalled();
   });
 
   it('agotada no deja comprar', async () => {

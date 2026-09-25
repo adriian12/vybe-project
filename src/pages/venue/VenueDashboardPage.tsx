@@ -44,6 +44,7 @@ import VenuePlan from '@/components/venue/venue-plan';
 import EventPicker from '@/components/venue/event-picker';
 import VenueWeeklyReport from '@/components/venue/venue-weekly-report';
 import VenueProfileForm from '@/components/venue/venue-profile-form';
+import VenueBusinessProfile from '@/components/venue/venue-business-profile';
 import { nightService } from '@/services/night';
 import { BOOST_PRICE, planHas } from '@/lib/venue-plans';
 import VenueSosAlerts, { VenueSosStrip } from '@/components/venue/venue-sos-alerts';
@@ -104,13 +105,13 @@ import { Event as VybeEvent, VenueStats } from '@/types/venue';
  * escritorio las seis van en la barra horizontal, como en los diseños de
  * escritorio de Stitch.
  */
-type Section = 'qr' | 'door' | 'events' | 'stats' | 'promos' | 'sales' | 'team' | 'plan';
+type Section = 'qr' | 'door' | 'events' | 'stats' | 'promos' | 'sales' | 'business' | 'team' | 'plan';
 type Period = 'total' | 'year' | 'month' | 'week';
 type EventFilter = 'live' | 'scheduled' | 'past';
 type Drawer = null | 'menu' | 'venue' | 'documents' | 'broadcast';
 
 const PERIODS: Period[] = ['total', 'year', 'month', 'week'];
-const PROFILE_SECTIONS: Section[] = ['stats', 'promos', 'sales', 'team', 'plan'];
+const PROFILE_SECTIONS: Section[] = ['stats', 'promos', 'sales', 'business', 'team', 'plan'];
 
 /**
  * Lo que ve cada cuenta del equipo (migración 072). El propietario, todo;
@@ -119,7 +120,7 @@ const PROFILE_SECTIONS: Section[] = ['stats', 'promos', 'sales', 'team', 'plan']
  * pone sus propios límites: esto sólo ordena el panel.
  */
 const SECCIONES_POR_ROL: Record<VenueRole, Section[]> = {
-  owner: ['qr', 'door', 'events', 'stats', 'promos', 'sales', 'team', 'plan'],
+  owner: ['qr', 'door', 'events', 'stats', 'promos', 'sales', 'business', 'team', 'plan'],
   security: ['door', 'qr'],
 };
 
@@ -459,6 +460,7 @@ const VenueDashboardPage = () => {
       { section: 'stats', label: t('venue.nav.stats'), icon: BarChart3 },
       { section: 'promos', label: t('venue.nav.promos'), icon: Tag },
       { section: 'sales', label: t('venue.nav.sales'), icon: Wallet },
+      { section: 'business', label: t('venue.nav.business'), icon: Building2 },
       { section: 'team', label: t('venue.tabs.team'), icon: Users },
       { section: 'plan', label: t('venue.nav.plan'), icon: CreditCard },
     ] as { section: Section; label: string; icon: typeof QrCode; also?: Section[] }[]
@@ -469,6 +471,7 @@ const VenueDashboardPage = () => {
       { section: 'stats', label: t('venue.tabs.stats') },
       { section: 'promos', label: t('venue.tabs.promos') },
       { section: 'sales', label: t('venue.tabs.sales') },
+      { section: 'business', label: t('venue.tabs.business') },
       { section: 'team', label: t('venue.tabs.team') },
       { section: 'plan', label: t('venue.tabs.plan') },
     ] as { section: Section; label: string }[]
@@ -1071,6 +1074,8 @@ const VenueDashboardPage = () => {
 
         {/* ------------------------------------------------------- ventas */}
         {section === 'sales' && <VenueSales events={myEvents} plan={plan} />}
+
+        {section === 'business' && <VenueBusinessProfile venueId={currentVenue.id} />}
 
         {section === 'team' && (
           <div className="mx-auto max-w-2xl">

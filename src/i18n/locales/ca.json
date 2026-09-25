@@ -754,7 +754,8 @@
             "plan": "Pla",
             "profile": "Perfil",
             "profileSubtitle": "Dades del negoci, promocions, equip i pla.",
-            "sales": "Vendes"
+            "sales": "Vendes",
+            "business": "Negoci"
         },
         "qr": {
             "title": "Codi d'accés",
@@ -1227,8 +1228,8 @@
             "raffleSoon": "Sorteig aquesta nit: {{prize}}"
         },
         "broadcast": {
-            "title": "Avisar qui és a dins",
-            "subtitle": "Només arriba a qui ha entrat a l'esdeveniment les últimes hores.",
+            "title": "Enviar un avís",
+            "subtitle": "Un avís al mòbil de qui triïs a «A qui», al moment o a l'hora que posis.",
             "subtitleGlobal": "Aquest avís arriba a tothom. Fes-lo servir amb cura.",
             "heading": "Títol",
             "headingPlaceholder": "Canvi de sala",
@@ -1285,7 +1286,8 @@
             "stats": "Estadístiques",
             "promos": "Promocions",
             "plan": "Pla i facturació",
-            "sales": "Vendes"
+            "sales": "Vendes",
+            "business": "Negoci"
         },
         "live": "en directe",
         "noLive": "Cap esdeveniment en directe",
@@ -1293,11 +1295,11 @@
         "planChip": "Pla {{plan}}",
         "menu": "Menú del negoci",
         "suiteTagline": "Tauler per a negocis",
-        "broadcastShort": "Avisar els assistents",
+        "broadcastShort": "Enviar un avís",
         "drawer": {
             "documents": "Documents",
             "billing": "Facturació",
-            "broadcast": "Avisos als assistents",
+            "broadcast": "Enviar avisos",
             "help": "Ajuda"
         },
         "counter": {
@@ -1612,12 +1614,12 @@
                 ]
             },
             "broadcast": {
-                "title": "Avisar a quien está dentro",
-                "body": "Un aviso al móvil de la gente que ha entrado en las últimas horas: cambio de sala, invitados, última hora de barra. Llega al momento, o a la hora que le pongas.",
+                "title": "Enviar un avís",
+                "body": "Un avís al mòbil del teu públic: canvi de sala, convidats, última hora de barra o la propera festa. Arriba al moment, o a l'hora que hi posis.",
                 "steps": [
-                    "Escribes título y mensaje.",
-                    "Sin hora sale al momento; con hora, espera a esa hora.",
-                    "Sólo lo recibe quien está dentro de esta fiesta."
+                    "A «A qui» tries a qui li arriba: «Dins ara» és la gent que ha entrat a aquesta festa.",
+                    "Escrius títol i missatge.",
+                    "Sense hora surt al moment; amb hora, espera fins a aquella hora."
                 ]
             },
             "thermometer": {
@@ -1628,6 +1630,41 @@
                     "Se publica en la ficha de tu fiesta.",
                     "Caduca solo: si no lo tocas, deja de salir."
                 ]
+            }
+        },
+        "business": {
+            "title": "Perfil del negoci",
+            "hint": "El que veu el públic a la teva fitxa, en comprar entrades i al PDF de l'entrada.",
+            "logo": "Logo",
+            "logoHelp": "PNG, JPG o WebP de fins a 2 MB. Millor quadrat i amb fons.",
+            "uploadLogo": "Pujar logo",
+            "changeLogo": "Canviar logo",
+            "removeLogo": "Treure",
+            "logoSaved": "Logo actualitzat",
+            "name": "Nom del negoci",
+            "nameLocked": "El nom queda fix després de la verificació. Per canviar-lo, escriu-nos.",
+            "address": "Adreça",
+            "city": "Ciutat",
+            "map": "Ubicació al mapa",
+            "mapHelp": "Cerca l'adreça o arrossega el marcador fins a la porta.",
+            "phone": "Telèfon (opcional)",
+            "contactEmail": "Correu de contacte (opcional)",
+            "contactEmailHelp": "Surt a la teva fitxa. Pot ser diferent del d'accés.",
+            "website": "Web (opcional)",
+            "instagram": "Instagram (opcional)",
+            "terms": "Condicions de venda",
+            "termsHelp": "Qui compra una entrada les ha d'acceptar: dret d'admissió, devolucions, edat mínima, etc.",
+            "termsPlaceholder": "Ex.: Reservat el dret d'admissió. No s'admeten devolucions excepte si s'anul·la l'esdeveniment…",
+            "saved": "Perfil desat",
+            "errors": {
+                "logoType": "El logo ha de ser PNG, JPG o WebP.",
+                "logoSize": "El logo no pot passar de 2 MB.",
+                "logoUpload": "No s'ha pogut pujar el logo.",
+                "name": "Escriu el nom del negoci.",
+                "website": "La web no és vàlida.",
+                "instagram": "L'usuari d'Instagram no és vàlid.",
+                "email": "El correu de contacte no és vàlid.",
+                "phone": "El telèfon no és vàlid."
             }
         }
     },
@@ -2105,7 +2142,9 @@
                 "closed": "La venda és tancada.",
                 "quantity": "Aquesta quantitat no està permesa.",
                 "checkout": "No s'ha pogut obrir el pagament. Torna-ho a provar."
-            }
+            },
+            "free": "Gratis",
+            "getFree": "Aconseguir entrada"
         },
         "mine": {
             "title": "Les teves entrades",
@@ -2116,6 +2155,65 @@
             "depositPaid": "Senyal pagada: {{amount}}",
             "used": "Usada a les {{time}}",
             "showAtDoor": "Ensenya-ho a la porta"
+        },
+        "checkout": {
+            "notFound": "Aquesta entrada ja no està a la venda",
+            "includes": "Inclou",
+            "minAge": "Edat mínima: {{age}} anys",
+            "dressCode": "Dress code: {{code}}",
+            "quantity": "Quantitat",
+            "holder": "Les teves dades",
+            "holderN": "Entrada {{n}}",
+            "holderTable": "Dades de la reserva",
+            "otherHolderHelp": "Si hi poses el seu correu, li arribarà la seva entrada.",
+            "fullName": "Nom i cognoms",
+            "email": "Correu electrònic",
+            "emailOptional": "Correu electrònic (opcional)",
+            "emailConfirm": "Repeteix el correu",
+            "phone": "Telèfon",
+            "phoneOptional": "Telèfon (opcional)",
+            "birthdate": "Data de naixement",
+            "acceptFiestea": "Accepto els <terms>termes d'ús</terms>, les <purchases>condicions de compra</purchases> i la <privacy>política de privadesa</privacy> de Fiestea.",
+            "acceptVenue": "Accepto les <open>condicions de {{venue}}</open>.",
+            "marketing": "Vull rebre novetats i ofertes de {{venue}} (opcional).",
+            "addToAccount": "Afegir aquesta entrada al meu compte Fiestea",
+            "summary": "Resum",
+            "total": "Total",
+            "freeNote": "Entrada gratuïta: rebràs el QR a l'app i al teu correu.",
+            "paidNote": "Pagament segur amb Stripe. Ven {{venue}}; t'arribarà l'entrada en PDF al correu.",
+            "getFree": "Aconseguir entrada gratis",
+            "pay": "Pagar {{amount}}",
+            "venueTerms": "Condicions de {{venue}}",
+            "errors": {
+                "terms": "Has d'acceptar les condicions per comprar.",
+                "holders": "Revisa les dades de cada entrada.",
+                "fullName": "Escriu el nom i els cognoms.",
+                "email": "Escriu un correu vàlid.",
+                "emailMatch": "Els correus no coincideixen.",
+                "phone": "Escriu un telèfon vàlid.",
+                "birthdate": "Indica la data de naixement.",
+                "minAge": "Per a aquesta festa cal tenir {{age}} anys o més.",
+                "review": "Revisa els camps marcats en vermell."
+            }
+        },
+        "order": {
+            "waiting": "Confirmant el pagament…",
+            "waitingBody": "Triga uns segons. No tanquis aquesta pantalla.",
+            "refunded": "Comanda retornada",
+            "notCompleted": "La compra no s'ha completat",
+            "stillPending": "Encara no ens ha arribat la confirmació del pagament. Si has pagat, les entrades apareixeran a «Entrades» i al teu correu d'aquí a uns minuts.",
+            "notCompletedBody": "No s'ha fet cap càrrec. Pots tornar-ho a provar des de la fitxa de la festa.",
+            "goTickets": "Anar a Entrades",
+            "done": "Procés completat",
+            "doneBody_one": "Ja tens la teva entrada per a {{event}}.",
+            "doneBody_other": "Ja tens les teves {{count}} entrades per a {{event}}.",
+            "emailSent": "T'hem enviat una còpia en PDF a {{email}}. Si no la veus, mira al correu brossa."
+        },
+        "download": {
+            "pdfOne": "Descarregar entrada (PDF)",
+            "pdfAll": "Descarregar entrades (PDF)",
+            "wallet": "Afegir a Apple Wallet",
+            "walletCode": "Apple Wallet · {{code}}"
         }
     },
     "vybes": {
@@ -2634,7 +2732,9 @@
         "noUpcoming": "No hi ha festes anunciades. Segueix-lo i t'avisarem de la propera.",
         "noUpcomingFollowing": "No hi ha festes anunciades. T'avisarem de la propera.",
         "promptTitle": "Vols que {{name}} t'avisi de les seves festes?",
-        "promptBody": "Segueix-lo i et arribarà un avís quan publiqui una festa nova. Pots deixar de seguir-lo quan vulguis des de la seva fitxa."
+        "promptBody": "Segueix-lo i et arribarà un avís quan publiqui una festa nova. Pots deixar de seguir-lo quan vulguis des de la seva fitxa.",
+        "email": "Correu",
+        "website": "Web"
     },
     "photoCheck": {
         "titleSingle": "La foto no compleix els requisits",
@@ -2855,7 +2955,7 @@
         "usedCount_other": "{{count}} validades",
         "form": {
             "edit": "Editar",
-            "newTable": "Nova taula",
+            "newTable": "Nova taula VIP",
             "newEntry": "Nova entrada",
             "name": "Nom",
             "tablePlaceholder": "Taula VIP",
@@ -2869,11 +2969,16 @@
             "guests": "Persones per taula",
             "minSpend": "Consum mínim (€)",
             "maxPerOrder": "Màxim per compra",
-            "onSale": "A la venda"
+            "onSale": "A la venda",
+            "newVip": "Nova entrada VIP",
+            "vipPlaceholder": "Entrada VIP",
+            "includes": "Inclou",
+            "includesPlaceholder": "Una consumició, accés a zona VIP, guarda-roba…",
+            "priceHelp": "0 € per a una entrada gratuïta. Si no, des de 0,50 €."
         },
         "saved": "Desat",
         "ended": "La festa ja ha acabat: no es pot vendre més.",
-        "addTable": "Afegir taula",
+        "addTable": "Afegir taula VIP",
         "addEntry": "Afegir entrada",
         "note": "Els diners de cada venda arriben directament al teu compte. Cada entrada porta un QR que es valida a Porta → «Validar entrada».",
         "orders": "Últimes compres",
@@ -2951,7 +3056,8 @@
                 "refund": "No s'ha pogut fer la devolució.",
                 "alreadyRefunded": "Aquesta compra ja estava retornada."
             }
-        }
+        },
+        "addVip": "Afegir entrada VIP"
     },
     "forecast": {
         "title": "Previsió",

@@ -204,6 +204,11 @@ export interface VenueProfile {
   followers: number;
   iFollow: boolean;
   subscribed: boolean;
+  logoUrl: string | null;
+  phone: string | null;
+  contactEmail: string | null;
+  website: string | null;
+  instagram: string | null;
 }
 
 export interface VenueEventSummary {
@@ -248,6 +253,11 @@ export const nightService = {
       followers: Number(row.followers),
       iFollow: row.i_follow,
       subscribed: row.subscribed,
+      logoUrl: row.logo_url,
+      phone: row.phone,
+      contactEmail: row.contact_email,
+      website: row.website,
+      instagram: row.instagram,
     };
   },
 

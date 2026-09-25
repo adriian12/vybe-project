@@ -49,6 +49,8 @@ const VenuePage = lazy(() => import('./pages/VenuePage'));
 // El mapa arrastra Leaflet (unos 150 KB con sus estilos): sólo se descarga al abrirlo.
 const MapPage = lazy(() => import('./pages/MapPage'));
 const TicketsPage = lazy(() => import('./pages/TicketsPage'));
+const TicketCheckoutPage = lazy(() => import('./pages/TicketCheckoutPage'));
+const TicketOrderPage = lazy(() => import('./pages/TicketOrderPage'));
 const UserProfilePage = lazy(() => import('./pages/UserProfilePage'));
 const EventSwipingPage = lazy(() => import('./pages/EventSwipingPage'));
 const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage'));
@@ -220,6 +222,8 @@ const App = () => (
                     <Route path="/location" element={clubber(<LocationPage />)} />
                     <Route path="/map" element={clubber(<MapPage />)} />
                     <Route path="/tickets" element={clubber(<TicketsPage />)} />
+                    <Route path="/tickets/buy/:typeId" element={clubber(<TicketCheckoutPage />)} />
+                    <Route path="/tickets/order/:orderId" element={clubber(<TicketOrderPage />)} />
                     <Route path="/matches" element={clubber(<MatchesPage />)} />
                     <Route path="/likes" element={clubber(<LikesPage />)} />
                     <Route path="/u/:userId" element={clubber(<UserProfilePage />)} />

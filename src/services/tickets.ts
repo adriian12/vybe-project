@@ -12,7 +12,7 @@ import { APP_URL } from '@/lib/hosts';
  * pasarela abandonada nunca deja entradas creadas.
  */
 
-export type TicketKind = 'entry' | 'table';
+export type TicketKind = 'entry' | 'vip' | 'table';
 
 export interface TicketType {
   id: string;
@@ -42,6 +42,75 @@ export interface MyTicket {
   startDate: string;
   endDate: string;
   venueName: string;
+  orderId: string;
+  /** Token de descarga del pedido (PDF y Apple Wallet), el mismo del correo. */
+  downloadToken: string | null;
+  holderName: string | null;
+}
+
+/** Lo que enseña la pantalla de compra antes de pagar (migración 077). */
+export interface TicketCheckoutInfo {
+  typeId: string;
+  kind: TicketKind;
+  name: string;
+  description: string | null;
+  priceCents: number;
+  remaining: number | null;
+  guests: number | null;
+  minSpendCents: number | null;
+  maxPerOrder: number;
+  eventId: string;
+  eventName: string;
+  startDate: string;
+  endDate: string;
+  dressCode: string | null;
+  minAge: number | null;
+  venueName: string;
+  venueLogo: string | null;
+  venueTerms: string | null;
+  /** Se puede comprar: es gratis o el negocio ya cobra con Stripe. */
+  purchasable: boolean;
+}
+
+/** Datos de cada asistente: van impresos en su entrada. */
+export interface TicketHolder {
+  name: string;
+  email: string;
+  phone: string;
+  /** AAAA-MM-DD. */
+  birthdate: string;
+}
+
+export interface CheckoutRequest {
+  ticketTypeId: string;
+  quantity: number;
+  holders: TicketHolder[];
+  buyerEmail: string;
+  addToAccount: boolean;
+  marketing: boolean;
+  acceptTerms: boolean;
+}
+
+/** Pasarela de Stripe (`url`) o, si era gratis, el pedido ya emitido. */
+export interface CheckoutResult {
+  orderId: string;
+  url: string | null;
+  free: boolean;
+}
+
+export interface TicketOrderResult {
+  orderId: string;
+  status: 'pending' | 'paid' | 'refunded' | 'expired' | 'cancelled';
+  downloadToken: string | null;
+  eventName: string;
+  startDate: string;
+  venueName: string;
+  typeName: string;
+  kind: TicketKind;
+  quantity: number;
+  amountCents: number;
+  addToAccount: boolean;
+  tickets: { id: string; code: string; holderName: string | null; holderEmail: string | null }[];
 }
 
 export interface TicketSale {
@@ -138,6 +207,8 @@ const ERRORES: Record<string, string> = {
   TICKET_REFUNDED: 'sales.errors.ticketRefunded',
   INVALID_COMMISSION: 'sales.errors.invalidCommission',
   PAYMENTS_NOT_ENABLED: 'tickets.buy.errors.closed',
+  TERMS_REQUIRED: 'tickets.checkout.errors.terms',
+  BAD_HOLDERS: 'tickets.checkout.errors.holders',
   CONNECT_NOT_ENABLED: 'sales.payments.errors.connectNotEnabled',
   ONBOARD_FAILED: 'sales.payments.errors.onboard',
   STATUS_FAILED: 'sales.payments.errors.generic',
@@ -174,6 +245,19 @@ const fallo = (message: string): ApiError => {
 export const euros = (cents: number): string =>
   `${(cents / 100).toLocaleString('es-ES', { minimumFractionDigits: cents % 100 ? 2 : 0, maximumFractionDigits: 2 })} €`;
 
+/**
+ * Descarga de las entradas de un pedido (Edge Function `ticket-download`, sin
+ * sesión: la protege el token). Sin `code`, el PDF con todas; con `pkpass`, el
+ * pase de Apple Wallet de esa entrada.
+ */
+export const ticketDownloadUrl = (token: string, code?: string, format?: 'pkpass'): string => {
+  const base = `${String(import.meta.env.VITE_SUPABASE_URL ?? '').replace(/\/+$/, '')}/functions/v1/ticket-download`;
+  const params = new URLSearchParams({ t: token });
+  if (code) params.set('code', code);
+  if (format) params.set('format', format);
+  return `${base}?${params.toString()}`;
+};
+
 /** Los códigos de entrada empiezan por «E-»; los vales de promoción, no. */
 export const isEventTicketCode = (code: string): boolean => /^E-[0-9A-F]{8}$/i.test(code.trim());
 
@@ -195,13 +279,42 @@ export const ticketsService = {
     }));
   },
 
-  /** Abre la pasarela de pago y devuelve su URL. */
-  startCheckout: async (ticketTypeId: string, quantity: number): Promise<string> => {
+  getCheckout: async (typeId: string): Promise<TicketCheckoutInfo | null> => {
+    const { data, error } = await supabase.rpc('get_ticket_checkout', { p_type_id: typeId });
+    const row = !error && data?.[0];
+    if (!row) return null;
+    return {
+      typeId: row.type_id,
+      kind: row.kind as TicketKind,
+      name: row.name,
+      description: row.description,
+      priceCents: row.price_cents,
+      remaining: row.remaining,
+      guests: row.guests,
+      minSpendCents: row.min_spend_cents,
+      maxPerOrder: row.max_per_order,
+      eventId: row.event_id,
+      eventName: row.event_name,
+      startDate: row.start_date,
+      endDate: row.end_date,
+      dressCode: row.dress_code,
+      minAge: row.min_age,
+      venueName: row.venue_name,
+      venueLogo: row.venue_logo,
+      venueTerms: row.venue_terms,
+      purchasable: row.payments_enabled,
+    };
+  },
+
+  /**
+   * Reserva las plazas y abre la pasarela. Si la entrada es gratis no hay
+   * pasarela: el pedido sale ya emitido y con el correo enviado.
+   */
+  startCheckout: async (input: CheckoutRequest): Promise<CheckoutResult> => {
     const { data, error } = await supabase.functions.invoke('stripe-checkout', {
       body: {
         plan: 'tickets',
-        ticketTypeId,
-        quantity,
+        ...input,
         // En la app instalada vuelve por `/pago.html`, que reabre «Entradas».
         returnUrl: isNative() ? `${APP_URL}/pago.html` : `${window.location.origin}/tickets`,
       },
@@ -215,12 +328,32 @@ export const ticketsService = {
         code = 'CHECKOUT_FAILED';
       }
     }
-    const url = (data as { url?: string } | null)?.url;
-    if (code || !url) {
+    const res = (data ?? {}) as { url?: string; orderId?: string; free?: boolean };
+    if (code || !res.orderId || (!res.url && !res.free)) {
       const key = code && ERRORES[code] ? ERRORES[code] : 'tickets.buy.errors.checkout';
       throw new ApiError(code ?? 'CHECKOUT_FAILED', key);
     }
-    return url;
+    return { orderId: res.orderId, url: res.url ?? null, free: Boolean(res.free) };
+  },
+
+  getOrder: async (orderId: string): Promise<TicketOrderResult | null> => {
+    const { data, error } = await supabase.rpc('get_my_ticket_order', { p_order_id: orderId });
+    const row = !error && data?.[0];
+    if (!row) return null;
+    return {
+      orderId: row.order_id,
+      status: row.status as TicketOrderResult['status'],
+      downloadToken: row.download_token,
+      eventName: row.event_name,
+      startDate: row.start_date,
+      venueName: row.venue_name,
+      typeName: row.type_name,
+      kind: row.kind as TicketKind,
+      quantity: row.quantity,
+      amountCents: row.amount_cents,
+      addToAccount: row.add_to_account,
+      tickets: (row.tickets as unknown as TicketOrderResult['tickets']) ?? [],
+    };
   },
 
   getMine: async (): Promise<MyTicket[]> => {
@@ -241,6 +374,9 @@ export const ticketsService = {
       startDate: row.start_date,
       endDate: row.end_date,
       venueName: row.venue_name,
+      orderId: row.order_id,
+      downloadToken: row.download_token,
+      holderName: row.holder_name,
     }));
   },
 

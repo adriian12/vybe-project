@@ -754,7 +754,8 @@
             "plan": "Tarif",
             "profile": "Profil",
             "profileSubtitle": "Angaben zum Lokal, Aktionen, Team und Tarif.",
-            "sales": "Verkäufe"
+            "sales": "Verkäufe",
+            "business": "Betrieb"
         },
         "qr": {
             "title": "Zugangscode",
@@ -1227,8 +1228,8 @@
             "raffleSoon": "Verlosung heute Nacht: {{prize}}"
         },
         "broadcast": {
-            "title": "Leute drinnen benachrichtigen",
-            "subtitle": "Erreicht nur, wer in den letzten Stunden eingecheckt hat.",
+            "title": "Hinweis senden",
+            "subtitle": "Ein Hinweis aufs Handy der Personen, die du unter „An wen“ wählst – sofort oder zur gewünschten Uhrzeit.",
             "subtitleGlobal": "Das geht an alle. Sparsam verwenden.",
             "heading": "Titel",
             "headingPlaceholder": "Raumwechsel",
@@ -1285,7 +1286,8 @@
             "stats": "Statistiken",
             "promos": "Aktionen",
             "plan": "Tarif & Abrechnung",
-            "sales": "Verkäufe"
+            "sales": "Verkäufe",
+            "business": "Betrieb"
         },
         "live": "live",
         "noLive": "Kein Event live",
@@ -1293,11 +1295,11 @@
         "planChip": "Tarif {{plan}}",
         "menu": "Location-Menü",
         "suiteTagline": "Dashboard für Locations",
-        "broadcastShort": "Gäste benachrichtigen",
+        "broadcastShort": "Hinweis senden",
         "drawer": {
             "documents": "Dokumente",
             "billing": "Abrechnung",
-            "broadcast": "Hinweise an Gäste",
+            "broadcast": "Hinweise senden",
             "help": "Hilfe"
         },
         "counter": {
@@ -1612,12 +1614,12 @@
                 ]
             },
             "broadcast": {
-                "title": "Avisar a quien está dentro",
-                "body": "Un aviso al móvil de la gente que ha entrado en las últimas horas: cambio de sala, invitados, última hora de barra. Llega al momento, o a la hora que le pongas.",
+                "title": "Hinweis senden",
+                "body": "Ein Hinweis aufs Handy deines Publikums: Raumwechsel, Gäste, letzte Runde an der Bar oder die nächste Party. Er kommt sofort an oder zur Uhrzeit, die du festlegst.",
                 "steps": [
-                    "Escribes título y mensaje.",
-                    "Sin hora sale al momento; con hora, espera a esa hora.",
-                    "Sólo lo recibe quien está dentro de esta fiesta."
+                    "Unter „An wen“ wählst du die Empfänger: „Jetzt drinnen“ sind die Leute, die auf dieser Party sind.",
+                    "Du schreibst Titel und Nachricht.",
+                    "Ohne Uhrzeit geht er sofort raus; mit Uhrzeit wartet er bis dahin."
                 ]
             },
             "thermometer": {
@@ -1628,6 +1630,41 @@
                     "Se publica en la ficha de tu fiesta.",
                     "Caduca solo: si no lo tocas, deja de salir."
                 ]
+            }
+        },
+        "business": {
+            "title": "Betriebsprofil",
+            "hint": "Was das Publikum auf deiner Seite, beim Ticketkauf und auf dem PDF-Ticket sieht.",
+            "logo": "Logo",
+            "logoHelp": "PNG, JPG oder WebP bis 2 MB. Am besten quadratisch mit Hintergrund.",
+            "uploadLogo": "Logo hochladen",
+            "changeLogo": "Logo ändern",
+            "removeLogo": "Entfernen",
+            "logoSaved": "Logo aktualisiert",
+            "name": "Name des Betriebs",
+            "nameLocked": "Nach der Verifizierung ist der Name fest. Schreib uns, um ihn zu ändern.",
+            "address": "Adresse",
+            "city": "Stadt",
+            "map": "Position auf der Karte",
+            "mapHelp": "Suche die Adresse oder zieh die Markierung zum Eingang.",
+            "phone": "Telefon (optional)",
+            "contactEmail": "Kontakt-E-Mail (optional)",
+            "contactEmailHelp": "Erscheint auf deiner Seite. Kann von der Login-E-Mail abweichen.",
+            "website": "Website (optional)",
+            "instagram": "Instagram (optional)",
+            "terms": "Verkaufsbedingungen",
+            "termsHelp": "Käufer müssen sie akzeptieren: Hausrecht, Erstattungen, Mindestalter usw.",
+            "termsPlaceholder": "z. B.: Hausrecht vorbehalten. Keine Erstattung außer bei Absage der Veranstaltung…",
+            "saved": "Profil gespeichert",
+            "errors": {
+                "logoType": "Das Logo muss PNG, JPG oder WebP sein.",
+                "logoSize": "Das Logo darf höchstens 2 MB groß sein.",
+                "logoUpload": "Das Logo konnte nicht hochgeladen werden.",
+                "name": "Gib den Namen des Betriebs ein.",
+                "website": "Die Website ist ungültig.",
+                "instagram": "Der Instagram-Name ist ungültig.",
+                "email": "Die Kontakt-E-Mail ist ungültig.",
+                "phone": "Die Telefonnummer ist ungültig."
             }
         }
     },
@@ -2105,7 +2142,9 @@
                 "closed": "Der Verkauf ist geschlossen.",
                 "quantity": "Diese Menge ist nicht erlaubt.",
                 "checkout": "Die Zahlung konnte nicht geöffnet werden. Versuch es erneut."
-            }
+            },
+            "free": "Gratis",
+            "getFree": "Ticket holen"
         },
         "mine": {
             "title": "Deine Tickets",
@@ -2116,6 +2155,65 @@
             "depositPaid": "Anzahlung bezahlt: {{amount}}",
             "used": "Verwendet um {{time}}",
             "showAtDoor": "Zeig es am Einlass"
+        },
+        "checkout": {
+            "notFound": "Dieses Ticket ist nicht mehr erhältlich",
+            "includes": "Enthält",
+            "minAge": "Mindestalter: {{age}} Jahre",
+            "dressCode": "Dresscode: {{code}}",
+            "quantity": "Anzahl",
+            "holder": "Deine Daten",
+            "holderN": "Ticket {{n}}",
+            "holderTable": "Reservierungsdaten",
+            "otherHolderHelp": "Mit ihrer E-Mail bekommt die Person ihr eigenes Ticket.",
+            "fullName": "Vor- und Nachname",
+            "email": "E-Mail",
+            "emailOptional": "E-Mail (optional)",
+            "emailConfirm": "E-Mail wiederholen",
+            "phone": "Telefon",
+            "phoneOptional": "Telefon (optional)",
+            "birthdate": "Geburtsdatum",
+            "acceptFiestea": "Ich akzeptiere die <terms>Nutzungsbedingungen</terms>, die <purchases>Kaufbedingungen</purchases> und die <privacy>Datenschutzerklärung</privacy> von Fiestea.",
+            "acceptVenue": "Ich akzeptiere die <open>Bedingungen von {{venue}}</open>.",
+            "marketing": "Ich möchte Neuigkeiten und Angebote von {{venue}} erhalten (optional).",
+            "addToAccount": "Dieses Ticket zu meinem Fiestea-Konto hinzufügen",
+            "summary": "Übersicht",
+            "total": "Gesamt",
+            "freeNote": "Gratis-Ticket: Den QR-Code bekommst du in der App und per E-Mail.",
+            "paidNote": "Sichere Zahlung mit Stripe. Verkäufer ist {{venue}}; dein PDF-Ticket kommt per E-Mail.",
+            "getFree": "Gratis-Ticket holen",
+            "pay": "{{amount}} bezahlen",
+            "venueTerms": "Bedingungen von {{venue}}",
+            "errors": {
+                "terms": "Zum Kaufen musst du die Bedingungen akzeptieren.",
+                "holders": "Prüfe die Daten jedes Tickets.",
+                "fullName": "Gib Vor- und Nachnamen ein.",
+                "email": "Gib eine gültige E-Mail ein.",
+                "emailMatch": "Die E-Mails stimmen nicht überein.",
+                "phone": "Gib eine gültige Telefonnummer ein.",
+                "birthdate": "Gib das Geburtsdatum an.",
+                "minAge": "Für diese Party musst du mindestens {{age}} Jahre alt sein.",
+                "review": "Prüfe die rot markierten Felder."
+            }
+        },
+        "order": {
+            "waiting": "Zahlung wird bestätigt…",
+            "waitingBody": "Das dauert ein paar Sekunden. Lass diesen Bildschirm offen.",
+            "refunded": "Bestellung erstattet",
+            "notCompleted": "Der Kauf wurde nicht abgeschlossen",
+            "stillPending": "Die Zahlungsbestätigung ist noch nicht da. Wenn du bezahlt hast, erscheinen deine Tickets in wenigen Minuten unter „Tickets“ und in deiner E-Mail.",
+            "notCompletedBody": "Es wurde nichts abgebucht. Du kannst es auf der Partyseite erneut versuchen.",
+            "goTickets": "Zu den Tickets",
+            "done": "Fertig",
+            "doneBody_one": "Du hast dein Ticket für {{event}}.",
+            "doneBody_other": "Du hast deine {{count}} Tickets für {{event}}.",
+            "emailSent": "Wir haben dir eine PDF-Kopie an {{email}} geschickt. Schau auch im Spam-Ordner nach."
+        },
+        "download": {
+            "pdfOne": "Ticket herunterladen (PDF)",
+            "pdfAll": "Tickets herunterladen (PDF)",
+            "wallet": "Zu Apple Wallet hinzufügen",
+            "walletCode": "Apple Wallet · {{code}}"
         }
     },
     "vybes": {
@@ -2634,7 +2732,9 @@
         "noUpcoming": "Noch keine Partys angekündigt. Folge ihr und wir sagen dir bei der nächsten Bescheid.",
         "noUpcomingFollowing": "Noch keine Partys angekündigt. Wir sagen dir bei der nächsten Bescheid.",
         "promptTitle": "Soll dich {{name}} über ihre Partys informieren?",
-        "promptBody": "Folge ihr und du bekommst eine Benachrichtigung, wenn sie eine neue Party veröffentlicht. Entfolgen geht jederzeit auf ihrer Seite."
+        "promptBody": "Folge ihr und du bekommst eine Benachrichtigung, wenn sie eine neue Party veröffentlicht. Entfolgen geht jederzeit auf ihrer Seite.",
+        "email": "E-Mail",
+        "website": "Website"
     },
     "photoCheck": {
         "titleSingle": "Das Foto erfüllt die Anforderungen nicht",
@@ -2855,7 +2955,7 @@
         "usedCount_other": "{{count}} entwertet",
         "form": {
             "edit": "Bearbeiten",
-            "newTable": "Neuer Tisch",
+            "newTable": "Neuer VIP-Tisch",
             "newEntry": "Neues Ticket",
             "name": "Name",
             "tablePlaceholder": "VIP-Tisch",
@@ -2869,11 +2969,16 @@
             "guests": "Personen pro Tisch",
             "minSpend": "Mindestverzehr (€)",
             "maxPerOrder": "Max. pro Kauf",
-            "onSale": "Im Verkauf"
+            "onSale": "Im Verkauf",
+            "newVip": "Neues VIP-Ticket",
+            "vipPlaceholder": "VIP-Ticket",
+            "includes": "Enthält",
+            "includesPlaceholder": "Ein Getränk, Zugang zum VIP-Bereich, Garderobe…",
+            "priceHelp": "0 € für ein Gratis-Ticket. Sonst ab 0,50 €."
         },
         "saved": "Gespeichert",
         "ended": "Die Party ist vorbei: Es kann nichts mehr verkauft werden.",
-        "addTable": "Tisch hinzufügen",
+        "addTable": "VIP-Tisch hinzufügen",
         "addEntry": "Ticket hinzufügen",
         "note": "Das Geld jedes Verkaufs geht direkt auf dein Konto. Jedes Ticket hat einen QR-Code, der unter Tür → „Ticket prüfen“ entwertet wird.",
         "orders": "Letzte Käufe",
@@ -2951,7 +3056,8 @@
                 "refund": "Die Erstattung hat nicht geklappt.",
                 "alreadyRefunded": "Dieser Kauf wurde schon erstattet."
             }
-        }
+        },
+        "addVip": "VIP-Ticket hinzufügen"
     },
     "forecast": {
         "title": "Prognose",

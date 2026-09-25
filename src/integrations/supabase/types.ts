@@ -4430,17 +4430,22 @@ export type Database = {
         Returns: {
           address: string
           city: string
+          contact_email: string
           description: string
           followers: number
           i_follow: boolean
           id: string
+          instagram: string
           latitude: number
+          logo_url: string
           longitude: number
           name: string
           opening_hours: Json
+          phone: string
           region: string
           subscribed: boolean
           type: string
+          website: string
         }[]
       }
       get_venue_ratings: { Args: never; Returns: Json }
@@ -4659,13 +4664,16 @@ export type Database = {
         Args: never
         Returns: {
           code: string
+          download_token: string
           end_date: string
           event_id: string
           event_name: string
           guests: number
+          holder_name: string
           id: string
           kind: string
           min_spend_cents: number
+          order_id: string
           start_date: string
           status: string
           type_name: string

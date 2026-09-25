@@ -299,7 +299,8 @@ serve(async (req: Request): Promise<Response> => {
         'payment_intent_data[metadata][order_id]': pedido.order_id,
       });
       if (comision > 0) entradas.set('payment_intent_data[application_fee_amount]', String(comision));
-      if (user.email) entradas.set('customer_email', user.email);
+      const correoComprador = (buyerEmail ?? user.email ?? '').trim().toLowerCase();
+      if (correoComprador) entradas.set('customer_email', correoComprador);
 
       // Cargo directo: la sesión se crea en la cuenta de Stripe del negocio
       // (`Stripe-Account`). El negocio es quien vende: paga la tarifa de

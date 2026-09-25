@@ -1,7 +1,22 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, BadgeCheck, Bell, BellRing, Clock, Loader2, MapPin, Martini, Navigation, Sparkles } from 'lucide-react';
+import {
+  ArrowLeft,
+  AtSign,
+  BadgeCheck,
+  Bell,
+  BellRing,
+  Clock,
+  Globe,
+  Loader2,
+  Mail,
+  MapPin,
+  Martini,
+  Navigation,
+  Phone,
+  Sparkles,
+} from 'lucide-react';
 import Header from '@/components/header';
 import Footer from '@/components/footer';
 import MapThumb from '@/components/map-thumb';
@@ -158,13 +173,17 @@ const VenuePage = () => {
         {/* ---------------------------------------------------------- cabecera */}
         <section className="rounded-3xl bg-surface-low p-5">
           <div className="flex items-start gap-4">
-            <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-party-primary font-display text-headline-md font-black text-ink">
-              {venue.name
-                .split(/\s+/)
-                .slice(0, 2)
-                .map((p) => p.charAt(0).toUpperCase())
-                .join('')}
-            </span>
+            {venue.logoUrl ? (
+              <img src={venue.logoUrl} alt="" className="h-16 w-16 shrink-0 rounded-2xl bg-white object-contain" />
+            ) : (
+              <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-party-primary font-display text-headline-md font-black text-ink">
+                {venue.name
+                  .split(/\s+/)
+                  .slice(0, 2)
+                  .map((p) => p.charAt(0).toUpperCase())
+                  .join('')}
+              </span>
+            )}
             <div className="min-w-0 flex-1">
               <h1 className="font-display text-headline-lg leading-tight">{venue.name}</h1>
               <p className="text-body-sm text-party-gray">
@@ -266,6 +285,52 @@ const VenuePage = () => {
                 {t('venuePage.directions')}
               </button>
             </div>
+          </section>
+        )}
+
+        {/* -------------------------------------------------------- contacto */}
+        {(venue.phone || venue.contactEmail || venue.website || venue.instagram) && (
+          <section className="flex flex-wrap gap-2">
+            {venue.phone && (
+              <button
+                type="button"
+                onClick={() => void openExternal(`tel:${venue.phone?.replace(/\s/g, '')}`)}
+                className="press flex h-10 items-center gap-1.5 rounded-xl bg-surface-low px-3 text-caption font-bold"
+              >
+                <Phone size={14} />
+                {venue.phone}
+              </button>
+            )}
+            {venue.contactEmail && (
+              <button
+                type="button"
+                onClick={() => void openExternal(`mailto:${venue.contactEmail}`)}
+                className="press flex h-10 items-center gap-1.5 rounded-xl bg-surface-low px-3 text-caption font-bold"
+              >
+                <Mail size={14} />
+                {t('venuePage.email')}
+              </button>
+            )}
+            {venue.website && (
+              <button
+                type="button"
+                onClick={() => void openExternal(venue.website as string)}
+                className="press flex h-10 items-center gap-1.5 rounded-xl bg-surface-low px-3 text-caption font-bold"
+              >
+                <Globe size={14} />
+                {t('venuePage.website')}
+              </button>
+            )}
+            {venue.instagram && (
+              <button
+                type="button"
+                onClick={() => void openExternal(`https://instagram.com/${venue.instagram}`)}
+                className="press flex h-10 items-center gap-1.5 rounded-xl bg-surface-low px-3 text-caption font-bold"
+              >
+                <AtSign size={14} />
+                {venue.instagram}
+              </button>
+            )}
           </section>
         )}
 
