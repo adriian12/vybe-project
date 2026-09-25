@@ -1,6 +1,7 @@
 import { serve } from 'https://deno.land/std@0.193.0/http/server.ts';
 import { json, preflight } from '../_shared/cors.ts';
 import { adminClient, getUser, getProfileId } from '../_shared/supabase.ts';
+import { stripeSecretKey } from '../_shared/stripe-env.ts';
 
 /**
  * Borrado duro de la cuenta (art. 17 RGPD).
@@ -49,7 +50,7 @@ serve(async (req: Request): Promise<Response> => {
     // Premium mensual: se cancela ya en Stripe. Si no, al desaparecer la
     // cuenta Stripe seguiría cobrando cada mes a alguien que ya no existe.
     if (profileId) {
-      const secretKey = Deno.env.get('STRIPE_SECRET_KEY');
+      const secretKey = stripeSecretKey();
       const { data: subs } = await supabase
         .from('premium_subscriptions')
         .select('stripe_subscription_id')

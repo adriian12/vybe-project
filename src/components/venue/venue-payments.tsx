@@ -58,6 +58,16 @@ const VenuePayments = ({ onStatus }: { onStatus?: (status: PaymentsStatus | null
       const guardado = await ticketsService.getPaymentsStatus();
       if (!vivo) return;
       aplicar(guardado);
+      // El enlace de alta dura unos minutos: si caducó, Stripe vuelve con
+      // `connect=refresh` y se abre otro sin que el negocio tenga que hacer nada.
+      if (vuelta === 'refresh') {
+        try {
+          window.location.assign(await ticketsService.startOnboarding());
+          return;
+        } catch (error) {
+          fail(error);
+        }
+      }
       setCargando(false);
       // Al volver del alta, o si faltaba algo, se pregunta a Stripe.
       if (vuelta || (guardado?.connected && !(guardado.chargesEnabled && guardado.payoutsEnabled))) {

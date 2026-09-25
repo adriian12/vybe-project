@@ -46,6 +46,8 @@ export interface Email {
   subject: string;
   html: string;
   text: string;
+  /** Ficheros adjuntos (p. ej. la entrada en PDF), en base64. */
+  attachments?: { filename: string; content: string }[];
 }
 
 export const sendEmail = async (email: Email): Promise<string> => {
@@ -67,6 +69,7 @@ export const sendEmail = async (email: Email): Promise<string> => {
       // Se manda también en texto plano: sin él muchos filtros lo puntúan como
       // correo basura, y el de verificación es justo el que no puede perderse.
       text: email.text,
+      ...(email.attachments?.length ? { attachments: email.attachments } : {}),
     }),
   });
 

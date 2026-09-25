@@ -1,6 +1,8 @@
 import { serve } from 'https://deno.land/std@0.193.0/http/server.ts';
 import { json, preflight } from '../_shared/cors.ts';
 import { adminClient, getUser, getProfileId } from '../_shared/supabase.ts';
+import { sendTicketEmail } from '../_shared/ticket-mail.ts';
+import { stripeSecretKey, stripeVar } from '../_shared/stripe-env.ts';
 
 /**
  * Abre una sesión de pago de Stripe (y cancela la suscripción mensual).
@@ -42,7 +44,7 @@ const PRICE_ENV: Record<Exclude<Plan, 'event_boost' | 'tickets'>, string[]> = {
 };
 
 const precio = (plan: Exclude<Plan, 'event_boost' | 'tickets'>): string | undefined =>
-  PRICE_ENV[plan].map((nombre) => Deno.env.get(nombre)).find(Boolean);
+  PRICE_ENV[plan].map((nombre) => stripeVar(nombre)).find(Boolean);
 
 /** Supercrush por compra: al menos 1; el tope evita cobros por error. */
 const MAX_SUPERCRUSH = 100;
@@ -68,11 +70,14 @@ const BOOST_PRICE_CENTS = 1900;
  *
  * Se cambian con `secrets set`, sin desplegar.
  */
+/**
+ * Lo que se queda la plataforma de una venta de entradas: el % pactado con el
+ * negocio y, si se configura, un fijo por entrada. Con cargos directos la
+ * tarifa de Stripe la paga la cuenta del negocio, así que ya no se repercute.
+ */
 const comisionPlataforma = (totalCents: number, unidades: number, pct: number): number => {
   const fijo = Number(Deno.env.get('CONNECT_FEE_FIXED_CENTS') ?? '0') || 0;
-  const repercutir = (Deno.env.get('CONNECT_PASS_STRIPE_FEES') ?? 'true') !== 'false';
-  const stripeFee = repercutir ? Math.round(totalCents * 0.015) + 25 : 0;
-  const total = Math.round((totalCents * pct) / 100) + fijo * unidades + stripeFee;
+  const total = Math.round((totalCents * pct) / 100) + fijo * unidades;
   return Math.max(0, Math.min(total, totalCents - 1));
 };
 
@@ -96,7 +101,7 @@ serve(async (req: Request): Promise<Response> => {
   if (early) return early;
   if (req.method !== 'POST') return json({ error: 'Método no permitido' }, 405);
 
-  const secretKey = Deno.env.get('STRIPE_SECRET_KEY');
+  const secretKey = stripeSecretKey();
   if (!secretKey) return json({ error: 'STRIPE_NOT_CONFIGURED' }, 200);
 
   const supabase = adminClient();
@@ -105,14 +110,21 @@ serve(async (req: Request): Promise<Response> => {
     const user = await getUser(req, supabase);
     if (!user) return json({ error: 'No autenticado' }, 401);
 
-    const { plan, eventId, returnUrl, quantity, action, ticketTypeId } = (await req.json()) as {
-      plan?: Plan;
-      eventId?: string | null;
-      ticketTypeId?: string;
-      returnUrl?: string;
-      quantity?: number;
-      action?: 'cancel';
-    };
+    const { plan, eventId, returnUrl, quantity, action, ticketTypeId, holders, buyerEmail, addToAccount, marketing, acceptTerms } =
+      (await req.json()) as {
+        plan?: Plan;
+        eventId?: string | null;
+        ticketTypeId?: string;
+        returnUrl?: string;
+        quantity?: number;
+        action?: 'cancel';
+        /** Entradas (migración 077): los datos de cada asistente. */
+        holders?: { name?: string; email?: string; phone?: string; birthdate?: string }[];
+        buyerEmail?: string;
+        addToAccount?: boolean;
+        marketing?: boolean;
+        acceptTerms?: boolean;
+      };
 
     const base = returnUrl ?? Deno.env.get('APP_URL') ?? '';
 
@@ -199,26 +211,64 @@ serve(async (req: Request): Promise<Response> => {
       const profileId = await getProfileId(supabase, user.id);
       if (!profileId) return json({ error: 'Perfil no encontrado' }, 404);
 
+      if (!acceptTerms) return json({ error: 'TERMS_REQUIRED' }, 400);
+      const unidadesPedidas = Math.floor(Number(quantity ?? 1));
+      const asistentes = Array.isArray(holders)
+        ? holders.slice(0, 20).map((h) => ({
+            name: String(h?.name ?? '').trim().slice(0, 80),
+            email: String(h?.email ?? '').trim().toLowerCase().slice(0, 120),
+            phone: String(h?.phone ?? '').trim().slice(0, 24),
+            birthdate: /^\d{4}-\d{2}-\d{2}$/.test(String(h?.birthdate ?? '')) ? String(h?.birthdate) : '',
+          }))
+        : null;
+      if (asistentes && (asistentes.length !== unidadesPedidas || asistentes.some((h) => h.name.length < 2))) {
+        return json({ error: 'BAD_HOLDERS' }, 400);
+      }
+
       const { data: pedidos, error: errorPedido } = await supabase.rpc('create_ticket_order', {
         p_profile_id: profileId,
         p_type_id: ticketTypeId,
-        p_quantity: Math.floor(Number(quantity ?? 1)),
+        p_quantity: unidadesPedidas,
+        p_holders: asistentes,
+        p_buyer_email: (buyerEmail ?? user.email ?? '').trim().toLowerCase() || null,
+        p_add_to_account: addToAccount !== false,
+        p_marketing: marketing === true,
       });
       if (errorPedido) {
-        const codigo = ['SOLD_OUT', 'SALES_CLOSED', 'BAD_QUANTITY', 'PAYMENTS_NOT_ENABLED'].find((c) =>
+        const codigo = ['SOLD_OUT', 'SALES_CLOSED', 'BAD_QUANTITY', 'PAYMENTS_NOT_ENABLED', 'BAD_HOLDERS'].find((c) =>
           errorPedido.message.includes(c),
         );
         return json({ error: codigo ?? 'ORDER_FAILED' }, 409);
       }
       const pedido = (Array.isArray(pedidos) ? pedidos[0] : pedidos) as {
         order_id: string;
+        amount_cents: number;
         unit_cents: number;
         type_name: string;
         kind: string;
         event_name: string;
       };
-      const unidades = Math.floor(Number(quantity ?? 1));
+      const unidades = unidadesPedidas;
       const separador = base.includes('?') ? '&' : '?';
+
+      // Entrada gratis: no hay nada que cobrar. Se emite ya, se manda el correo
+      // y la app va directa a «Proceso completado».
+      if (pedido.amount_cents === 0) {
+        const { error: errorEmitir } = await supabase.rpc('fulfill_ticket_order', {
+          p_order_id: pedido.order_id,
+          p_session_id: `free:${pedido.order_id}`,
+        });
+        if (errorEmitir) {
+          console.error('fulfill free:', errorEmitir);
+          return json({ error: 'ORDER_FAILED' }, 500);
+        }
+        try {
+          await sendTicketEmail(supabase, pedido.order_id);
+        } catch (errorCorreo) {
+          console.error('ticket mail free:', errorCorreo);
+        }
+        return json({ orderId: pedido.order_id, free: true });
+      }
 
       // El cobro va a la cuenta de Stripe del local (Connect, migración 069).
       const { data: orden } = await supabase
@@ -238,7 +288,7 @@ serve(async (req: Request): Promise<Response> => {
         'line_items[0][price_data][currency]': 'eur',
         'line_items[0][price_data][unit_amount]': String(pedido.unit_cents),
         'line_items[0][price_data][product_data][name]': `${pedido.type_name} · ${pedido.event_name}`,
-        success_url: `${base}${separador}tickets=success`,
+        success_url: `${base}${separador}tickets=success&order=${pedido.order_id}`,
         cancel_url: `${base}${separador}tickets=cancelled`,
         client_reference_id: profileId,
         'metadata[kind]': 'tickets',
@@ -246,18 +296,22 @@ serve(async (req: Request): Promise<Response> => {
         'metadata[profile_id]': profileId,
         expires_at: String(Math.floor(Date.now() / 1000) + 30 * 60 + 30),
         locale: 'auto',
-        // Cobro a nombre del local: sale su nombre en el extracto y el dinero
-        // llega a su cuenta; la plataforma se queda `application_fee_amount`.
-        'payment_intent_data[on_behalf_of]': destino,
-        'payment_intent_data[transfer_data][destination]': destino,
         'payment_intent_data[metadata][order_id]': pedido.order_id,
       });
       if (comision > 0) entradas.set('payment_intent_data[application_fee_amount]', String(comision));
       if (user.email) entradas.set('customer_email', user.email);
 
+      // Cargo directo: la sesión se crea en la cuenta de Stripe del negocio
+      // (`Stripe-Account`). El negocio es quien vende: paga la tarifa de
+      // Stripe y responde de reembolsos y contracargos; la plataforma sólo
+      // cobra `application_fee_amount`.
       const respuesta = await fetch('https://api.stripe.com/v1/checkout/sessions', {
         method: 'POST',
-        headers: { Authorization: `Bearer ${secretKey}`, 'Content-Type': 'application/x-www-form-urlencoded' },
+        headers: {
+          Authorization: `Bearer ${secretKey}`,
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Stripe-Account': destino,
+        },
         body: entradas,
       });
       if (!respuesta.ok) {
@@ -270,7 +324,7 @@ serve(async (req: Request): Promise<Response> => {
         .from('ticket_orders')
         .update({ stripe_session_id: sesion.id, application_fee_cents: comision })
         .eq('id', pedido.order_id);
-      return json({ url: sesion.url });
+      return json({ url: sesion.url, orderId: pedido.order_id });
     }
 
     if (!plan || !(plan in PRICE_ENV)) return json({ error: 'Plan no válido' }, 400);

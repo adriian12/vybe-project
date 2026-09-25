@@ -1,5 +1,7 @@
 import { serve } from 'https://deno.land/std@0.193.0/http/server.ts';
 import { adminClient } from '../_shared/supabase.ts';
+import { sendTicketEmail } from '../_shared/ticket-mail.ts';
+import { stripeWebhookSecrets } from '../_shared/stripe-env.ts';
 
 /**
  * Webhook de Stripe: activa, renueva y cancela las suscripciones.
@@ -99,17 +101,24 @@ const monthFromNow = (): string => {
 serve(async (req: Request): Promise<Response> => {
   if (req.method !== 'POST') return new Response('Método no permitido', { status: 405 });
 
-  const secret = Deno.env.get('STRIPE_WEBHOOK_SECRET');
-  if (!secret) return new Response('Webhook no configurado', { status: 500 });
+  // Dos webhooks llegan aquí: el de la plataforma y el de Connect (los cargos
+  // directos ocurren en la cuenta del negocio). Cada uno firma con su secreto.
+  const secrets = stripeWebhookSecrets();
+  if (secrets.length === 0) return new Response('Webhook no configurado', { status: 500 });
 
   const signature = req.headers.get('Stripe-Signature');
   if (!signature) return new Response('Falta la firma', { status: 400 });
 
   const payload = await req.text();
 
-  if (!(await verifySignature(payload, signature, secret))) {
-    return new Response('Firma no válida', { status: 400 });
+  let firmaOk = false;
+  for (const secret of secrets) {
+    if (await verifySignature(payload, signature, secret)) {
+      firmaOk = true;
+      break;
+    }
   }
+  if (!firmaOk) return new Response('Firma no válida', { status: 400 });
 
   const supabase = adminClient();
 
@@ -140,6 +149,12 @@ serve(async (req: Request): Promise<Response> => {
               .from('ticket_orders')
               .update({ payment_intent_id: object.payment_intent as string })
               .eq('id', metadata.order_id);
+          }
+          // La copia de la entrada por correo, con el PDF (una sola vez).
+          try {
+            await sendTicketEmail(supabase, metadata.order_id);
+          } catch (errorCorreo) {
+            console.error('ticket mail:', errorCorreo);
           }
           break;
         }

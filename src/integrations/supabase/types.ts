@@ -2464,11 +2464,17 @@ export type Database = {
       }
       ticket_orders: {
         Row: {
+          add_to_account: boolean
           amount_cents: number
           application_fee_cents: number
+          buyer_email: string | null
           created_at: string
+          download_token: string | null
+          email_sent_at: string | null
           event_id: string
+          holders: Json | null
           id: string
+          marketing_opt_in: boolean
           paid_at: string | null
           payment_intent_id: string | null
           profile_id: string | null
@@ -2478,16 +2484,23 @@ export type Database = {
           status: string
           stripe_account_id: string | null
           stripe_session_id: string | null
+          terms_accepted_at: string | null
           ticket_type_id: string
           unit_cents: number
           venue_id: string
         }
         Insert: {
+          add_to_account?: boolean
           amount_cents: number
           application_fee_cents?: number
+          buyer_email?: string | null
           created_at?: string
+          download_token?: string | null
+          email_sent_at?: string | null
           event_id: string
+          holders?: Json | null
           id?: string
+          marketing_opt_in?: boolean
           paid_at?: string | null
           payment_intent_id?: string | null
           profile_id?: string | null
@@ -2497,16 +2510,23 @@ export type Database = {
           status?: string
           stripe_account_id?: string | null
           stripe_session_id?: string | null
+          terms_accepted_at?: string | null
           ticket_type_id: string
           unit_cents: number
           venue_id: string
         }
         Update: {
+          add_to_account?: boolean
           amount_cents?: number
           application_fee_cents?: number
+          buyer_email?: string | null
           created_at?: string
+          download_token?: string | null
+          email_sent_at?: string | null
           event_id?: string
+          holders?: Json | null
           id?: string
+          marketing_opt_in?: boolean
           paid_at?: string | null
           payment_intent_id?: string | null
           profile_id?: string | null
@@ -2516,6 +2536,7 @@ export type Database = {
           status?: string
           stripe_account_id?: string | null
           stripe_session_id?: string | null
+          terms_accepted_at?: string | null
           ticket_type_id?: string
           unit_cents?: number
           venue_id?: string
@@ -2622,6 +2643,10 @@ export type Database = {
           code: string
           created_at: string
           event_id: string
+          holder_birthdate: string | null
+          holder_email: string | null
+          holder_name: string | null
+          holder_phone: string | null
           id: string
           order_id: string
           profile_id: string | null
@@ -2635,6 +2660,10 @@ export type Database = {
           code: string
           created_at?: string
           event_id: string
+          holder_birthdate?: string | null
+          holder_email?: string | null
+          holder_name?: string | null
+          holder_phone?: string | null
           id?: string
           order_id: string
           profile_id?: string | null
@@ -2648,6 +2677,10 @@ export type Database = {
           code?: string
           created_at?: string
           event_id?: string
+          holder_birthdate?: string | null
+          holder_email?: string | null
+          holder_name?: string | null
+          holder_phone?: string | null
           id?: string
           order_id?: string
           profile_id?: string | null
@@ -3265,16 +3298,20 @@ export type Database = {
         Row: {
           address: string | null
           avg_spend: number | null
+          business_terms: string | null
           city: string | null
+          contact_email: string | null
           created_at: string | null
           description: string | null
           documents: string[] | null
           email: string
           event_radius: number | null
           id: string
+          instagram: string | null
           is_platform: boolean
           is_verified: boolean | null
           latitude: number | null
+          logo_url: string | null
           longitude: number | null
           name: string
           opening_hours: Json | null
@@ -3292,20 +3329,25 @@ export type Database = {
           updated_at: string | null
           venue_id: string
           verification_status: string
+          website: string | null
         }
         Insert: {
           address?: string | null
           avg_spend?: number | null
+          business_terms?: string | null
           city?: string | null
+          contact_email?: string | null
           created_at?: string | null
           description?: string | null
           documents?: string[] | null
           email: string
           event_radius?: number | null
           id?: string
+          instagram?: string | null
           is_platform?: boolean
           is_verified?: boolean | null
           latitude?: number | null
+          logo_url?: string | null
           longitude?: number | null
           name: string
           opening_hours?: Json | null
@@ -3323,20 +3365,25 @@ export type Database = {
           updated_at?: string | null
           venue_id: string
           verification_status?: string
+          website?: string | null
         }
         Update: {
           address?: string | null
           avg_spend?: number | null
+          business_terms?: string | null
           city?: string | null
+          contact_email?: string | null
           created_at?: string | null
           description?: string | null
           documents?: string[] | null
           email?: string
           event_radius?: number | null
           id?: string
+          instagram?: string | null
           is_platform?: boolean
           is_verified?: boolean | null
           latitude?: number | null
+          logo_url?: string | null
           longitude?: number | null
           name?: string
           opening_hours?: Json | null
@@ -3354,6 +3401,7 @@ export type Database = {
           updated_at?: string | null
           venue_id?: string
           verification_status?: string
+          website?: string | null
         }
         Relationships: []
       }
@@ -3686,7 +3734,15 @@ export type Database = {
         }[]
       }
       create_ticket_order: {
-        Args: { p_profile_id: string; p_quantity: number; p_type_id: string }
+        Args: {
+          p_add_to_account?: boolean
+          p_buyer_email?: string
+          p_holders?: Json
+          p_marketing?: boolean
+          p_profile_id: string
+          p_quantity: number
+          p_type_id: string
+        }
         Returns: {
           amount_cents: number
           event_name: string
@@ -4079,6 +4135,23 @@ export type Database = {
           venue_name: string
         }[]
       }
+      get_my_ticket_order: {
+        Args: { p_order_id: string }
+        Returns: {
+          add_to_account: boolean
+          amount_cents: number
+          download_token: string
+          event_name: string
+          kind: string
+          order_id: string
+          quantity: number
+          start_date: string
+          status: string
+          tickets: Json
+          type_name: string
+          venue_name: string
+        }[]
+      }
       get_my_venue_membership: {
         Args: never
         Returns: {
@@ -4219,6 +4292,30 @@ export type Database = {
           played_at: string
           title: string
           votes: number
+        }[]
+      }
+      get_ticket_checkout: {
+        Args: { p_type_id: string }
+        Returns: {
+          description: string
+          dress_code: string
+          end_date: string
+          event_id: string
+          event_name: string
+          guests: number
+          kind: string
+          max_per_order: number
+          min_age: number
+          min_spend_cents: number
+          name: string
+          payments_enabled: boolean
+          price_cents: number
+          remaining: number
+          start_date: string
+          type_id: string
+          venue_logo: string
+          venue_name: string
+          venue_terms: string
         }[]
       }
       get_ticket_orders: {
@@ -4393,6 +4490,13 @@ export type Database = {
           avg_attendance: number
           events_count: number
           scans_count: number
+        }[]
+      }
+      get_venue_terms: {
+        Args: { p_venue_id: string }
+        Returns: {
+          terms: string
+          venue_name: string
         }[]
       }
       get_venue_weekday_stats: {

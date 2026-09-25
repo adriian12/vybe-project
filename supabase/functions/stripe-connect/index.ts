@@ -1,11 +1,15 @@
 import { serve } from 'https://deno.land/std@0.193.0/http/server.ts';
 import { json, preflight } from '../_shared/cors.ts';
 import { adminClient, getUser } from '../_shared/supabase.ts';
+import { stripeSecretKey, stripeTestMode } from '../_shared/stripe-env.ts';
 
 /**
  * Stripe Connect para los locales (migración 069).
  *
- * Cada local cobra sus entradas en su propia cuenta Express. Acciones:
+ * Cada negocio cobra sus entradas en su propia cuenta de Stripe, con cargos
+ * directos: es el vendedor, paga la tarifa de Stripe y responde de reembolsos y
+ * contracargos. La cuenta se crea con Stripe asumiendo las pérdidas y con el
+ * panel completo de Stripe para el negocio. Acciones:
  *   · `onboard`: crea la cuenta (con todo lo que ya sabemos del local, para que
  *     en Stripe sólo le quede lo imprescindible) y devuelve el enlace de alta.
  *     Si ya usa Stripe, en ese formulario puede entrar con su cuenta y
@@ -13,13 +17,13 @@ import { adminClient, getUser } from '../_shared/supabase.ts';
  *   · `status`: pregunta a Stripe cómo está la cuenta y lo guarda. Se llama al
  *     volver del alta y al abrir Ventas: así no depende de configurar un
  *     webhook de Connect.
- *   · `dashboard`: enlace de un solo uso al panel de pagos del local.
+ *   · `dashboard`: el panel de Stripe del negocio (entra con su usuario).
  *   · `refund`: devuelve un pedido entero (el dinero sale de la cuenta del
  *     local y se devuelve también la comisión de la plataforma).
  *
  * Sólo el propietario del local, y sólo en Business.
  *
- * Variables: STRIPE_SECRET_KEY, APP_URL.
+ * Variables: STRIPE_SECRET_KEY (o STRIPE_TEST_SECRET_KEY con STRIPE_MODE=test), APP_URL.
  */
 
 const STRIPE = 'https://api.stripe.com/v1';
@@ -29,14 +33,40 @@ const stripe = async (
   path: string,
   params?: URLSearchParams,
   method: 'GET' | 'POST' = params ? 'POST' : 'GET',
+  cuenta?: string,
 ): Promise<{ ok: boolean; data: Record<string, unknown> }> => {
   const respuesta = await fetch(`${STRIPE}${path}`, {
     method,
-    headers: { Authorization: `Bearer ${secret}`, 'Content-Type': 'application/x-www-form-urlencoded' },
+    headers: {
+      Authorization: `Bearer ${secret}`,
+      'Content-Type': 'application/x-www-form-urlencoded',
+      // Operaciones sobre la cuenta del negocio (cargos directos).
+      ...(cuenta ? { 'Stripe-Account': cuenta } : {}),
+    },
     body: params,
   });
   const data = (await respuesta.json()) as Record<string, unknown>;
   if (!respuesta.ok) console.error(`Stripe ${path}:`, JSON.stringify(data));
+  return { ok: respuesta.ok, data };
+};
+
+/** API v2 de Stripe (cuentas y enlaces de alta): JSON y versión fija. */
+const stripeV2 = async (
+  secret: string,
+  path: string,
+  body: Record<string, unknown>,
+): Promise<{ ok: boolean; data: Record<string, unknown> }> => {
+  const respuesta = await fetch(`https://api.stripe.com/v2${path}`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${secret}`,
+      'Stripe-Version': '2026-08-26.dahlia',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  });
+  const data = (await respuesta.json()) as Record<string, unknown>;
+  if (!respuesta.ok) console.error(`Stripe v2 ${path}:`, JSON.stringify(data));
   return { ok: respuesta.ok, data };
 };
 
@@ -73,7 +103,7 @@ serve(async (req: Request): Promise<Response> => {
   if (early) return early;
   if (req.method !== 'POST') return json({ error: 'Método no permitido' }, 405);
 
-  const secret = Deno.env.get('STRIPE_SECRET_KEY');
+  const secret = stripeSecretKey();
   if (!secret) return json({ error: 'STRIPE_NOT_CONFIGURED' }, 200);
 
   const supabase = adminClient();
@@ -131,25 +161,32 @@ serve(async (req: Request): Promise<Response> => {
       if (!cuentaId) {
         // Todo lo que ya sabemos va relleno: en Stripe sólo le queda lo que la
         // ley exige que ponga él (persona responsable, IBAN, verificación).
-        const alta = new URLSearchParams({
-          type: 'express',
-          country: 'ES',
-          'capabilities[card_payments][requested]': 'true',
-          'capabilities[transfers][requested]': 'true',
-          'business_profile[name]': venue.name,
-          // 5813: bares, discotecas y salas de fiestas.
-          'business_profile[mcc]': '5813',
-          'business_profile[product_description]': 'Venta de entradas y reservas de mesa para sus fiestas.',
-          'business_profile[url]': `${appUrl}/local/${venue.id}`,
-          'metadata[venue_id]': venue.id,
-          default_currency: 'eur',
-        });
+        // Accounts v2: Stripe ya no deja crear cuentas conectadas con la v1.
         // El teléfono y la dirección no se mandan: si Stripe no acepta su
         // formato (o el tipo de empresa aún no está elegido) rechaza el alta
         // entera. Los pide el propio formulario.
-        if (venue.email) alta.set('email', venue.email);
-
-        const creada = await stripe(secret, '/accounts', alta);
+        const creada = await stripeV2(secret, '/core/accounts', {
+          contact_email: venue.email ?? undefined,
+          display_name: venue.name,
+          dashboard: 'full',
+          identity: { country: 'es' },
+          configuration: {
+            // 5813: bares, discotecas y salas de fiestas.
+            merchant: { capabilities: { card_payments: { requested: true } }, mcc: '5813' },
+          },
+          defaults: {
+            currency: 'eur',
+            locales: ['es-ES'],
+            // Quien paga las tarifas y responde de pérdidas y contracargos es el
+            // negocio (y Stripe si su saldo no llega), no la plataforma.
+            responsibilities: { fees_collector: 'stripe', losses_collector: 'stripe' },
+            profile: {
+              business_url: `${appUrl}/local/${venue.id}`,
+              product_description: 'Venta de entradas y reservas de mesa para sus fiestas.',
+            },
+          },
+          metadata: { venue_id: venue.id },
+        });
         if (!creada.ok) {
           const mensaje = String((creada.data.error as { message?: string } | undefined)?.message ?? '');
           // Sin activar Connect en el panel de Stripe no se pueden crear cuentas.
@@ -163,18 +200,17 @@ serve(async (req: Request): Promise<Response> => {
           .eq('id', venue.id);
       }
 
-      const enlace = await stripe(
-        secret,
-        '/account_links',
-        new URLSearchParams({
-          account: cuentaId,
+      const enlace = await stripeV2(secret, '/core/account_links', {
+        account: cuentaId,
+        use_case: {
           type: 'account_onboarding',
-          // Sólo lo necesario para empezar a cobrar; el resto, cuando haga falta.
-          'collection_options[fields]': 'currently_due',
-          refresh_url: `${base}?seccion=sales&connect=refresh`,
-          return_url: `${base}?seccion=sales&connect=return`,
-        }),
-      );
+          account_onboarding: {
+            configurations: ['merchant'],
+            refresh_url: `${base}?seccion=sales&connect=refresh`,
+            return_url: `${base}?seccion=sales&connect=return`,
+          },
+        },
+      });
       if (!enlace.ok) return json({ error: 'ONBOARD_FAILED' }, 502);
       return json({ url: enlace.data.url });
     }
@@ -195,9 +231,8 @@ serve(async (req: Request): Promise<Response> => {
 
     // ---------------------------------------------------------- dashboard
     if (action === 'dashboard') {
-      const enlace = await stripe(secret, `/accounts/${venue.stripe_account_id}/login_links`, new URLSearchParams());
-      if (!enlace.ok) return json({ error: 'DASHBOARD_FAILED' }, 502);
-      return json({ url: enlace.data.url });
+      // Panel completo: el negocio entra en su Stripe con su propio usuario.
+      return json({ url: stripeTestMode() ? 'https://dashboard.stripe.com/test/dashboard' : 'https://dashboard.stripe.com/dashboard' });
     }
 
     // ------------------------------------------------------------- refund
@@ -217,12 +252,13 @@ serve(async (req: Request): Promise<Response> => {
         '/refunds',
         new URLSearchParams({
           payment_intent: pedido.payment_intent_id,
-          // El dinero sale de la cuenta del local, y la comisión de la
-          // plataforma también se devuelve.
-          reverse_transfer: 'true',
+          // Cargo directo: el dinero sale de la cuenta del negocio, y la
+          // comisión de la plataforma también se devuelve.
           refund_application_fee: 'true',
           'metadata[order_id]': pedido.id,
         }),
+        'POST',
+        venue.stripe_account_id as string,
       );
       if (!devolucion.ok) {
         const codigo = String((devolucion.data.error as { code?: string } | undefined)?.code ?? '');
