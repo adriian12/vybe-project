@@ -1,5 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import i18n from '@/i18n';
+import { BRAND } from '@/lib/hosts';
 
 /**
  * Alta de cuenta y correos de la cuenta.
@@ -51,7 +52,7 @@ interface AuthEmailResponse {
 
 const call = async (payload: Record<string, unknown>): Promise<AuthEmailResponse> => {
   const { data, error } = await supabase.functions.invoke<AuthEmailResponse>('auth-email', {
-    body: { ...payload, locale: i18n.resolvedLanguage ?? 'es' },
+    body: { ...payload, locale: i18n.resolvedLanguage ?? 'es', brand: BRAND },
   });
 
   // `invoke` trata cualquier código distinto de 2xx como error y deja el cuerpo

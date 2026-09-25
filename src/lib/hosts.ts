@@ -16,6 +16,12 @@ import { isNative } from '@/services/native';
 
 const clean = (value: string | undefined, fallback: string): string => (value || fallback).replace(/\/+$/, '');
 
+/**
+ * La marca de esta rama. El backend es el mismo para las dos apps y lo usa
+ * para los correos (`auth-email`): nombre, colores y enlace a su web.
+ */
+export const BRAND = 'vybes' as const;
+
 const PROD_LANDING = 'https://vybes.es';
 const PROD_APP = 'https://app.vybes.es';
 

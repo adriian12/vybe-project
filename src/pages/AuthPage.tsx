@@ -317,7 +317,7 @@ const UserLoginForm = () => {
     setIsLoading(true);
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: values.email,
+        email: values.email.trim(),
         password: values.password,
       });
 
@@ -451,7 +451,7 @@ const UserRegisterForm = ({ kind }: { kind: AccountKind }) => {
       // metadatos. Insertarlo desde el cliente fallaba porque todavía no hay
       // sesión y la policy exige auth.uid() = user_id.
       await authEmailService.signUp({
-        email: values.email,
+        email: values.email.trim(),
         password: values.password,
         metadata: {
           account_type: 'user',
@@ -696,7 +696,7 @@ const VenueLoginForm = () => {
     setIsLoading(true);
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: values.email,
+        email: values.email.trim(),
         password: values.password,
       });
 
@@ -854,7 +854,7 @@ const VenueRegisterForm = () => {
       // subía ni uno, y administración veía todos los locales sin documentación
       // sin que nadie entendiera por qué.
       await authEmailService.signUp({
-        email: values.email,
+        email: values.email.trim(),
         password: values.password,
         documents,
         metadata: {
