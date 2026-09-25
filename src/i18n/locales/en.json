@@ -678,7 +678,12 @@
             "already": "You already have Premium here.",
             "notAtEvent": "You need to be inside the party to buy its pass.",
             "unavailable": "Payments are not available right now."
-        }
+        },
+        "appleTerms": "Monthly Premium: {{price}} per month. Charged to your Apple ID and renews automatically unless cancelled at least 24 hours before the end of the month, in Settings › your name › Subscriptions.",
+        "restore": "Restore purchases",
+        "restored": "Purchases restored",
+        "nothingToRestore": "No purchases to restore",
+        "manageOnIphone": "Your Premium was bought on iPhone: cancel it in Settings › your name › Subscriptions."
     },
     "likes": {
         "title": "They like you",

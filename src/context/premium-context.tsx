@@ -6,6 +6,17 @@ import { useAppContext } from '@/context/app-context';
 import { useToast } from '@/components/ui/use-toast';
 import { track } from '@/lib/observability';
 import { isNative, onAppResume, openExternal } from '@/services/native';
+import {
+  ApplePlan,
+  ApplePrice,
+  buyWithApple,
+  getApplePrices,
+  listenAppleTransactions,
+  manageAppleSubscription,
+  restoreApplePurchases,
+  syncApplePurchases,
+  usesApplePurchases,
+} from '@/services/iap';
 
 export type SubscriptionType = 'monthly' | 'event' | 'lifetime';
 
@@ -35,6 +46,13 @@ interface PremiumContextType {
   upgradeToPremium: () => Promise<boolean>;
   getPremiumForEvent: () => Promise<boolean>;
   cancelPremium: () => Promise<boolean>;
+  /**
+   * iPhone: se compra con Apple (In-App Purchase). Precios de la App Store de
+   * la persona y «Restaurar compras».
+   */
+  applePurchases: boolean;
+  applePrices: Partial<Record<ApplePlan, ApplePrice>>;
+  restorePurchases: () => Promise<void>;
   /** Supercrush comprados o regalados que quedan (valen en cualquier evento). */
   supercrushBalance: number;
   /** Queda el supercrush que incluye Premium en el evento en el que estás. */
@@ -73,6 +91,9 @@ export const PremiumProvider = ({ children }: { children: ReactNode }) => {
   const [supercrushBalance, setSupercrushBalance] = useState(0);
   const [supercrushIncluded, setSupercrushIncluded] = useState(false);
   const [showSupercrushDialog, setShowSupercrushDialog] = useState(false);
+  const [store, setStore] = useState<string | null>(null);
+  const [applePrices, setApplePrices] = useState<Partial<Record<ApplePlan, ApplePrice>>>({});
+  const applePurchases = usesApplePurchases();
 
   const activo = isLoggedIn && userType !== 'venue';
 
@@ -93,6 +114,7 @@ export const PremiumProvider = ({ children }: { children: ReactNode }) => {
       setPremiumEventId(status?.eventId ?? null);
       setExpiresAt(status?.expiresAt ?? null);
       setCancelAtPeriodEnd(status?.cancelAtPeriodEnd ?? false);
+      setStore(status?.store ?? null);
     } catch (error) {
       console.error('Error loading subscription:', error);
     } finally {
@@ -114,6 +136,25 @@ export const PremiumProvider = ({ children }: { children: ReactNode }) => {
       console.error('Error loading supercrush:', error);
     }
   }, [activo]);
+
+  // iPhone: precios de la App Store, compras que quedaron a medias y
+  // renovaciones que avisa StoreKit con la app abierta.
+  useEffect(() => {
+    if (!applePurchases || !activo) return;
+    void getApplePrices().then(setApplePrices);
+    const releer = () => {
+      void loadSubscription();
+      void refreshSupercrush();
+    };
+    void syncApplePurchases().then((n) => n > 0 && releer());
+    let quitar: (() => void) | null = null;
+    let vivo = true;
+    void listenAppleTransactions(releer).then((q) => (vivo ? (quitar = q) : q()));
+    return () => {
+      vivo = false;
+      quitar?.();
+    };
+  }, [applePurchases, activo, loadSubscription, refreshSupercrush]);
 
   // El evento activo decide si el Premium por evento cuenta: se relee al
   // entrar, al salir y al cambiar de fiesta.
@@ -176,9 +217,33 @@ export const PremiumProvider = ({ children }: { children: ReactNode }) => {
     [toast, t],
   );
 
-  /** Abre Stripe. Premium lo activa el webhook cuando el cobro se confirma. */
+  /**
+   * En el iPhone, compra integrada de Apple (lo activa `apple-iap` al
+   * verificar la compra). En Android y la web, Stripe: Premium lo activa el
+   * webhook cuando el cobro se confirma.
+   */
   const checkout = useCallback(
     async (plan: 'monthly' | 'event' | 'supercrush', options: { eventId?: string; quantity?: number } = {}) => {
+      if (applePurchases) {
+        try {
+          const hecho = await buyWithApple(plan, options);
+          if (!hecho) return false;
+          setShowPremiumDialog(false);
+          setShowSupercrushDialog(false);
+          await Promise.all([loadSubscription(), refreshSupercrush()]);
+          if (plan === 'supercrush') {
+            track('supercrush_bought');
+            toast({ title: t('supercrush.bought'), description: t('supercrush.boughtBody') });
+          } else {
+            track('premium_subscribed');
+            toast({ title: t('premium.activated'), description: t('premium.activatedBody') });
+          }
+          return true;
+        } catch (error) {
+          fallo(error);
+          return false;
+        }
+      }
       try {
         const url = await api.startCheckout(plan, options);
         if (isNative()) {
@@ -194,8 +259,18 @@ export const PremiumProvider = ({ children }: { children: ReactNode }) => {
         return false;
       }
     },
-    [fallo],
+    [fallo, applePurchases, loadSubscription, refreshSupercrush, toast, t],
   );
+
+  const restorePurchases = useCallback(async () => {
+    try {
+      const n = await restoreApplePurchases();
+      await Promise.all([loadSubscription(), refreshSupercrush()]);
+      toast({ title: t(n > 0 ? 'premium.restored' : 'premium.nothingToRestore') });
+    } catch (error) {
+      fallo(error);
+    }
+  }, [loadSubscription, refreshSupercrush, toast, t, fallo]);
 
   const upgradeToPremium = useCallback(() => checkout('monthly'), [checkout]);
 
@@ -213,6 +288,20 @@ export const PremiumProvider = ({ children }: { children: ReactNode }) => {
   );
 
   const cancelPremium = useCallback(async (): Promise<boolean> => {
+    // Comprado con Apple: se cancela en los ajustes de suscripciones del iPhone.
+    if (store === 'apple') {
+      if (!applePurchases) {
+        toast({ title: t('premium.manageOnIphone') });
+        return false;
+      }
+      try {
+        await manageAppleSubscription();
+        await loadSubscription();
+      } catch (error) {
+        fallo(error);
+      }
+      return false;
+    }
     try {
       await api.cancelSubscription();
       await loadSubscription();
@@ -222,7 +311,7 @@ export const PremiumProvider = ({ children }: { children: ReactNode }) => {
       fallo(error);
       return false;
     }
-  }, [loadSubscription, toast, t, fallo]);
+  }, [loadSubscription, toast, t, fallo, store, applePurchases]);
 
   const value: PremiumContextType = {
     isPremium,
@@ -236,6 +325,9 @@ export const PremiumProvider = ({ children }: { children: ReactNode }) => {
     upgradeToPremium,
     getPremiumForEvent,
     cancelPremium,
+    applePurchases,
+    applePrices,
+    restorePurchases,
     supercrushBalance,
     supercrushIncluded,
     showSupercrushDialog,

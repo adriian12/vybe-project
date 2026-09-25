@@ -94,7 +94,7 @@ export const legalDocs = (app: string, web: string, panel: string, miembro: stri
         },
         {
           title: 'Qué datos tratamos',
-          body: `Datos de cuenta: correo, nombre, fecha de nacimiento o edad, género, a quién quieres ver y teléfono. Fotografías: la foto del momento que haces con la cámara al entrar en una fiesta y, si las añades, las de tu perfil. Ubicación mientras usas la app para entrar en una fiesta. Actividad en ${app}: fiestas en las que dices que vas a ir o en las que entras, locales que sigues, likes, supercrush, matches, mensajes, peticiones de canciones, retos, sorteos, vales, valoraciones, entradas compradas y apuntes a listas de invitados (nombre y número de acompañantes). Datos de pago: los gestiona Stripe; nosotros sólo recibimos el resultado y el importe, nunca el número de tarjeta. Datos técnicos: tipo de dispositivo, idioma, avisos push y registros de errores.`,
+          body: `Datos de cuenta: correo, nombre, fecha de nacimiento o edad, género, a quién quieres ver y teléfono. Fotografías: la foto del momento que haces con la cámara al entrar en una fiesta y, si las añades, las de tu perfil. Ubicación mientras usas la app para entrar en una fiesta. Actividad en ${app}: fiestas en las que dices que vas a ir o en las que entras, locales que sigues, likes, supercrush, matches, mensajes, peticiones de canciones, retos, sorteos, vales, valoraciones, entradas compradas y apuntes a listas de invitados (nombre y número de acompañantes). Datos de pago: los gestionan Stripe o, en el iPhone, Apple; nosotros sólo recibimos el resultado, el producto y el importe, nunca el número de tarjeta. Datos técnicos: tipo de dispositivo, idioma, avisos push y registros de errores.`,
         },
         {
           title: 'Para qué los usamos',
@@ -118,7 +118,7 @@ export const legalDocs = (app: string, web: string, panel: string, miembro: stri
         },
         {
           title: 'Con quién los compartimos',
-          body: 'Con proveedores que tratan los datos por encargo nuestro y con contrato: Supabase (base de datos, cuentas y almacenamiento), Vercel (alojamiento de la web), Stripe (pagos y cobros de los locales), Resend (correo), Twilio (SMS), Google Firebase Cloud Messaging y Apple Push Notification service (avisos al teléfono), Sightengine (moderación de imágenes), Sentry (registro de errores, sin datos personales) y CARTO (mapas). No vendemos datos ni los cedemos para publicidad. Algunos de estos proveedores están fuera del Espacio Económico Europeo; en ese caso la transferencia se ampara en el Marco de Privacidad de Datos UE-EE. UU. o en las cláusulas contractuales tipo de la Comisión Europea. También podemos comunicar datos a las autoridades cuando la ley lo exija.',
+          body: 'Con proveedores que tratan los datos por encargo nuestro y con contrato: Supabase (base de datos, cuentas y almacenamiento), Vercel (alojamiento de la web), Stripe (pagos y cobros de los locales), Apple (compras dentro de la app de iPhone), Resend (correo), Twilio (SMS), Google Firebase Cloud Messaging y Apple Push Notification service (avisos al teléfono), Sightengine (moderación de imágenes), Sentry (registro de errores, sin datos personales) y CARTO (mapas). No vendemos datos ni los cedemos para publicidad. Algunos de estos proveedores están fuera del Espacio Económico Europeo; en ese caso la transferencia se ampara en el Marco de Privacidad de Datos UE-EE. UU. o en las cláusulas contractuales tipo de la Comisión Europea. También podemos comunicar datos a las autoridades cuando la ley lo exija.',
         },
         {
           title: 'Cuánto tiempo los conservamos',
@@ -270,11 +270,11 @@ export const legalDocs = (app: string, web: string, panel: string, miembro: stri
         },
         {
           title: 'Pago',
-          body: 'Todos los pagos se hacen con Stripe, en su página segura. No guardamos los datos de tu tarjeta. Recibirás el justificante por correo.',
+          body: 'En la app del iPhone, Premium y los supercrush se compran con la compra integrada de Apple y se cobran en tu Apple ID. En Android y en la web, y las entradas en cualquier dispositivo, se pagan con Stripe, en su página segura. No guardamos los datos de tu tarjeta y recibirás el justificante por correo.',
         },
         {
           title: 'Premium mensual',
-          body: 'Se renueva cada mes hasta que la canceles desde el perfil. Al cancelar, sigues teniendo Premium hasta el final del periodo pagado y no se vuelve a cobrar.',
+          body: 'Se renueva cada mes hasta que la canceles. Si la compraste en el iPhone, se cancela en Ajustes › tu nombre › Suscripciones, al menos 24 horas antes de que acabe el mes; si no, desde el perfil. Al cancelar, sigues teniendo Premium hasta el final del periodo pagado y no se vuelve a cobrar.',
         },
         {
           title: 'Premium para una fiesta y supercrush',
@@ -290,7 +290,7 @@ export const legalDocs = (app: string, web: string, panel: string, miembro: stri
         },
         {
           title: 'Devoluciones',
-          body: `Si la fiesta se cancela, el local debe devolver el importe de las entradas. Para cualquier otra devolución de una entrada, habla con el local. Si hay un cargo que no reconoces o un problema con Premium o supercrush, escribe a ${correo} y lo revisamos.`,
+          body: `Si la fiesta se cancela, el local debe devolver el importe de las entradas. Para cualquier otra devolución de una entrada, habla con el local. Las compras hechas con Apple sólo las puede devolver Apple: pídelo en reportaproblem.apple.com. Si hay un cargo que no reconoces o un problema con Premium o supercrush, escribe a ${correo} y lo revisamos.`,
         },
         {
           title: 'Destacar una fiesta',

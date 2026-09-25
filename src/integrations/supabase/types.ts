@@ -123,6 +123,69 @@ export type Database = {
           },
         ]
       }
+      apple_transactions: {
+        Row: {
+          created_at: string
+          currency: string | null
+          environment: string
+          event_id: string | null
+          expires_date: string | null
+          original_transaction_id: string
+          price_cents: number | null
+          product_id: string
+          profile_id: string | null
+          purchase_date: string
+          quantity: number
+          revoked_at: string | null
+          transaction_id: string
+        }
+        Insert: {
+          created_at?: string
+          currency?: string | null
+          environment: string
+          event_id?: string | null
+          expires_date?: string | null
+          original_transaction_id: string
+          price_cents?: number | null
+          product_id: string
+          profile_id?: string | null
+          purchase_date: string
+          quantity?: number
+          revoked_at?: string | null
+          transaction_id: string
+        }
+        Update: {
+          created_at?: string
+          currency?: string | null
+          environment?: string
+          event_id?: string | null
+          expires_date?: string | null
+          original_transaction_id?: string
+          price_cents?: number | null
+          product_id?: string
+          profile_id?: string | null
+          purchase_date?: string
+          quantity?: number
+          revoked_at?: string | null
+          transaction_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "apple_transactions_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "apple_transactions_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       auth_throttle: {
         Row: {
           count: number
@@ -1519,6 +1582,7 @@ export type Database = {
       }
       premium_subscriptions: {
         Row: {
+          apple_original_transaction_id: string | null
           cancel_at_period_end: boolean
           created_at: string | null
           event_id: string | null
@@ -1535,6 +1599,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          apple_original_transaction_id?: string | null
           cancel_at_period_end?: boolean
           created_at?: string | null
           event_id?: string | null
@@ -1551,6 +1616,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          apple_original_transaction_id?: string | null
           cancel_at_period_end?: boolean
           created_at?: string | null
           event_id?: string | null
@@ -2402,7 +2468,7 @@ export type Database = {
           id: string
           paid_at: string | null
           payment_intent_id: string | null
-          profile_id: string
+          profile_id: string | null
           quantity: number
           refunded_at: string | null
           refunded_by: string | null
@@ -2421,7 +2487,7 @@ export type Database = {
           id?: string
           paid_at?: string | null
           payment_intent_id?: string | null
-          profile_id: string
+          profile_id?: string | null
           quantity: number
           refunded_at?: string | null
           refunded_by?: string | null
@@ -2440,7 +2506,7 @@ export type Database = {
           id?: string
           paid_at?: string | null
           payment_intent_id?: string | null
-          profile_id?: string
+          profile_id?: string | null
           quantity?: number
           refunded_at?: string | null
           refunded_by?: string | null
@@ -2555,7 +2621,7 @@ export type Database = {
           event_id: string
           id: string
           order_id: string
-          profile_id: string
+          profile_id: string | null
           status: string
           ticket_type_id: string
           used_at: string | null
@@ -2568,7 +2634,7 @@ export type Database = {
           event_id: string
           id?: string
           order_id: string
-          profile_id: string
+          profile_id?: string | null
           status?: string
           ticket_type_id: string
           used_at?: string | null
@@ -2581,7 +2647,7 @@ export type Database = {
           event_id?: string
           id?: string
           order_id?: string
-          profile_id?: string
+          profile_id?: string | null
           status?: string
           ticket_type_id?: string
           used_at?: string | null
@@ -4445,6 +4511,7 @@ export type Database = {
           event_id: string
           expires_at: string
           is_premium: boolean
+          store: string
           subscription_id: string
           subscription_type: string
         }[]

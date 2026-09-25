@@ -678,7 +678,12 @@
             "already": "Ja tens Premium actiu aquí.",
             "notAtEvent": "Has d'estar dins la festa per comprar-ne el passi.",
             "unavailable": "Els pagaments no estan disponibles ara mateix."
-        }
+        },
+        "appleTerms": "Premium mensual: {{price}} al mes. Es cobra al teu Apple ID i es renova sol si no el cancel·les almenys 24 hores abans que acabi el mes, a Configuració › el teu nom › Subscripcions.",
+        "restore": "Restaura les compres",
+        "restored": "Compres restaurades",
+        "nothingToRestore": "No hi ha compres per restaurar",
+        "manageOnIphone": "El teu Premium es va comprar a l'iPhone: cancel·la'l a Configuració › el teu nom › Subscripcions."
     },
     "likes": {
         "title": "Els agrades",
