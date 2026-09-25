@@ -690,8 +690,11 @@ const LandingPage = () => {
             {
               title: t('landing.footer.legal'),
               links: [
-                { to: '/legal/privacy', label: t('landing.footer.privacy') },
-                { to: '/legal/terms', label: t('landing.footer.terms') },
+                { to: '/legal/privacidad', label: t('landing.footer.privacy') },
+                { to: '/legal/terminos', label: t('landing.footer.terms') },
+                { to: '/legal/cookies', label: t('landing.footer.cookies') },
+                { to: '/legal/aviso-legal', label: t('landing.footer.notice') },
+                { to: '/legal', label: t('landing.footer.allLegal') },
                 { href: `mailto:${COMPANY.email}`, label: t('landing.footer.contact') },
               ],
             },

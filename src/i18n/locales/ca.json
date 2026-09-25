@@ -2407,7 +2407,10 @@
             "terms": "Termes",
             "contact": "Contacte",
             "rights": "© {{year}} Fiestea. Tots els drets reservats.",
-            "made": "Fet a Palma de Mallorca"
+            "made": "Fet a Palma de Mallorca",
+            "cookies": "Galetes",
+            "notice": "Avís legal",
+            "allLegal": "Tots els textos legals"
         },
         "download": {
             "googlePlay": "Google Play",

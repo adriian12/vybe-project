@@ -46,6 +46,29 @@ serve(async (req: Request): Promise<Response> => {
 
     const profileId = await getProfileId(supabase, user.id);
 
+    // Premium mensual: se cancela ya en Stripe. Si no, al desaparecer la
+    // cuenta Stripe seguiría cobrando cada mes a alguien que ya no existe.
+    if (profileId) {
+      const secretKey = Deno.env.get('STRIPE_SECRET_KEY');
+      const { data: subs } = await supabase
+        .from('premium_subscriptions')
+        .select('stripe_subscription_id')
+        .eq('user_id', profileId)
+        .not('stripe_subscription_id', 'is', null);
+      for (const sub of subs ?? []) {
+        if (!secretKey) break;
+        const r = await fetch(`https://api.stripe.com/v1/subscriptions/${sub.stripe_subscription_id}`, {
+          method: 'DELETE',
+          headers: { Authorization: `Bearer ${secretKey}` },
+        });
+        // Ya cancelada o inexistente (404) no impide borrar la cuenta.
+        if (!r.ok && r.status !== 404) {
+          console.error('Stripe cancel on delete:', r.status, await r.text());
+          return json({ error: 'CANCEL_FAILED' }, 502);
+        }
+      }
+    }
+
     // Los mensajes no se borran en cascada al desaparecer la conexión, así que
     // los eliminamos explícitamente antes de tocar el perfil.
     if (profileId) {

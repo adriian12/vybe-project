@@ -2407,7 +2407,10 @@
             "terms": "AGB",
             "contact": "Kontakt",
             "rights": "© {{year}} Fiestea. Alle Rechte vorbehalten.",
-            "made": "Gemacht in Palma de Mallorca"
+            "made": "Gemacht in Palma de Mallorca",
+            "cookies": "Cookies",
+            "notice": "Impressum",
+            "allLegal": "Alle rechtlichen Hinweise"
         },
         "download": {
             "googlePlay": "Google Play",
