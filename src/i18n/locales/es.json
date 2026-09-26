@@ -237,7 +237,8 @@
         "sponsored": "Destacado",
         "byPlatform": "Evento creado por {{app}}",
         "noPartiesThatDay": "No hay fiestas para {{day}}: estas son las próximas.",
-        "nearDate": "Cerca de esa fecha"
+        "nearDate": "Cerca de esa fecha",
+        "fromPrice": "Desde {{price}}"
     },
     "eventAccess": {
         "verifyTitle": "Verificar proximidad",
@@ -1733,7 +1734,13 @@
             "colDate": "Fecha",
             "colStatus": "Estado",
             "tabList": "Eventos",
-            "edit": "Editar"
+            "edit": "Editar",
+            "sortBy": "Ordenar",
+            "sort": {
+                "nearest": "Más cercanos",
+                "newest": "Más recientes",
+                "oldest": "Más antiguos"
+            }
         },
         "reports": {
             "title": "Reportes de usuarios",
@@ -2114,22 +2121,7 @@
         "intentNote": "Al marcar «voy a ir», el negocio te verá en su Lista Fiestea (nombre, edad y foto).",
         "viewPoster": "Ver el cartel",
         "locationOff": "Sin ubicación",
-        "locationOffBody": "Activa la ubicación de la app en los ajustes del móvil para ver a qué distancia está.",
-        "liveNow": "En directo",
-        "endedShort": "Ya terminó",
-        "today": "Hoy",
-        "tomorrow": "Mañana",
-        "inDays_one": "En {{count}} día",
-        "inDays_other": "En {{count}} días",
-        "duration": "{{hours}} h de fiesta",
-        "fromYou": "A {{distance}} de ti",
-        "travel": {
-            "walk": "Unos {{minutes}} min andando · ver ruta",
-            "car": "Unos {{minutes}} min en coche · ver ruta"
-        },
-        "locating": "Buscando tu ubicación…",
-        "distanceUnknown": "¿A qué distancia está?",
-        "distanceHelp": "Toca para usar tu ubicación"
+        "locationOffBody": "Activa la ubicación de la app en los ajustes del móvil para ver a qué distancia está."
     },
     "venueTypes": {
         "discoteca": "Discoteca",

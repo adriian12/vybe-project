@@ -237,7 +237,8 @@
         "sponsored": "Featured",
         "byPlatform": "Event by {{app}}",
         "noPartiesThatDay": "No parties for {{day}}: here are the next ones.",
-        "nearDate": "Around that date"
+        "nearDate": "Around that date",
+        "fromPrice": "From {{price}}"
     },
     "eventAccess": {
         "verifyTitle": "Verify you're nearby",
@@ -1733,7 +1734,13 @@
             "colDate": "Date",
             "colStatus": "Status",
             "tabList": "Events",
-            "edit": "Edit"
+            "edit": "Edit",
+            "sortBy": "Sort",
+            "sort": {
+                "nearest": "Closest first",
+                "newest": "Newest first",
+                "oldest": "Oldest first"
+            }
         },
         "reports": {
             "title": "User reports",
@@ -2114,22 +2121,7 @@
         "intentNote": "When you mark \"I'm going\", the venue will see you on its Fiestea List (name, age and photo).",
         "viewPoster": "View poster",
         "locationOff": "No location",
-        "locationOffBody": "Turn on the app's location in your phone settings to see how far it is.",
-        "liveNow": "Live now",
-        "endedShort": "Already over",
-        "today": "Today",
-        "tomorrow": "Tomorrow",
-        "inDays_one": "In {{count}} day",
-        "inDays_other": "In {{count}} days",
-        "duration": "{{hours}} h of party",
-        "fromYou": "{{distance}} from you",
-        "travel": {
-            "walk": "About {{minutes}} min walking · see route",
-            "car": "About {{minutes}} min by car · see route"
-        },
-        "locating": "Finding your location…",
-        "distanceUnknown": "How far is it?",
-        "distanceHelp": "Tap to use your location"
+        "locationOffBody": "Turn on the app's location in your phone settings to see how far it is."
     },
     "venueTypes": {
         "discoteca": "Club",

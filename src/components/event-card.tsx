@@ -3,6 +3,7 @@ import { ArrowRight, Bookmark, BookmarkCheck, Clock, MapPin, Music, Ticket } fro
 import { formatDistance } from '@/services/geo';
 import { EventActivity, socialService } from '@/services/social';
 import { Event } from '@/types/venue';
+import { franjaDe } from '@/lib/party-filters';
 import { cn } from '@/lib/utils';
 import {
   AttendeeStack,
@@ -73,8 +74,17 @@ const EventCard: React.FC<EventCardProps> = ({
     event.venueName
   );
 
+  // «Desde»: casi siempre hay varios precios y el de la ficha es el más bajo.
+  // Las importadas (Funout) sin precio no son gratis: su precio no se sabe, y
+  // entonces no se enseña ninguno.
   const precio =
-    event.price !== undefined && event.price > 0 ? `${event.price} €` : t('eventAccess.free');
+    event.price !== undefined && event.price > 0
+      ? t('home.fromPrice', { price: `${event.price} €` })
+      : event.price === undefined && event.externalSource
+        ? null
+        : t('eventAccess.free');
+  // Tardeo, nocheo o after, según la hora a la que empieza.
+  const franja = franjaDe(event);
 
   const guardar = (
     <button
@@ -175,18 +185,21 @@ const EventCard: React.FC<EventCardProps> = ({
                 {event.city ? ` · ${event.city}` : ''}
               </p>
             </div>
-            <span className="shrink-0 rounded-xl bg-party-primary px-3 py-1.5 font-display text-base font-black text-ink shadow-sm">
-              {precio}
-            </span>
+            {precio && (
+              <span className="shrink-0 rounded-xl bg-party-primary px-3 py-1.5 font-display text-base font-black text-ink shadow-sm">
+                {precio}
+              </span>
+            )}
           </div>
         )}
 
         <div className={cn('flex flex-wrap items-center gap-1.5', featured ? 'mt-2.5' : 'mt-3')}>
-          {featured && (
+          {featured && precio && (
             <span className="rounded-full bg-party-primary px-2.5 py-1 text-[11px] font-black text-ink">
               {precio}
             </span>
           )}
+          {franja && <Tag>{t(`filters.franjas.${franja}`)}</Tag>}
           {event.theme && <Tag>{event.theme}</Tag>}
           {event.minAge !== undefined && <Tag>{event.minAge}+</Tag>}
           {!featured && event.dressCode && <Tag>{event.dressCode}</Tag>}

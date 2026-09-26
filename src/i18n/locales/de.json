@@ -237,7 +237,8 @@
         "sponsored": "Hervorgehoben",
         "byPlatform": "Event von {{app}}",
         "noPartiesThatDay": "Keine Partys für {{day}}: Hier sind die nächsten.",
-        "nearDate": "Rund um dieses Datum"
+        "nearDate": "Rund um dieses Datum",
+        "fromPrice": "Ab {{price}}"
     },
     "eventAccess": {
         "verifyTitle": "Nähe bestätigen",
@@ -1733,7 +1734,13 @@
             "colDate": "Datum",
             "colStatus": "Status",
             "tabList": "Events",
-            "edit": "Bearbeiten"
+            "edit": "Bearbeiten",
+            "sortBy": "Sortieren",
+            "sort": {
+                "nearest": "Nächste zuerst",
+                "newest": "Neueste zuerst",
+                "oldest": "Älteste zuerst"
+            }
         },
         "reports": {
             "title": "Nutzermeldungen",
@@ -2114,22 +2121,7 @@
         "intentNote": "Wenn du „Ich gehe hin“ markierst, sieht dich die Location auf ihrer Fiestea-Liste (Name, Alter und Foto).",
         "viewPoster": "Plakat ansehen",
         "locationOff": "Kein Standort",
-        "locationOffBody": "Aktiviere den Standort der App in den Handy-Einstellungen, um die Entfernung zu sehen.",
-        "liveNow": "Jetzt live",
-        "endedShort": "Schon vorbei",
-        "today": "Heute",
-        "tomorrow": "Morgen",
-        "inDays_one": "In {{count}} Tag",
-        "inDays_other": "In {{count}} Tagen",
-        "duration": "{{hours}} h Party",
-        "fromYou": "{{distance}} von dir",
-        "travel": {
-            "walk": "Etwa {{minutes}} Min. zu Fuß · Route",
-            "car": "Etwa {{minutes}} Min. mit dem Auto · Route"
-        },
-        "locating": "Standort wird gesucht…",
-        "distanceUnknown": "Wie weit ist es?",
-        "distanceHelp": "Tippen, um deinen Standort zu nutzen"
+        "locationOffBody": "Aktiviere den Standort der App in den Handy-Einstellungen, um die Entfernung zu sehen."
     },
     "venueTypes": {
         "discoteca": "Club",

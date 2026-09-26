@@ -237,7 +237,8 @@
         "sponsored": "Destacat",
         "byPlatform": "Esdeveniment creat per {{app}}",
         "noPartiesThatDay": "No hi ha festes per a {{day}}: aquestes són les properes.",
-        "nearDate": "A prop d'aquesta data"
+        "nearDate": "A prop d'aquesta data",
+        "fromPrice": "Des de {{price}}"
     },
     "eventAccess": {
         "verifyTitle": "Verificar proximitat",
@@ -1733,7 +1734,13 @@
             "colDate": "Data",
             "colStatus": "Estat",
             "tabList": "Esdeveniments",
-            "edit": "Editar"
+            "edit": "Editar",
+            "sortBy": "Ordenar",
+            "sort": {
+                "nearest": "Més propers",
+                "newest": "Més recents",
+                "oldest": "Més antics"
+            }
         },
         "reports": {
             "title": "Reports d'usuaris",
@@ -2114,22 +2121,7 @@
         "intentNote": "En marcar «hi vaig», el negoci et veurà a la seva Llista Fiestea (nom, edat i foto).",
         "viewPoster": "Veure el cartell",
         "locationOff": "Sense ubicació",
-        "locationOffBody": "Activa la ubicació de l'app als ajustos del mòbil per veure a quina distància és.",
-        "liveNow": "En directe",
-        "endedShort": "Ja ha acabat",
-        "today": "Avui",
-        "tomorrow": "Demà",
-        "inDays_one": "D'aquí a {{count}} dia",
-        "inDays_other": "D'aquí a {{count}} dies",
-        "duration": "{{hours}} h de festa",
-        "fromYou": "A {{distance}} de tu",
-        "travel": {
-            "walk": "Uns {{minutes}} min a peu · veure ruta",
-            "car": "Uns {{minutes}} min en cotxe · veure ruta"
-        },
-        "locating": "Cercant la teva ubicació…",
-        "distanceUnknown": "A quina distància és?",
-        "distanceHelp": "Toca per fer servir la teva ubicació"
+        "locationOffBody": "Activa la ubicació de l'app als ajustos del mòbil per veure a quina distància és."
     },
     "venueTypes": {
         "discoteca": "Discoteca",

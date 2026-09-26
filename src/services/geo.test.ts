@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { calculateDistance, formatDistance, getCurrentPosition, GeolocationError, travelEstimate } from './geo';
+import { calculateDistance, formatDistance, getCurrentPosition, GeolocationError } from './geo';
 
 describe('calculateDistance', () => {
   it('devuelve 0 para el mismo punto', () => {
@@ -39,13 +39,6 @@ describe('formatDistance', () => {
     expect(formatDistance(2540, 'es-ES')).toBe('2,5 km');
     expect(formatDistance(2540, 'en-GB')).toBe('2.5 km');
     expect(formatDistance(12400, 'es-ES')).toBe('12 km');
-  });
-});
-
-describe('travelEstimate', () => {
-  it('andando hasta 2,5 km y en coche más lejos', () => {
-    expect(travelEstimate(800)).toEqual({ mode: 'walk', minutes: 10 });
-    expect(travelEstimate(5000)).toEqual({ mode: 'car', minutes: 13 });
   });
 });
 

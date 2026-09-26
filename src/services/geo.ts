@@ -151,12 +151,3 @@ export const formatDistance = (meters: number, locale?: string): string => {
   });
   return `${km} km`;
 };
-
-/**
- * Cuánto se tarda, a ojo: andando (unos 4,8 km/h) hasta 2,5 km y, más lejos,
- * en coche por ciudad. Sólo orienta; la ruta exacta la da el mapa.
- */
-export const travelEstimate = (meters: number): { mode: 'walk' | 'car'; minutes: number } =>
-  meters <= 2500
-    ? { mode: 'walk', minutes: Math.max(1, Math.round(meters / 80)) }
-    : { mode: 'car', minutes: Math.max(1, Math.round(meters / 500) + 3) };

@@ -1451,7 +1451,7 @@ export const api = {
       .from('events')
       .select('*, venues(*)')
       .order('start_date', { ascending: false })
-      .limit(100);
+      .limit(500);
 
     if (error || !data) return [];
 

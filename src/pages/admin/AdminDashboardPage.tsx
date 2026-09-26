@@ -162,6 +162,8 @@ const AdminDashboardPage = () => {
   const [eventQuery, setEventQuery] = useState('');
   // Eventos: la lista de fiestas o los de Funout para añadir (migración 082).
   const [pestanaEventos, setPestanaEventos] = useState<'list' | 'funout'>('list');
+  // Orden de la lista: por defecto, lo más cercano a hoy primero.
+  const [ordenEventos, setOrdenEventos] = useState<'nearest' | 'newest' | 'oldest'>('nearest');
   const [editandoEvento, setEditandoEvento] = useState<Event | null>(null);
 
   const [suspendTarget, setSuspendTarget] = useState<Report | null>(null);
@@ -259,9 +261,20 @@ const AdminDashboardPage = () => {
 
   const eventosVisibles = useMemo(() => {
     const q = eventQuery.trim().toLocaleLowerCase();
-    if (!q) return events;
-    return events.filter((e) => `${e.name} ${e.venueName ?? ''}`.toLocaleLowerCase().includes(q));
-  }, [events, eventQuery]);
+    const lista = q
+      ? events.filter((e) => `${e.name} ${e.placeName ?? ''} ${e.venueName ?? ''}`.toLocaleLowerCase().includes(q))
+      : [...events];
+    const inicio = (e: Event) => new Date(e.startDate).getTime();
+    if (ordenEventos === 'newest') return lista.sort((a, b) => inicio(b) - inicio(a));
+    if (ordenEventos === 'oldest') return lista.sort((a, b) => inicio(a) - inicio(b));
+    // Más cercanos: las que siguen en marcha o están por venir, de la más
+    // próxima a la más lejana, y después las pasadas, de la última a la más
+    // antigua.
+    const ya = Date.now();
+    const vivas = lista.filter((e) => new Date(e.endDate).getTime() > ya).sort((a, b) => inicio(a) - inicio(b));
+    const pasadas = lista.filter((e) => new Date(e.endDate).getTime() <= ya).sort((a, b) => inicio(b) - inicio(a));
+    return [...vivas, ...pasadas];
+  }, [events, eventQuery, ordenEventos]);
 
   const salir = async () => {
     await logout();
@@ -1044,6 +1057,22 @@ const AdminDashboardPage = () => {
                   </button>
                 ))}
               </div>
+              {pestanaEventos === 'list' && (
+                <label className="mb-3 ml-3 inline-flex items-center gap-2 text-caption font-bold text-white/70">
+                  {t('admin.events.sortBy')}
+                  <select
+                    value={ordenEventos}
+                    onChange={(e) => setOrdenEventos(e.target.value as typeof ordenEventos)}
+                    className="h-9 rounded-lg border border-white/15 bg-white/10 px-2 text-caption font-bold text-white"
+                  >
+                    {(['nearest', 'newest', 'oldest'] as const).map((o) => (
+                      <option key={o} value={o} className="text-ink">
+                        {t(`admin.events.sort.${o}`)}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              )}
               {pestanaEventos === 'funout' ? (
                 <AdminFunout onImported={() => void loadAll(true)} />
               ) : eventosVisibles.length === 0 ? (

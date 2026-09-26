@@ -7,11 +7,8 @@ import {
   Bookmark,
   BookmarkCheck,
   CalendarDays,
-  Car,
   CheckCircle2,
-  ChevronRight,
   Clock,
-  Footprints,
   Loader2,
   Martini,
   Navigation,
@@ -38,7 +35,8 @@ import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { useAppContext } from '@/context/app-context';
 import { isEventLive, useEventsFeed } from '@/hooks/use-events-feed';
 import { api } from '@/services/api';
-import { calculateDistance, Coordinates, formatDistance, getCurrentPosition, travelEstimate } from '@/services/geo';
+import { calculateDistance, Coordinates, formatDistance, getCurrentPosition } from '@/services/geo';
+import { franjaDe } from '@/lib/party-filters';
 import { openExternal } from '@/services/native';
 import { EMPTY_ACTIVITY, socialService } from '@/services/social';
 import { publicLink, shareOrCopy } from '@/lib/share';
@@ -47,44 +45,32 @@ import { cn } from '@/lib/utils';
 import { Event } from '@/types/venue';
 
 /**
- * Una fila de «cuándo y dónde»: icono, el dato en grande y un matiz debajo
- * («Mañana», «7 h de fiesta», «12 min andando»). Con `onClick`, toda la fila
- * es el botón.
+ * Una de las tres losetas blancas: icono en círculo oscuro, dato y etiqueta.
+ * Con `onClick` (la distancia) toda la loseta es el botón.
  */
-const Dato: React.FC<{
-  icon: typeof Clock;
-  title: string;
-  detail?: string;
-  onClick?: () => void;
-}> = ({ icon: Icon, title, detail, onClick }) => {
+const Loseta: React.FC<{ icon: typeof Clock; value: string; label: string; onClick?: () => void }> = ({
+  icon: Icon,
+  value,
+  label,
+  onClick,
+}) => {
   const contenido = (
     <>
-      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-party-primary/15 text-party-primary">
-        <Icon size={18} />
+      <span className="mb-1 flex h-8 w-8 items-center justify-center rounded-full bg-surface-low text-white">
+        <Icon size={17} />
       </span>
-      <span className="min-w-0 flex-1">
-        <span className="block truncate font-display text-title-card text-white first-letter:uppercase">{title}</span>
-        {detail && <span className="block truncate text-caption text-party-gray">{detail}</span>}
-      </span>
-      {onClick && <ChevronRight size={18} className="shrink-0 text-party-gray" />}
+      <span className="font-display text-title-card leading-tight text-ink">{value}</span>
+      <span className="text-caption uppercase text-ink/60">{label}</span>
     </>
   );
+  const clase = 'flex flex-col items-center justify-center rounded-xl bg-white p-3 text-center';
   return onClick ? (
-    <button type="button" onClick={onClick} className="press flex w-full items-center gap-3 px-4 py-3 text-left">
+    <button type="button" onClick={onClick} className={`press ${clase}`}>
       {contenido}
     </button>
   ) : (
-    <div className="flex items-center gap-3 px-4 py-3">{contenido}</div>
+    <div className={clase}>{contenido}</div>
   );
-};
-
-/** Días de calendario entre hoy y la fecha (0 = hoy). */
-const diasHasta = (iso: string) => {
-  const hoy = new Date();
-  hoy.setHours(0, 0, 0, 0);
-  const dia = new Date(iso);
-  dia.setHours(0, 0, 0, 0);
-  return Math.round((dia.getTime() - hoy.getTime()) / 86_400_000);
 };
 
 /** Píldora oscura del detalle: edad, género, vestimenta. */
@@ -175,7 +161,6 @@ const EventDetailPage = () => {
     posicion && event.location
       ? calculateDistance(posicion.latitude, posicion.longitude, event.location.latitude, event.location.longitude)
       : (withDistance.find((e) => e.event.id === event.id)?.distance ?? null);
-  const trayecto = distancia !== null ? travelEstimate(distancia) : null;
   const cifras = activity[event.id] ?? EMPTY_ACTIVITY;
 
   const fecha = new Date(event.startDate)
@@ -203,22 +188,7 @@ const EventDetailPage = () => {
     }
   };
 
-  const fechaLarga = new Date(event.startDate).toLocaleDateString(i18n.language, {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-  });
-  const dias = diasHasta(event.startDate);
-  const cuando = live
-    ? t('eventDetail.liveNow')
-    : terminado
-      ? t('eventDetail.endedShort')
-      : dias <= 0
-        ? t('eventDetail.today')
-        : dias === 1
-          ? t('eventDetail.tomorrow')
-          : t('eventDetail.inDays', { count: dias });
-  const horas = Math.round(((new Date(event.endDate).getTime() - new Date(event.startDate).getTime()) / 3_600_000) * 2) / 2;
+  const franja = franjaDe(event);
 
   const verRuta = () => {
     if (!event.location) return;
@@ -303,31 +273,33 @@ const EventDetailPage = () => {
         </div>
 
         <div className="space-y-4 px-margin">
-          {/* --------------------------------------------- cuándo y dónde */}
-          <section className="divide-y divide-white/[0.06] overflow-hidden rounded-2xl bg-surface-low">
-            <Dato icon={CalendarDays} title={fechaLarga} detail={cuando} />
-            <Dato
+          {/* ---------------------------------------------------- losetas */}
+          <div className="grid grid-cols-3 gap-2">
+            <Loseta icon={CalendarDays} value={fecha} label={t('eventDetail.date')} />
+            <Loseta
               icon={Clock}
-              title={formatHourRange(event.startDate, event.endDate)}
-              detail={horas > 0 && horas <= 24 ? t('eventDetail.duration', { hours: horas.toLocaleString(i18n.language) }) : undefined}
+              value={formatHourRange(event.startDate, event.endDate)}
+              label={t('eventAccess.schedule')}
             />
-            {event.location &&
-              (distancia !== null && trayecto ? (
-                <Dato
-                  icon={trayecto.mode === 'walk' ? Footprints : Car}
-                  title={t('eventDetail.fromYou', { distance: formatDistance(distancia, i18n.language) })}
-                  detail={t(`eventDetail.travel.${trayecto.mode}`, { minutes: trayecto.minutes })}
-                  onClick={verRuta}
-                />
-              ) : (
-                <Dato
-                  icon={Navigation}
-                  title={pidiendoUbicacion ? t('eventDetail.locating') : t('eventDetail.distanceUnknown')}
-                  detail={t('eventDetail.distanceHelp')}
-                  onClick={pidiendoUbicacion ? undefined : () => void pedirUbicacion()}
-                />
-              ))}
-          </section>
+            {/* Con la ubicación, la distancia real y al tocarla la ruta; sin
+                ella, al tocarla se pide. */}
+            <Loseta
+              icon={Navigation}
+              value={
+                distancia !== null ? formatDistance(distancia, i18n.language) : pidiendoUbicacion ? '…' : '—'
+              }
+              label={t('eventDetail.distance')}
+              onClick={
+                !event.location
+                  ? undefined
+                  : distancia !== null
+                    ? verRuta
+                    : pidiendoUbicacion
+                      ? undefined
+                      : () => void pedirUbicacion()
+              }
+            />
+          </div>
 
           {/* ------------------------------------------------ ahora mismo */}
           {/* El ambiente lo da el local desde la puerta; la cifra no se enseña
@@ -356,9 +328,15 @@ const EventDetailPage = () => {
 
           {/* ---------------------------------------------------- píldoras */}
           <div className="no-scrollbar -mx-margin flex items-center gap-1 overflow-x-auto px-margin py-0.5">
-            <span className="shrink-0 rounded-full bg-party-primary px-3 py-1.5 font-display text-title-card text-ink">
-              {event.price !== undefined && event.price > 0 ? `${event.price} €` : t('eventAccess.free')}
-            </span>
+            {/* Las importadas sin precio no son gratis: su precio no se sabe. */}
+            {!(event.price === undefined && event.externalSource) && (
+              <span className="shrink-0 rounded-full bg-party-primary px-3 py-1.5 font-display text-title-card text-ink">
+                {event.price !== undefined && event.price > 0
+                  ? t('home.fromPrice', { price: `${event.price} €` })
+                  : t('eventAccess.free')}
+              </span>
+            )}
+            {franja && <Etiqueta>{t(`filters.franjas.${franja}`)}</Etiqueta>}
             {event.minAge !== undefined && <Etiqueta>{event.minAge}+</Etiqueta>}
             {event.theme && <Etiqueta>{event.theme}</Etiqueta>}
             {event.dressCode && <Etiqueta>{event.dressCode}</Etiqueta>}
