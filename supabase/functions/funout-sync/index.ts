@@ -11,20 +11,20 @@ import { adminClient, getUser } from '../_shared/supabase.ts';
  * se copian. La clave es el id de Funout: nada se duplica. Después pone al día
  * las fiestas ya añadidas a Fiestea (`funout_refresh_imported`).
  *
- * La llaman pg_cron cada hora (`x-cron-secret` = `CRON_SECRET`) y el panel de
- * administración (sesión de un admin). Sin JWT en la pasarela: la protección
- * va dentro.
+ * La llaman pg_cron cada noche a las 23:00 de Madrid (`x-cron-secret` =
+ * `CRON_SECRET`, migración 087) y el panel de administración con «Actualizar»
+ * (sesión de un admin). Sin JWT en la pasarela: la protección va dentro.
  *
- * El CDN de Funout bloquea las IP de servidores (403), pero su API admite CORS
- * desde `app.fiestea.es`: el panel la lee desde el navegador y manda aquí la
- * lista (`events`). El cron sólo funcionará cuando Funout deje pasar a
- * Supabase; hasta entonces devuelve `FUNOUT_UNAVAILABLE` sin tocar nada.
+ * El cortafuegos de Funout rechaza un agente de navegador que llega desde un
+ * servidor (403), así que aquí se pide con un agente propio de Fiestea. El
+ * panel, además, la lee desde el navegador (su API admite CORS) y manda aquí
+ * la lista (`events`).
  */
 
 const FUNOUT_URL = 'https://funout.es/wp-json/mallorca-events/v1/events?per_page=500';
-// Su cortafuegos rechaza los agentes genéricos.
-const NAVEGADOR =
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0 Safari/537.36';
+// Su cortafuegos rechaza un navegador falso que llega desde un servidor; un
+// agente que dice quién es pasa.
+const NAVEGADOR = 'Fiestea/1.0 (+https://fiestea.es)';
 // Buscador de mapas sobre OpenStreetMap que no bloquea a Supabase (Nominatim sí).
 const PHOTON = 'https://photon.komoot.io/api/';
 
@@ -211,7 +211,6 @@ serve(async (req: Request): Promise<Response> => {
       headers: {
         Accept: 'application/json, text/plain, */*',
         'Accept-Language': 'es-ES,es;q=0.9,en;q=0.8',
-        Referer: 'https://funout.es/',
         'User-Agent': NAVEGADOR,
       },
     });

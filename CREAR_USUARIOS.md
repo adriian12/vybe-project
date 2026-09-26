@@ -146,53 +146,53 @@ noche. 28 mujeres y 22 hombres de 18 a 44 años, con preferencias mezcladas.
 | Nerea Garau | Mujer | 18 | `nerea.garau` | BCM Foam Party |
 | Paula Ferrer | Mujer | 19 | `paula.ferrer` | BCM Foam Party |
 | Maria Sastre | Mujer | 20 | `maria.sastre` | Tokio Joe's Student Night |
-| Noa Pons | Mujer | 21 | `noa.pons` | Vybe Test Night |
+| Noa Pons | Mujer | 21 | `noa.pons` | Fiestea Test Night |
 | Mia Schneider | Mujer | 22 | `mia.schneider` | Bierkönig Live Session |
-| Sara Moyà | Mujer | 22 | `sara.moya` | Vybe Test Night |
+| Sara Moyà | Mujer | 22 | `sara.moya` | Fiestea Test Night |
 | Hannah Müller | Mujer | 23 | `hannah.muller` | Bierkönig Live Session |
-| Aina Vidal | Mujer | 23 | `aina.vidal` | Vybe Test Night |
-| Emma Johansson | Mujer | 24 | `emma.johansson` | Vybe Test Night |
+| Aina Vidal | Mujer | 23 | `aina.vidal` | Fiestea Test Night |
+| Emma Johansson | Mujer | 24 | `emma.johansson` | Fiestea Test Night |
 | Clara Riera | Mujer | 24 | `clara.riera` | Physical Tuesday Madness |
-| Julia Roig | Mujer | 25 | `julia.roig` | Vybe Test Night |
-| Daniela Ruiz | Mujer | 25 | `daniela.ruiz` | Vybe Test Night |
-| Laia Fornés | Mujer | 26 | `laia.fornes` | Vybe Test Night |
-| Alba Crespí | Mujer | 26 | `alba.crespi` | Vybe Test Night |
-| Lena Fischer | Mujer | 26 | `lena.fischer` | Vybe Test Night |
-| Carla Serra | Mujer | 27 | `carla.serra` | Vybe Test Night |
-| Olivia Brown | Mujer | 27 | `olivia.brown` | Vybe Test Night |
-| Zoe Williams | Mujer | 28 | `zoe.williams` | Vybe Test Night |
-| Laura Mas | Mujer | 28 | `laura.mas` | Vybe Test Night |
-| Valentina Rossi | Mujer | 29 | `valentina.rossi` | Vybe Test Night |
+| Julia Roig | Mujer | 25 | `julia.roig` | Fiestea Test Night |
+| Daniela Ruiz | Mujer | 25 | `daniela.ruiz` | Fiestea Test Night |
+| Laia Fornés | Mujer | 26 | `laia.fornes` | Fiestea Test Night |
+| Alba Crespí | Mujer | 26 | `alba.crespi` | Fiestea Test Night |
+| Lena Fischer | Mujer | 26 | `lena.fischer` | Fiestea Test Night |
+| Carla Serra | Mujer | 27 | `carla.serra` | Fiestea Test Night |
+| Olivia Brown | Mujer | 27 | `olivia.brown` | Fiestea Test Night |
+| Zoe Williams | Mujer | 28 | `zoe.williams` | Fiestea Test Night |
+| Laura Mas | Mujer | 28 | `laura.mas` | Fiestea Test Night |
+| Valentina Rossi | Mujer | 29 | `valentina.rossi` | Fiestea Test Night |
 | Camila Torres | Mujer | 29 | `camila.torres` | Tito's Tuesday · Urban & Reggaeton |
-| Chloé Martin | Mujer | 30 | `chloe.martin` | Vybe Test Night |
-| Sofía Castro | Mujer | 31 | `sofia.castro` | Vybe Test Night |
+| Chloé Martin | Mujer | 30 | `chloe.martin` | Fiestea Test Night |
+| Sofía Castro | Mujer | 31 | `sofia.castro` | Fiestea Test Night |
 | Marta Oliver | Mujer | 32 | `marta.oliver` | Tito's Tuesday · Urban & Reggaeton |
-| Inés Morey | Mujer | 33 | `ines.morey` | Vybe Test Night |
-| Irene Bauzà | Mujer | 34 | `irene.bauza` | Vybe Test Night |
-| Elena Bonet | Mujer | 37 | `elena.bonet` | Vybe Test Night |
-| Andrea Alemany | Mujer | 41 | `andrea.alemany` | Vybe Test Night |
+| Inés Morey | Mujer | 33 | `ines.morey` | Fiestea Test Night |
+| Irene Bauzà | Mujer | 34 | `irene.bauza` | Fiestea Test Night |
+| Elena Bonet | Mujer | 37 | `elena.bonet` | Fiestea Test Night |
+| Andrea Alemany | Mujer | 41 | `andrea.alemany` | Fiestea Test Night |
 | Iván Torrens | Hombre | 21 | `ivan.torrens` | BCM Foam Party |
 | Marc Coll | Hombre | 22 | `marc.coll` | Tokio Joe's Student Night |
-| Hugo Llompart | Hombre | 23 | `hugo.llompart` | Vybe Test Night |
-| Joan Salvà | Hombre | 24 | `joan.salva` | Vybe Test Night |
-| Matteo Conti | Hombre | 24 | `matteo.conti` | Vybe Test Night |
-| Álex Martorell | Hombre | 25 | `alex.martorell` | Vybe Test Night |
-| Oliver Smith | Hombre | 25 | `oliver.smith` | Vybe Test Night |
+| Hugo Llompart | Hombre | 23 | `hugo.llompart` | Fiestea Test Night |
+| Joan Salvà | Hombre | 24 | `joan.salva` | Fiestea Test Night |
+| Matteo Conti | Hombre | 24 | `matteo.conti` | Fiestea Test Night |
+| Álex Martorell | Hombre | 25 | `alex.martorell` | Fiestea Test Night |
+| Oliver Smith | Hombre | 25 | `oliver.smith` | Fiestea Test Night |
 | Jonas Weber | Hombre | 26 | `jonas.weber` | Bierkönig Live Session |
-| Guillem Pascual | Hombre | 27 | `guillem.pascual` | Vybe Test Night |
+| Guillem Pascual | Hombre | 27 | `guillem.pascual` | Fiestea Test Night |
 | Luca Bianchi | Hombre | 27 | `luca.bianchi` | Tito's Tuesday · Urban & Reggaeton |
-| Rubén Oliver | Hombre | 28 | `ruben.oliver` | Vybe Test Night |
-| Pau Llull | Hombre | 29 | `pau.llull` | Vybe Test Night |
-| Jaume Riutort | Hombre | 29 | `jaume.riutort` | Vybe Test Night |
-| Kwame Mensah | Hombre | 30 | `kwame.mensah` | Vybe Test Night |
+| Rubén Oliver | Hombre | 28 | `ruben.oliver` | Fiestea Test Night |
+| Pau Llull | Hombre | 29 | `pau.llull` | Fiestea Test Night |
+| Jaume Riutort | Hombre | 29 | `jaume.riutort` | Fiestea Test Night |
+| Kwame Mensah | Hombre | 30 | `kwame.mensah` | Fiestea Test Night |
 | Víctor Cerdà | Hombre | 30 | `victor.cerda` | BCM Foam Party |
-| Biel Rosselló | Hombre | 31 | `biel.rossello` | Vybe Test Night |
-| Nicolás Vega | Hombre | 32 | `nicolas.vega` | Vybe Test Night |
+| Biel Rosselló | Hombre | 31 | `biel.rossello` | Fiestea Test Night |
+| Nicolás Vega | Hombre | 32 | `nicolas.vega` | Fiestea Test Night |
 | Tomás Arbona | Hombre | 33 | `tomas.arbona` | Tito's Tuesday · Urban & Reggaeton |
-| Toni Amengual | Hombre | 34 | `toni.amengual` | Vybe Test Night |
+| Toni Amengual | Hombre | 34 | `toni.amengual` | Fiestea Test Night |
 | Samuel Duarte | Hombre | 35 | `samuel.duarte` | Physical Tuesday Madness |
-| David Nicolau | Hombre | 38 | `david.nicolau` | Vybe Test Night |
-| Carlos Mendoza | Hombre | 44 | `carlos.mendoza` | Vybe Test Night |
+| David Nicolau | Hombre | 38 | `david.nicolau` | Fiestea Test Night |
+| Carlos Mendoza | Hombre | 44 | `carlos.mendoza` | Fiestea Test Night |
 
 Los locales también tienen cuenta (`titos@seed.vybe.test`,
 `bcm@seed.vybe.test`, `tokio@seed.vybe.test`, `megapark@`, `bierkonig@`,
@@ -214,7 +214,7 @@ y código de acceso:
 | `511203` | Tokio Joe's Student Night | Tokio Joe's (Calvià) | 16/09 05:00 |
 | `511204` | Bierkönig Live Session | Bierkönig (Palma) | 16/09 03:00 |
 | `511205` | Physical Tuesday Madness | Physical Cala Ratjada (Capdepera) | 16/09 06:00 |
-| `LAB777` | Vybe Test Night | Vybe · Sala de pruebas | Siempre en marcha |
+| `LAB777` | Fiestea Test Night | Vybe · Sala de pruebas | Siempre en marcha |
 
 Estas fechas son absolutas, no relativas a `NOW()`: pasada esa noche, los cinco
 primeros códigos caducan y las demás fiestas siguen apareciendo como próximas.
@@ -234,7 +234,7 @@ probar geocerca, código, tablón, likes y matches sin salir de casa.
    que los matches salgan al primer swipe.
 3. Marca **Borrar mis swipes de esa fiesta** si quieres volver a ver a todo el
    mundo después de haberlos pasado.
-4. En **Inicio** aparece «Vybe Test Night» a tu lado: entra con `LAB777`.
+4. En **Inicio** aparece «Fiestea Test Night» a tu lado: entra con `LAB777`.
 
 Sin la app, lo mismo se hace desde el SQL Editor. Ahí no hay sesión, así que
 primero hay que decir en nombre de qué cuenta de administración se llama (es
