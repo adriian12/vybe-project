@@ -74,9 +74,18 @@ const AdminFunout = ({ onImported }: { onImported?: () => void }) => {
       setMarcados(new Set());
       await cargar();
       onImported?.();
-      toast({ title: t('admin.funout.imported', { count: n, app: t('common.appName') }) });
-    } catch {
-      toast({ title: t('common.error'), variant: 'destructive' });
+      toast({
+        title: t('admin.funout.imported', { count: n, app: t('common.appName') }),
+        description: t('admin.funout.importedBody'),
+      });
+    } catch (error) {
+      // El motivo, legible: sin esto sólo salía «Error».
+      const motivo = error instanceof Error ? error.message : '';
+      toast({
+        title: t('admin.funout.importError'),
+        description: motivo ? t(`admin.funout.errors.${motivo}`, { defaultValue: motivo }) : undefined,
+        variant: 'destructive',
+      });
     } finally {
       setImportando(false);
     }

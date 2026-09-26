@@ -1990,7 +1990,14 @@
             "noLocation": "Sense ubicació",
             "imported_one": "{{count}} festa afegida a {{app}}",
             "imported_other": "{{count}} festes afegides a {{app}}",
-            "note": "Només es fan servir les dades: nom, sala, dia i hora, adreça, estil, dress code, cartell i enllaç d'entrades. Les ja afegides s'actualitzen soles a cada actualització."
+            "note": "Només es fan servir les dades: nom, sala, dia i hora, adreça, estil, dress code, cartell i enllaç d'entrades. Les ja afegides s'actualitzen soles a cada actualització.",
+            "importedBody": "Ja surten a l'inici de l'app, el seu dia.",
+            "importError": "No s'han pogut afegir",
+            "errors": {
+                "NOT_AUTHORIZED": "El teu compte no té permisos d'administració.",
+                "PLAN_EVENT_LIMIT": "El local ha arribat al límit de festes del seu pla.",
+                "HOUSE_OWNER_MISSING": "Falta el compte de sistema del local de la casa."
+            }
         }
     },
     "pwa": {

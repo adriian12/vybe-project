@@ -1990,7 +1990,14 @@
             "noLocation": "Kein Standort",
             "imported_one": "{{count}} Party zu {{app}} hinzugefügt",
             "imported_other": "{{count}} Partys zu {{app}} hinzugefügt",
-            "note": "Es werden nur die Daten genutzt: Name, Club, Datum und Uhrzeit, Adresse, Stil, Dresscode, Plakat und Ticket-Link. Hinzugefügte werden bei jeder Aktualisierung selbst angepasst."
+            "note": "Es werden nur die Daten genutzt: Name, Club, Datum und Uhrzeit, Adresse, Stil, Dresscode, Plakat und Ticket-Link. Hinzugefügte werden bei jeder Aktualisierung selbst angepasst.",
+            "importedBody": "Sie erscheinen schon auf der Startseite der App, an ihrem Tag.",
+            "importError": "Konnten nicht hinzugefügt werden",
+            "errors": {
+                "NOT_AUTHORIZED": "Dein Konto hat keine Admin-Rechte.",
+                "PLAN_EVENT_LIMIT": "Der Betrieb hat das Party-Limit seines Plans erreicht.",
+                "HOUSE_OWNER_MISSING": "Das Systemkonto des Hauses fehlt."
+            }
         }
     },
     "pwa": {

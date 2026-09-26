@@ -1990,7 +1990,14 @@
             "noLocation": "No location",
             "imported_one": "{{count}} party added to {{app}}",
             "imported_other": "{{count}} parties added to {{app}}",
-            "note": "Only the data is used: name, venue, date and time, address, style, dress code, poster and tickets link. Added ones update themselves on every refresh."
+            "note": "Only the data is used: name, venue, date and time, address, style, dress code, poster and tickets link. Added ones update themselves on every refresh.",
+            "importedBody": "They already show on the app home, on their day.",
+            "importError": "Couldn't add them",
+            "errors": {
+                "NOT_AUTHORIZED": "Your account doesn't have admin permissions.",
+                "PLAN_EVENT_LIMIT": "The venue has reached its plan's party limit.",
+                "HOUSE_OWNER_MISSING": "The house venue's system account is missing."
+            }
         }
     },
     "pwa": {

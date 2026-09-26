@@ -1990,7 +1990,14 @@
             "noLocation": "Sin ubicación",
             "imported_one": "{{count}} fiesta añadida a {{app}}",
             "imported_other": "{{count}} fiestas añadidas a {{app}}",
-            "note": "Sólo se usan los datos: nombre, sala, día y hora, dirección, estilo, dress code, cartel y enlace de entradas. Las ya añadidas se ponen al día solas en cada actualización."
+            "note": "Sólo se usan los datos: nombre, sala, día y hora, dirección, estilo, dress code, cartel y enlace de entradas. Las ya añadidas se ponen al día solas en cada actualización.",
+            "importedBody": "Ya salen en el inicio de la app, en su día.",
+            "importError": "No se han podido añadir",
+            "errors": {
+                "NOT_AUTHORIZED": "Tu cuenta no tiene permisos de administración.",
+                "PLAN_EVENT_LIMIT": "El local ha llegado al límite de fiestas de su plan.",
+                "HOUSE_OWNER_MISSING": "Falta la cuenta de sistema del local de la casa."
+            }
         }
     },
     "pwa": {
