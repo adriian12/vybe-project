@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { calculateDistance, formatDistance, getCurrentPosition, GeolocationError } from './geo';
+import { calculateDistance, formatDistance, getCurrentPosition, GeolocationError, travelEstimate } from './geo';
 
 describe('calculateDistance', () => {
   it('devuelve 0 para el mismo punto', () => {
@@ -29,14 +29,23 @@ describe('calculateDistance', () => {
 
 describe('formatDistance', () => {
   it('usa metros por debajo de 1 km', () => {
-    expect(formatDistance(0)).toBe('0m');
-    expect(formatDistance(45.6)).toBe('46m');
-    expect(formatDistance(999)).toBe('999m');
+    expect(formatDistance(0, 'es-ES')).toBe('0 m');
+    expect(formatDistance(45.6, 'es-ES')).toBe('46 m');
+    expect(formatDistance(999, 'es-ES')).toBe('999 m');
   });
 
-  it('cambia a kilómetros a partir de 1000 m', () => {
-    expect(formatDistance(1000)).toBe('1.0km');
-    expect(formatDistance(2540)).toBe('2.5km');
+  it('cambia a kilómetros a partir de 1000 m, con la coma del idioma', () => {
+    expect(formatDistance(1000, 'es-ES')).toBe('1,0 km');
+    expect(formatDistance(2540, 'es-ES')).toBe('2,5 km');
+    expect(formatDistance(2540, 'en-GB')).toBe('2.5 km');
+    expect(formatDistance(12400, 'es-ES')).toBe('12 km');
+  });
+});
+
+describe('travelEstimate', () => {
+  it('andando hasta 2,5 km y en coche más lejos', () => {
+    expect(travelEstimate(800)).toEqual({ mode: 'walk', minutes: 10 });
+    expect(travelEstimate(5000)).toEqual({ mode: 'car', minutes: 13 });
   });
 });
 

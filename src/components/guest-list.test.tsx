@@ -51,14 +51,11 @@ describe('apuntarse a la lista', () => {
     info = { enabled: true, message: 'Lista gratis antes de las 19:00', mine: null };
   });
 
-  it('pregunta al marcar «voy a ir» y apunta con acompañantes', async () => {
-    const { rerender } = render(<GuestListJoin eventId="e1" ask={0} defaultName="Adrián" />);
-    await screen.findByText('guestList.available');
+  it('enseña la lista en la ficha y apunta con acompañantes', async () => {
+    render(<GuestListJoin eventId="e1" ask={0} defaultName="Adrián" />);
+    await screen.findByText('guestList.brandTitle');
+    expect(screen.getByText('Lista gratis antes de las 19:00')).toBeTruthy();
 
-    rerender(<GuestListJoin eventId="e1" ask={1} defaultName="Adrián" />);
-    fireEvent.click(await screen.findByRole('button', { name: 'guestList.yes' }));
-
-    expect((await screen.findAllByText('Lista gratis antes de las 19:00')).length).toBeGreaterThan(1);
     fireEvent.click(screen.getByRole('button', { name: '+1' }));
     fireEvent.click(screen.getByRole('button', { name: '+1' }));
     fireEvent.click(screen.getByRole('button', { name: 'guestList.join' }));

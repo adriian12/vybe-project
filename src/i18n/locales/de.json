@@ -1666,6 +1666,27 @@
                 "email": "Die Kontakt-E-Mail ist ungültig.",
                 "phone": "Die Telefonnummer ist ungültig."
             }
+        },
+        "liveSettings": {
+            "title": "Party-Einstellungen",
+            "hint": "Was du erlaubst und was das Publikum auf dieser Party sieht. Wird beim Tippen gespeichert.",
+            "swipe": {
+                "title": "Leute kennenlernen (Swipe)",
+                "body": "Wer drinnen ist, sieht das Board, swipt und hat Crushes. Aus: niemand sieht es."
+            },
+            "headcount": {
+                "title": "Live-Zählung",
+                "body": "Die Seite zeigt, wie viele gerade drinnen sind: die Zahl der Tür oder, falls du nicht zählst, wer mit der App kam."
+            },
+            "genderSplit": {
+                "title": "% Männer und Frauen",
+                "body": "Die Seite zeigt die Verteilung live, gerundet und erst ab 10 Personen."
+            },
+            "guestList": {
+                "title": "Fiestea-Liste",
+                "body": "Die Seite zeigt über den Tickets ein Formular zum Eintragen mit Name und Begleitung.",
+                "messagePlaceholder": "Nachricht (z. B. Gratis vor 00:30)"
+            }
         }
     },
     "admin": {
@@ -2055,7 +2076,25 @@
         "ended": "Dieses Event ist vorbei",
         "enterNow": "Jetzt rein",
         "confirmed": "Du bist dabei!",
-        "intentNote": "Wenn du „Ich gehe hin“ markierst, sieht dich die Location auf ihrer Fiestea-Liste (Name, Alter und Foto)."
+        "intentNote": "Wenn du „Ich gehe hin“ markierst, sieht dich die Location auf ihrer Fiestea-Liste (Name, Alter und Foto).",
+        "viewPoster": "Plakat ansehen",
+        "locationOff": "Kein Standort",
+        "locationOffBody": "Aktiviere den Standort der App in den Handy-Einstellungen, um die Entfernung zu sehen.",
+        "liveNow": "Jetzt live",
+        "endedShort": "Schon vorbei",
+        "today": "Heute",
+        "tomorrow": "Morgen",
+        "inDays_one": "In {{count}} Tag",
+        "inDays_other": "In {{count}} Tagen",
+        "duration": "{{hours}} h Party",
+        "fromYou": "{{distance}} von dir",
+        "travel": {
+            "walk": "Etwa {{minutes}} Min. zu Fuß · Route",
+            "car": "Etwa {{minutes}} Min. mit dem Auto · Route"
+        },
+        "locating": "Standort wird gesucht…",
+        "distanceUnknown": "Wie weit ist es?",
+        "distanceHelp": "Tippen, um deinen Standort zu nutzen"
     },
     "venueTypes": {
         "discoteca": "Club",
@@ -2697,7 +2736,11 @@
             "long": "Lange Schlange"
         },
         "nowPlaying": "Läuft: {{song}}",
-        "mix": "{{women}} % Frauen · {{men}} % Männer (mit Fiestea)"
+        "mix": "{{women}} % Frauen · {{men}} % Männer (mit Fiestea)",
+        "headcount_one": "Person gerade drinnen",
+        "headcount_other": "Personen gerade drinnen",
+        "women": "{{pct}} % Frauen",
+        "men": "{{pct}} % Männer"
     },
     "whereNext": {
         "title": "Die Party geht zu Ende",
@@ -2805,6 +2848,10 @@
         "switched": {
             "vyber": "Du bist jetzt im Fiester-Modus",
             "guest": "Du bist jetzt im Gast-Modus"
+        },
+        "swipeOff": {
+            "title": "Heute ohne Board",
+            "body": "Der Betrieb hat Leute kennenlernen auf dieser Party nicht aktiviert. Angebote, Verlosungen und Hinweise hast du trotzdem."
         }
     },
     "accountKind": {
@@ -3137,7 +3184,8 @@
             "ofLeft_other": "von {{count}}",
             "admitN_one": "{{count}} einlassen",
             "admitN_other": "{{count}} einlassen"
-        }
+        },
+        "brandTitle": "{{app}}-Liste"
     },
     "team": {
         "share": {

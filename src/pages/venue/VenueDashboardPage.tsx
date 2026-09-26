@@ -45,6 +45,7 @@ import EventPicker from '@/components/venue/event-picker';
 import VenueWeeklyReport from '@/components/venue/venue-weekly-report';
 import VenueProfileForm from '@/components/venue/venue-profile-form';
 import VenueBusinessProfile from '@/components/venue/venue-business-profile';
+import EventLiveSettings from '@/components/venue/event-live-settings';
 import { nightService } from '@/services/night';
 import { BOOST_PRICE, planHas } from '@/lib/venue-plans';
 import VenueSosAlerts, { VenueSosStrip } from '@/components/venue/venue-sos-alerts';
@@ -766,6 +767,9 @@ const VenueDashboardPage = () => {
         {/* --------------------------------------------------------- puerta */}
         {section === 'door' && puede('door') && <VenueSosAlerts sos={sos} />}
         {section === 'door' && picker}
+        {section === 'door' && esPropietario && workingEventId && (
+          <EventLiveSettings key={`ajustes-${workingEventId}`} eventId={workingEventId} className="mb-4" />
+        )}
         {section === 'door' &&
           (workingEventId ? (
             <VenueDoor
@@ -844,12 +848,6 @@ const VenueDashboardPage = () => {
                         <div className="min-w-0 flex-1">
                           <p className="flex flex-wrap items-center gap-x-1.5 gap-y-1">
                             <span className="max-w-full truncate font-display text-title-card">{event.name}</span>
-                            {event.featured && (
-                              <span className="flex shrink-0 items-center gap-0.5 rounded-md bg-party-accent px-1.5 py-0.5 text-[10px] font-extrabold uppercase text-white">
-                                <Sparkles size={10} />
-                                {t('venue.boost.badge')}
-                              </span>
-                            )}
                           </p>
                           <p className="truncate text-body-sm text-ink/55">
                             {fecha} · {formatHourRange(event.startDate, event.endDate)}
@@ -1223,6 +1221,11 @@ const VenueDashboardPage = () => {
                 void loadAllSummary();
               }}
             />
+          )}
+          {editing && esPropietario && (
+            <div className="px-5 pb-5">
+              <EventLiveSettings eventId={editing.id} className="border border-black/[0.08]" />
+            </div>
           )}
         </DialogContent>
       </Dialog>

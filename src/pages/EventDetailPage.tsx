@@ -7,8 +7,11 @@ import {
   Bookmark,
   BookmarkCheck,
   CalendarDays,
+  Car,
   CheckCircle2,
+  ChevronRight,
   Clock,
+  Footprints,
   Loader2,
   Martini,
   Navigation,
@@ -17,6 +20,7 @@ import {
   Share2,
   Ticket,
   Undo2,
+  X,
   Zap,
 } from 'lucide-react';
 import Header from '@/components/header';
@@ -30,10 +34,11 @@ import GuestListJoin from '@/components/guest-list-join';
 import { EventRatingBadge } from '@/components/rate-party';
 import { PartyButton } from '@/components/ui-custom/party-button';
 import { useToast } from '@/components/ui/use-toast';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { useAppContext } from '@/context/app-context';
 import { isEventLive, useEventsFeed } from '@/hooks/use-events-feed';
 import { api } from '@/services/api';
-import { formatDistance } from '@/services/geo';
+import { calculateDistance, Coordinates, formatDistance, getCurrentPosition, travelEstimate } from '@/services/geo';
 import { openExternal } from '@/services/native';
 import { EMPTY_ACTIVITY, socialService } from '@/services/social';
 import { publicLink, shareOrCopy } from '@/lib/share';
@@ -41,20 +46,46 @@ import { track } from '@/lib/observability';
 import { cn } from '@/lib/utils';
 import { Event } from '@/types/venue';
 
-/** Una de las tres losetas blancas: icono en círculo oscuro, dato y etiqueta. */
-const Loseta: React.FC<{ icon: typeof Clock; value: string; label: string }> = ({
-  icon: Icon,
-  value,
-  label,
-}) => (
-  <div className="flex flex-col items-center justify-center rounded-xl bg-white p-3 text-center">
-    <span className="mb-1 flex h-8 w-8 items-center justify-center rounded-full bg-surface-low text-white">
-      <Icon size={17} />
-    </span>
-    <span className="font-display text-title-card leading-tight text-ink">{value}</span>
-    <span className="text-caption uppercase text-ink/60">{label}</span>
-  </div>
-);
+/**
+ * Una fila de «cuándo y dónde»: icono, el dato en grande y un matiz debajo
+ * («Mañana», «7 h de fiesta», «12 min andando»). Con `onClick`, toda la fila
+ * es el botón.
+ */
+const Dato: React.FC<{
+  icon: typeof Clock;
+  title: string;
+  detail?: string;
+  onClick?: () => void;
+}> = ({ icon: Icon, title, detail, onClick }) => {
+  const contenido = (
+    <>
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-party-primary/15 text-party-primary">
+        <Icon size={18} />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block truncate font-display text-title-card text-white first-letter:uppercase">{title}</span>
+        {detail && <span className="block truncate text-caption text-party-gray">{detail}</span>}
+      </span>
+      {onClick && <ChevronRight size={18} className="shrink-0 text-party-gray" />}
+    </>
+  );
+  return onClick ? (
+    <button type="button" onClick={onClick} className="press flex w-full items-center gap-3 px-4 py-3 text-left">
+      {contenido}
+    </button>
+  ) : (
+    <div className="flex items-center gap-3 px-4 py-3">{contenido}</div>
+  );
+};
+
+/** Días de calendario entre hoy y la fecha (0 = hoy). */
+const diasHasta = (iso: string) => {
+  const hoy = new Date();
+  hoy.setHours(0, 0, 0, 0);
+  const dia = new Date(iso);
+  dia.setHours(0, 0, 0, 0);
+  return Math.round((dia.getTime() - hoy.getTime()) / 86_400_000);
+};
 
 /** Píldora oscura del detalle: edad, género, vestimenta. */
 const Etiqueta: React.FC<{ children: React.ReactNode }> = ({ children }) => (
@@ -74,12 +105,21 @@ const Etiqueta: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 const EventDetailPage = () => {
   const { eventId } = useParams<{ eventId: string }>();
   const navigate = useNavigate();
-  const { t } = useTranslation();
   const { toast } = useToast();
   const { activeEvent, currentUser } = useAppContext();
-  const { withDistance, activity, intents, busyIntent, toggleIntent } = useEventsFeed();
+  const { t, i18n } = useTranslation();
+  const { withDistance, activity, intents, busyIntent, toggleIntent, position } = useEventsFeed();
 
   const [event, setEvent] = useState<Event | null>(null);
+  // La posición del móvil para la distancia: la del listado si ya la tiene, y
+  // si no se pide aquí (el evento puede no estar en el listado).
+  const [posicion, setPosicion] = useState<Coordinates | null>(null);
+  const [pidiendoUbicacion, setPidiendoUbicacion] = useState(false);
+  const [verCartel, setVerCartel] = useState(false);
+
+  useEffect(() => {
+    if (position) setPosicion(position);
+  }, [position]);
   const [estado, setEstado] = useState<'loading' | 'ready' | 'not-found'>('loading');
   const [preguntaLista, setPreguntaLista] = useState(0);
 
@@ -131,7 +171,11 @@ const EventDetailPage = () => {
     if (!iba) setPreguntaLista((n) => n + 1);
   };
   const dentro = activeEvent?.eventId === event.id;
-  const distancia = withDistance.find((e) => e.event.id === event.id)?.distance ?? null;
+  const distancia =
+    posicion && event.location
+      ? calculateDistance(posicion.latitude, posicion.longitude, event.location.latitude, event.location.longitude)
+      : (withDistance.find((e) => e.event.id === event.id)?.distance ?? null);
+  const trayecto = distancia !== null ? travelEstimate(distancia) : null;
   const cifras = activity[event.id] ?? EMPTY_ACTIVITY;
 
   const fecha = new Date(event.startDate)
@@ -147,6 +191,34 @@ const EventDetailPage = () => {
     if (resultado === 'copied') toast({ title: t('eventDetail.copied') });
     if (resultado === 'failed') toast({ title: t('common.error'), variant: 'destructive' });
   };
+
+  const pedirUbicacion = async () => {
+    setPidiendoUbicacion(true);
+    try {
+      setPosicion(await getCurrentPosition());
+    } catch {
+      toast({ title: t('eventDetail.locationOff'), description: t('eventDetail.locationOffBody') });
+    } finally {
+      setPidiendoUbicacion(false);
+    }
+  };
+
+  const fechaLarga = new Date(event.startDate).toLocaleDateString(i18n.language, {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+  });
+  const dias = diasHasta(event.startDate);
+  const cuando = live
+    ? t('eventDetail.liveNow')
+    : terminado
+      ? t('eventDetail.endedShort')
+      : dias <= 0
+        ? t('eventDetail.today')
+        : dias === 1
+          ? t('eventDetail.tomorrow')
+          : t('eventDetail.inDays', { count: dias });
+  const horas = Math.round(((new Date(event.endDate).getTime() - new Date(event.startDate).getTime()) / 3_600_000) * 2) / 2;
 
   const verRuta = () => {
     if (!event.location) return;
@@ -164,7 +236,16 @@ const EventDetailPage = () => {
         {/* ---------------------------------------------------------- cartel */}
         <div className="relative h-80 w-full overflow-hidden">
           {event.posterUrl ? (
-            <img src={event.posterUrl} alt="" className="h-full w-full object-cover" />
+            // El cartel se ve entero al tocarlo: el del negocio suele llevar
+            // el line-up y la letra pequeña.
+            <button
+              type="button"
+              onClick={() => setVerCartel(true)}
+              aria-label={t('eventDetail.viewPoster')}
+              className="block h-full w-full"
+            >
+              <img src={event.posterUrl} alt="" className="h-full w-full object-cover" />
+            </button>
           ) : (
             <div className="flex h-full w-full items-center justify-center bg-surface-high">
               <Martini size={64} className="text-party-primary/30" />
@@ -222,20 +303,31 @@ const EventDetailPage = () => {
         </div>
 
         <div className="space-y-4 px-margin">
-          {/* ---------------------------------------------------- losetas */}
-          <div className="grid grid-cols-3 gap-2">
-            <Loseta icon={CalendarDays} value={fecha} label={t('eventDetail.date')} />
-            <Loseta
+          {/* --------------------------------------------- cuándo y dónde */}
+          <section className="divide-y divide-white/[0.06] overflow-hidden rounded-2xl bg-surface-low">
+            <Dato icon={CalendarDays} title={fechaLarga} detail={cuando} />
+            <Dato
               icon={Clock}
-              value={formatHourRange(event.startDate, event.endDate)}
-              label={t('eventAccess.schedule')}
+              title={formatHourRange(event.startDate, event.endDate)}
+              detail={horas > 0 && horas <= 24 ? t('eventDetail.duration', { hours: horas.toLocaleString(i18n.language) }) : undefined}
             />
-            <Loseta
-              icon={Navigation}
-              value={distancia !== null ? formatDistance(distancia) : '—'}
-              label={t('eventDetail.distance')}
-            />
-          </div>
+            {event.location &&
+              (distancia !== null && trayecto ? (
+                <Dato
+                  icon={trayecto.mode === 'walk' ? Footprints : Car}
+                  title={t('eventDetail.fromYou', { distance: formatDistance(distancia, i18n.language) })}
+                  detail={t(`eventDetail.travel.${trayecto.mode}`, { minutes: trayecto.minutes })}
+                  onClick={verRuta}
+                />
+              ) : (
+                <Dato
+                  icon={Navigation}
+                  title={pidiendoUbicacion ? t('eventDetail.locating') : t('eventDetail.distanceUnknown')}
+                  detail={t('eventDetail.distanceHelp')}
+                  onClick={pidiendoUbicacion ? undefined : () => void pedirUbicacion()}
+                />
+              ))}
+          </section>
 
           {/* ------------------------------------------------ ahora mismo */}
           {/* El ambiente lo da el local desde la puerta; la cifra no se enseña
@@ -256,10 +348,6 @@ const EventDetailPage = () => {
             </p>
           )}
           <WhoIsGoing eventId={event.id} going={cifras.going} />
-          {/* Lista de invitados del local, si la tiene activada. */}
-          {!terminado && (
-            <GuestListJoin eventId={event.id} ask={preguntaLista} defaultName={currentUser?.name ?? ''} />
-          )}
           {/* Lista Vybe: el local ve quién ha dicho que va. Se avisa aquí,
               donde se decide marcarlo. */}
           {!terminado && !live && (
@@ -284,6 +372,17 @@ const EventDetailPage = () => {
                 {event.description}
               </p>
             </section>
+          )}
+
+          {/* ------------------------------------------------ Lista Fiestea */}
+          {/* Encima de las entradas, si el negocio la tiene activada. */}
+          {!terminado && (
+            <GuestListJoin
+              key={currentUser?.id ?? 'anon'}
+              eventId={event.id}
+              ask={preguntaLista}
+              defaultName={currentUser?.name ?? ''}
+            />
           )}
 
           {/* ------------------------------------------------------ entradas */}
@@ -312,30 +411,53 @@ const EventDetailPage = () => {
           {event.location && (
             <section className="pb-2">
               <h2 className="mb-2 font-display text-headline-md text-white">{t('eventDetail.directions')}</h2>
-              <div className="flex items-center gap-3 rounded-xl bg-white p-3">
+              {/* Todo el recuadro abre la ruta, no sólo el texto. */}
+              <button
+                type="button"
+                onClick={verRuta}
+                className="press flex w-full items-center gap-3 rounded-xl bg-white p-3 text-left"
+              >
                 <MapThumb latitude={event.location.latitude} longitude={event.location.longitude} />
-                <div className="flex min-w-0 flex-1 flex-col justify-between">
+                <span className="flex min-w-0 flex-1 flex-col justify-between">
                   <span className="truncate font-display text-title-card text-ink">
                     {event.location.address || event.venueName}
                   </span>
                   <span className="truncate text-caption font-medium text-ink/60">
                     {[event.city, event.region].filter(Boolean).join(', ')}
                   </span>
-                  <button
-                    type="button"
-                    onClick={verRuta}
-                    className="press mt-2 inline-flex items-center gap-1 self-start text-label-pill uppercase text-ink"
-                  >
+                  <span className="mt-2 inline-flex items-center gap-1 self-start text-label-pill uppercase text-ink">
                     <Navigation size={15} className="text-party-primary" />
                     {t('eventDetail.route')}
-                  </button>
-                </div>
-              </div>
+                  </span>
+                </span>
+              </button>
               <p className="mt-1 text-right text-[10px] text-party-gray/70">© OpenStreetMap · CARTO</p>
             </section>
           )}
         </div>
       </main>
+
+      {event.posterUrl && (
+        <Dialog open={verCartel} onOpenChange={setVerCartel}>
+          <DialogContent className="flex h-[100dvh] max-h-none w-screen max-w-none items-center justify-center rounded-none border-0 bg-black/95 p-0 [&>button]:hidden">
+            <DialogTitle className="sr-only">{event.name}</DialogTitle>
+            <button
+              type="button"
+              onClick={() => setVerCartel(false)}
+              aria-label={t('common.close')}
+              className="press absolute right-4 top-[calc(var(--safe-area-inset-top,0px)+1rem)] z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/15 text-white"
+            >
+              <X size={20} />
+            </button>
+            <img
+              src={event.posterUrl}
+              alt={event.name}
+              onClick={() => setVerCartel(false)}
+              className="max-h-full max-w-full object-contain"
+            />
+          </DialogContent>
+        </Dialog>
+      )}
 
       {/* ---------------------------------------------- barra de la acción */}
       <div className="fixed inset-x-0 bottom-[var(--nav-h)] z-20 bg-surface-low/95 px-margin py-3 backdrop-blur-lg">

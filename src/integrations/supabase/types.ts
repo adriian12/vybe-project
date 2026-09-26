@@ -1070,12 +1070,15 @@ export type Database = {
           recurrence_parent_id: string | null
           region: string | null
           requires_location: boolean
+          show_gender_split: boolean
+          show_headcount: boolean
           song_requests_enabled: boolean
           sponsor_logo_url: string | null
           sponsor_name: string | null
           sponsor_url: string | null
           stamps_enabled: boolean
           start_date: string
+          swipe_enabled: boolean
           test_lab: boolean
           theme: string | null
           ticket_provider: string | null
@@ -1114,12 +1117,15 @@ export type Database = {
           recurrence_parent_id?: string | null
           region?: string | null
           requires_location?: boolean
+          show_gender_split?: boolean
+          show_headcount?: boolean
           song_requests_enabled?: boolean
           sponsor_logo_url?: string | null
           sponsor_name?: string | null
           sponsor_url?: string | null
           stamps_enabled?: boolean
           start_date: string
+          swipe_enabled?: boolean
           test_lab?: boolean
           theme?: string | null
           ticket_provider?: string | null
@@ -1158,12 +1164,15 @@ export type Database = {
           recurrence_parent_id?: string | null
           region?: string | null
           requires_location?: boolean
+          show_gender_split?: boolean
+          show_headcount?: boolean
           song_requests_enabled?: boolean
           sponsor_logo_url?: string | null
           sponsor_name?: string | null
           sponsor_url?: string | null
           stamps_enabled?: boolean
           start_date?: string
+          swipe_enabled?: boolean
           test_lab?: boolean
           theme?: string | null
           ticket_provider?: string | null
@@ -4005,9 +4014,11 @@ export type Database = {
           event_id: string
           friends_going: number
           going: number
+          headcount: number
           inside: number
           now_playing: string
           queue_level: string
+          swipe_enabled: boolean
           trend: string
           vibe_at: string
           vibe_level: string
@@ -4867,6 +4878,15 @@ export type Database = {
           p_event_id: string
           p_now_playing?: string
           p_queue_level?: string
+        }
+        Returns: undefined
+      }
+      set_event_live_settings: {
+        Args: {
+          p_event_id: string
+          p_gender: boolean
+          p_headcount: boolean
+          p_swipe: boolean
         }
         Returns: undefined
       }

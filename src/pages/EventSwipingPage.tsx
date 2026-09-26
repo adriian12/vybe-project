@@ -97,6 +97,8 @@ const EventSwipingPage = () => {
   const [showSafety, setShowSafety] = useState(false);
   const [matchedUser, setMatchedUser] = useState<User | null>(null);
   const [dentro, setDentro] = useState<number | null>(null);
+  // El negocio puede no dejar conocer gente en su fiesta (migración 081).
+  const [sinSwipe, setSinSwipe] = useState(false);
   const [misIntereses, setMisIntereses] = useState<string[]>([]);
 
   const tarjeta = useRef<ProfileCardHandle | null>(null);
@@ -129,7 +131,9 @@ const EventSwipingPage = () => {
     let vivo = true;
     const leer = () =>
       socialService.getEventsActivity([activeEvent.eventId]).then((data) => {
-        if (vivo) setDentro(data[activeEvent.eventId]?.inside ?? null);
+        if (!vivo) return;
+        setDentro(data[activeEvent.eventId]?.inside ?? null);
+        setSinSwipe(data[activeEvent.eventId]?.swipeEnabled === false);
       });
     void leer();
     const reloj = setInterval(() => void leer(), 60_000);
@@ -221,8 +225,8 @@ const EventSwipingPage = () => {
   // -------------------------------------------------------------------------
   // Antes del tablón: la foto de esta noche
   // -------------------------------------------------------------------------
-  if (modo === 'guest') {
-    return <GuestEventPage />;
+  if (modo === 'guest' || sinSwipe) {
+    return <GuestEventPage swipeOff={sinSwipe} />;
   }
 
   if (step === 'event_photo') {

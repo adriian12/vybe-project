@@ -1666,6 +1666,27 @@
                 "email": "El correu de contacte no és vàlid.",
                 "phone": "El telèfon no és vàlid."
             }
+        },
+        "liveSettings": {
+            "title": "Ajustos de la festa",
+            "hint": "El que permets i el que veu el públic en aquesta festa. Es desa en tocar-ho.",
+            "swipe": {
+                "title": "Conèixer gent (swipe)",
+                "body": "Qui entra pot veure el tauler, lliscar i fer crush. Apagat, ningú no el veu."
+            },
+            "headcount": {
+                "title": "Recompte en directe",
+                "body": "La fitxa mostra quanta gent hi ha dins ara: el total de la porta o, si no el portes, qui ha entrat amb l'app."
+            },
+            "genderSplit": {
+                "title": "% d'homes i dones",
+                "body": "La fitxa mostra el repartiment en directe, arrodonit i només amb 10 persones o més."
+            },
+            "guestList": {
+                "title": "Llista Fiestea",
+                "body": "La fitxa mostra, damunt de les entrades, un formulari per apuntar-se amb nom i acompanyants.",
+                "messagePlaceholder": "Missatge (ex.: Gratis abans de les 00:30)"
+            }
         }
     },
     "admin": {
@@ -2055,7 +2076,25 @@
         "ended": "Aquest esdeveniment ja ha acabat",
         "enterNow": "Entrar ara",
         "confirmed": "Confirmat!",
-        "intentNote": "En marcar «hi vaig», el negoci et veurà a la seva Llista Fiestea (nom, edat i foto)."
+        "intentNote": "En marcar «hi vaig», el negoci et veurà a la seva Llista Fiestea (nom, edat i foto).",
+        "viewPoster": "Veure el cartell",
+        "locationOff": "Sense ubicació",
+        "locationOffBody": "Activa la ubicació de l'app als ajustos del mòbil per veure a quina distància és.",
+        "liveNow": "En directe",
+        "endedShort": "Ja ha acabat",
+        "today": "Avui",
+        "tomorrow": "Demà",
+        "inDays_one": "D'aquí a {{count}} dia",
+        "inDays_other": "D'aquí a {{count}} dies",
+        "duration": "{{hours}} h de festa",
+        "fromYou": "A {{distance}} de tu",
+        "travel": {
+            "walk": "Uns {{minutes}} min a peu · veure ruta",
+            "car": "Uns {{minutes}} min en cotxe · veure ruta"
+        },
+        "locating": "Cercant la teva ubicació…",
+        "distanceUnknown": "A quina distància és?",
+        "distanceHelp": "Toca per fer servir la teva ubicació"
     },
     "venueTypes": {
         "discoteca": "Discoteca",
@@ -2697,7 +2736,11 @@
             "long": "Molta cua"
         },
         "nowPlaying": "Sona: {{song}}",
-        "mix": "{{women}} % noies · {{men}} % nois (amb Fiestea)"
+        "mix": "{{women}} % noies · {{men}} % nois (amb Fiestea)",
+        "headcount_one": "persona dins ara",
+        "headcount_other": "persones dins ara",
+        "women": "{{pct}} % dones",
+        "men": "{{pct}} % homes"
     },
     "whereNext": {
         "title": "La festa s'està acabant",
@@ -2805,6 +2848,10 @@
         "switched": {
             "vyber": "Ara estàs en mode Fiester@",
             "guest": "Ara estàs en mode convidat"
+        },
+        "swipeOff": {
+            "title": "Aquesta nit, sense tauler",
+            "body": "El negoci no ha activat conèixer gent en aquesta festa. Tens les seves ofertes, sortejos i avisos."
         }
     },
     "accountKind": {
@@ -3137,7 +3184,8 @@
             "ofLeft_other": "de {{count}}",
             "admitN_one": "Entra {{count}}",
             "admitN_other": "Entren {{count}}"
-        }
+        },
+        "brandTitle": "Llista {{app}}"
     },
     "team": {
         "share": {

@@ -82,6 +82,12 @@ export interface Event {
   featuredUntil?: string;
   /** `false`: se entra sin comprobar la ubicación (la sala de pruebas). */
   requiresLocation?: boolean;
+  /** El negocio deja conocer gente dentro (tablón y swipe). Por defecto, sí. */
+  swipeEnabled?: boolean;
+  /** El público ve cuánta gente hay dentro, en directo. */
+  showHeadcount?: boolean;
+  /** El público ve el % de hombres y mujeres, en directo. */
+  showGenderSplit?: boolean;
   /**
    * Repetición. Con `weekly` o `biweekly` la base de datos crea la siguiente
    * edición sola (`generate_recurring_events()`).

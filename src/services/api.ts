@@ -104,6 +104,9 @@ const dbEventToEvent = (dbEvent: EventRow, venue?: VenueRow): Event => ({
   maxCapacity: dbEvent.max_capacity ?? undefined,
   featuredUntil: dbEvent.featured_until ?? undefined,
   requiresLocation: dbEvent.requires_location ?? true,
+  swipeEnabled: dbEvent.swipe_enabled ?? true,
+  showHeadcount: dbEvent.show_headcount ?? false,
+  showGenderSplit: dbEvent.show_gender_split ?? false,
   recurrence: (dbEvent.recurrence as Event['recurrence']) ?? 'none',
   // La dirección es la del local: el evento no tiene columna propia, y la
   // tarjeta de «Cómo llegar» la necesita escrita, no sólo el punto del mapa.

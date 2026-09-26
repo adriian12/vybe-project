@@ -1666,6 +1666,27 @@
                 "email": "El correo de contacto no es válido.",
                 "phone": "El teléfono no es válido."
             }
+        },
+        "liveSettings": {
+            "title": "Ajustes de la fiesta",
+            "hint": "Lo que permites y lo que ve el público en esta fiesta. Se guarda al tocarlo.",
+            "swipe": {
+                "title": "Conocer gente (swipe)",
+                "body": "Quien entra puede ver el tablón, deslizar y hacer crush. Apagado, nadie lo ve."
+            },
+            "headcount": {
+                "title": "Recuento en directo",
+                "body": "La ficha enseña cuánta gente hay dentro ahora: el total de la puerta o, si no lo llevas, quien entró con la app."
+            },
+            "genderSplit": {
+                "title": "% de hombres y mujeres",
+                "body": "La ficha enseña el reparto en directo, redondeado y sólo con 10 personas o más."
+            },
+            "guestList": {
+                "title": "Lista Fiestea",
+                "body": "La ficha enseña, encima de las entradas, un formulario para apuntarse con nombre y acompañantes.",
+                "messagePlaceholder": "Mensaje (ej.: Gratis antes de las 00:30)"
+            }
         }
     },
     "admin": {
@@ -2055,7 +2076,25 @@
         "ended": "Este evento ya ha terminado",
         "enterNow": "Entrar ahora",
         "confirmed": "¡Confirmado!",
-        "intentNote": "Al marcar «voy a ir», el negocio te verá en su Lista Fiestea (nombre, edad y foto)."
+        "intentNote": "Al marcar «voy a ir», el negocio te verá en su Lista Fiestea (nombre, edad y foto).",
+        "viewPoster": "Ver el cartel",
+        "locationOff": "Sin ubicación",
+        "locationOffBody": "Activa la ubicación de la app en los ajustes del móvil para ver a qué distancia está.",
+        "liveNow": "En directo",
+        "endedShort": "Ya terminó",
+        "today": "Hoy",
+        "tomorrow": "Mañana",
+        "inDays_one": "En {{count}} día",
+        "inDays_other": "En {{count}} días",
+        "duration": "{{hours}} h de fiesta",
+        "fromYou": "A {{distance}} de ti",
+        "travel": {
+            "walk": "Unos {{minutes}} min andando · ver ruta",
+            "car": "Unos {{minutes}} min en coche · ver ruta"
+        },
+        "locating": "Buscando tu ubicación…",
+        "distanceUnknown": "¿A qué distancia está?",
+        "distanceHelp": "Toca para usar tu ubicación"
     },
     "venueTypes": {
         "discoteca": "Discoteca",
@@ -2697,7 +2736,11 @@
             "long": "Mucha cola"
         },
         "nowPlaying": "Suena: {{song}}",
-        "mix": "{{women}} % chicas · {{men}} % chicos (con Fiestea)"
+        "mix": "{{women}} % chicas · {{men}} % chicos (con Fiestea)",
+        "headcount_one": "persona dentro ahora",
+        "headcount_other": "personas dentro ahora",
+        "women": "{{pct}} % mujeres",
+        "men": "{{pct}} % hombres"
     },
     "whereNext": {
         "title": "La fiesta se está acabando",
@@ -2805,6 +2848,10 @@
         "switched": {
             "vyber": "Ahora estás en modo Fiester@",
             "guest": "Ahora estás en modo invitado"
+        },
+        "swipeOff": {
+            "title": "Esta noche, sin tablón",
+            "body": "El negocio no ha activado conocer gente en esta fiesta. Tienes sus ofertas, sorteos y avisos."
         }
     },
     "accountKind": {
@@ -3137,7 +3184,8 @@
             "ofLeft_other": "de {{count}}",
             "admitN_one": "Entra {{count}}",
             "admitN_other": "Entran {{count}}"
-        }
+        },
+        "brandTitle": "Lista {{app}}"
     },
     "team": {
         "share": {

@@ -50,7 +50,10 @@ export interface EventActivity {
   friendsGoing: number;
   /** Termómetro: si la sala se llena o se vacía (null si no se sabe). */
   trend: 'up' | 'down' | 'steady' | null;
-  /** % de mujeres entre la gente con Vybe dentro, en decenas (null con menos de 10). */
+  /**
+   * % de mujeres entre la gente con la app dentro, en decenas (null con menos
+   * de 10, o si el negocio no lo publica: `show_gender_split`).
+   */
   womenShare: number | null;
   /** Cola en la puerta según el local (de los últimos 45 min). */
   queueLevel: 'none' | 'short' | 'long' | null;
@@ -58,6 +61,14 @@ export interface EventActivity {
   nowPlaying: string | null;
   /** La puerta está cerrada: ya no entra nadie nuevo. */
   entryClosed: boolean;
+  /**
+   * Cuánta gente hay dentro ahora, sólo si el negocio lo publica
+   * (`show_headcount`) y la fiesta está en marcha: el total de la puerta o, si
+   * no lo lleva, quien entró con la app.
+   */
+  headcount: number | null;
+  /** Si en esta fiesta se puede conocer gente (tablón y swipe). */
+  swipeEnabled: boolean;
 }
 
 export const EMPTY_ACTIVITY: EventActivity = {
@@ -71,6 +82,8 @@ export const EMPTY_ACTIVITY: EventActivity = {
   queueLevel: null,
   nowPlaying: null,
   entryClosed: false,
+  headcount: null,
+  swipeEnabled: true,
 };
 
 export interface Reputation {
@@ -369,6 +382,8 @@ export const socialService = {
             : null,
         nowPlaying: row.now_playing ?? null,
         entryClosed: Boolean(row.entry_closed),
+        headcount: row.headcount ?? null,
+        swipeEnabled: row.swipe_enabled !== false,
       };
       return acc;
     }, {});

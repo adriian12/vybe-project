@@ -16,24 +16,25 @@ import { guestListService, GuestListInfo } from '@/services/guest-lists';
 
 interface GuestListJoinProps {
   eventId: string;
-  /** Cambia cada vez que la persona marca «voy a ir»: entonces se le pregunta. */
+  /** Cambia cada vez que la persona marca «voy a ir»: entonces se le lleva a la lista. */
   ask: number;
   defaultName?: string;
 }
 
 /**
- * La lista de invitados de la fiesta, desde la ficha.
+ * «Lista Fiestea»: la lista de invitados de la fiesta, desde la ficha.
  *
- * Al marcar «voy a ir», si el local tiene la lista activada y la persona no
- * está apuntada, se le pregunta si quiere apuntarse; con «Sí» ve el mensaje
- * del local («Lista gratis antes de las 19:00…»), su nombre y cuántos
- * acompañantes lleva. Una vez apuntada, la ficha lo dice y deja cambiarlo.
+ * Si el negocio la activa, la ficha enseña encima de las entradas su mensaje
+ * («Lista gratis antes de las 19:00…»), el nombre, cuántas personas más vienen
+ * y «Apuntarme». Al marcar «voy a ir», la ficha baja hasta ella. Una vez
+ * apuntada, la ficha lo dice y deja cambiarlo o borrarse.
  */
 const GuestListJoin = ({ eventId, ask, defaultName = '' }: GuestListJoinProps) => {
   const { t } = useTranslation();
   const { toast } = useToast();
   const [info, setInfo] = useState<GuestListInfo | null>(null);
-  const [paso, setPaso] = useState<null | 'ask' | 'form'>(null);
+  const [paso, setPaso] = useState<null | 'form'>(null);
+  const tarjeta = useRef<HTMLElement | null>(null);
   const [nombre, setNombre] = useState(defaultName);
   const [acompanantes, setAcompanantes] = useState(0);
   const [busy, setBusy] = useState(false);
@@ -54,7 +55,7 @@ const GuestListJoin = ({ eventId, ask, defaultName = '' }: GuestListJoinProps) =
     if (ask === ultimaPregunta.current) return;
     ultimaPregunta.current = ask;
     void cargar().then((datos) => {
-      if (datos?.enabled && !datos.mine) setPaso('ask');
+      if (datos?.enabled && !datos.mine) tarjeta.current?.scrollIntoView?.({ behavior: 'smooth', block: 'center' });
     });
   }, [ask, cargar]);
 
@@ -124,47 +125,66 @@ const GuestListJoin = ({ eventId, ask, defaultName = '' }: GuestListJoinProps) =
           </button>
         </div>
       ) : info?.enabled ? (
-        <button
-          type="button"
-          onClick={abrirFormulario}
-          className="press flex w-full items-center gap-3 rounded-xl bg-white/[0.06] p-3 text-left"
-        >
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-party-primary text-ink">
-            <ClipboardList size={18} />
-          </span>
-          <span className="min-w-0 flex-1">
-            <span className="block font-display text-title-card">{t('guestList.available')}</span>
-            {info.message && <span className="block truncate text-caption text-party-gray">{info.message}</span>}
-          </span>
-        </button>
+        <section ref={tarjeta} className="rounded-2xl bg-white p-4 text-ink">
+          <div className="flex items-center gap-3">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-party-primary">
+              <ClipboardList size={18} />
+            </span>
+            <div className="min-w-0 flex-1">
+              <h2 className="font-display text-title-card">{t('guestList.brandTitle', { app: t('common.appName') })}</h2>
+              <p className="text-caption text-ink/60">{info.message || t('guestList.formBody')}</p>
+            </div>
+          </div>
+          <div className="mt-3 flex items-stretch gap-2">
+            <Input
+              aria-label={t('guestList.name')}
+              placeholder={t('guestList.name')}
+              value={nombre}
+              maxLength={80}
+              autoComplete="name"
+              onChange={(e) => setNombre(e.target.value)}
+              className="h-12 min-w-0 flex-1 border-black/10 bg-black/[0.04] text-ink placeholder:text-ink/40"
+            />
+            <div className="flex h-12 shrink-0 items-center rounded-xl border border-black/10">
+              <button
+                type="button"
+                aria-label="-1"
+                disabled={acompanantes <= 0}
+                onClick={() => cambiar(acompanantes - 1)}
+                className="press flex h-12 w-9 items-center justify-center disabled:opacity-30"
+              >
+                <Minus size={15} />
+              </button>
+              <span className="min-w-[2.25rem] text-center font-bold tabular" aria-label={t('guestList.companions')}>
+                +{acompanantes}
+              </span>
+              <button
+                type="button"
+                aria-label="+1"
+                disabled={acompanantes >= 50}
+                onClick={() => cambiar(acompanantes + 1)}
+                className="press flex h-12 w-9 items-center justify-center disabled:opacity-30"
+              >
+                <Plus size={15} />
+              </button>
+            </div>
+          </div>
+          <p className="mt-1 text-caption text-ink/50">{t('guestList.total', { count: acompanantes + 1 })}</p>
+          <button
+            type="button"
+            disabled={busy || !nombre.trim()}
+            onClick={() => void apuntarme()}
+            className="press mt-3 flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-ink font-bold text-white disabled:opacity-40"
+          >
+            {busy && <Loader2 size={16} className="animate-spin" />}
+            {t('guestList.join')}
+          </button>
+        </section>
       ) : null}
 
       <Dialog open={paso !== null} onOpenChange={(open) => !open && setPaso(null)}>
         <DialogContent className="max-w-sm">
-          {paso === 'ask' ? (
-            <>
-              <DialogHeader className="text-left">
-                <DialogTitle>{t('guestList.askTitle')}</DialogTitle>
-                <DialogDescription>{t('guestList.askBody')}</DialogDescription>
-              </DialogHeader>
-              <DialogFooter className="flex-row gap-2">
-                <button
-                  type="button"
-                  onClick={() => setPaso(null)}
-                  className="press h-12 flex-1 rounded-xl border border-white/15 font-bold"
-                >
-                  {t('guestList.no')}
-                </button>
-                <button
-                  type="button"
-                  onClick={abrirFormulario}
-                  className="press h-12 flex-1 rounded-xl bg-party-primary font-bold text-ink"
-                >
-                  {t('guestList.yes')}
-                </button>
-              </DialogFooter>
-            </>
-          ) : (
+          {paso === 'form' && (
             <>
               <DialogHeader className="text-left">
                 <DialogTitle>{t('guestList.formTitle')}</DialogTitle>

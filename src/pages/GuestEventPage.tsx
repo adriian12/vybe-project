@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, EyeOff, LogOut, ShieldAlert, Sparkles } from 'lucide-react';
+import { ArrowLeft, EyeOff, HeartOff, LogOut, ShieldAlert, Sparkles } from 'lucide-react';
 import Header from '@/components/header';
 import Footer from '@/components/footer';
 import EventOffers from '@/components/event-offers';
@@ -17,10 +17,13 @@ import { formatHourRange } from '@/components/event-bits';
  * La fiesta en modo invitado.
  *
  * Aquí no hay tablón: ni se ve ni se sale en él. Queda lo del local —ofertas,
- * retos, sorteos y sus avisos— y el botón para pasarse a vyber si al final
+ * retos, sorteos y sus avisos— y el botón para pasarse a fiester@ si al final
  * apetece conocer a alguien.
+ *
+ * `swipeOff`: el negocio no deja conocer gente en esta fiesta (migración 081).
+ * Todo el mundo la vive así, y no se ofrece el cambio a fiester@.
  */
-const GuestEventPage = () => {
+const GuestEventPage = ({ swipeOff = false }: { swipeOff?: boolean }) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { activeEvent, currentUser, leaveEvent } = useAppContext();
@@ -62,10 +65,14 @@ const GuestEventPage = () => {
 
         <section className="rounded-3xl bg-surface-low p-5 text-center">
           <span className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-party-primary text-ink">
-            <EyeOff size={26} />
+            {swipeOff ? <HeartOff size={26} /> : <EyeOff size={26} />}
           </span>
-          <h1 className="font-display text-headline-lg">{t('eventMode.guest.title')}</h1>
-          <p className="mt-1 text-body-md text-party-gray">{t('eventMode.guest.hereBody')}</p>
+          <h1 className="font-display text-headline-lg">
+            {swipeOff ? t('eventMode.swipeOff.title') : t('eventMode.guest.title')}
+          </h1>
+          <p className="mt-1 text-body-md text-party-gray">
+            {swipeOff ? t('eventMode.swipeOff.body') : t('eventMode.guest.hereBody')}
+          </p>
           <p className="mt-3 text-caption text-party-gray">
             {t('eventMode.until', { time: formatHourRange(activeEvent.startDate, activeEvent.endDate) })}
           </p>
@@ -74,7 +81,7 @@ const GuestEventPage = () => {
         <div className="no-scrollbar flex gap-2 overflow-x-auto py-1">
           <EventOffers eventId={activeEvent.eventId} />
           {/* Un vyber que entró como invitado puede volver a su modo. */}
-          {currentUser?.accountType === 'vyber' && <EventModeSwitch mode="guest" />}
+          {currentUser?.accountType === 'vyber' && !swipeOff && <EventModeSwitch mode="guest" />}
           <EventActionButton
             icon={LogOut}
             label={t('swiping.exitShort')}
@@ -100,7 +107,7 @@ const GuestEventPage = () => {
 
         {/* La cuenta de invitado puede hacerse Vyber desde aquí mismo, con
             las mismas reglas que en el perfil. */}
-        {currentUser?.accountType === 'guest' && <AccountTypeCard />}
+        {currentUser?.accountType === 'guest' && !swipeOff && <AccountTypeCard />}
 
         {activeEvent.venueId && (
           <FollowVenuePrompt
