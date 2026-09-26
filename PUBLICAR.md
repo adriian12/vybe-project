@@ -232,27 +232,31 @@ Edge Functions (`RESEND_*`, `INBOUND_*`, `AUTH_FROM_EMAIL`, `APP_URL`, `FCM_*`,
      gestor.
    - 🤖 Configurar `bundleRelease` para generar el AAB firmado.
    - Activar *Play App Signing*.
-4. 🧑 **Firebase con el nuevo `appId`.** La app es ahora `com.vybe.app` (no se
-   podrá cambiar tras la primera subida). El `google-services.json` que había
-   estaba registrado para `party.vybe.app` y con otro paquete rompe la
-   compilación, así que se ha apartado como
-   `android/app/google-services.party.vybe.app.json.bak`. Hasta que no se
-   ponga uno nuevo, **los avisos push no llegan a la app de Android**.
+4. 🧑 **Firebase con el paquete de la app.** La app de Android es
+   `es.fiestea.app`, igual que en iOS, y no se podrá cambiar tras la primera
+   subida. El `google-services.json` actual sólo conoce los paquetes antiguos, y
+   con otro paquete el plugin de Google Services para la compilación: **hasta
+   poner el nuevo no se puede generar el APK**.
    - Consola de Firebase, proyecto `party-vybe-app` → *Configuración del
      proyecto* → *Añadir app* → Android.
-   - Paquete `com.vybe.app`.
+   - Paquete `es.fiestea.app`, apodo «Fiestea».
+   - Huella SHA-1 de la clave de depuración (la de `npm run native:apk`):
+     `40:5D:6A:7D:2C:AC:1F:FE:7C:45:14:FB:F9:B3:6A:8E:F0:BD:F5:BF`.
    - Descarga el `google-services.json` en `android/app/`.
    - Las credenciales de servidor (`FCM_*`) no cambian: es el mismo proyecto.
-   - Borra la app antigua de Firebase cuando la nueva funcione.
+   - Borra las apps antiguas (`com.vybe.app`, `party.vybe.app`) de Firebase
+     cuando la nueva funcione, y cambia el nombre visible del proyecto a
+     «Fiestea» (*Configuración del proyecto* → *Nombre público*; el ID
+     `party-vybe-app` no se puede cambiar).
 5. 🧑 **Ficha y formularios:**
-   - Política de privacidad (`https://vybes.es/legal/privacy`).
+   - Política de privacidad (`https://fiestea.es/legal/privacidad`).
    - *Data safety*: ubicación, fotos, correo, teléfono, mensajes.
    - Clasificación de contenido y público objetivo **18+**.
    - Instrucciones de acceso para revisión: una cuenta de prueba y un código de
      fiesta que funcione.
    - Capturas de pantalla.
-6. 🤖🧑 **App Links.** El manifiesto ya abre en la app las rutas de clubber de
-   `app.vybes.es`. Falta publicar `public/.well-known/assetlinks.json` con la
+6. 🤖🧑 **App Links.** El manifiesto ya abre en la app las rutas de
+   `app.fiestea.es`. Falta publicar `public/.well-known/assetlinks.json` con la
    huella SHA-256 de la clave de firma de Play (Play Console → Integridad de la
    app → Firma de apps):
 
@@ -261,7 +265,7 @@ Edge Functions (`RESEND_*`, `INBOUND_*`, `AUTH_FROM_EMAIL`, `APP_URL`, `FCM_*`,
      "relation": ["delegate_permission/common.handle_all_urls"],
      "target": {
        "namespace": "android_app",
-       "package_name": "com.vybe.app",
+       "package_name": "es.fiestea.app",
        "sha256_cert_fingerprints": ["AA:BB:…"]
      }
    }]
@@ -269,8 +273,8 @@ Edge Functions (`RESEND_*`, `INBOUND_*`, `AUTH_FROM_EMAIL`, `APP_URL`, `FCM_*`,
 
 7. 🧑 **Avisos push:** con el `google-services.json` nuevo (punto 4), probar un
    aviso real en un teléfono antes de publicar.
-8. 🧑 **Desinstala la app vieja** del teléfono: `party.vybe.app` y `com.vybe.app`
-   son para Android dos apps distintas y pueden convivir.
+8. 🧑 **Desinstala la app vieja** del teléfono: `party.vybe.app` y
+   `es.fiestea.app` son para Android dos apps distintas y pueden convivir.
 
 ---
 

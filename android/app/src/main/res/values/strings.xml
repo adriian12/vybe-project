@@ -7,5 +7,5 @@
     <!-- El dominio desde el que se abren los enlaces directos. Cuando lo
          tengas, cambialo aqui y publica /.well-known/assetlinks.json en el
          mismo dominio con la huella SHA-256 de la clave de firma. -->
-    <string name="deep_link_host">app.vybes.es</string>
+    <string name="deep_link_host">app.fiestea.es</string>
 </resources>

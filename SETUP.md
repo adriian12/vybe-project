@@ -287,9 +287,9 @@ En el navegador se usa Web Push. En la aplicación instalada el aviso lo entrega
 el sistema operativo a través de Firebase, y `send-push` elige el canal según el
 dispositivo: quien usa las dos cosas recibe el aviso en ambas.
 
-**Pendiente tras el cambio a `com.vybe.app`:** el `google-services.json` estaba
-registrado para el paquete antiguo y se apartó (`google-services.party.vybe.app.json.bak`).
-Hay que añadir la app Android `com.vybe.app` al proyecto de Firebase
+**Pendiente tras el cambio a `es.fiestea.app`:** el `google-services.json`
+actual sólo conoce los paquetes antiguos y, hasta sustituirlo, el APK no compila.
+Hay que añadir la app Android `es.fiestea.app` al proyecto de Firebase
 `party-vybe-app` y poner su `google-services.json` en `android/app/`. Con él, el
 plugin de Gradle lo procesa y el APK lleva las librerías de Firebase. El teléfono registra su token al conceder el
 permiso y lo guarda con `save_native_push_token()`.

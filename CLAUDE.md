@@ -1,6 +1,6 @@
-# Vybe (`vybe-project`)
+# Fiestea (`vybe-project`)
 
-App Vite del proyecto **Vybe App**. Documentación completa: **`../CLAUDE.md`**.
+App Vite de **Fiestea**. Documentación completa: **`../CLAUDE.md`**.
 
 ## Arranque
 
@@ -10,7 +10,7 @@ npm install && npm run dev   # :5173
 ```
 
 Migraciones en `supabase/migrations/`, en orden **001 → 002 → 003 → 006 → 007 →
-008 → … → 031**, y después el seed opcional **005 → 004**. De la 006 en adelante
+008 → … hasta la última**, y después el seed opcional **005 → 004**. De la 006 en adelante
 son obligatorias: las 008–013 corrigen la deriva entre lo que declaran las
 migraciones y lo que hay de verdad en la base de datos, y la **028 cierra las
 columnas con privilegio** (`role`, `is_verified`…), que hasta entonces podía
@@ -25,8 +25,9 @@ npm run verify   # typecheck + lint + tests + build
 ## MCPs
 
 `supabase` (proyecto `vipixvfplxownccuhrme`) y `sentry`, definidos en el
-`.mcp.json` de la carpeta padre. El CLI está autenticado con **otra cuenta**, así
-que las migraciones y los despliegues van por MCP.
+`.mcp.json` de la carpeta padre. El CLI está autenticado con **otra cuenta**: las
+migraciones van por MCP y las funciones con `node scripts/run-supabase.mjs
+functions deploy`.
 
 ## Docs
 
