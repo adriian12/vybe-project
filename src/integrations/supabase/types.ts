@@ -2774,6 +2774,7 @@ export type Database = {
       }
       tickets: {
         Row: {
+          archived_at: string | null
           code: string
           created_at: string
           event_id: string
@@ -2791,6 +2792,7 @@ export type Database = {
           venue_id: string
         }
         Insert: {
+          archived_at?: string | null
           code: string
           created_at?: string
           event_id: string
@@ -2808,6 +2810,7 @@ export type Database = {
           venue_id: string
         }
         Update: {
+          archived_at?: string | null
           code?: string
           created_at?: string
           event_id?: string
@@ -4499,8 +4502,11 @@ export type Database = {
           remaining: number
           start_date: string
           type_id: string
+          venue_address: string
+          venue_email: string
           venue_logo: string
           venue_name: string
+          venue_tax_id: string
           venue_terms: string
         }[]
       }
@@ -4851,6 +4857,7 @@ export type Database = {
       my_tickets: {
         Args: never
         Returns: {
+          archived: boolean
           code: string
           download_token: string
           end_date: string
@@ -5094,6 +5101,10 @@ export type Database = {
       set_raffle_entries: {
         Args: { p_closed: boolean; p_raffle_id: string }
         Returns: string
+      }
+      set_ticket_archived: {
+        Args: { p_archived: boolean; p_ticket_id: string }
+        Returns: undefined
       }
       set_venue_avg_spend: { Args: { p_amount: number }; Returns: undefined }
       set_venue_stamp_card: {

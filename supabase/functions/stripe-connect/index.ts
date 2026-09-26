@@ -1,15 +1,18 @@
 import { serve } from 'https://deno.land/std@0.193.0/http/server.ts';
 import { json, preflight } from '../_shared/cors.ts';
 import { adminClient, getUser } from '../_shared/supabase.ts';
-import { stripeSecretKey, stripeTestMode } from '../_shared/stripe-env.ts';
+import { stripeSecretKey, stripeTestMode, stripeVar } from '../_shared/stripe-env.ts';
 
 /**
  * Stripe Connect para los locales (migración 069).
  *
  * Cada negocio cobra sus entradas en su propia cuenta de Stripe, con cargos
  * directos: es el vendedor, paga la tarifa de Stripe y responde de reembolsos y
- * contracargos. La cuenta se crea con Stripe asumiendo las pérdidas y con el
- * panel completo de Stripe para el negocio. Acciones:
+ * contracargos. La cuenta se crea con Stripe asumiendo las pérdidas y **sin
+ * panel de Stripe** (`dashboard: 'none'`): el negocio no tiene que crearse un
+ * usuario de Stripe. Stripe no admite el panel Express si las pérdidas no son
+ * de la plataforma. Sus cobros, transferencias, contracargos y datos bancarios
+ * los ve en Ventas con los componentes integrados de Stripe. Acciones:
  *   · `onboard`: crea la cuenta (con todo lo que ya sabemos del local, para que
  *     en Stripe sólo le quede lo imprescindible) y devuelve el enlace de alta.
  *     Si ya usa Stripe, en ese formulario puede entrar con su cuenta y
@@ -17,13 +20,17 @@ import { stripeSecretKey, stripeTestMode } from '../_shared/stripe-env.ts';
  *   · `status`: pregunta a Stripe cómo está la cuenta y lo guarda. Se llama al
  *     volver del alta y al abrir Ventas: así no depende de configurar un
  *     webhook de Connect.
- *   · `dashboard`: el panel de Stripe del negocio (entra con su usuario).
+ *   · `session`: sesión para los componentes integrados (cobros,
+ *     transferencias, cuenta y avisos), con la clave pública del modo actual.
+ *   · `dashboard`: el panel de Stripe de las cuentas antiguas con panel
+ *     completo (entran con su usuario).
  *   · `refund`: devuelve un pedido entero (el dinero sale de la cuenta del
  *     local y se devuelve también la comisión de la plataforma).
  *
  * Sólo el propietario del local, y sólo en Business.
  *
- * Variables: STRIPE_SECRET_KEY (o STRIPE_TEST_SECRET_KEY con STRIPE_MODE=test), APP_URL.
+ * Variables: STRIPE_SECRET_KEY y STRIPE_PUBLISHABLE_KEY (o sus STRIPE_TEST_…
+ * con STRIPE_MODE=test), APP_URL.
  */
 
 const STRIPE = 'https://api.stripe.com/v1';
@@ -113,7 +120,7 @@ serve(async (req: Request): Promise<Response> => {
     if (!user) return json({ error: 'NOT_AUTHENTICATED' }, 401);
 
     const { action, returnUrl, orderId } = (await req.json()) as {
-      action?: 'onboard' | 'status' | 'dashboard' | 'refund';
+      action?: 'onboard' | 'status' | 'session' | 'dashboard' | 'refund';
       returnUrl?: string;
       orderId?: string;
     };
@@ -168,7 +175,8 @@ serve(async (req: Request): Promise<Response> => {
         const creada = await stripeV2(secret, '/core/accounts', {
           contact_email: venue.email ?? undefined,
           display_name: venue.name,
-          dashboard: 'full',
+          // Sin usuario de Stripe: lo ve todo en Ventas.
+          dashboard: 'none',
           identity: { country: 'es' },
           configuration: {
             // 5813: bares, discotecas y salas de fiestas.
@@ -227,6 +235,28 @@ serve(async (req: Request): Promise<Response> => {
       const cuenta = await stripe(secret, `/accounts/${venue.stripe_account_id}`);
       if (!cuenta.ok) return json({ error: 'STATUS_FAILED' }, 502);
       return json(await guardarEstado(supabase, venue.id, cuenta.data));
+    }
+
+    // ------------------------------------------------------------ session
+    if (action === 'session') {
+      const publishableKey = stripeVar('STRIPE_PUBLISHABLE_KEY');
+      if (!publishableKey) return json({ error: 'STRIPE_NOT_CONFIGURED' }, 200);
+      const p = new URLSearchParams({ account: venue.stripe_account_id as string });
+      p.set('components[notification_banner][enabled]', 'true');
+      p.set('components[notification_banner][features][external_account_collection]', 'true');
+      p.set('components[payments][enabled]', 'true');
+      p.set('components[payments][features][refund_management]', 'true');
+      p.set('components[payments][features][dispute_management]', 'true');
+      p.set('components[payments][features][capture_payments]', 'true');
+      p.set('components[payouts][enabled]', 'true');
+      p.set('components[payouts][features][standard_payouts]', 'true');
+      p.set('components[payouts][features][edit_payout_schedule]', 'true');
+      p.set('components[payouts][features][external_account_collection]', 'true');
+      p.set('components[account_management][enabled]', 'true');
+      p.set('components[account_management][features][external_account_collection]', 'true');
+      const sesion = await stripe(secret, '/account_sessions', p);
+      if (!sesion.ok) return json({ error: 'SESSION_FAILED' }, 502);
+      return json({ clientSecret: sesion.data.client_secret, publishableKey });
     }
 
     // ---------------------------------------------------------- dashboard

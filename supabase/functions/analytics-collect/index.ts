@@ -29,6 +29,11 @@ const ALLOWED = new Set([
   'venue_event_created',
   'venue_code_generated',
   'account_deleted',
+  'venue_event_updated',
+  'supercrush_bought',
+  'tickets_checkout',
+  'event_rated',
+  'page_view',
 ]);
 
 interface IncomingEvent {

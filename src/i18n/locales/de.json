@@ -194,7 +194,8 @@
         "accept": "Akzeptieren und fortfahren",
         "required": "Du musst die ersten drei Punkte akzeptieren, um Fiestea zu nutzen.",
         "readDocs": "Du kannst die vollständigen Dokumente jederzeit in deinem Profil einsehen.",
-        "all": "Ich bin mindestens 18 Jahre alt und akzeptiere die <terms>AGB</terms> und die <privacy>Datenschutzerklärung</privacy>."
+        "all": "Ich bin mindestens 18 Jahre alt und akzeptiere die <terms>AGB</terms> und die <privacy>Datenschutzerklärung</privacy>.",
+        "venue": "Ich akzeptiere die <venues>Bedingungen für Betriebe</venues> (einschließlich der Auftragsverarbeitung der Daten meiner Kunden), die <terms>Nutzungsbedingungen</terms> und die <privacy>Datenschutzerklärung</privacy>."
     },
     "home": {
         "title": "Events in deiner Stadt",
@@ -2220,7 +2221,15 @@
             "waiting": "Deine Tickets werden ausgestellt…",
             "depositPaid": "Anzahlung bezahlt: {{amount}}",
             "used": "Verwendet um {{time}}",
-            "showAtDoor": "Zeig es am Einlass"
+            "showAtDoor": "Zeig es am Einlass",
+            "archive": "Archivieren",
+            "restore": "Wiederherstellen",
+            "archived": "Ticket archiviert",
+            "archivedBody": "Es gilt weiterhin am Eingang. Du findest es unter „Archiviert“.",
+            "restored": "Ticket wiederhergestellt",
+            "archivedList_one": "Archiviert ({{count}})",
+            "archivedList_other": "Archiviert ({{count}})",
+            "allArchived": "Du hast alle deine Tickets archiviert. Sie gelten weiterhin: Du findest sie unten."
         },
         "checkout": {
             "notFound": "Dieses Ticket ist nicht mehr erhältlich",
@@ -2260,7 +2269,9 @@
                 "birthdate": "Gib das Geburtsdatum an.",
                 "minAge": "Für diese Party musst du mindestens {{age}} Jahre alt sein.",
                 "review": "Prüfe die rot markierten Felder."
-            }
+            },
+            "seller": "Verkäufer: {{venue}}. Fiestea ist die Verkaufsplattform.",
+            "legalNote": "Endpreis inklusive Steuern. Für Tickets zu einem bestimmten Datum besteht kein Widerrufsrecht. Wenn du Daten anderer Personen angibst, bestätigst du, dass sie einverstanden sind und dass du sie über die Datenschutzerklärung informierst."
         },
         "order": {
             "waiting": "Zahlung wird bestätigt…",
@@ -2628,6 +2639,13 @@
             "appStore": "App Store",
             "getIt": "Jetzt bei",
             "soon": "Demnächst"
+        },
+        "meta": {
+            "description": "Entdecke die Partys auf Mallorca, kauf dein Ticket und komm mit dem QR-Code rein. Für Betriebe: Ticketverkauf, Gästelisten, Live-Auslastung und Hinweise."
+        },
+        "whatsapp": {
+            "label": "Schreib uns auf WhatsApp",
+            "message": "Hallo, ich möchte Informationen über Fiestea für meinen Betrieb."
         }
     },
     "mobileOnly": {
@@ -3107,8 +3125,8 @@
         "payments": {
             "title": "Zahlungen",
             "active": "Zahlungen aktiv",
-            "intro": "Aktiviere Zahlungen, um Tickets und Tische zu verkaufen: Das Geld geht direkt auf dein Bankkonto. Dauert 2-3 Minuten; wenn du Stripe schon nutzt, melde dich einfach an.",
-            "activeBody": "Jeder Verkauf geht auf dein Stripe-Konto und von dort automatisch auf deine Bank.",
+            "intro": "Aktiviere Zahlungen, um Tickets und Tische zu verkaufen: Das Geld geht direkt auf dein Bankkonto. Es dauert 2-3 Minuten und du brauchst kein Stripe-Konto anzulegen.",
+            "activeBody": "Jeder Verkauf geht auf dein Zahlungskonto und von dort automatisch auf deine Bank.",
             "noPayouts": "Du kannst schon verkaufen, aber es fehlt dein Bankkonto für die Auszahlungen.",
             "reviewing": "Stripe prüft deine Angaben. Das dauert meist ein paar Minuten.",
             "missing_one": "Es fehlt noch {{count}} Angabe, um Zahlungen anzunehmen.",
@@ -3116,7 +3134,7 @@
             "activate": "Zahlungen aktivieren",
             "complete": "Angaben vervollständigen",
             "check": "Prüfen",
-            "dashboard": "Meine Zahlungen",
+            "dashboard": "Zahlungen und Auszahlungen ansehen",
             "back": "Wir haben dein Zahlungskonto geprüft.",
             "hidden": "Deine Tickets werden in der App erst angezeigt, wenn du Zahlungen aktivierst.",
             "refunded": "Erstattung erledigt",
@@ -3133,6 +3151,11 @@
                 "generic": "Keine Verbindung zu Stripe. Versuch es erneut.",
                 "refund": "Die Erstattung hat nicht geklappt.",
                 "alreadyRefunded": "Dieser Kauf wurde schon erstattet."
+            },
+            "tabs": {
+                "payments": "Zahlungen",
+                "payouts": "Auszahlungen",
+                "account": "Konto und Bank"
             }
         },
         "addVip": "VIP-Ticket hinzufügen"

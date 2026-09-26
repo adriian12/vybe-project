@@ -194,7 +194,8 @@
         "accept": "Accept and continue",
         "required": "You must accept the first three items to use Fiestea.",
         "readDocs": "You can read the full documents any time from your profile.",
-        "all": "I am 18 or older and accept the <terms>Terms</terms> and the <privacy>Privacy Policy</privacy>."
+        "all": "I am 18 or older and accept the <terms>Terms</terms> and the <privacy>Privacy Policy</privacy>.",
+        "venue": "I accept the <venues>Terms for businesses</venues> (including the processing of my customers’ data on my behalf), the <terms>Terms</terms> and the <privacy>Privacy policy</privacy>."
     },
     "home": {
         "title": "Events in your city",
@@ -2220,7 +2221,15 @@
             "waiting": "We're issuing your tickets…",
             "depositPaid": "Deposit paid: {{amount}}",
             "used": "Used at {{time}}",
-            "showAtDoor": "Show it at the door"
+            "showAtDoor": "Show it at the door",
+            "archive": "Archive",
+            "restore": "Restore",
+            "archived": "Ticket archived",
+            "archivedBody": "It still works at the door. You can find it in “Archived”.",
+            "restored": "Ticket restored",
+            "archivedList_one": "Archived ({{count}})",
+            "archivedList_other": "Archived ({{count}})",
+            "allArchived": "You have archived all your tickets. They still work: they are below."
         },
         "checkout": {
             "notFound": "This ticket is no longer on sale",
@@ -2260,7 +2269,9 @@
                 "birthdate": "Enter the date of birth.",
                 "minAge": "You must be {{age}} or older for this party.",
                 "review": "Check the fields marked in red."
-            }
+            },
+            "seller": "Sold by: {{venue}}. Fiestea is the sales platform.",
+            "legalNote": "Final price including taxes. Tickets for a specific date have no right of withdrawal. If you enter other people’s details, you confirm they have agreed and that you will tell them about the privacy policy."
         },
         "order": {
             "waiting": "Confirming payment…",
@@ -2628,6 +2639,13 @@
             "appStore": "App Store",
             "getIt": "Get it on",
             "soon": "Coming soon"
+        },
+        "meta": {
+            "description": "Discover the parties in Mallorca, buy your ticket and get in with the QR. For businesses: ticket sales, guest lists, live capacity and alerts."
+        },
+        "whatsapp": {
+            "label": "Message us on WhatsApp",
+            "message": "Hi, I would like information about Fiestea for my business."
         }
     },
     "mobileOnly": {
@@ -3107,8 +3125,8 @@
         "payments": {
             "title": "Payments",
             "active": "Payments active",
-            "intro": "Turn on payments to sell tickets and tables: the money goes straight to your bank account. It takes 2-3 minutes; if you already use Stripe, just log in.",
-            "activeBody": "Every sale goes to your Stripe account and from there to your bank automatically.",
+            "intro": "Turn on payments to sell tickets and tables: the money goes straight to your bank account. It takes 2-3 minutes and you don’t need to create a Stripe user.",
+            "activeBody": "Every sale goes to your payments account and from there to your bank automatically.",
             "noPayouts": "You can sell now, but your bank account is missing to receive payouts.",
             "reviewing": "Stripe is reviewing your details. It usually takes a few minutes.",
             "missing_one": "{{count}} detail is missing before you can take payments.",
@@ -3116,7 +3134,7 @@
             "activate": "Turn on payments",
             "complete": "Complete details",
             "check": "Check",
-            "dashboard": "View my payments",
+            "dashboard": "See payments and payouts",
             "back": "We've checked your payments account.",
             "hidden": "Your tickets aren't shown in the app until you turn on payments.",
             "refunded": "Refund done",
@@ -3133,6 +3151,11 @@
                 "generic": "Couldn't connect to Stripe. Try again.",
                 "refund": "Couldn't make the refund.",
                 "alreadyRefunded": "That purchase was already refunded."
+            },
+            "tabs": {
+                "payments": "Payments",
+                "payouts": "Payouts",
+                "account": "Account and bank"
             }
         },
         "addVip": "Add VIP ticket"

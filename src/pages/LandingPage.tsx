@@ -40,6 +40,8 @@ import VenueLeadForm from '@/components/landing/venue-lead-form';
 import { PanelMock, PhoneMock } from '@/components/landing/landing-showcase';
 import { useAppContext } from '@/context/app-context';
 import StoreButtons from '@/components/store-buttons';
+import { setSeo } from '@/lib/seo';
+import WhatsAppButton from '@/components/whatsapp-button';
 import { COMPANY } from '@/lib/company';
 import { appHref, isExternalHref } from '@/lib/hosts';
 import { cn } from '@/lib/utils';
@@ -111,7 +113,7 @@ const LandingPage = () => {
   const appHome = userType === 'venue' ? '/venue/dashboard' : userType === 'admin' ? '/admin/dashboard' : '/home';
 
   useEffect(() => {
-    document.title = `Fiestea · ${t('landing.hero.pill')}`;
+    setSeo({ title: `Fiestea · ${t('landing.hero.pill')}`, description: t('landing.meta.description'), path: '/' });
   }, [t]);
 
   useEffect(() => {
@@ -727,6 +729,7 @@ const LandingPage = () => {
           </p>
         </div>
       </footer>
+      <WhatsAppButton />
     </div>
   );
 };

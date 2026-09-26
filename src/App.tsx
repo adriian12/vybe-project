@@ -22,6 +22,7 @@ import StaffOnlyWeb from '@/components/staff-only-web';
 import WhereNextPrompt from '@/components/where-next-prompt';
 import Index from './pages/Index';
 import NotFound from './pages/NotFound';
+import PageViewTracker from '@/components/page-view-tracker';
 import AuthPage from './pages/AuthPage';
 import LocationPage from './pages/LocationPage';
 import HomePage from './pages/HomePage';
@@ -160,6 +161,7 @@ const App = () => (
             <SupercrushDialog />
             <DevSentryCheck />
             <DeepLinks />
+            <PageViewTracker />
             <NativePushBridge />
             <StaffOnlyWeb />
             <WhereNextPrompt />

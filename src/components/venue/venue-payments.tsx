@@ -1,17 +1,22 @@
-import { useCallback, useEffect, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AlertTriangle, CheckCircle2, CreditCard, ExternalLink, Loader2, RefreshCw } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, ChevronDown, CreditCard, Loader2, RefreshCw } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { ApiError } from '@/services/api';
 import { PaymentsStatus, ticketsService } from '@/services/tickets';
 
+// La librería de Stripe sólo se descarga al abrir los cobros.
+const VenueStripePanel = lazy(() => import('./venue-stripe-panel'));
+
 /**
- * «Cobros»: la cuenta de Stripe del local (Connect Express).
+ * «Cobros»: la cuenta de Stripe del local (Connect, sin panel de Stripe).
  *
  * Activar es un botón: la cuenta se crea con lo que ya sabemos del local y en
- * Stripe sólo le queda lo que exige la ley (persona responsable, IBAN,
- * verificación). Si ya usa Stripe, entra con su cuenta y reutiliza sus datos.
- * Al volver (`?connect=return`) se pregunta a Stripe cómo ha quedado.
+ * el alta de Stripe sólo le queda lo que exige la ley (persona responsable,
+ * IBAN, verificación), sin crearse usuario ni contraseña. Al volver
+ * (`?connect=return`) se pregunta a Stripe cómo ha quedado. Cobros,
+ * transferencias, contracargos y cuenta bancaria se ven aquí mismo
+ * (`venue-stripe-panel.tsx`).
  */
 const VenuePayments = ({ onStatus }: { onStatus?: (status: PaymentsStatus | null) => void }) => {
   const { t } = useTranslation();
@@ -19,6 +24,7 @@ const VenuePayments = ({ onStatus }: { onStatus?: (status: PaymentsStatus | null
   const [status, setStatus] = useState<PaymentsStatus | null>(null);
   const [cargando, setCargando] = useState(true);
   const [busy, setBusy] = useState(false);
+  const [abierto, setAbierto] = useState(false);
 
   const aplicar = useCallback(
     (s: PaymentsStatus | null) => {
@@ -166,18 +172,26 @@ const VenuePayments = ({ onStatus }: { onStatus?: (status: PaymentsStatus | null
             {t('sales.payments.check')}
           </button>
         )}
-        {activo && (
+        {status?.connected && status.detailsSubmitted && (
           <button
             type="button"
-            disabled={busy}
-            onClick={() => void irA(ticketsService.paymentsDashboard)}
-            className="press flex h-11 items-center gap-1.5 rounded-xl border border-black/15 px-4 text-caption font-bold disabled:opacity-50"
+            aria-expanded={abierto}
+            onClick={() => setAbierto((v) => !v)}
+            className="press flex h-11 items-center gap-1.5 rounded-xl border border-black/15 px-4 text-caption font-bold"
           >
-            <ExternalLink size={14} />
             {t('sales.payments.dashboard')}
+            <ChevronDown size={14} className={abierto ? 'rotate-180 transition-transform' : 'transition-transform'} />
           </button>
         )}
       </div>
+
+      {abierto && (
+        <div className="mt-4 border-t border-black/10 pt-4">
+          <Suspense fallback={<div className="h-40 animate-pulse rounded-xl bg-black/5" />}>
+            <VenueStripePanel />
+          </Suspense>
+        </div>
+      )}
     </div>
   );
 };

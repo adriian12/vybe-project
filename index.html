@@ -4,11 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 
-    <title>Fiestea - Conecta en eventos</title>
+    <title>Fiestea · Las fiestas de Mallorca en tu móvil</title>
     <meta
       name="description"
-      content="Conecta con la gente que está en la misma fiesta que tú. Eventos verificados en Mallorca."
+      content="Descubre las fiestas de Mallorca, compra tu entrada y entra con el QR. Para negocios: venta de entradas, listas, aforo en directo y avisos."
     />
+    <link rel="canonical" href="https://fiestea.es/" />
 
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="icon" href="/favicon.ico" sizes="any" />
@@ -22,9 +23,51 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Fiestea" />
 
-    <meta property="og:title" content="Fiestea" />
-    <meta property="og:description" content="Encuentra tu fiesta. Vívela a tope." />
+    <meta property="og:site_name" content="Fiestea" />
+    <meta property="og:title" content="Fiestea · Las fiestas de Mallorca en tu móvil" />
+    <meta property="og:description" content="Descubre qué hay esta noche, compra tu entrada y entra con el QR." />
     <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://fiestea.es/" />
+    <meta property="og:locale" content="es_ES" />
+    <meta property="og:image" content="https://fiestea.es/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Fiestea: las fiestas de Mallorca, en tu móvil." />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="https://fiestea.es/og-image.png" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://fiestea.es/#organization",
+            "name": "Fiestea",
+            "url": "https://fiestea.es/",
+            "logo": "https://fiestea.es/icons/icon-512.png",
+            "email": "soporte@fiestea.es",
+            "areaServed": "Mallorca, Illes Balears, España"
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://fiestea.es/#website",
+            "url": "https://fiestea.es/",
+            "name": "Fiestea",
+            "inLanguage": "es-ES",
+            "publisher": { "@id": "https://fiestea.es/#organization" }
+          },
+          {
+            "@type": "MobileApplication",
+            "name": "Fiestea",
+            "operatingSystem": "Android, iOS",
+            "applicationCategory": "LifestyleApplication",
+            "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
+            "publisher": { "@id": "https://fiestea.es/#organization" }
+          }
+        ]
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

@@ -37,7 +37,7 @@ export interface LegalDoc {
 }
 
 /** Última revisión de los textos. */
-export const LEGAL_UPDATED = '25 de septiembre de 2026';
+export { LEGAL_UPDATED } from '@/lib/company';
 
 const ALIASES: Record<string, LegalDocId> = {
   privacy: 'privacy',
@@ -116,7 +116,11 @@ export const legalDocs = (app: string, web: string, panel: string, miembro: stri
         },
         {
           title: 'Qué ven otras personas y los negocios',
-          body: `Si entras como ${miembro}, quienes están en la misma fiesta ven tu nombre de pila, edad, fotos, bio e intereses. Como invitado no apareces en el tablón. El negocio ve sus estadísticas siempre agregadas (los grupos con muy pocas personas se descartan para que nadie pueda deducir de quién se trata), las valoraciones sin nombre, y el nombre de pila, la edad y la foto de quien marca «voy a ir». Si te apuntas a una lista de invitados, el negocio y su equipo de puerta (propietarios, seguridad y la persona de relaciones públicas de esa lista) ven el nombre que das y cuántos acompañantes llevas. Si compras una entrada, el negocio ve tu nombre y el tipo de entrada al validarla.`,
+          body: `Si entras como ${miembro}, quienes están en la misma fiesta ven tu nombre de pila, edad, fotos, bio e intereses. Como invitado no apareces en el tablón. El negocio ve sus estadísticas siempre agregadas (los grupos con muy pocas personas se descartan para que nadie pueda deducir de quién se trata), las valoraciones sin nombre, y el nombre de pila, la edad y la foto de quien marca «voy a ir». Si te apuntas a una lista de invitados, el negocio y su equipo de puerta (propietarios, seguridad y la persona de relaciones públicas de esa lista) ven el nombre que das y cuántos acompañantes llevas. Si compras una entrada, el negocio ve los datos del pedido y de cada asistente (véase «Compra de entradas»).`,
+        },
+        {
+          title: 'Compra de entradas',
+          body: `Al comprar entradas pedimos el nombre y apellidos, el correo, el teléfono y la fecha de nacimiento de cada asistente. Sirven para emitir cada entrada a su nombre, comprobar la edad mínima de la fiesta, mandar a cada asistente su entrada por correo y que la puerta la valide. Si das los datos de otras personas, debes contar con su permiso y avisarles de esta política. En la venta, el negocio es el vendedor y el responsable de esos datos para gestionar su fiesta, su facturación y las devoluciones; ${app} los trata por su encargo (artículo 28 del RGPD), además de como responsable de tu cuenta. Si marcas la casilla de novedades del negocio, le comunicamos tu nombre y tu correo para que te mande sus ofertas; puedes retirar ese permiso cuando quieras escribiéndole a él o a ${correo}. Los pedidos se conservan el tiempo que exigen las normas fiscales y mercantiles (hasta seis años).`,
         },
         {
           title: 'Con quién los compartimos',
@@ -190,7 +194,7 @@ export const legalDocs = (app: string, web: string, panel: string, miembro: stri
         },
         {
           title: 'Ley aplicable',
-          body: 'Se aplica la ley española. Si eres consumidor, son competentes los juzgados de tu domicilio. También puedes usar la plataforma europea de resolución de litigios en línea (ec.europa.eu/consumers/odr).',
+          body: 'Se aplica la ley española. Si eres consumidor, son competentes los juzgados de tu domicilio. Si tienes una queja, escríbenos a ${correo}; también puedes reclamar ante los servicios de consumo de tu comunidad autónoma (en las Illes Balears, la Dirección General de Consumo) o ante una junta arbitral de consumo.',
         },
       ],
     },
@@ -268,11 +272,11 @@ export const legalDocs = (app: string, web: string, panel: string, miembro: stri
       sections: [
         {
           title: 'Qué se puede comprar',
-          body: `Premium (suscripción mensual o para una sola fiesta), supercrush sueltos, destacar una fiesta (para negocios) y entradas o mesas de las fiestas de los negocios que las venden en ${app}. El precio, con los impuestos que correspondan, se muestra antes de pagar.`,
+          body: `Premium (suscripción mensual o para una sola fiesta), supercrush sueltos, destacar una fiesta (para negocios) y entradas o mesas de las fiestas de los negocios que las venden en ${app}. El precio final, con los impuestos incluidos, se muestra antes de pagar.`,
         },
         {
           title: 'Pago',
-          body: 'En la app del iPhone, Premium y los supercrush se compran con la compra integrada de Apple y se cobran en tu Apple ID. En Android y en la web, y las entradas en cualquier dispositivo, se pagan con Stripe, en su página segura. No guardamos los datos de tu tarjeta y recibirás el justificante por correo.',
+          body: `En la app del iPhone, Premium y los supercrush se compran con la compra integrada de Apple y se cobran en tu Apple ID. En Android y en la web, y las entradas en cualquier dispositivo, se pagan con Stripe, en su página segura. No guardamos los datos de tu tarjeta. Al terminar recibes por correo la confirmación, que sirve de justificante (con las entradas en PDF si compras entradas); estas condiciones están siempre en ${dominio}/legal/compras.`,
         },
         {
           title: 'Premium mensual',
@@ -288,11 +292,11 @@ export const legalDocs = (app: string, web: string, panel: string, miembro: stri
         },
         {
           title: 'Entradas y mesas',
-          body: `Las vende el negocio que organiza la fiesta, que es quien las cobra a través de su cuenta de Stripe; ${app} actúa como plataforma y puede cobrar al negocio una comisión. Cada entrada tiene un código QR que se valida una sola vez en la puerta. El negocio decide el acceso según sus normas (edad, aforo, derecho de admisión) y es quien atiende las devoluciones.`,
+          body: `Las vende el negocio que organiza la fiesta, que es quien las cobra a través de su cuenta de Stripe; ${app} actúa como plataforma y puede cobrar al negocio una comisión, que no se suma a tu precio. Antes de pagar ves quién vende, con su NIF, su dirección y su correo, y sus condiciones si las tiene. Cada entrada va a nombre de un asistente y tiene un código QR que se valida una sola vez en la puerta; las gratuitas también. El negocio decide el acceso según sus normas (edad, aforo, derecho de admisión), es quien atiende las devoluciones y te da la factura si se la pides. Si compras para otras personas, puedes archivar sus entradas en tu cuenta sin que dejen de valer.`,
         },
         {
           title: 'Devoluciones',
-          body: `Si la fiesta se cancela, el negocio debe devolver el importe de las entradas. Para cualquier otra devolución de una entrada, habla con el negocio. Las compras hechas con Apple sólo las puede devolver Apple: pídelo en reportaproblem.apple.com. Si hay un cargo que no reconoces o un problema con Premium o supercrush, escribe a ${correo} y lo revisamos.`,
+          body: `Si la fiesta se cancela, o cambia de fecha y no puedes ir, el negocio debe devolverte el importe de las entradas. Para cualquier otra devolución de una entrada, habla con el negocio. Las compras hechas con Apple sólo las puede devolver Apple: pídelo en reportaproblem.apple.com. Si hay un cargo que no reconoces o un problema con Premium o supercrush, escribe a ${correo} y lo revisamos.`,
         },
         {
           title: 'Destacar una fiesta',
@@ -310,7 +314,7 @@ export const legalDocs = (app: string, web: string, panel: string, miembro: stri
       sections: [
         {
           title: 'Alta y verificación',
-          body: `Para usar el panel de negocios (${panel.replace(/^https?:\/\//, '')}) hay que registrar el establecimiento con su nombre, NIF, dirección y documentación que acredite la titularidad. Revisamos cada alta antes de aprobarla. Al aprobarse, el negocio tiene 30 días del plan Pro de prueba.`,
+          body: `Para usar el panel de negocios (${panel.replace(/^https?:\/\//, '')}) hay que registrar el establecimiento con su nombre, NIF, dirección y documentación que acredite la titularidad. Al registrarse, el negocio acepta estas condiciones, los términos y la política de privacidad; queda anotado con la fecha y la versión. Revisamos cada alta antes de aprobarla. Al aprobarse, el negocio tiene 30 días del plan Pro de prueba.`,
         },
         {
           title: 'Planes',
@@ -318,7 +322,7 @@ export const legalDocs = (app: string, web: string, panel: string, miembro: stri
         },
         {
           title: 'Venta de entradas',
-          body: `Para vender entradas y mesas, el negocio abre su propia cuenta de Stripe (Stripe Connect) y acepta sus condiciones. El dinero de cada venta va a esa cuenta. ${app} puede quedarse una comisión por entrada, pactada con el negocio, y repercute la tarifa de procesamiento de Stripe. El negocio es el vendedor: responde de la fiesta, del acceso, de los impuestos de sus ventas y de las devoluciones.`,
+          body: `Para vender entradas y mesas, el negocio abre una cuenta de cobros con Stripe (Stripe Connect): da a Stripe los datos que exige la ley y acepta el Acuerdo de cuenta conectada de Stripe (stripe.com/connect-account/legal), sin tener que crearse un usuario de Stripe. Sus cobros, transferencias, contracargos y datos bancarios los ve en Ventas. El dinero de cada venta va a esa cuenta. Stripe le cobra directamente su tarifa de procesamiento, y ${app} puede quedarse una comisión por entrada, pactada con el negocio, por la que emite factura con el IVA que corresponda. El negocio es el vendedor: responde de la fiesta, del acceso, de los impuestos y la facturación de sus ventas, de las devoluciones y de los contracargos, y debe tener a disposición del público las hojas de reclamaciones que exige la normativa de consumo.`,
         },
         {
           title: 'Equipo',
@@ -327,6 +331,10 @@ export const legalDocs = (app: string, web: string, panel: string, miembro: stri
         {
           title: 'Datos de los clientes',
           body: 'El negocio recibe estadísticas agregadas y, para gestionar la puerta, los nombres de las listas de invitados, las entradas y las alertas de ayuda. Sólo puede usarlos para gestionar sus fiestas, no puede copiarlos a otros sistemas ni usarlos para publicidad sin el consentimiento de cada persona, y debe tratarlos con confidencialidad.',
+        },
+        {
+          title: 'Encargo del tratamiento',
+          body: `En la venta de entradas y en la gestión de su puerta, el negocio es el responsable de los datos de sus compradores y asistentes, y ${app} los trata por su encargo (artículo 28 del RGPD) con estas condiciones: sólo para vender y validar sus entradas, gestionar sus listas y mandar los correos de la compra, siguiendo sus instrucciones, que son estas condiciones y lo que configure en el panel; con deber de confidencialidad para quien acceda a ellos; con las medidas de seguridad descritas en la política de privacidad (acceso por permisos, cifrado en tránsito, copias de seguridad); con los subencargados que figuran en la política de privacidad, que el negocio autoriza, avisándole antes de añadir otros para que pueda oponerse; ayudándole a atender los derechos de las personas y a cumplir sus obligaciones de seguridad, y avisándole sin dilación de cualquier brecha que les afecte; y, al terminar la relación, devolviéndole o suprimiendo los datos, salvo lo que la ley obligue a conservar. El negocio puede pedir la información necesaria para comprobar que se cumple.`,
         },
         {
           title: 'Contenido y fiestas',

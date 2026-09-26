@@ -194,7 +194,8 @@
         "accept": "Accepto i continuo",
         "required": "Has d'acceptar els tres primers punts per fer servir Fiestea.",
         "readDocs": "Pots consultar els documents complets en qualsevol moment des del teu perfil.",
-        "all": "Tinc 18 anys o més i accepto els <terms>Termes</terms> i la <privacy>Política de privacitat</privacy>."
+        "all": "Tinc 18 anys o més i accepto els <terms>Termes</terms> i la <privacy>Política de privacitat</privacy>.",
+        "venue": "Accept les <venues>Condicions per a negocis</venues> (inclòs l’encàrrec del tractament de les dades dels meus clients), els <terms>Termes</terms> i la <privacy>Política de privadesa</privacy>."
     },
     "home": {
         "title": "Esdeveniments a la teva ciutat",
@@ -2220,7 +2221,15 @@
             "waiting": "Estem emetent les teves entrades…",
             "depositPaid": "Senyal pagada: {{amount}}",
             "used": "Usada a les {{time}}",
-            "showAtDoor": "Ensenya-ho a la porta"
+            "showAtDoor": "Ensenya-ho a la porta",
+            "archive": "Arxivar",
+            "restore": "Recuperar",
+            "archived": "Entrada arxivada",
+            "archivedBody": "Continua sent vàlida a la porta. La tens a «Arxivades».",
+            "restored": "Entrada recuperada",
+            "archivedList_one": "Arxivades ({{count}})",
+            "archivedList_other": "Arxivades ({{count}})",
+            "allArchived": "Has arxivat totes les teves entrades. Continuen sent vàlides: les tens a baix."
         },
         "checkout": {
             "notFound": "Aquesta entrada ja no està a la venda",
@@ -2260,7 +2269,9 @@
                 "birthdate": "Indica la data de naixement.",
                 "minAge": "Per a aquesta festa cal tenir {{age}} anys o més.",
                 "review": "Revisa els camps marcats en vermell."
-            }
+            },
+            "seller": "Ven: {{venue}}. Fiestea és la plataforma de venda.",
+            "legalNote": "Preu final amb imposts inclosos. Les entrades per a una data concreta no tenen dret de desistiment. Si dones les dades d’altres persones, confirmes que t’han donat permís i que els avisaràs de la política de privadesa."
         },
         "order": {
             "waiting": "Confirmant el pagament…",
@@ -2628,6 +2639,13 @@
             "appStore": "App Store",
             "getIt": "Disponible a",
             "soon": "Aviat"
+        },
+        "meta": {
+            "description": "Descobreix les festes de Mallorca, compra la teva entrada i entra amb el QR. Per a negocis: venda d’entrades, llistes, aforament en directe i avisos."
+        },
+        "whatsapp": {
+            "label": "Escriu-nos per WhatsApp",
+            "message": "Hola, vull informació sobre Fiestea per al meu negoci."
         }
     },
     "mobileOnly": {
@@ -3107,8 +3125,8 @@
         "payments": {
             "title": "Cobraments",
             "active": "Cobraments actius",
-            "intro": "Activa els cobraments per vendre entrades i taules: els diners arriben directament al teu compte bancari. Són 2-3 minuts; si ja fas servir Stripe, entra amb el teu compte i llestos.",
-            "activeBody": "Cada venda arriba al teu compte de Stripe i d'allà al teu banc automàticament.",
+            "intro": "Activa els cobraments per vendre entrades i taules: els doblers arriben directament al teu compte bancari. Són 2-3 minuts i no t’has de crear cap usuari d’Stripe.",
+            "activeBody": "Cada venda arriba al teu compte de cobraments i d’allà al teu banc automàticament.",
             "noPayouts": "Ja pots vendre, però falta el teu compte bancari per rebre les transferències.",
             "reviewing": "Stripe està revisant les teves dades. Sol tardar uns minuts.",
             "missing_one": "Falta {{count}} dada per poder cobrar.",
@@ -3116,7 +3134,7 @@
             "activate": "Activar cobraments",
             "complete": "Completar dades",
             "check": "Comprovar",
-            "dashboard": "Veure els meus pagaments",
+            "dashboard": "Veure cobraments i transferències",
             "back": "Hem comprovat el teu compte de cobraments.",
             "hidden": "Les teves entrades no es veuen a l'app fins que activis els cobraments.",
             "refunded": "Devolució feta",
@@ -3133,6 +3151,11 @@
                 "generic": "No s'ha pogut connectar amb Stripe. Torna-ho a provar.",
                 "refund": "No s'ha pogut fer la devolució.",
                 "alreadyRefunded": "Aquesta compra ja estava retornada."
+            },
+            "tabs": {
+                "payments": "Cobraments",
+                "payouts": "Transferències",
+                "account": "Compte i banc"
             }
         },
         "addVip": "Afegir entrada VIP"

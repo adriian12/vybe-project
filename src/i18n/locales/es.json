@@ -194,7 +194,8 @@
         "accept": "Acepto y continúo",
         "required": "Debes aceptar los tres primeros puntos para usar Fiestea.",
         "readDocs": "Puedes consultar los documentos completos en cualquier momento desde tu perfil.",
-        "all": "Tengo 18 años o más y acepto los <terms>Términos</terms> y la <privacy>Política de privacidad</privacy>."
+        "all": "Tengo 18 años o más y acepto los <terms>Términos</terms> y la <privacy>Política de privacidad</privacy>.",
+        "venue": "Acepto las <venues>Condiciones para negocios</venues> (incluido el encargo del tratamiento de los datos de mis clientes), los <terms>Términos</terms> y la <privacy>Política de privacidad</privacy>."
     },
     "home": {
         "title": "Eventos en tu ciudad",
@@ -2220,7 +2221,15 @@
             "waiting": "Estamos emitiendo tus entradas…",
             "depositPaid": "Señal pagada: {{amount}}",
             "used": "Usada a las {{time}}",
-            "showAtDoor": "Enséñalo en la puerta"
+            "showAtDoor": "Enséñalo en la puerta",
+            "archive": "Archivar",
+            "restore": "Recuperar",
+            "archived": "Entrada archivada",
+            "archivedBody": "Sigue valiendo en la puerta. La tienes en «Archivadas».",
+            "restored": "Entrada recuperada",
+            "archivedList_one": "Archivadas ({{count}})",
+            "archivedList_other": "Archivadas ({{count}})",
+            "allArchived": "Has archivado todas tus entradas. Siguen valiendo: las tienes abajo."
         },
         "checkout": {
             "notFound": "Esta entrada ya no está a la venta",
@@ -2260,7 +2269,9 @@
                 "birthdate": "Indica la fecha de nacimiento.",
                 "minAge": "Para esta fiesta hay que tener {{age}} años o más.",
                 "review": "Revisa los campos marcados en rojo."
-            }
+            },
+            "seller": "Vende: {{venue}}. Fiestea es la plataforma de venta.",
+            "legalNote": "Precio final con impuestos incluidos. Las entradas para una fecha concreta no tienen derecho de desistimiento. Si das los datos de otras personas, confirmas que te han dado permiso y que les avisarás de la política de privacidad."
         },
         "order": {
             "waiting": "Confirmando el pago…",
@@ -2628,6 +2639,13 @@
             "appStore": "App Store",
             "getIt": "Disponible en",
             "soon": "Próximamente"
+        },
+        "meta": {
+            "description": "Descubre las fiestas de Mallorca, compra tu entrada y entra con el QR. Para negocios: venta de entradas, listas, aforo en directo y avisos."
+        },
+        "whatsapp": {
+            "label": "Escríbenos por WhatsApp",
+            "message": "Hola, quiero información sobre Fiestea para mi negocio."
         }
     },
     "mobileOnly": {
@@ -3107,8 +3125,8 @@
         "payments": {
             "title": "Cobros",
             "active": "Cobros activos",
-            "intro": "Activa los cobros para vender entradas y mesas: el dinero llega directamente a tu cuenta bancaria. Son 2-3 minutos; si ya usas Stripe, entra con tu cuenta y listo.",
-            "activeBody": "Cada venta llega a tu cuenta de Stripe y de ahí a tu banco automáticamente.",
+            "intro": "Activa los cobros para vender entradas y mesas: el dinero llega directamente a tu cuenta bancaria. Son 2-3 minutos y no tienes que crearte ningún usuario de Stripe.",
+            "activeBody": "Cada venta llega a tu cuenta de cobros y de ahí a tu banco automáticamente.",
             "noPayouts": "Ya puedes vender, pero falta tu cuenta bancaria para recibir las transferencias.",
             "reviewing": "Stripe está revisando tus datos. Suele tardar unos minutos.",
             "missing_one": "Falta {{count}} dato para poder cobrar.",
@@ -3116,7 +3134,7 @@
             "activate": "Activar cobros",
             "complete": "Completar datos",
             "check": "Comprobar",
-            "dashboard": "Ver mis pagos",
+            "dashboard": "Ver cobros y transferencias",
             "back": "Hemos comprobado tu cuenta de cobros.",
             "hidden": "Tus entradas no se ven en la app hasta que actives los cobros.",
             "refunded": "Devolución hecha",
@@ -3133,6 +3151,11 @@
                 "generic": "No se ha podido conectar con Stripe. Inténtalo de nuevo.",
                 "refund": "No se ha podido hacer la devolución.",
                 "alreadyRefunded": "Esa compra ya estaba devuelta."
+            },
+            "tabs": {
+                "payments": "Cobros",
+                "payouts": "Transferencias",
+                "account": "Cuenta y banco"
             }
         },
         "addVip": "Añadir entrada VIP"

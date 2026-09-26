@@ -46,6 +46,8 @@ export interface MyTicket {
   /** Token de descarga del pedido (PDF y Apple Wallet), el mismo del correo. */
   downloadToken: string | null;
   holderName: string | null;
+  /** Archivada por quien la compró: no sale en la lista, pero sigue valiendo. */
+  archived: boolean;
 }
 
 /** Lo que enseña la pantalla de compra antes de pagar (migración 077). */
@@ -68,6 +70,10 @@ export interface TicketCheckoutInfo {
   venueName: string;
   venueLogo: string | null;
   venueTerms: string | null;
+  /** Datos del vendedor (el negocio), que la ley pide enseñar antes de pagar. */
+  venueTaxId: string | null;
+  venueAddress: string | null;
+  venueEmail: string | null;
   /** Se puede comprar: es gratis o el negocio ya cobra con Stripe. */
   purchasable: boolean;
 }
@@ -219,6 +225,7 @@ const ERRORES: Record<string, string> = {
   ONBOARD_FAILED: 'sales.payments.errors.onboard',
   STATUS_FAILED: 'sales.payments.errors.generic',
   DASHBOARD_FAILED: 'sales.payments.errors.generic',
+  SESSION_FAILED: 'sales.payments.errors.generic',
   REFUND_FAILED: 'sales.payments.errors.refund',
   NOT_REFUNDABLE: 'sales.payments.errors.refund',
   ALREADY_REFUNDED: 'sales.payments.errors.alreadyRefunded',
@@ -308,6 +315,9 @@ export const ticketsService = {
       venueName: row.venue_name,
       venueLogo: row.venue_logo,
       venueTerms: row.venue_terms,
+      venueTaxId: row.venue_tax_id,
+      venueAddress: row.venue_address,
+      venueEmail: row.venue_email,
       purchasable: row.payments_enabled,
     };
   },
@@ -383,7 +393,14 @@ export const ticketsService = {
       orderId: row.order_id,
       downloadToken: row.download_token,
       holderName: row.holder_name,
+      archived: row.archived,
     }));
+  },
+
+  /** Archiva una entrada (o la recupera): sólo cambia lo que se ve en «Entradas». */
+  setArchived: async (ticketId: string, archived: boolean): Promise<void> => {
+    const { error } = await supabase.rpc('set_ticket_archived', { p_ticket_id: ticketId, p_archived: archived });
+    if (error) throw fallo(error.message);
   },
 
   // ----------------------------------------------------------------- local
@@ -486,8 +503,13 @@ export const ticketsService = {
   startOnboarding: async (): Promise<string> =>
     (await connect<{ url: string }>({ action: 'onboard', returnUrl: volverAlPanel() })).url,
 
-  /** Enlace de un solo uso al panel de pagos del local en Stripe. */
-  paymentsDashboard: async (): Promise<string> => (await connect<{ url: string }>({ action: 'dashboard' })).url,
+  /**
+   * Sesión para los componentes de Stripe dentro de Ventas (cobros,
+   * transferencias, contracargos y datos bancarios): el negocio no tiene
+   * usuario de Stripe.
+   */
+  paymentsSession: (): Promise<{ clientSecret: string; publishableKey: string }> =>
+    connect<{ clientSecret: string; publishableKey: string }>({ action: 'session' }),
 
   /** Devuelve un pedido entero; sus entradas dejan de valer. */
   refundOrder: async (orderId: string): Promise<void> => {

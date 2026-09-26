@@ -15,6 +15,7 @@ import { VybeMark } from '@/components/brand/vybe-logo';
 import ForgotPassword from '@/components/forgot-password';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
+import { LEGAL_UPDATED } from '@/lib/company';
 import { useToast } from '@/components/ui/use-toast';
 import {
   Form,
@@ -158,6 +159,9 @@ const buildVenueRegisterSchema = (t: Translate) =>
         .refine(isValidNif, { message: t('auth.errors.taxIdInvalid') }),
       address: z.string().min(8, { message: t('auth.errors.addressRequired') }).max(160),
       phone: buildPhoneSchema(t),
+      // Contrato con el negocio: condiciones para negocios (con el encargo del
+      // tratamiento de los datos de sus clientes), términos y privacidad.
+      acceptTerms: z.literal(true, { errorMap: () => ({ message: t('auth.errors.acceptAll') }) }),
     })
     .refine((data) => data.password === data.confirmPassword, {
       message: t('auth.errors.passwordMismatch'),
@@ -647,6 +651,7 @@ const VenueRegisterForm = () => {
       address: '',
       phone: '+34',
       venueType: 'bar',
+      acceptTerms: false as unknown as true,
     },
   });
 
@@ -706,6 +711,9 @@ const VenueRegisterForm = () => {
           phone: values.phone,
           tax_id: values.taxId,
           address: values.address,
+          // Qué versión de las condiciones aceptó y cuándo.
+          venue_terms_accepted_at: new Date().toISOString(),
+          venue_terms_version: LEGAL_UPDATED,
         },
       });
 
@@ -987,6 +995,36 @@ const VenueRegisterForm = () => {
                 <p className="text-xs text-party-gray">{t('auth.documentsRequired')}</p>
               )}
             </div>
+
+            <FormField
+              control={form.control}
+              name="acceptTerms"
+              render={({ field }) => (
+                <FormItem className="space-y-1">
+                  <div className="flex items-start gap-3">
+                    <FormControl>
+                      <Checkbox
+                        id="venue-accept"
+                        checked={Boolean(field.value)}
+                        onCheckedChange={(checked) => field.onChange(checked === true)}
+                        className="mt-0.5 shrink-0"
+                      />
+                    </FormControl>
+                    <label htmlFor="venue-accept" className="cursor-pointer text-body-sm leading-snug text-[#E4E1E6]">
+                      <Trans
+                        i18nKey="consent.venue"
+                        components={{
+                          venues: <Link to="/legal/negocios" {...legalLinkProps} />,
+                          terms: <Link to="/legal/terminos" {...legalLinkProps} />,
+                          privacy: <Link to="/legal/privacidad" {...legalLinkProps} />,
+                        }}
+                      />
+                    </label>
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <div className="flex gap-2">
               <PartyButton

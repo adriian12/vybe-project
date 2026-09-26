@@ -69,7 +69,7 @@ export const sendTicketEmail = async (supabase: SupabaseClient, orderId: string)
       paragraphs: ['Aquí tienes tu entrada. Va también adjunta en PDF: enseña el QR en la puerta.'],
       blockHtml: tarjeta,
       buttons: botones,
-      note: `Entrada vendida por ${data.venueName} a través de ${BRAND.name}. Cada entrada vale una sola vez.`,
+      note: `Entrada vendida por ${data.venueName} a través de ${BRAND.name}. Cada entrada vale una sola vez. Este correo es tu justificante. Condiciones de compra: ${BRAND.web}/legal/compras · Privacidad: ${BRAND.web}/legal/privacidad`,
     });
     await sendEmail({
       to,

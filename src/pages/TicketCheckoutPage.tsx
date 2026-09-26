@@ -405,6 +405,13 @@ const TicketCheckoutPage = () => {
               <Casilla id="a-mi-cuenta" checked={aMiCuenta} onChange={setAMiCuenta}>
                 {t('tickets.checkout.addToAccount')}
               </Casilla>
+              {/* Información previa a la compra: quién vende y qué derechos hay. */}
+              <p className="border-t border-white/10 pt-3 text-caption leading-relaxed text-party-gray">
+                {t('tickets.checkout.seller', {
+                  venue: [info.venueName, info.venueTaxId, info.venueAddress, info.venueEmail].filter(Boolean).join(' · '),
+                })}{' '}
+                {t('tickets.checkout.legalNote')}
+              </p>
             </section>
 
             {/* --------------------------------------------------------- resumen */}

@@ -11,3 +11,6 @@ export const COMPANY = {
   address: 'Calle Reina Laura, 8, 3.º, 07007 Palma de Mallorca, Illes Balears, España',
   email: 'soporte@fiestea.es',
 };
+
+/** Fecha de la versión vigente de los textos legales (se guarda al aceptarlos). */
+export const LEGAL_UPDATED = '27 de septiembre de 2026';

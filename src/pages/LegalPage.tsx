@@ -1,9 +1,10 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, ChevronRight } from 'lucide-react';
 import { APP_URL, LANDING_URL } from '@/lib/hosts';
 import { LEGAL_UPDATED, legalDocs, resolveLegalDoc } from '@/lib/legal-docs';
+import { setSeo } from '@/lib/seo';
 
 /**
  * Textos legales: `/legal` (índice) y `/legal/<documento>`.
@@ -22,6 +23,14 @@ const LegalPage = () => {
   );
   const id = resolveLegalDoc(slug);
   const doc = id ? docs.find((d) => d.id === id) : null;
+
+  useEffect(() => {
+    setSeo(
+      doc
+        ? { title: `${doc.title} · Fiestea`, description: doc.summary, path: `/legal/${doc.slug}` }
+        : { title: 'Textos legales · Fiestea', description: 'Privacidad, términos, cookies, aviso legal y condiciones de Fiestea.', path: '/legal' },
+    );
+  }, [doc]);
 
   return (
     <div className="min-h-screen px-6 pt-[calc(1.5rem+var(--safe-top))] pb-[calc(1.5rem+var(--safe-bottom))]">
