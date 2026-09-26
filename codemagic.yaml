@@ -28,8 +28,8 @@ definitions:
     VITE_CARTO_API_KEY: 'cb1_3ojw_1_4e25963353432396cdd7b2aa'
     # «Continuar con Google» (migración 075). IDs de cliente OAuth de Google
     # Cloud (no son secretos). Vacíos, el botón de Google no sale.
-    VITE_GOOGLE_WEB_CLIENT_ID: ''
-    VITE_GOOGLE_IOS_CLIENT_ID: ''
+    VITE_GOOGLE_WEB_CLIENT_ID: '563350138901-eaeqbgjtperrnnqsbmf94jv8o19b4o47.apps.googleusercontent.com'
+    VITE_GOOGLE_IOS_CLIENT_ID: '563350138901-oviodlaq6bhslcj014k0jfu4e08tucmr.apps.googleusercontent.com'
 
 workflows:
   ios-fiestea:
