@@ -1731,7 +1731,9 @@
             "search": "Event oder Location suchen",
             "colEvent": "Event",
             "colDate": "Datum",
-            "colStatus": "Status"
+            "colStatus": "Status",
+            "tabList": "Events",
+            "edit": "Bearbeiten"
         },
         "reports": {
             "title": "Nutzermeldungen",
@@ -1938,7 +1940,15 @@
             "location": "Ort",
             "optional": "optional",
             "locationHouseHelp": "Pflicht: In {{app}}-Partys kommt man rein, wenn man in der Nähe ist, ohne Code.",
-            "locationVenueHelp": "Leer lassen, um den Ort des Betriebs zu nutzen."
+            "locationVenueHelp": "Leer lassen, um den Ort des Betriebs zu nutzen.",
+            "editTitle": "Party bearbeiten",
+            "saved": "Party gespeichert",
+            "placeName": "Club oder Ort",
+            "address": "Adresse",
+            "dressCode": "Dresscode",
+            "bookingUrl": "Ticket-Link",
+            "posterUrl": "Plakat (Bild-Link)",
+            "description": "Beschreibung"
         },
         "notices": {
             "sent_one": "{{count}} Nachricht gesendet",
@@ -1963,6 +1973,24 @@
             "ends": "Läuft am {{date}} ab (keine Verlängerung)",
             "endsCancelled": "Gekündigt: läuft am {{date}} ab",
             "trialEnds": "Gratis-Test bis {{date}}"
+        },
+        "funout": {
+            "synced_one": "{{count}} Event aktuell",
+            "synced_other": "{{count}} Events aktuell",
+            "syncError": "Funout konnte nicht gelesen werden. Versuch es später noch einmal.",
+            "selectAll": "Alle auswählen",
+            "unselectAll": "Auswahl aufheben",
+            "selected": "{{count}} von {{total}} ausgewählt",
+            "refresh": "Aktualisieren",
+            "add": "Zu {{app}} hinzufügen",
+            "loading": "Funout-Events werden geladen…",
+            "empty": "Keine anstehenden Funout-Events.",
+            "noPlace": "Kein Club",
+            "added": "Schon in {{app}}",
+            "noLocation": "Kein Standort",
+            "imported_one": "{{count}} Party zu {{app}} hinzugefügt",
+            "imported_other": "{{count}} Partys zu {{app}} hinzugefügt",
+            "note": "Es werden nur die Daten genutzt: Name, Club, Datum und Uhrzeit, Adresse, Stil, Dresscode, Plakat und Ticket-Link. Hinzugefügte werden bei jeder Aktualisierung selbst angepasst."
         }
     },
     "pwa": {

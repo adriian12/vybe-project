@@ -1040,6 +1040,7 @@ export type Database = {
       }
       events: {
         Row: {
+          address: string | null
           booking_url: string | null
           capacity_alert_ratio: number
           city: string | null
@@ -1048,6 +1049,8 @@ export type Database = {
           dress_code: string | null
           end_date: string
           entry_closed_at: string | null
+          external_id: string | null
+          external_source: string | null
           featured_until: string | null
           followers_notified_at: string | null
           guest_list_enabled: boolean
@@ -1061,6 +1064,7 @@ export type Database = {
           name: string
           now_playing: string | null
           now_playing_at: string | null
+          place_name: string | null
           poster_url: string | null
           price: number | null
           qr_code: string | null
@@ -1087,6 +1091,7 @@ export type Database = {
           venue_id: string
         }
         Insert: {
+          address?: string | null
           booking_url?: string | null
           capacity_alert_ratio?: number
           city?: string | null
@@ -1095,6 +1100,8 @@ export type Database = {
           dress_code?: string | null
           end_date: string
           entry_closed_at?: string | null
+          external_id?: string | null
+          external_source?: string | null
           featured_until?: string | null
           followers_notified_at?: string | null
           guest_list_enabled?: boolean
@@ -1108,6 +1115,7 @@ export type Database = {
           name: string
           now_playing?: string | null
           now_playing_at?: string | null
+          place_name?: string | null
           poster_url?: string | null
           price?: number | null
           qr_code?: string | null
@@ -1134,6 +1142,7 @@ export type Database = {
           venue_id: string
         }
         Update: {
+          address?: string | null
           booking_url?: string | null
           capacity_alert_ratio?: number
           city?: string | null
@@ -1142,6 +1151,8 @@ export type Database = {
           dress_code?: string | null
           end_date?: string
           entry_closed_at?: string | null
+          external_id?: string | null
+          external_source?: string | null
           featured_until?: string | null
           followers_notified_at?: string | null
           guest_list_enabled?: boolean
@@ -1155,6 +1166,7 @@ export type Database = {
           name?: string
           now_playing?: string | null
           now_playing_at?: string | null
+          place_name?: string | null
           poster_url?: string | null
           price?: number | null
           qr_code?: string | null
@@ -1196,6 +1208,113 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      funout_events: {
+        Row: {
+          address: string | null
+          city: string | null
+          dress_code: string | null
+          end_at: string
+          event_type: string | null
+          funout_id: number
+          genres: string[]
+          image_url: string | null
+          imported_event_id: string | null
+          is_free: boolean
+          latitude: number | null
+          lineup: string[]
+          longitude: number | null
+          place_name: string | null
+          source_url: string | null
+          start_at: string
+          synced_at: string
+          theme: string | null
+          ticket_url: string | null
+          title: string
+        }
+        Insert: {
+          address?: string | null
+          city?: string | null
+          dress_code?: string | null
+          end_at: string
+          event_type?: string | null
+          funout_id: number
+          genres?: string[]
+          image_url?: string | null
+          imported_event_id?: string | null
+          is_free?: boolean
+          latitude?: number | null
+          lineup?: string[]
+          longitude?: number | null
+          place_name?: string | null
+          source_url?: string | null
+          start_at: string
+          synced_at?: string
+          theme?: string | null
+          ticket_url?: string | null
+          title: string
+        }
+        Update: {
+          address?: string | null
+          city?: string | null
+          dress_code?: string | null
+          end_at?: string
+          event_type?: string | null
+          funout_id?: number
+          genres?: string[]
+          image_url?: string | null
+          imported_event_id?: string | null
+          is_free?: boolean
+          latitude?: number | null
+          lineup?: string[]
+          longitude?: number | null
+          place_name?: string | null
+          source_url?: string | null
+          start_at?: string
+          synced_at?: string
+          theme?: string | null
+          ticket_url?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "funout_events_imported_event_id_fkey"
+            columns: ["imported_event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      funout_places: {
+        Row: {
+          address: string | null
+          city: string | null
+          geocoded_at: string
+          latitude: number | null
+          longitude: number | null
+          name: string | null
+          place_key: string
+        }
+        Insert: {
+          address?: string | null
+          city?: string | null
+          geocoded_at?: string
+          latitude?: number | null
+          longitude?: number | null
+          name?: string | null
+          place_key: string
+        }
+        Update: {
+          address?: string | null
+          city?: string | null
+          geocoded_at?: string
+          latitude?: number | null
+          longitude?: number | null
+          name?: string | null
+          place_key?: string
+        }
+        Relationships: []
       }
       group_members: {
         Row: {
@@ -3493,7 +3612,30 @@ export type Database = {
         }[]
       }
       admin_house_venue: { Args: never; Returns: string }
+      admin_import_funout: { Args: { p_ids: number[] }; Returns: number }
       admin_is_staff_only: { Args: never; Returns: boolean }
+      admin_list_funout: {
+        Args: never
+        Returns: {
+          address: string
+          city: string
+          dress_code: string
+          end_at: string
+          funout_id: number
+          genres: string[]
+          has_location: boolean
+          image_url: string
+          imported_event_id: string
+          is_free: boolean
+          lineup: string[]
+          place_name: string
+          start_at: string
+          synced_at: string
+          theme: string
+          ticket_url: string
+          title: string
+        }[]
+      }
       admin_list_users: {
         Args: { p_limit?: number; p_offset?: number; p_search?: string }
         Returns: {
@@ -3571,6 +3713,27 @@ export type Database = {
       admin_set_venue_plan: {
         Args: { p_days?: number; p_plan: string; p_venue_id: string }
         Returns: string
+      }
+      admin_update_event: {
+        Args: {
+          p_address: string
+          p_booking_url: string
+          p_capacity: number
+          p_city: string
+          p_description: string
+          p_dress_code: string
+          p_end: string
+          p_event_id: string
+          p_latitude: number
+          p_longitude: number
+          p_name: string
+          p_place_name: string
+          p_poster_url: string
+          p_price: number
+          p_start: string
+          p_theme: string
+        }
+        Returns: undefined
       }
       admin_venue_events: {
         Args: { p_venue_id: string }
@@ -3806,6 +3969,11 @@ export type Database = {
       fulfill_ticket_order: {
         Args: { p_order_id: string; p_session_id: string }
         Returns: number
+      }
+      funout_refresh_imported: { Args: never; Returns: number }
+      funout_upsert_event: {
+        Args: { p_funout_id: number; p_venue_id: string }
+        Returns: string
       }
       generate_recurring_events: { Args: never; Returns: number }
       generate_weekly_report: {
@@ -4955,6 +5123,7 @@ export type Database = {
       toggle_song_vote: { Args: { p_request_id: string }; Returns: boolean }
       toggle_venue_follow: { Args: { p_venue_id: string }; Returns: boolean }
       trigger_event_notifications: { Args: never; Returns: undefined }
+      trigger_funout_sync: { Args: never; Returns: undefined }
       undo_pass: {
         Args: { p_event_id: string; p_profile_id: string }
         Returns: boolean

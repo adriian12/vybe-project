@@ -49,6 +49,13 @@ export interface Event {
   venueName?: string;
   /** Creada por administración sin local: «Evento creado por Fiestea». */
   byPlatform?: boolean;
+  /**
+   * Sala donde se celebra, si no es la del local (fiestas de Fiestea y las
+   * traídas de Funout): «Amok Mallorca».
+   */
+  placeName?: string;
+  /** De dónde viene, si se importó (`funout`). */
+  externalSource?: string;
   venueType?: VenueType;
   /** Localidad y comunidad del local, para filtrar la lista de eventos. */
   city?: string;

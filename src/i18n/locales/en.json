@@ -1731,7 +1731,9 @@
             "search": "Search event or venue",
             "colEvent": "Event",
             "colDate": "Date",
-            "colStatus": "Status"
+            "colStatus": "Status",
+            "tabList": "Events",
+            "edit": "Edit"
         },
         "reports": {
             "title": "User reports",
@@ -1938,7 +1940,15 @@
             "location": "Location",
             "optional": "optional",
             "locationHouseHelp": "Required: people get into {{app}} parties by being nearby, no code.",
-            "locationVenueHelp": "If empty, the business location is used."
+            "locationVenueHelp": "If empty, the business location is used.",
+            "editTitle": "Edit party",
+            "saved": "Party saved",
+            "placeName": "Venue or place",
+            "address": "Address",
+            "dressCode": "Dress code",
+            "bookingUrl": "Tickets link",
+            "posterUrl": "Poster (image link)",
+            "description": "Description"
         },
         "notices": {
             "sent_one": "{{count}} notice sent",
@@ -1963,6 +1973,24 @@
             "ends": "Expires on {{date}} (won't renew)",
             "endsCancelled": "Cancelled: expires on {{date}}",
             "trialEnds": "Free trial until {{date}}"
+        },
+        "funout": {
+            "synced_one": "{{count}} event up to date",
+            "synced_other": "{{count}} events up to date",
+            "syncError": "Couldn't read Funout. Try again in a while.",
+            "selectAll": "Select all",
+            "unselectAll": "Clear selection",
+            "selected": "{{count}} of {{total}} selected",
+            "refresh": "Refresh",
+            "add": "Add to {{app}}",
+            "loading": "Fetching Funout events…",
+            "empty": "No upcoming Funout events.",
+            "noPlace": "No venue",
+            "added": "Already in {{app}}",
+            "noLocation": "No location",
+            "imported_one": "{{count}} party added to {{app}}",
+            "imported_other": "{{count}} parties added to {{app}}",
+            "note": "Only the data is used: name, venue, date and time, address, style, dress code, poster and tickets link. Added ones update themselves on every refresh."
         }
     },
     "pwa": {

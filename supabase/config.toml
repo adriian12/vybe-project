@@ -141,3 +141,6 @@ verify_jwt = false
 # PDF y pase de Wallet de las entradas: se abre desde el correo; protege el token del pedido.
 [functions.ticket-download]
 verify_jwt = false
+
+[functions.funout-sync]
+verify_jwt = false

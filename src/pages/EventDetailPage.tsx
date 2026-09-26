@@ -295,7 +295,7 @@ const EventDetailPage = () => {
           >
             <Martini size={16} className="shrink-0" />
             <span className="truncate underline decoration-white/20 underline-offset-4">
-              {event.venueName}
+              {event.placeName ?? event.venueName}
               {event.city ? ` · ${event.city}` : ''}
             </span>
           </button>

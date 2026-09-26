@@ -63,8 +63,11 @@ const EventCard: React.FC<EventCardProps> = ({
 }) => {
   const { t } = useTranslation();
   const featured = variant === 'featured';
-  // Las fiestas que crea administración sin local firman como la app.
-  const anfitrion = event.byPlatform ? (
+  // Las fiestas que crea administración sin local firman como la app, salvo
+  // que lleven su sala (las de Funout, por ejemplo).
+  const anfitrion = event.placeName ? (
+    event.placeName
+  ) : event.byPlatform ? (
     <span className="font-semibold text-ink">{t('home.byPlatform', { app: t('common.appName') })}</span>
   ) : (
     event.venueName

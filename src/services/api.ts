@@ -85,6 +85,8 @@ const dbEventToEvent = (dbEvent: EventRow, venue?: VenueRow): Event => ({
   venueId: dbEvent.venue_id,
   venueName: venue?.name,
   byPlatform: venue?.is_platform ?? false,
+  placeName: dbEvent.place_name ?? undefined,
+  externalSource: dbEvent.external_source ?? undefined,
   venueType: venue?.type as VenueType | undefined,
   eventRadius: venue?.event_radius,
   // Las fiestas de administración llevan su propia localidad (migración 072).
@@ -108,11 +110,15 @@ const dbEventToEvent = (dbEvent: EventRow, venue?: VenueRow): Event => ({
   showHeadcount: dbEvent.show_headcount ?? false,
   showGenderSplit: dbEvent.show_gender_split ?? false,
   recurrence: (dbEvent.recurrence as Event['recurrence']) ?? 'none',
-  // La dirección es la del local: el evento no tiene columna propia, y la
-  // tarjeta de «Cómo llegar» la necesita escrita, no sólo el punto del mapa.
+  // La dirección, la del evento si la tiene (migración 082) y si no la del
+  // local: la tarjeta de «Cómo llegar» la necesita escrita, no sólo el punto.
   location:
     dbEvent.latitude !== null && dbEvent.longitude !== null
-      ? { latitude: dbEvent.latitude, longitude: dbEvent.longitude, address: venue?.address ?? undefined }
+      ? {
+          latitude: dbEvent.latitude,
+          longitude: dbEvent.longitude,
+          address: dbEvent.address ?? venue?.address ?? undefined,
+        }
       : venue?.latitude !== null && venue?.latitude !== undefined && venue?.longitude !== null
         ? {
             latitude: venue.latitude,

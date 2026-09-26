@@ -1731,7 +1731,9 @@
             "search": "Cercar esdeveniment o negoci",
             "colEvent": "Esdeveniment",
             "colDate": "Data",
-            "colStatus": "Estat"
+            "colStatus": "Estat",
+            "tabList": "Esdeveniments",
+            "edit": "Editar"
         },
         "reports": {
             "title": "Reports d'usuaris",
@@ -1938,7 +1940,15 @@
             "location": "Ubicació",
             "optional": "opcional",
             "locationHouseHelp": "Obligatòria: a les festes de {{app}} s'entra estant a prop, sense codi.",
-            "locationVenueHelp": "Si la deixes buida, s'usa la del negoci."
+            "locationVenueHelp": "Si la deixes buida, s'usa la del negoci.",
+            "editTitle": "Editar festa",
+            "saved": "Festa desada",
+            "placeName": "Sala o lloc",
+            "address": "Adreça",
+            "dressCode": "Dress code",
+            "bookingUrl": "Enllaç d'entrades",
+            "posterUrl": "Cartell (enllaç de la imatge)",
+            "description": "Descripció"
         },
         "notices": {
             "sent_one": "{{count}} avís enviat",
@@ -1963,6 +1973,24 @@
             "ends": "Caduca el {{date}} (no es renova)",
             "endsCancelled": "Cancel·lada: caduca el {{date}}",
             "trialEnds": "Prova gratis fins al {{date}}"
+        },
+        "funout": {
+            "synced_one": "{{count}} esdeveniment al dia",
+            "synced_other": "{{count}} esdeveniments al dia",
+            "syncError": "No s'ha pogut llegir Funout. Torna-ho a provar d'aquí a una estona.",
+            "selectAll": "Seleccionar-los tots",
+            "unselectAll": "Treure la selecció",
+            "selected": "{{count}} de {{total}} marcats",
+            "refresh": "Actualitzar",
+            "add": "Afegir a {{app}}",
+            "loading": "Portant els esdeveniments de Funout…",
+            "empty": "No hi ha esdeveniments de Funout per començar.",
+            "noPlace": "Sense sala",
+            "added": "Ja a {{app}}",
+            "noLocation": "Sense ubicació",
+            "imported_one": "{{count}} festa afegida a {{app}}",
+            "imported_other": "{{count}} festes afegides a {{app}}",
+            "note": "Només es fan servir les dades: nom, sala, dia i hora, adreça, estil, dress code, cartell i enllaç d'entrades. Les ja afegides s'actualitzen soles a cada actualització."
         }
     },
     "pwa": {

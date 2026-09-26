@@ -21,6 +21,7 @@ import {
   MapPin,
   Menu,
   Paperclip,
+  Pencil,
   Phone,
   RefreshCw,
   Search,
@@ -49,6 +50,7 @@ import AdminMetrics from '@/components/admin/admin-metrics';
 import AdminUsers from '@/components/admin/admin-users';
 import AdminCreate from '@/components/admin/admin-create';
 import AdminEventForm from '@/components/admin/admin-event-form';
+import AdminFunout from '@/components/admin/admin-funout';
 import AdminVenues from '@/components/admin/admin-venues';
 import TestLabCard from '@/components/admin/test-lab-card';
 import { VybeMark } from '@/components/brand/vybe-logo';
@@ -71,13 +73,13 @@ import { Report } from '@/types/user';
 const SECCIONES = [
   { id: 'overview' as const, icon: LayoutGrid },
   { id: 'users' as const, icon: UsersRound },
+  { id: 'events' as const, icon: CalendarDays },
   { id: 'venuesAll' as const, icon: Store },
   { id: 'venues' as const, icon: Building },
   { id: 'leads' as const, icon: Inbox },
   { id: 'photos' as const, icon: ImageIcon },
   { id: 'reports' as const, icon: Flag },
   { id: 'sos' as const, icon: Siren },
-  { id: 'events' as const, icon: CalendarDays },
   { id: 'metrics' as const, icon: BarChart3 },
 ];
 
@@ -158,6 +160,9 @@ const AdminDashboardPage = () => {
   const [menuAbierto, setMenuAbierto] = useState(false);
   const [photoFilter, setPhotoFilter] = useState<'all' | 'event_photo' | 'face_verification'>('all');
   const [eventQuery, setEventQuery] = useState('');
+  // Eventos: la lista de fiestas o los de Funout para añadir (migración 082).
+  const [pestanaEventos, setPestanaEventos] = useState<'list' | 'funout'>('list');
+  const [editandoEvento, setEditandoEvento] = useState<Event | null>(null);
 
   const [suspendTarget, setSuspendTarget] = useState<Report | null>(null);
   const [suspendDays, setSuspendDays] = useState('');
@@ -1024,7 +1029,24 @@ const AdminDashboardPage = () => {
                   </label>
                 }
               />
-              {eventosVisibles.length === 0 ? (
+              <div className="mb-3 inline-flex rounded-xl bg-white/10 p-1">
+                {(['list', 'funout'] as const).map((id) => (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => setPestanaEventos(id)}
+                    className={cn(
+                      'press h-9 rounded-lg px-4 text-caption font-extrabold uppercase tracking-wide',
+                      pestanaEventos === id ? 'bg-party-primary text-ink shadow-sm' : 'text-white/70 hover:text-white',
+                    )}
+                  >
+                    {id === 'list' ? t('admin.events.tabList') : 'FUNOUT'}
+                  </button>
+                ))}
+              </div>
+              {pestanaEventos === 'funout' ? (
+                <AdminFunout onImported={() => void loadAll(true)} />
+              ) : eventosVisibles.length === 0 ? (
                 <Vacio text={t('admin.events.empty')} icon={CalendarDays} />
               ) : (
                 <div className="surface-light overflow-hidden rounded-2xl">
@@ -1056,7 +1078,7 @@ const AdminDashboardPage = () => {
                                 <div className="min-w-0">
                                   <p className="truncate font-bold">{event.name}</p>
                                   <p className="truncate text-caption text-party-gray">
-                                    {event.venueName ?? '—'}
+                                    {event.placeName ?? event.venueName ?? '—'}
                                     <span className="sm:hidden"> · {new Date(event.startDate).toLocaleDateString()}</span>
                                   </p>
                                 </div>
@@ -1080,7 +1102,15 @@ const AdminDashboardPage = () => {
                                 {t(`venue.events.status.${estado}`)}
                               </span>
                             </td>
-                            <td className="px-4 py-3 text-right">
+                            <td className="whitespace-nowrap px-4 py-3 text-right">
+                              <button
+                                type="button"
+                                onClick={() => setEditandoEvento(event)}
+                                aria-label={t('admin.events.edit')}
+                                className="press mr-2 inline-flex h-8 w-8 items-center justify-center rounded-lg border border-black/15 align-middle"
+                              >
+                                <Pencil size={14} />
+                              </button>
                               <button
                                 type="button"
                                 disabled={busyId === event.id}
@@ -1242,6 +1272,26 @@ const AdminDashboardPage = () => {
         </button>
       )}
 
+      <Dialog open={editandoEvento !== null} onOpenChange={(open) => !open && setEditandoEvento(null)}>
+        <DialogContent className="surface-light !bg-white max-h-[88vh] overflow-y-auto text-ink sm:max-w-lg">
+          <DialogHeader className="text-left">
+            <DialogTitle>{t('admin.newEvent.editTitle')}</DialogTitle>
+            <DialogDescription>{editandoEvento?.name}</DialogDescription>
+          </DialogHeader>
+          {editandoEvento && (
+            <AdminEventForm
+              key={editandoEvento.id}
+              bare
+              event={editandoEvento}
+              onCreated={() => {
+                setEditandoEvento(null);
+                void loadAll(true);
+              }}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={alta !== null} onOpenChange={(open) => !open && setAlta(null)}>
         <DialogContent className="surface-light !bg-white max-h-[88vh] overflow-y-auto text-ink sm:max-w-lg">
           <DialogHeader className="text-left">
@@ -1265,6 +1315,7 @@ const AdminDashboardPage = () => {
               onCreated={() => {
                 setAlta(null);
                 setAltas((n) => n + 1);
+                void loadAll(true);
               }}
             />
           ) : (

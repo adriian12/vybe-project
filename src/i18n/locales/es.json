@@ -1731,7 +1731,9 @@
             "search": "Buscar evento o negocio",
             "colEvent": "Evento",
             "colDate": "Fecha",
-            "colStatus": "Estado"
+            "colStatus": "Estado",
+            "tabList": "Eventos",
+            "edit": "Editar"
         },
         "reports": {
             "title": "Reportes de usuarios",
@@ -1938,7 +1940,15 @@
             "location": "Ubicación",
             "optional": "opcional",
             "locationHouseHelp": "Obligatoria: a las fiestas de {{app}} se entra estando cerca, sin código.",
-            "locationVenueHelp": "Si la dejas vacía, se usa la del negocio."
+            "locationVenueHelp": "Si la dejas vacía, se usa la del negocio.",
+            "editTitle": "Editar fiesta",
+            "saved": "Fiesta guardada",
+            "placeName": "Sala o lugar",
+            "address": "Dirección",
+            "dressCode": "Dress code",
+            "bookingUrl": "Enlace de entradas",
+            "posterUrl": "Cartel (enlace de la imagen)",
+            "description": "Descripción"
         },
         "notices": {
             "sent_one": "{{count}} aviso enviado",
@@ -1963,6 +1973,24 @@
             "ends": "Caduca el {{date}} (no se renueva)",
             "endsCancelled": "Cancelada: caduca el {{date}}",
             "trialEnds": "Prueba gratis hasta el {{date}}"
+        },
+        "funout": {
+            "synced_one": "{{count}} evento al día",
+            "synced_other": "{{count}} eventos al día",
+            "syncError": "No se ha podido leer Funout. Prueba otra vez en un rato.",
+            "selectAll": "Seleccionar todos",
+            "unselectAll": "Quitar la selección",
+            "selected": "{{count}} de {{total}} marcados",
+            "refresh": "Actualizar",
+            "add": "Añadir a {{app}}",
+            "loading": "Trayendo los eventos de Funout…",
+            "empty": "No hay eventos de Funout por empezar.",
+            "noPlace": "Sin sala",
+            "added": "Ya en {{app}}",
+            "noLocation": "Sin ubicación",
+            "imported_one": "{{count}} fiesta añadida a {{app}}",
+            "imported_other": "{{count}} fiestas añadidas a {{app}}",
+            "note": "Sólo se usan los datos: nombre, sala, día y hora, dirección, estilo, dress code, cartel y enlace de entradas. Las ya añadidas se ponen al día solas en cada actualización."
         }
     },
     "pwa": {
