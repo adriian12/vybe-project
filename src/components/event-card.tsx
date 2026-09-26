@@ -222,6 +222,20 @@ const EventCard: React.FC<EventCardProps> = ({
             >
               <ArrowRight size={17} />
             </span>
+          ) : activity?.hasTickets ? (
+            // Vende entradas en la app: la compra está en la ficha. «Voy a ir»
+            // queda dentro de la ficha.
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpen();
+              }}
+              className="press inline-flex h-9 shrink-0 items-center gap-1.5 rounded-xl bg-ink px-4 text-sm font-bold text-party-primary"
+            >
+              {t('home.buy')}
+              <Ticket size={15} />
+            </button>
           ) : event.bookingUrl ? (
             // El clic se anota antes de abrir la web del local: es la última
             // fila del embudo que el local ve en sus datos. Si el registro

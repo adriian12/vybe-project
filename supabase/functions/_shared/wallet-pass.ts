@@ -88,9 +88,11 @@ export const buildWalletPass = async (
         { key: 'nombre', label: 'NOMBRE', value: ticket.holderName ?? '—' },
         { key: 'tipo', label: 'TIPO', value: data.typeName },
       ],
-      auxiliaryFields: [{ key: 'lugar', label: 'DÓNDE', value: data.address ?? data.venueName }],
+      auxiliaryFields: [{ key: 'lugar', label: 'DÓNDE', value: data.placeLine ?? data.address ?? data.venueName }],
       backFields: [
         ...(data.description ? [{ key: 'incluye', label: 'Incluye', value: data.description }] : []),
+        ...(data.minAge ? [{ key: 'edad', label: 'Edad mínima', value: `${data.minAge} años` }] : []),
+        ...(data.dressCode ? [{ key: 'dress', label: 'Dress code', value: data.dressCode }] : []),
         { key: 'codigo', label: 'Código', value: code },
         { key: 'nota', label: 'Importante', value: 'Entrada nominal. Enseña el QR en la puerta. Cada código vale una sola vez.' },
       ],

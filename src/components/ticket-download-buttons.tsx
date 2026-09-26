@@ -24,12 +24,14 @@ interface Props {
   code?: string;
   /** Códigos para los botones de Wallet (uno por entrada). */
   walletCodes?: string[];
+  /** Nombre de quien lleva cada entrada, por código: así se sabe cuál es cuál. */
+  names?: Record<string, string | null | undefined>;
   /** `light` sobre tarjeta blanca; `dark` sobre el fondo de la app. */
   tone?: 'light' | 'dark';
   className?: string;
 }
 
-const TicketDownloadButtons = ({ token, code, walletCodes, tone = 'dark', className }: Props) => {
+const TicketDownloadButtons = ({ token, code, walletCodes, names, tone = 'dark', className }: Props) => {
   const { t } = useTranslation();
   const codigos = walletCodes ?? (code ? [code] : []);
   const wallet = canUseAppleWallet() && codigos.length > 0;
@@ -56,7 +58,9 @@ const TicketDownloadButtons = ({ token, code, walletCodes, tone = 'dark', classN
             className="press flex h-11 items-center justify-center gap-2 rounded-xl bg-black px-4 font-bold text-white ring-1 ring-white/15"
           >
             <Wallet size={16} />
-            {codigos.length > 1 ? t('tickets.download.walletCode', { code: c }) : t('tickets.download.wallet')}
+            {codigos.length > 1 || names?.[c]
+              ? t('tickets.download.walletCode', { code: names?.[c]?.trim() || c })
+              : t('tickets.download.wallet')}
           </button>
         ))}
     </div>

@@ -35,15 +35,20 @@ export const sendTicketEmail = async (supabase: SupabaseClient, orderId: string)
   if (!pedido || pedido.emailSentAt) return false;
   const { data, token } = pedido;
 
+  // Cada entrada se reconoce por el nombre de quien la lleva, no por su código.
+  const nombreDe = (codigo: string, i: number) =>
+    data.tickets.find((t) => t.code === codigo)?.holderName?.trim() || `${data.typeName} ${i + 1}`;
+
   const enviar = async (to: string, codigos: string[]) => {
     const unaSola = codigos.length === 1 ? codigos[0] : undefined;
+    const nombres = codigos.map(nombreDe);
     const pdf = await renderTicketsPdf(data, unaSola);
     const descarga = `${base()}?t=${token}${unaSola ? `&code=${encodeURIComponent(unaSola)}` : ''}`;
     const botones = [{ text: codigos.length > 1 ? 'Descargar las entradas' : 'Descargar la entrada', url: descarga }];
     if (walletConfigured()) {
-      for (const c of codigos.slice(0, 6)) {
+      for (const [i, c] of codigos.slice(0, 10).entries()) {
         botones.push({
-          text: codigos.length > 1 ? `Apple Wallet · ${c}` : 'Añadir a Apple Wallet',
+          text: `Apple Wallet · ${nombres[i]}`,
           url: `${base()}?t=${token}&code=${encodeURIComponent(c)}&format=pkpass`,
           style: 'secondary',
         } as never);
@@ -54,8 +59,8 @@ export const sendTicketEmail = async (supabase: SupabaseClient, orderId: string)
         <div style="color:${BRAND.accent};font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;">${escapeHtml(data.typeName)}</div>
         <div style="color:#fff;font-size:18px;font-weight:800;padding-top:4px;">${escapeHtml(data.eventName)}</div>
         <div style="color:${BRAND.muted};font-size:14px;padding-top:6px;">${escapeHtml(cuando(data.startDate))}</div>
-        <div style="color:${BRAND.muted};font-size:14px;">${escapeHtml(data.address ?? data.venueName)}</div>
-        <div style="color:#fff;font-size:14px;padding-top:8px;">${codigos.length} ${codigos.length === 1 ? 'entrada' : 'entradas'} · ${codigos.map(escapeHtml).join(', ')}</div>
+        <div style="color:${BRAND.muted};font-size:14px;">${escapeHtml(data.placeLine ?? data.address ?? data.venueName)}</div>
+        <div style="color:#fff;font-size:14px;padding-top:8px;">${codigos.length} ${codigos.length === 1 ? 'entrada' : 'entradas'} · ${nombres.map(escapeHtml).join(', ')}</div>
       </td></tr></table>`;
     const { html, text } = renderEmail({
       preheader: `Tu entrada para ${data.eventName}`,
@@ -64,7 +69,7 @@ export const sendTicketEmail = async (supabase: SupabaseClient, orderId: string)
       paragraphs: ['Aquí tienes tu entrada. Va también adjunta en PDF: enseña el QR en la puerta.'],
       blockHtml: tarjeta,
       buttons: botones,
-      note: `Entrada vendida por ${data.venueName} a través de ${BRAND.name}. Cada código vale una sola vez.`,
+      note: `Entrada vendida por ${data.venueName} a través de ${BRAND.name}. Cada entrada vale una sola vez.`,
     });
     await sendEmail({
       to,

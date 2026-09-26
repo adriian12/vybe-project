@@ -2210,7 +2210,7 @@
                 "checkout": "Couldn't open the payment. Try again."
             },
             "free": "Free",
-            "getFree": "Get ticket"
+            "getFree": "Buy ticket"
         },
         "mine": {
             "title": "Your tickets",
@@ -2247,7 +2247,7 @@
             "total": "Total",
             "freeNote": "Free ticket: you will get the QR in the app and by email.",
             "paidNote": "Secure payment with Stripe. Sold by {{venue}}; your PDF ticket will be emailed to you.",
-            "getFree": "Get free ticket",
+            "getFree": "Buy ticket",
             "pay": "Pay {{amount}}",
             "venueTerms": "Conditions of {{venue}}",
             "errors": {
@@ -3048,7 +3048,10 @@
             "vipPlaceholder": "VIP ticket",
             "includes": "Includes",
             "includesPlaceholder": "One drink, VIP area access, cloakroom…",
-            "priceHelp": "€0 for a free ticket. Otherwise, from €0.50."
+            "priceHelp": "€0 for a free ticket. Otherwise, from €0.50.",
+            "minAge": "Minimum age",
+            "dressCode": "Dress code",
+            "fromEvent": "The party's"
         },
         "saved": "Saved",
         "ended": "The party is over: you can't sell any more.",
@@ -3071,7 +3074,8 @@
             "ticketNotFound": "That ticket doesn't exist or isn't from this venue.",
             "ticketRefunded": "That ticket has been refunded.",
             "invalidCommission": "Invalid commission (up to 100 % or €1,000 per person).",
-            "form": "Check the name, price and quantity."
+            "form": "Check the name, price and quantity.",
+            "invalidMinAge": "Minimum age must be between 14 and 99."
         },
         "promoters": {
             "total": "Tonight's commissions",

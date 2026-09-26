@@ -52,6 +52,9 @@ interface Borrador {
   minSpend: string;
   maxPerOrder: string;
   active: boolean;
+  /** Vacíos: valen los de la fiesta. */
+  minAge: string;
+  dressCode: string;
 }
 
 const vacio = (kind: TicketKind): Borrador => ({
@@ -65,6 +68,8 @@ const vacio = (kind: TicketKind): Borrador => ({
   minSpend: '',
   maxPerOrder: '6',
   active: true,
+  minAge: '',
+  dressCode: '',
 });
 
 const aCentimos = (texto: string): number | null => {
@@ -202,6 +207,8 @@ const VenueSales = ({ events, plan }: VenueSalesProps) => {
         minSpendCents: borrador.kind === 'table' ? aCentimos(borrador.minSpend) : null,
         maxPerOrder: entero(borrador.maxPerOrder) ?? 6,
         active: borrador.active,
+        minAge: borrador.minAge.trim() ? entero(borrador.minAge) : null,
+        dressCode: borrador.dressCode.trim() || null,
       });
       setBorrador(null);
       toast({ title: t('sales.saved') });
@@ -225,6 +232,8 @@ const VenueSales = ({ events, plan }: VenueSalesProps) => {
       minSpend: venta.minSpendCents ? String(venta.minSpendCents / 100) : '',
       maxPerOrder: String(venta.maxPerOrder),
       active: venta.active,
+      minAge: venta.minAge !== null ? String(venta.minAge) : '',
+      dressCode: venta.dressCode ?? '',
     });
 
   const guardarComision = async (codeId: string) => {
@@ -511,6 +520,26 @@ const VenueSales = ({ events, plan }: VenueSalesProps) => {
                         />
                       </div>
                     )}
+                    <div className="space-y-1">
+                      <Label htmlFor="tt-age" className="text-caption">{t('sales.form.minAge')}</Label>
+                      <Input
+                        id="tt-age"
+                        inputMode="numeric"
+                        placeholder={t('sales.form.fromEvent')}
+                        value={borrador.minAge}
+                        onChange={(e) => setBorrador({ ...borrador, minAge: e.target.value })}
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label htmlFor="tt-dress" className="text-caption">{t('sales.form.dressCode')}</Label>
+                      <Input
+                        id="tt-dress"
+                        maxLength={40}
+                        placeholder={t('sales.form.fromEvent')}
+                        value={borrador.dressCode}
+                        onChange={(e) => setBorrador({ ...borrador, dressCode: e.target.value })}
+                      />
+                    </div>
                   </div>
                   <label className="flex items-center justify-between gap-3 text-body-sm">
                     {t('sales.form.onSale')}

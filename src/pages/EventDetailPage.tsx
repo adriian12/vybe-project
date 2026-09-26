@@ -320,6 +320,23 @@ const EventDetailPage = () => {
             </p>
           )}
           <WhoIsGoing eventId={event.id} going={cifras.going} />
+          {/* «Voy a ir», también a la vista: en la tarjeta del inicio no está
+              cuando la fiesta vende entradas. */}
+          {!terminado && !live && (
+            <button
+              type="button"
+              disabled={busyIntent === event.id}
+              onClick={() => void marcarVoy()}
+              aria-pressed={going}
+              className={cn(
+                'press flex h-11 w-full items-center justify-center gap-2 rounded-xl font-bold disabled:opacity-50',
+                going ? 'bg-party-primary text-ink' : 'border border-white/15 text-white',
+              )}
+            >
+              {going ? <BookmarkCheck size={17} /> : <Bookmark size={17} />}
+              {going ? t('home.notGoing') : t('home.imGoing')}
+            </button>
+          )}
           {/* Lista Vybe: el local ve quién ha dicho que va. Se avisa aquí,
               donde se decide marcarlo. */}
           {!terminado && !live && (

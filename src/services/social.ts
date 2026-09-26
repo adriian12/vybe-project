@@ -69,6 +69,8 @@ export interface EventActivity {
   headcount: number | null;
   /** Si en esta fiesta se puede conocer gente (tablón y swipe). */
   swipeEnabled: boolean;
+  /** Vende entradas en la app: la tarjeta enseña «Entradas» y no «Voy a ir». */
+  hasTickets: boolean;
 }
 
 export const EMPTY_ACTIVITY: EventActivity = {
@@ -84,6 +86,7 @@ export const EMPTY_ACTIVITY: EventActivity = {
   entryClosed: false,
   headcount: null,
   swipeEnabled: true,
+  hasTickets: false,
 };
 
 export interface Reputation {
@@ -384,6 +387,7 @@ export const socialService = {
         entryClosed: Boolean(row.entry_closed),
         headcount: row.headcount ?? null,
         swipeEnabled: row.swipe_enabled !== false,
+        hasTickets: Boolean(row.has_tickets),
       };
       return acc;
     }, {});

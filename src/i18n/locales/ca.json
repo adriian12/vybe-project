@@ -2210,7 +2210,7 @@
                 "checkout": "No s'ha pogut obrir el pagament. Torna-ho a provar."
             },
             "free": "Gratis",
-            "getFree": "Aconseguir entrada"
+            "getFree": "Comprar entrada"
         },
         "mine": {
             "title": "Les teves entrades",
@@ -2247,7 +2247,7 @@
             "total": "Total",
             "freeNote": "Entrada gratuïta: rebràs el QR a l'app i al teu correu.",
             "paidNote": "Pagament segur amb Stripe. Ven {{venue}}; t'arribarà l'entrada en PDF al correu.",
-            "getFree": "Aconseguir entrada gratis",
+            "getFree": "Comprar entrada",
             "pay": "Pagar {{amount}}",
             "venueTerms": "Condicions de {{venue}}",
             "errors": {
@@ -3048,7 +3048,10 @@
             "vipPlaceholder": "Entrada VIP",
             "includes": "Inclou",
             "includesPlaceholder": "Una consumició, accés a zona VIP, guarda-roba…",
-            "priceHelp": "0 € per a una entrada gratuïta. Si no, des de 0,50 €."
+            "priceHelp": "0 € per a una entrada gratuïta. Si no, des de 0,50 €.",
+            "minAge": "Edat mínima",
+            "dressCode": "Dress code",
+            "fromEvent": "La de la festa"
         },
         "saved": "Desat",
         "ended": "La festa ja ha acabat: no es pot vendre més.",
@@ -3071,7 +3074,8 @@
             "ticketNotFound": "Aquesta entrada no existeix o no és d'aquest negoci.",
             "ticketRefunded": "Aquesta entrada està reemborsada.",
             "invalidCommission": "Comissió no vàlida (fins a 100 % o 1.000 € per persona).",
-            "form": "Revisa el nom, el preu i la quantitat."
+            "form": "Revisa el nom, el preu i la quantitat.",
+            "invalidMinAge": "L'edat mínima ha d'estar entre 14 i 99."
         },
         "promoters": {
             "total": "Comissions de la nit",

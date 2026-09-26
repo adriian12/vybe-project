@@ -2210,7 +2210,7 @@
                 "checkout": "No se ha podido abrir el pago. Inténtalo de nuevo."
             },
             "free": "Gratis",
-            "getFree": "Conseguir entrada"
+            "getFree": "Comprar entrada"
         },
         "mine": {
             "title": "Tus entradas",
@@ -2247,7 +2247,7 @@
             "total": "Total",
             "freeNote": "Entrada gratuita: recibirás el QR en la app y en tu correo.",
             "paidNote": "Pago seguro con Stripe. Vende {{venue}}; te llegará la entrada en PDF a tu correo.",
-            "getFree": "Conseguir entrada gratis",
+            "getFree": "Comprar entrada",
             "pay": "Pagar {{amount}}",
             "venueTerms": "Condiciones de {{venue}}",
             "errors": {
@@ -3048,7 +3048,10 @@
             "vipPlaceholder": "Entrada VIP",
             "includes": "Incluye",
             "includesPlaceholder": "Una consumición, acceso a zona VIP, guardarropa…",
-            "priceHelp": "0 € para una entrada gratuita. Si no, desde 0,50 €."
+            "priceHelp": "0 € para una entrada gratuita. Si no, desde 0,50 €.",
+            "minAge": "Edad mínima",
+            "dressCode": "Dress code",
+            "fromEvent": "La de la fiesta"
         },
         "saved": "Guardado",
         "ended": "La fiesta ya terminó: no se puede vender más.",
@@ -3071,7 +3074,8 @@
             "ticketNotFound": "Esa entrada no existe o no es de este negocio.",
             "ticketRefunded": "Esa entrada está reembolsada.",
             "invalidCommission": "Comisión no válida (hasta 100 % o 1.000 € por persona).",
-            "form": "Revisa el nombre, el precio y la cantidad."
+            "form": "Revisa el nombre, el precio y la cantidad.",
+            "invalidMinAge": "La edad mínima tiene que estar entre 14 y 99."
         },
         "promoters": {
             "total": "Comisiones de la noche",

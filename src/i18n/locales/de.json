@@ -2210,7 +2210,7 @@
                 "checkout": "Die Zahlung konnte nicht geöffnet werden. Versuch es erneut."
             },
             "free": "Gratis",
-            "getFree": "Ticket holen"
+            "getFree": "Ticket kaufen"
         },
         "mine": {
             "title": "Deine Tickets",
@@ -2247,7 +2247,7 @@
             "total": "Gesamt",
             "freeNote": "Gratis-Ticket: Den QR-Code bekommst du in der App und per E-Mail.",
             "paidNote": "Sichere Zahlung mit Stripe. Verkäufer ist {{venue}}; dein PDF-Ticket kommt per E-Mail.",
-            "getFree": "Gratis-Ticket holen",
+            "getFree": "Ticket kaufen",
             "pay": "{{amount}} bezahlen",
             "venueTerms": "Bedingungen von {{venue}}",
             "errors": {
@@ -3048,7 +3048,10 @@
             "vipPlaceholder": "VIP-Ticket",
             "includes": "Enthält",
             "includesPlaceholder": "Ein Getränk, Zugang zum VIP-Bereich, Garderobe…",
-            "priceHelp": "0 € für ein Gratis-Ticket. Sonst ab 0,50 €."
+            "priceHelp": "0 € für ein Gratis-Ticket. Sonst ab 0,50 €.",
+            "minAge": "Mindestalter",
+            "dressCode": "Dresscode",
+            "fromEvent": "Wie die Party"
         },
         "saved": "Gespeichert",
         "ended": "Die Party ist vorbei: Es kann nichts mehr verkauft werden.",
@@ -3071,7 +3074,8 @@
             "ticketNotFound": "Dieses Ticket existiert nicht oder gehört nicht zu dieser Location.",
             "ticketRefunded": "Dieses Ticket wurde erstattet.",
             "invalidCommission": "Ungültige Provision (bis 100 % oder 1.000 € pro Person).",
-            "form": "Prüfe Name, Preis und Menge."
+            "form": "Prüfe Name, Preis und Menge.",
+            "invalidMinAge": "Das Mindestalter muss zwischen 14 und 99 liegen."
         },
         "promoters": {
             "total": "Provisionen der Nacht",

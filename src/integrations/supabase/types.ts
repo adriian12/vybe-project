@@ -2706,11 +2706,13 @@ export type Database = {
           capacity: number | null
           created_at: string
           description: string | null
+          dress_code: string | null
           event_id: string
           guests: number | null
           id: string
           kind: string
           max_per_order: number
+          min_age: number | null
           min_spend_cents: number | null
           name: string
           price_cents: number
@@ -2722,11 +2724,13 @@ export type Database = {
           capacity?: number | null
           created_at?: string
           description?: string | null
+          dress_code?: string | null
           event_id: string
           guests?: number | null
           id?: string
           kind: string
           max_per_order?: number
+          min_age?: number | null
           min_spend_cents?: number | null
           name: string
           price_cents: number
@@ -2738,11 +2742,13 @@ export type Database = {
           capacity?: number | null
           created_at?: string
           description?: string | null
+          dress_code?: string | null
           event_id?: string
           guests?: number | null
           id?: string
           kind?: string
           max_per_order?: number
+          min_age?: number | null
           min_spend_cents?: number | null
           name?: string
           price_cents?: number
@@ -4182,6 +4188,7 @@ export type Database = {
           event_id: string
           friends_going: number
           going: number
+          has_tickets: boolean
           headcount: number
           inside: number
           now_playing: string
@@ -4520,10 +4527,12 @@ export type Database = {
           active: boolean
           capacity: number
           description: string
+          dress_code: string
           guests: number
           id: string
           kind: string
           max_per_order: number
+          min_age: number
           min_spend_cents: number
           name: string
           price_cents: number
@@ -5017,11 +5026,13 @@ export type Database = {
           p_active?: boolean
           p_capacity: number
           p_description: string
+          p_dress_code?: string
           p_event_id: string
           p_guests?: number
           p_id: string
           p_kind: string
           p_max_per_order?: number
+          p_min_age?: number
           p_min_spend_cents?: number
           p_name: string
           p_price_cents: number

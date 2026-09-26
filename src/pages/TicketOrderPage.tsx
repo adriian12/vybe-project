@@ -133,7 +133,11 @@ const TicketOrderPage = () => {
         </section>
 
         {pedido.downloadToken && (
-          <TicketDownloadButtons token={pedido.downloadToken} walletCodes={pedido.tickets.map((x) => x.code)} />
+          <TicketDownloadButtons
+            token={pedido.downloadToken}
+            walletCodes={pedido.tickets.map((x) => x.code)}
+            names={Object.fromEntries(pedido.tickets.map((x) => [x.code, x.holderName]))}
+          />
         )}
 
         {correo && (

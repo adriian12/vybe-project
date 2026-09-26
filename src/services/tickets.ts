@@ -127,6 +127,9 @@ export interface TicketSale {
   sold: number;
   used: number;
   revenueCents: number;
+  /** Propios de la entrada; sin ellos valen los de la fiesta. */
+  minAge: number | null;
+  dressCode: string | null;
 }
 
 export interface TicketOrder {
@@ -167,6 +170,8 @@ export interface TicketTypeInput {
   minSpendCents?: number | null;
   maxPerOrder?: number;
   active?: boolean;
+  minAge?: number | null;
+  dressCode?: string | null;
 }
 
 export interface ValidatedTicket {
@@ -206,6 +211,7 @@ const ERRORES: Record<string, string> = {
   TICKET_NOT_FOUND: 'sales.errors.ticketNotFound',
   TICKET_REFUNDED: 'sales.errors.ticketRefunded',
   INVALID_COMMISSION: 'sales.errors.invalidCommission',
+  INVALID_MIN_AGE: 'sales.errors.invalidMinAge',
   PAYMENTS_NOT_ENABLED: 'tickets.buy.errors.closed',
   TERMS_REQUIRED: 'tickets.checkout.errors.terms',
   BAD_HOLDERS: 'tickets.checkout.errors.holders',
@@ -414,6 +420,8 @@ export const ticketsService = {
       sold: row.sold,
       used: row.used,
       revenueCents: Number(row.revenue_cents),
+      minAge: row.min_age ?? null,
+      dressCode: row.dress_code ?? null,
     }));
   },
 
@@ -449,6 +457,8 @@ export const ticketsService = {
       p_min_spend_cents: input.minSpendCents ?? null,
       p_max_per_order: input.maxPerOrder ?? 6,
       p_active: input.active ?? true,
+      p_min_age: input.minAge ?? null,
+      p_dress_code: input.dressCode ?? null,
     } as never);
     if (error) throw fallo(error.message);
     return String(data ?? '');
