@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Armchair, Check, Crown, Download, Loader2, Pencil, Plus, Ticket, Undo2, X } from 'lucide-react';
+import { Armchair, Check, Crown, Download, Loader2, Pencil, Plus, Ticket, Trash2, Undo2, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -138,6 +138,7 @@ const VenueSales = ({ events, plan }: VenueSalesProps) => {
   const [ocupado, setOcupado] = useState<string | null>(null);
   const [pagos, setPagos] = useState<PaymentsStatus | null>(null);
   const [aDevolver, setADevolver] = useState<TicketOrder | null>(null);
+  const [aEliminar, setAEliminar] = useState<TicketSale | null>(null);
 
   const fail = useCallback(
     (error: unknown) => {
@@ -217,6 +218,19 @@ const VenueSales = ({ events, plan }: VenueSalesProps) => {
       fail(error);
     } finally {
       setGuardando(false);
+    }
+  };
+
+  // Sin ventas se borra; con ventas se retira (las entradas vendidas siguen valiendo).
+  const eliminar = async (venta: TicketSale) => {
+    setAEliminar(null);
+    try {
+      const resultado = await ticketsService.deleteType(venta.id);
+      if (borrador?.id === venta.id) setBorrador(null);
+      toast({ title: t(resultado === 'archived' ? 'sales.archivedType' : 'sales.deletedType') });
+      await load();
+    } catch (error) {
+      fail(error);
     }
   };
 
@@ -404,15 +418,26 @@ const VenueSales = ({ events, plan }: VenueSalesProps) => {
                         <div className="shrink-0 text-right">
                           <p className="text-body-sm font-bold tabular">{euros(venta.revenueCents)}</p>
                           {!terminado && (
-                            <button
-                              type="button"
-                              onClick={() => editar(venta)}
-                              aria-label={t('common.edit')}
-                              className="press mt-1 inline-flex items-center gap-1 text-caption text-party-gray hover:text-ink"
-                            >
-                              <Pencil size={12} />
-                              {t('common.edit')}
-                            </button>
+                            <div className="mt-1 flex items-center justify-end gap-3">
+                              <button
+                                type="button"
+                                onClick={() => editar(venta)}
+                                aria-label={t('common.edit')}
+                                className="press inline-flex items-center gap-1 text-caption text-party-gray hover:text-ink"
+                              >
+                                <Pencil size={12} />
+                                {t('common.edit')}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setAEliminar(venta)}
+                                aria-label={t('common.delete')}
+                                className="press inline-flex items-center gap-1 text-caption text-destructive hover:opacity-80"
+                              >
+                                <Trash2 size={12} />
+                                {t('common.delete')}
+                              </button>
+                            </div>
                           )}
                         </div>
                       </div>
@@ -765,6 +790,25 @@ const VenueSales = ({ events, plan }: VenueSalesProps) => {
           </div>
         </div>
       )}
+      <AlertDialog open={Boolean(aEliminar)} onOpenChange={(open) => !open && setAEliminar(null)}>
+        <AlertDialogContent className="surface-light !bg-white text-ink">
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('sales.deleteTitle', { name: aEliminar?.name ?? '' })}</AlertDialogTitle>
+            <AlertDialogDescription className="text-ink/70">
+              {aEliminar && aEliminar.sold > 0 ? t('sales.deleteBodySold', { count: aEliminar.sold }) : t('sales.deleteBody')}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => aEliminar && void eliminar(aEliminar)}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {t('common.delete')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       <AlertDialog open={Boolean(aDevolver)} onOpenChange={(open) => !open && setADevolver(null)}>
         <AlertDialogContent className="surface-light !bg-white text-ink">
           <AlertDialogHeader>

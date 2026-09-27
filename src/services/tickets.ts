@@ -461,6 +461,13 @@ export const ticketsService = {
     }));
   },
 
+  /** Borra un tipo de entrada sin ventas; si ya tiene, lo retira de la venta. */
+  deleteType: async (typeId: string): Promise<'deleted' | 'archived'> => {
+    const { data, error } = await supabase.rpc('delete_ticket_type', { p_type_id: typeId });
+    if (error) throw fallo(error.message);
+    return data === 'archived' ? 'archived' : 'deleted';
+  },
+
   saveType: async (input: TicketTypeInput): Promise<string> => {
     const { data, error } = await supabase.rpc('save_ticket_type', {
       p_id: input.id ?? null,

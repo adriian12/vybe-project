@@ -3160,7 +3160,13 @@
                 "account": "Account and bank"
             }
         },
-        "addVip": "Add VIP ticket"
+        "addVip": "Add VIP ticket",
+        "deleteTitle": "Delete “{{name}}”?",
+        "deleteBody": "This ticket will be deleted. This cannot be undone.",
+        "deleteBodySold_one": "{{count}} has already been sold and will still work at the door. The ticket stops selling and leaves the list.",
+        "deleteBodySold_other": "{{count}} have already been sold and will still work at the door. The ticket stops selling and leaves the list.",
+        "deletedType": "Ticket deleted",
+        "archivedType": "Ticket withdrawn from sale"
     },
     "forecast": {
         "title": "Forecast",

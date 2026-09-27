@@ -2771,6 +2771,7 @@ export type Database = {
           active: boolean
           capacity: number | null
           created_at: string
+          deleted_at: string | null
           description: string | null
           dress_code: string | null
           event_id: string
@@ -2789,6 +2790,7 @@ export type Database = {
           active?: boolean
           capacity?: number | null
           created_at?: string
+          deleted_at?: string | null
           description?: string | null
           dress_code?: string | null
           event_id: string
@@ -2807,6 +2809,7 @@ export type Database = {
           active?: boolean
           capacity?: number | null
           created_at?: string
+          deleted_at?: string | null
           description?: string | null
           dress_code?: string | null
           event_id?: string
@@ -4014,6 +4017,7 @@ export type Database = {
       current_venue_role: { Args: never; Returns: string }
       delete_guest_entry: { Args: { p_entry_id: string }; Returns: undefined }
       delete_guest_list: { Args: { p_list_id: string }; Returns: undefined }
+      delete_ticket_type: { Args: { p_type_id: string }; Returns: string }
       demographics_min_bucket: { Args: never; Returns: number }
       draw_raffle: { Args: { p_raffle_id: string }; Returns: string }
       enter_platform_event: {

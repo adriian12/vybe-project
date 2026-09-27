@@ -3160,7 +3160,13 @@
                 "account": "Cuenta y banco"
             }
         },
-        "addVip": "Añadir entrada VIP"
+        "addVip": "Añadir entrada VIP",
+        "deleteTitle": "¿Eliminar «{{name}}»?",
+        "deleteBody": "Se borra esta entrada. No se puede deshacer.",
+        "deleteBodySold_one": "Ya se ha vendido {{count}}: seguirá valiendo en la puerta. La entrada deja de venderse y sale de la lista.",
+        "deleteBodySold_other": "Ya se han vendido {{count}}: seguirán valiendo en la puerta. La entrada deja de venderse y sale de la lista.",
+        "deletedType": "Entrada eliminada",
+        "archivedType": "Entrada retirada de la venta"
     },
     "forecast": {
         "title": "Previsión",

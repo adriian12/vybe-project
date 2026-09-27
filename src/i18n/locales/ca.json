@@ -3160,7 +3160,13 @@
                 "account": "Compte i banc"
             }
         },
-        "addVip": "Afegir entrada VIP"
+        "addVip": "Afegir entrada VIP",
+        "deleteTitle": "Eliminar «{{name}}»?",
+        "deleteBody": "S’esborra aquesta entrada. No es pot desfer.",
+        "deleteBodySold_one": "Ja se n’ha venuda {{count}}: continuarà sent vàlida a la porta. L’entrada deixa de vendre’s i surt de la llista.",
+        "deleteBodySold_other": "Ja se n’han venut {{count}}: continuaran sent vàlides a la porta. L’entrada deixa de vendre’s i surt de la llista.",
+        "deletedType": "Entrada eliminada",
+        "archivedType": "Entrada retirada de la venda"
     },
     "forecast": {
         "title": "Previsió",

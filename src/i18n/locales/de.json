@@ -3160,7 +3160,13 @@
                 "account": "Konto und Bank"
             }
         },
-        "addVip": "VIP-Ticket hinzufügen"
+        "addVip": "VIP-Ticket hinzufügen",
+        "deleteTitle": "„{{name}}“ löschen?",
+        "deleteBody": "Dieses Ticket wird gelöscht. Das kann nicht rückgängig gemacht werden.",
+        "deleteBodySold_one": "Es wurde schon {{count}} verkauft und gilt weiterhin am Eingang. Das Ticket wird nicht mehr verkauft und verschwindet aus der Liste.",
+        "deleteBodySold_other": "Es wurden schon {{count}} verkauft und gelten weiterhin am Eingang. Das Ticket wird nicht mehr verkauft und verschwindet aus der Liste.",
+        "deletedType": "Ticket gelöscht",
+        "archivedType": "Ticket aus dem Verkauf genommen"
     },
     "forecast": {
         "title": "Prognose",
