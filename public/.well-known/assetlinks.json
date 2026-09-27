@@ -1,0 +1,10 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "es.fiestea.app",
+      "sha256_cert_fingerprints": ["7F:D1:8A:2F:3F:D9:9A:59:25:85:D7:AD:B5:E7:14:27:14:79:4D:4C:81:75:E1:69:85:CC:4A:66:AC:E6:18:84"]
+    }
+  }
+]

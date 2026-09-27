@@ -28,7 +28,8 @@ import { useAppContext } from '@/context/app-context';
 import { isEventLive, useEventsFeed } from '@/hooks/use-events-feed';
 import { api } from '@/services/api';
 import { ClaimedOffer, EventHistoryItem, EventOffer, socialService } from '@/services/social';
-import { publicLink, shareOrCopy } from '@/lib/share';
+import { publicLink } from '@/lib/share';
+import { useShareSheet } from '@/components/share-sheet';
 import { cn } from '@/lib/utils';
 import { Event } from '@/types/venue';
 
@@ -52,6 +53,7 @@ const TicketsPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { share, sheet } = useShareSheet();
   const { activeEvent } = useAppContext();
   const { withDistance, intents, isLoading } = useEventsFeed();
 
@@ -120,18 +122,17 @@ const TicketsPage = () => {
 
   const activas = proximas.length + (activeEvent ? 1 : 0);
 
-  const compartir = async (event: Event) => {
-    const resultado = await shareOrCopy({
+  const compartir = (event: Event) =>
+    share({
       title: event.name,
       text: t('tickets.shareText', { name: event.name, venue: event.venueName ?? '' }),
       url: publicLink(`/event/${event.id}`),
     });
-    if (resultado === 'copied') toast({ title: t('eventDetail.copied') });
-  };
 
   return (
     <div className="min-h-screen pb-[calc(var(--nav-h)+2rem)] pt-[var(--header-h)]">
       <Header />
+      {sheet}
 
       <main className="mx-auto max-w-md space-y-5 px-margin pt-5">
         {/* --------------------------------------------------------- título */}
@@ -288,7 +289,7 @@ const TicketsPage = () => {
                     {eventoActivo && (
                       <button
                         type="button"
-                        onClick={() => void compartir(eventoActivo)}
+                        onClick={() => compartir(eventoActivo)}
                         aria-label={t('eventDetail.share')}
                         className="press flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-party-primary text-ink"
                       >

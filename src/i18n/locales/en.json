@@ -723,7 +723,9 @@
         "restore": "Restore purchases",
         "restored": "Purchases restored",
         "nothingToRestore": "No purchases to restore",
-        "manageOnIphone": "Your Premium was bought on iPhone: cancel it in Settings › your name › Subscriptions."
+        "manageOnIphone": "Your Premium was bought on iPhone: cancel it in Settings › your name › Subscriptions.",
+        "googleTerms": "Monthly Premium: {{price}} per month. Charged to your Google Play account and renews automatically until you cancel it in Google Play › Payments & subscriptions › Subscriptions.",
+        "manageOnAndroid": "Your Premium was bought on Google Play: cancel it in Google Play › Payments & subscriptions › Subscriptions."
     },
     "likes": {
         "title": "They like you",
@@ -3337,5 +3339,12 @@
         "optional": "optional",
         "save": "Save and continue",
         "done": "Profile ready!"
+    },
+    "share": {
+        "title": "Share",
+        "copy": "Copy link",
+        "more": "More",
+        "copied": "Link copied",
+        "instagramHint": "Paste it in an Instagram chat or story."
     }
 }

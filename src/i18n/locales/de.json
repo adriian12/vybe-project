@@ -723,7 +723,9 @@
         "restore": "Käufe wiederherstellen",
         "restored": "Käufe wiederhergestellt",
         "nothingToRestore": "Keine Käufe zum Wiederherstellen",
-        "manageOnIphone": "Dein Premium wurde auf dem iPhone gekauft: Kündige es unter Einstellungen › dein Name › Abonnements."
+        "manageOnIphone": "Dein Premium wurde auf dem iPhone gekauft: Kündige es unter Einstellungen › dein Name › Abonnements.",
+        "googleTerms": "Premium monatlich: {{price}} pro Monat. Wird über dein Google-Play-Konto abgerechnet und verlängert sich automatisch, bis du es unter Google Play › Zahlungen & Abos › Abos kündigst.",
+        "manageOnAndroid": "Dein Premium wurde über Google Play gekauft: Kündige es unter Google Play › Zahlungen & Abos › Abos."
     },
     "likes": {
         "title": "Du gefällst ihnen",
@@ -3337,5 +3339,12 @@
         "optional": "optional",
         "save": "Speichern und weiter",
         "done": "Profil fertig!"
+    },
+    "share": {
+        "title": "Teilen",
+        "copy": "Link kopieren",
+        "more": "Mehr",
+        "copied": "Link kopiert",
+        "instagramHint": "Füge ihn in einen Instagram-Chat oder deine Story ein."
     }
 }

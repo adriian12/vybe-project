@@ -1,7 +1,7 @@
 # Publicar Vybe
 
-Lista de lo que falta para tener Vybe en producción: la landing en `vybes.es`,
-la web de locales y administración en `app.vybes.es` y las apps de clubbers en
+Lista de lo que falta para tener Vybe en producción: la landing en `fiestea.es`,
+la web de locales y administración en `app.fiestea.es` y las apps de clubbers en
 Google Play y App Store.
 
 Cada punto dice **quién** lo hace: 🧑 tú (cuentas, pagos, paneles, DNS) o 🤖
@@ -11,14 +11,14 @@ código ya hecho / que se puede hacer desde el repositorio.
 
 Hecho, y por eso algunos puntos de abajo ya no aplican:
 
-- ✅ DNS de `vybes.es` hacia Vercel (A y CNAME de `www` y `app`).
+- ✅ DNS de `fiestea.es` hacia Vercel (A y CNAME de `www` y `app`).
 - ✅ Resend: dominio verificado (envío y recepción), webhook con
   `email.received`.
 - ✅ Secretos en Supabase: `RESEND_WEBHOOK_SECRET`, `RESEND_FULL_API_KEY`,
   `INBOUND_FORWARD_TO` (el Gmail de avisos), `INBOUND_FORWARD_FROM`,
   `AUTH_FROM_EMAIL` (`hola@vybes.es`), `SOS_FROM_EMAIL`, `APP_URL`
-  (`https://app.vybes.es`), `LEADS_NOTIFY_EMAIL`, `VAPID_SUBJECT`.
-- ✅ Auth de Supabase: Site URL `https://app.vybes.es` y Redirect URLs (con
+  (`https://app.fiestea.es`), `LEADS_NOTIFY_EMAIL`, `VAPID_SUBJECT`.
+- ✅ Auth de Supabase: Site URL `https://app.fiestea.es` y Redirect URLs (con
   `vybe://**`).
 - ✅ `SUPABASE_ACCESS_TOKEN` y `VITE_CARTO_API_KEY` en `.env`; mapa de CARTO
   funcionando.
@@ -36,18 +36,18 @@ Edge Functions (`RESEND_*`, `INBOUND_*`, `AUTH_FROM_EMAIL`, `APP_URL`, `FCM_*`,
 
 | Dominio | Qué sirve | Quién entra |
 |---------|-----------|-------------|
-| `vybes.es` (y `www.` → redirige) | Landing y textos legales. Cualquier otra ruta se manda a `app.vybes.es` | Público |
-| `app.vybes.es` | Panel de local y de administración. Las pantallas de clubber muestran «Vybe se vive desde el móvil» | Locales y admins |
+| `fiestea.es` (y `www.` → redirige) | Landing y textos legales. Cualquier otra ruta se manda a `app.fiestea.es` | Público |
+| `app.fiestea.es` | Panel de local y de administración. Las pantallas de clubber muestran «Vybe se vive desde el móvil» | Locales y admins |
 | App Android / iOS | Toda la app de clubbers (y también el panel de local) | Clubbers |
 
 - 🤖 Lo decide `src/lib/hosts.ts` según el dominio. En `localhost` y en las
   previews de Vercel se ve todo, para desarrollar.
-- 🤖 En `app.vybes.es`: `/` abre el acceso de locales, el registro sólo es de
+- 🤖 En `app.fiestea.es`: `/` abre el acceso de locales, el registro sólo es de
   local y el acceso de administración está en un enlace discreto bajo el login.
 - 🤖 Un solo proyecto de Vercel sirve los dos dominios (`vercel.json`: SPA,
-  `www` → `vybes.es`, cabeceras de seguridad, caché, `noindex` en `app.`).
-- 🤖 Los enlaces que se comparten (`VITE_SITE_URL`) y los de los correos van a
-  `app.vybes.es`; con App Links / Universal Links se abren en la app si está
+  `www` → `fiestea.es`, cabeceras de seguridad, caché, `noindex` en `app.`).
+- 🤖 Los enlaces que se comparten (`src/lib/share.ts`) y los de los correos van a
+  `app.fiestea.es`; con App Links / Universal Links se abren en la app si está
   instalada (sección 6).
 
 ---
@@ -68,9 +68,8 @@ Edge Functions (`RESEND_*`, `INBOUND_*`, `AUTH_FROM_EMAIL`, `APP_URL`, `FCM_*`,
    | `VITE_SUPABASE_ANON_KEY` | la de tu `.env` |
    | `VITE_VAPID_PUBLIC_KEY` | la de tu `.env` |
    | `VITE_SENTRY_DSN` | la de tu `.env` |
-   | `VITE_SITE_URL` | `https://app.vybes.es` |
-   | `VITE_LANDING_URL` | `https://vybes.es` |
-   | `VITE_APP_URL` | `https://app.vybes.es` |
+   | `VITE_LANDING_URL` | `https://fiestea.es` |
+   | `VITE_APP_URL` | `https://app.fiestea.es` |
    | `VITE_CARTO_API_KEY` | la clave de CARTO (sección 4) |
    | `VITE_PLAY_STORE_URL` / `VITE_APP_STORE_URL` | vacías hasta publicar |
 
@@ -78,7 +77,7 @@ Edge Functions (`RESEND_*`, `INBOUND_*`, `AUTH_FROM_EMAIL`, `APP_URL`, `FCM_*`,
    otro secreto sin `VITE_`: son de las Edge Functions y viven en Supabase. La
    web sólo necesita las `VITE_*`.
 
-4. 🧑 **Dominios** en el proyecto: `vybes.es`, `www.vybes.es` y `app.vybes.es`.
+4. 🧑 **Dominios** en el proyecto: `fiestea.es`, `www.fiestea.es` y `app.fiestea.es`.
 5. 🧑 **DNS** en el registrador, con los valores exactos que muestre Vercel
    (suelen ser estos):
 
@@ -107,14 +106,14 @@ Edge Functions (`RESEND_*`, `INBOUND_*`, `AUTH_FROM_EMAIL`, `APP_URL`, `FCM_*`,
    `VITE_FACE_VERIFICATION_URL` (las dos últimas son opcionales). Un
    `secrets:push` con valores viejos pisaría los buenos.
 3. 🧑 **Authentication → URL Configuration:**
-   - Site URL: `https://app.vybes.es`
-   - Redirect URLs: `https://app.vybes.es/**`, `https://vybes.es/**`,
+   - Site URL: `https://app.fiestea.es`
+   - Redirect URLs: `https://app.fiestea.es/**`, `https://fiestea.es/**`,
      `vybe://**`, `http://localhost:5173/**`
 4. 🧑 **Edge Functions → Secrets** (o `.env` + `npm run secrets:push`):
 
    | Secreto | Valor |
    |---------|-------|
-   | `APP_URL` | `https://app.vybes.es` — **en `.env` está `http://localhost:5173`**, y si es lo que se subió, los enlaces de los correos de verificación y del pago llevan a localhost |
+   | `APP_URL` | `https://app.fiestea.es` — **en `.env` está `http://localhost:5173`**, y si es lo que se subió, los enlaces de los correos de verificación y del pago llevan a localhost |
    | `AUTH_FROM_EMAIL` | `Vybe <hola@vybes.es>` (tras verificar el dominio en Resend) |
    | `SOS_FROM_EMAIL` | `Vybe <avisos@vybes.es>` |
    | `LEADS_NOTIFY_EMAIL` | el correo que debe recibir las solicitudes de demo |
@@ -140,9 +139,9 @@ Edge Functions (`RESEND_*`, `INBOUND_*`, `AUTH_FROM_EMAIL`, `APP_URL`, `FCM_*`,
 
 ---
 
-## 3. Correo con Resend (`vybes.es`)
+## 3. Correo con Resend (`fiestea.es`)
 
-1. ✅ Dominio `vybes.es` verificado en Resend (región eu-west-1). DNS en Piensa
+1. ✅ Dominio `fiestea.es` verificado en Resend (región eu-west-1). DNS en Piensa
    Solutions: DKIM `resend._domainkey`, CNAME `send` y `rsend`, MX `@` →
    `inbound-smtp.eu-west-1.amazonaws.com`.
 2. ✅ **DMARC ya existe** (`_dmarc` = `v=DMARC1; p=none;`). Por eso daba error al
@@ -163,7 +162,7 @@ Edge Functions (`RESEND_*`, `INBOUND_*`, `AUTH_FROM_EMAIL`, `APP_URL`, `FCM_*`,
    responde `NOT_CONFIGURED`. No uses `npm run secrets:push` con el `.env`
    reconstruido (sube todo, también valores viejos): sube sólo esas claves.
 5. **Correos `soporte@`, `admin@`, `hola@`…** No hay que crearlos:
-   - **Enviar** desde cualquier dirección de `vybes.es` ya funciona.
+   - **Enviar** desde cualquier dirección de `fiestea.es` ya funciona.
    - **Recibir:** el MX apunta a Resend, así que llega todo lo que se mande a
      cualquier dirección del dominio (Resend → Emails → *Receiving*).
    - 🤖 `resend-webhook` los **reenvía a tu Gmail** con `Reply-To` al remitente:
@@ -286,7 +285,7 @@ Edge Functions (`RESEND_*`, `INBOUND_*`, `AUTH_FROM_EMAIL`, `APP_URL`, `FCM_*`,
    Android.
 3. 🧑 **Avisos push:** subir la clave APNs a Firebase y añadir
    `GoogleService-Info.plist`.
-4. 🧑 **Universal Links.** El archivo de derechos ya pide `applinks:app.vybes.es`.
+4. 🧑 **Universal Links.** El archivo de derechos ya pide `applinks:app.fiestea.es`.
    Falta publicar `public/.well-known/apple-app-site-association` con tu Team
    ID:
 
@@ -330,15 +329,15 @@ Edge Functions (`RESEND_*`, `INBOUND_*`, `AUTH_FROM_EMAIL`, `APP_URL`, `FCM_*`,
 - 🧑 **Sightengine:** comprobar que el plan aguanta el volumen de fotos
   previsto.
 - 🧑 **Sentry:** crear alertas de errores nuevos y de picos.
-- 🧑 **Monitor de disponibilidad** (UptimeRobot o similar) para `vybes.es`,
-  `app.vybes.es` y la Edge Function `auth-email`.
+- 🧑 **Monitor de disponibilidad** (UptimeRobot o similar) para `fiestea.es`,
+  `app.fiestea.es` y la Edge Function `auth-email`.
 
 ---
 
 ## Orden recomendado
 
-1. **Esta semana (web):** secciones 1, 2, 3 y 4. Con eso `vybes.es` capta
-   locales, `app.vybes.es` les deja registrarse y los correos llegan a
+1. **Esta semana (web):** secciones 1, 2, 3 y 4. Con eso `fiestea.es` capta
+   locales, `app.fiestea.es` les deja registrarse y los correos llegan a
    cualquiera.
 2. **Antes de dar de alta locales de pago:** sección 5 (Stripe real y planes de
    local), 2.7 (limpiar datos de prueba) y 8.

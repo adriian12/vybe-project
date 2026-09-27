@@ -21,7 +21,7 @@
     "native:android": "npm run native:sync && npx cap open android",
     "native:ios": "npm run native:sync && npx cap open ios",
     "native:apk": "npm run native:sync && node scripts/build-apk.mjs",
-    "functions:deploy": "node scripts/run-supabase.mjs functions deploy moderate-photo send-sos-alert stripe-checkout stripe-connect stripe-webhook admin-notify delete-account venue-add-member send-push analytics-collect send-sms-verification notify-events auth-email resend-webhook venue-lead door-counter team-access apple-iap apple-notifications ticket-download song-search likes-preview funout-sync"
+    "functions:deploy": "node scripts/run-supabase.mjs functions deploy moderate-photo send-sos-alert stripe-checkout stripe-connect stripe-webhook admin-notify delete-account venue-add-member send-push analytics-collect send-sms-verification notify-events auth-email resend-webhook venue-lead door-counter team-access apple-iap apple-notifications google-play google-play-notifications ticket-download song-search likes-preview funout-sync"
   },
   "dependencies": {
     "@capacitor/android": "^8.5.2",
@@ -35,6 +35,7 @@
     "@capacitor/ios": "^8.5.2",
     "@capacitor/preferences": "^8.0.1",
     "@capacitor/push-notifications": "^8.1.2",
+    "@capacitor/share": "^8.0.2",
     "@capacitor/splash-screen": "^8.0.2",
     "@capacitor/status-bar": "^8.0.3",
     "@capgo/capacitor-social-login": "^8.5.11",

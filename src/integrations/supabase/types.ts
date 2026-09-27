@@ -1316,6 +1316,69 @@ export type Database = {
         }
         Relationships: []
       }
+      google_purchases: {
+        Row: {
+          created_at: string
+          event_id: string | null
+          expires_at: string | null
+          kind: string
+          order_id: string | null
+          product_id: string
+          profile_id: string | null
+          purchase_time: string | null
+          purchase_token: string
+          quantity: number
+          test_purchase: boolean
+          updated_at: string
+          voided_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_id?: string | null
+          expires_at?: string | null
+          kind: string
+          order_id?: string | null
+          product_id: string
+          profile_id?: string | null
+          purchase_time?: string | null
+          purchase_token: string
+          quantity?: number
+          test_purchase?: boolean
+          updated_at?: string
+          voided_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_id?: string | null
+          expires_at?: string | null
+          kind?: string
+          order_id?: string | null
+          product_id?: string
+          profile_id?: string | null
+          purchase_time?: string | null
+          purchase_token?: string
+          quantity?: number
+          test_purchase?: boolean
+          updated_at?: string
+          voided_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "google_purchases_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "google_purchases_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       group_members: {
         Row: {
           group_id: string
@@ -1715,6 +1778,7 @@ export type Database = {
           created_at: string | null
           event_id: string | null
           expires_at: string | null
+          google_purchase_token: string | null
           id: string
           plan_type: string
           started_at: string | null
@@ -1732,6 +1796,7 @@ export type Database = {
           created_at?: string | null
           event_id?: string | null
           expires_at?: string | null
+          google_purchase_token?: string | null
           id?: string
           plan_type?: string
           started_at?: string | null
@@ -1749,6 +1814,7 @@ export type Database = {
           created_at?: string | null
           event_id?: string | null
           expires_at?: string | null
+          google_purchase_token?: string | null
           id?: string
           plan_type?: string
           started_at?: string | null

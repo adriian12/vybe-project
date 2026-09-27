@@ -723,7 +723,9 @@
         "restore": "Restaura les compres",
         "restored": "Compres restaurades",
         "nothingToRestore": "No hi ha compres per restaurar",
-        "manageOnIphone": "El teu Premium es va comprar a l'iPhone: cancel·la'l a Configuració › el teu nom › Subscripcions."
+        "manageOnIphone": "El teu Premium es va comprar a l'iPhone: cancel·la'l a Configuració › el teu nom › Subscripcions.",
+        "googleTerms": "Premium mensual: {{price}} al mes. Es cobra al teu compte de Google Play i es renova tot sol fins que el cancel·lis a Google Play › Pagaments i subscripcions › Subscripcions.",
+        "manageOnAndroid": "El teu Premium es va comprar a Google Play: cancel·la’l a Google Play › Pagaments i subscripcions › Subscripcions."
     },
     "likes": {
         "title": "Els agrades",
@@ -3337,5 +3339,12 @@
         "optional": "opcional",
         "save": "Desa i entra",
         "done": "Perfil a punt!"
+    },
+    "share": {
+        "title": "Compartir",
+        "copy": "Copiar enllaç",
+        "more": "Més",
+        "copied": "Enllaç copiat",
+        "instagramHint": "Enganxa’l en un xat o a la teva història d’Instagram."
     }
 }

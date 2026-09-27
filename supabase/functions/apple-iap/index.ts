@@ -3,6 +3,7 @@ import { json, preflight } from '../_shared/cors.ts';
 import { adminClient, getProfileId, getUser } from '../_shared/supabase.ts';
 import { AppleJwsError, AppleTransaction, verifyAppleJws } from '../_shared/apple-jws.ts';
 import { grantAppleTransaction } from '../_shared/apple-grant.ts';
+import { storePrecheck } from '../_shared/iap-precheck.ts';
 
 /**
  * Compras integradas de Apple desde la app de iOS (migración 074).
@@ -41,42 +42,8 @@ serve(async (req: Request): Promise<Response> => {
 
     // ------------------------------------------------------------- precheck
     if (action === 'precheck') {
-      if (plan === 'supercrush') return json({ ok: true, profileId });
-
-      const { data: mensual } = await supabase
-        .from('premium_subscriptions')
-        .select('id')
-        .eq('user_id', profileId)
-        .eq('status', 'active')
-        .is('event_id', null)
-        .or(`expires_at.is.null,expires_at.gt.${new Date().toISOString()}`)
-        .limit(1)
-        .maybeSingle();
-      if (mensual) return json({ error: 'ALREADY_PREMIUM' }, 409);
-      if (plan === 'monthly') return json({ ok: true, profileId });
-
-      if (plan !== 'event') return json({ error: 'INVALID_PLAN' }, 400);
-      if (!eventId) return json({ error: 'EVENT_REQUIRED' }, 400);
-
-      const { data: dentro } = await supabase
-        .from('event_attendance')
-        .select('event_id, events!inner(end_date)')
-        .eq('profile_id', profileId)
-        .eq('event_id', eventId)
-        .is('left_at', null)
-        .maybeSingle();
-      const fin = (dentro?.events as { end_date: string } | null)?.end_date;
-      if (!dentro || !fin || new Date(fin).getTime() <= Date.now()) return json({ error: 'NOT_AT_EVENT' }, 403);
-
-      const { data: yaPagado } = await supabase
-        .from('premium_subscriptions')
-        .select('id')
-        .eq('user_id', profileId)
-        .eq('event_id', eventId)
-        .eq('status', 'active')
-        .limit(1)
-        .maybeSingle();
-      if (yaPagado) return json({ error: 'ALREADY_PREMIUM' }, 409);
+      const fallo = await storePrecheck(supabase, profileId, plan, eventId);
+      if (fallo) return json({ error: fallo.error }, fallo.status);
       return json({ ok: true, profileId });
     }
 

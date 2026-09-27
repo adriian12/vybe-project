@@ -723,7 +723,9 @@
         "restore": "Restaurar compras",
         "restored": "Compras restauradas",
         "nothingToRestore": "No hay compras que restaurar",
-        "manageOnIphone": "Tu Premium se compró en el iPhone: cancélalo en Ajustes › tu nombre › Suscripciones."
+        "manageOnIphone": "Tu Premium se compró en el iPhone: cancélalo en Ajustes › tu nombre › Suscripciones.",
+        "googleTerms": "Premium mensual: {{price}} al mes. Se cobra en tu cuenta de Google Play y se renueva solo hasta que lo canceles en Google Play › Pagos y suscripciones › Suscripciones.",
+        "manageOnAndroid": "Tu Premium se compró en Google Play: cancélalo en Google Play › Pagos y suscripciones › Suscripciones."
     },
     "likes": {
         "title": "Les gustas",
@@ -3337,5 +3339,12 @@
         "optional": "opcional",
         "save": "Guardar y entrar",
         "done": "¡Perfil listo!"
+    },
+    "share": {
+        "title": "Compartir",
+        "copy": "Copiar enlace",
+        "more": "Más",
+        "copied": "Enlace copiado",
+        "instagramHint": "Pégalo en un chat o en tu historia de Instagram."
     }
 }

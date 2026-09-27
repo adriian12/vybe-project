@@ -10,7 +10,6 @@ interface ImportMetaEnv {
   readonly VITE_VAPID_PUBLIC_KEY?: string;
   readonly VITE_FACE_VERIFICATION_URL?: string;
   /** Dominio público de la web, para los enlaces que se comparten desde la app instalada. */
-  readonly VITE_SITE_URL?: string;
 }
 
 interface ImportMeta {

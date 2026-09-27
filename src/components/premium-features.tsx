@@ -44,13 +44,13 @@ const PremiumFeatures: React.FC = () => {
     getPremiumForEvent,
     isPremium,
     setShowSupercrushDialog,
-    applePurchases,
-    applePrices,
+    storePurchases,
+    storePrices,
     restorePurchases,
   } = usePremium();
-  // En el iPhone, el precio de la App Store de cada persona (su moneda).
+  // En la app, el precio de la tienda de cada persona (su moneda).
   const precio = (plan: 'monthly' | 'event') =>
-    applePrices[plan]?.label ??
+    storePrices[plan]?.label ??
     PREMIUM_PRICES[plan].toLocaleString(undefined, { style: 'currency', currency: 'EUR', minimumFractionDigits: 2 });
   const { activeEvent } = useAppContext();
 
@@ -121,11 +121,12 @@ const PremiumFeatures: React.FC = () => {
                   : t('premium.needEvent')}
               </PartyButton>
               <p className="text-center text-caption text-party-gray">{t('premium.eventOnlyNote')}</p>
-              {applePurchases && (
-                // Lo que Apple pide junto a una suscripción: renovación, cómo
-                // cancelarla, términos y privacidad, y restaurar compras.
+              {storePurchases && (
+                // Lo que Apple y Google piden junto a una suscripción:
+                // renovación, cómo cancelarla, términos y privacidad, y
+                // restaurar compras.
                 <p className="text-center text-[11px] leading-snug text-party-gray">
-                  {t('premium.appleTerms', { price: precio('monthly') })}{' '}
+                  {t(storePurchases === 'apple' ? 'premium.appleTerms' : 'premium.googleTerms', { price: precio('monthly') })}{' '}
                   <a href={`${LANDING_URL}/legal/terminos`} target="_blank" rel="noreferrer" className="underline">
                     {t('privacy.termsLink')}
                   </a>

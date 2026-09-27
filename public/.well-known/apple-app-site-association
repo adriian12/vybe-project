@@ -1,0 +1,16 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["XQ5WB5Y646.es.fiestea.app"],
+        "components": [
+          { "/": "/event/*" },
+          { "/": "/local/*" },
+          { "/": "/tickets*" },
+          { "/": "/u/*" }
+        ]
+      }
+    ]
+  },
+  "webcredentials": { "apps": ["XQ5WB5Y646.es.fiestea.app"] }
+}

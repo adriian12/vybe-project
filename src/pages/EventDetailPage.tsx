@@ -39,7 +39,8 @@ import { calculateDistance, Coordinates, formatDistance, getCurrentPosition } fr
 import { franjaDe } from '@/lib/party-filters';
 import { openExternal } from '@/services/native';
 import { EMPTY_ACTIVITY, socialService } from '@/services/social';
-import { publicLink, shareOrCopy } from '@/lib/share';
+import { publicLink } from '@/lib/share';
+import { useShareSheet } from '@/components/share-sheet';
 import { track } from '@/lib/observability';
 import { cn } from '@/lib/utils';
 import { Event } from '@/types/venue';
@@ -92,6 +93,7 @@ const EventDetailPage = () => {
   const { eventId } = useParams<{ eventId: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { share, sheet } = useShareSheet();
   const { activeEvent, currentUser } = useAppContext();
   const { t, i18n } = useTranslation();
   const { withDistance, activity, intents, busyIntent, toggleIntent, position } = useEventsFeed();
@@ -167,15 +169,12 @@ const EventDetailPage = () => {
     .toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' })
     .replace(/\./g, '');
 
-  const compartir = async () => {
-    const resultado = await shareOrCopy({
+  const compartir = () =>
+    share({
       title: event.name,
       text: t('eventDetail.shareText', { name: event.name, venue: event.venueName ?? '', date: fecha }),
       url: publicLink(`/event/${event.id}`),
     });
-    if (resultado === 'copied') toast({ title: t('eventDetail.copied') });
-    if (resultado === 'failed') toast({ title: t('common.error'), variant: 'destructive' });
-  };
 
   const pedirUbicacion = async () => {
     setPidiendoUbicacion(true);
@@ -200,6 +199,7 @@ const EventDetailPage = () => {
 
   return (
     <div className="min-h-screen pb-[calc(var(--nav-h)+7rem)] pt-[var(--header-h)]">
+      {sheet}
       <Header />
 
       <main className="mx-auto max-w-2xl">
@@ -459,7 +459,7 @@ const EventDetailPage = () => {
         <div className="mx-auto flex max-w-md items-center gap-3">
           <button
             type="button"
-            onClick={() => void compartir()}
+            onClick={compartir}
             aria-label={t('eventDetail.share')}
             className="press flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-surface-container text-foreground hover:bg-surface-high"
           >

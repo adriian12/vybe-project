@@ -4,7 +4,7 @@ import { Minus, Plus, Star } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
 import { PartyButton } from '@/components/ui-custom/party-button';
 import { PREMIUM_PRICES, usePremium } from '@/context/premium-context';
-import { APPLE_MAX_QUANTITY } from '@/services/iap';
+import { storeMaxQuantity } from '@/services/iap';
 
 const MAX = 100;
 
@@ -19,13 +19,14 @@ const dinero = (value: number, currency = 'EUR') =>
  */
 const SupercrushDialog = () => {
   const { t } = useTranslation();
-  const { showSupercrushDialog, setShowSupercrushDialog, buySupercrush, supercrushBalance, applePurchases, applePrices } =
+  const { showSupercrushDialog, setShowSupercrushDialog, buySupercrush, supercrushBalance, storePurchases, storePrices } =
     usePremium();
-  // En el iPhone se compra con Apple: su precio y, como mucho, 10 de una vez.
-  const tope = applePurchases ? APPLE_MAX_QUANTITY : MAX;
-  const apple = applePurchases ? applePrices.supercrush : undefined;
-  const unidad = apple?.amount ?? PREMIUM_PRICES.supercrush;
-  const moneda = apple?.currency ?? 'EUR';
+  // En la app se compra en la tienda: su precio y, como mucho, 10 de una vez
+  // en Apple y 1 en Google Play.
+  const tope = storePurchases ? storeMaxQuantity() : MAX;
+  const tienda = storePurchases ? storePrices.supercrush : undefined;
+  const unidad = tienda?.amount ?? PREMIUM_PRICES.supercrush;
+  const moneda = tienda?.currency ?? 'EUR';
   const [cantidad, setCantidad] = useState(1);
   const [enviando, setEnviando] = useState(false);
 
@@ -83,7 +84,7 @@ const SupercrushDialog = () => {
           <p className="text-center text-body-sm text-party-gray">
             {t('supercrush.priceLine', {
               count: cantidad,
-              unit: apple?.label ?? dinero(unidad, moneda),
+              unit: tienda?.label ?? dinero(unidad, moneda),
               total: dinero(total, moneda),
             })}
           </p>
