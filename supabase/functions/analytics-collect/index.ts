@@ -1,4 +1,5 @@
 import { serve } from 'https://deno.land/std@0.193.0/http/server.ts';
+import { overLimit, tooManyRequests } from '../_shared/rate-limit.ts';
 import { json, preflight } from '../_shared/cors.ts';
 import { adminClient, getUser, getProfileId } from '../_shared/supabase.ts';
 
@@ -48,6 +49,8 @@ serve(async (req: Request): Promise<Response> => {
   if (req.method !== 'POST') return json({ error: 'Método no permitido' }, 405);
 
   const supabase = adminClient();
+  // La analítica se manda en lotes: 60 lotes por minuto e IP es de sobra.
+  if (await overLimit(supabase, req, 'analytics-collect', 60)) return tooManyRequests();
 
   try {
     const { events } = (await req.json()) as { events?: IncomingEvent[] };

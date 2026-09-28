@@ -1,4 +1,5 @@
 import { serve } from 'https://deno.land/std@0.193.0/http/server.ts';
+import { overLimit, tooManyRequests } from '../_shared/rate-limit.ts';
 import { corsHeaders, json } from '../_shared/cors.ts';
 import { adminClient } from '../_shared/supabase.ts';
 import { loadTicketOrder, renderTicketsPdf } from '../_shared/ticket-pdf.ts';
@@ -26,6 +27,8 @@ serve(async (req: Request): Promise<Response> => {
   if (!/^[a-f0-9]{24,64}$/.test(token)) return json({ error: 'INVALID_LINK' }, 404);
 
   try {
+    // Se abre desde el correo, sin sesión: por IP.
+    if (await overLimit(adminClient(), req, 'ticket-download', 40)) return tooManyRequests();
     const pedido = await loadTicketOrder(adminClient(), { token });
     if (!pedido || pedido.data.tickets.length === 0) return json({ error: 'NOT_FOUND' }, 404);
     if (code && !pedido.data.tickets.some((t) => t.code === code)) return json({ error: 'NOT_FOUND' }, 404);

@@ -13,4 +13,4 @@ export const COMPANY = {
 };
 
 /** Fecha de la versión vigente de los textos legales (se guarda al aceptarlos). */
-export const LEGAL_UPDATED = '27 de septiembre de 2026';
+export const LEGAL_UPDATED = '28 de septiembre de 2026';

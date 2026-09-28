@@ -1,4 +1,5 @@
 import { serve } from 'https://deno.land/std@0.193.0/http/server.ts';
+import { overLimit, tooManyRequests } from '../_shared/rate-limit.ts';
 import { Image } from 'https://deno.land/x/imagescript@1.3.0/mod.ts';
 import { json, preflight } from '../_shared/cors.ts';
 import { adminClient, getProfileId, getUser } from '../_shared/supabase.ts';
@@ -45,6 +46,7 @@ serve(async (req: Request): Promise<Response> => {
   try {
     const user = await getUser(req, supabase);
     if (!user) return json({ error: 'No autenticado' }, 401);
+    if (await overLimit(supabase, req, 'likes-preview', 30, { userId: user.id })) return tooManyRequests();
 
     const profileId = await getProfileId(supabase, user.id);
     if (!profileId) return json({ likes: [] });

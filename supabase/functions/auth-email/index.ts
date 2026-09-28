@@ -1,4 +1,5 @@
 import { serve } from 'https://deno.land/std@0.193.0/http/server.ts';
+import { overLimit, tooManyRequests } from '../_shared/rate-limit.ts';
 import { json, preflight } from '../_shared/cors.ts';
 import { BRAND, renderEmail } from '../_shared/email.ts';
 import { adminClient } from '../_shared/supabase.ts';
@@ -221,6 +222,12 @@ serve(async (req: Request): Promise<Response> => {
   }
 
   const supabase = adminClient();
+
+  // Altas, reenvíos y recuperación: 30 por minuto e IP (la comprobación
+
+  // de correo tiene además su propio límite por hora).
+
+  if (await overLimit(supabase, req, 'auth-email', 30)) return tooManyRequests();
 
   try {
     const body = (await req.json()) as RequestBody;

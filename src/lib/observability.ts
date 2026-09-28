@@ -1,4 +1,5 @@
 import * as Sentry from '@sentry/react';
+import type { PostHog } from 'posthog-js';
 
 const DSN = import.meta.env.VITE_SENTRY_DSN as string | undefined;
 /**
@@ -10,6 +11,49 @@ const ANALYTICS_ENDPOINT =
   (import.meta.env.VITE_ANALYTICS_URL as string | undefined) ??
   (SUPABASE_URL ? `${SUPABASE_URL}/functions/v1/analytics-collect` : undefined);
 const ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
+
+/**
+ * PostHog (analítica de producto). Sin `VITE_POSTHOG_KEY` no se carga. Va al
+ * servidor de la UE y **sin cookies ni almacenamiento** (`persistence:
+ * 'memory'`): no guarda nada en el dispositivo, por eso no hace falta aviso de
+ * cookies. Sin grabación de sesiones (hay chats y fotos) ni captura de campos.
+ */
+const POSTHOG_KEY = import.meta.env.VITE_POSTHOG_KEY as string | undefined;
+const POSTHOG_HOST = (import.meta.env.VITE_POSTHOG_HOST as string | undefined) ?? 'https://eu.i.posthog.com';
+let posthog: PostHog | null = null;
+/** Lo que llega antes de que PostHog termine de cargar. */
+const pendientesPosthog: ((ph: PostHog) => void)[] = [];
+const conPosthog = (accion: (ph: PostHog) => void) => {
+  if (!POSTHOG_KEY || import.meta.env.DEV) return;
+  if (posthog) accion(posthog);
+  else pendientesPosthog.push(accion);
+};
+
+const initPosthog = () => {
+  if (!POSTHOG_KEY || import.meta.env.DEV) return;
+  // Aparte del fichero principal: sólo se descarga si está configurado.
+  void import('posthog-js').then(({ default: ph }) => {
+    ph.init(POSTHOG_KEY, {
+      api_host: POSTHOG_HOST,
+      persistence: 'memory',
+      person_profiles: 'identified_only',
+      capture_pageview: false,
+      capture_pageleave: true,
+      autocapture: { dom_event_allowlist: ['click', 'submit'], element_allowlist: ['a', 'button', 'form'] },
+      disable_session_recording: true,
+      mask_all_text: false,
+      mask_all_element_attributes: false,
+      sanitize_properties: (props) => {
+        for (const k of ['$current_url', '$referrer', '$initial_current_url', '$initial_referrer']) {
+          if (typeof props[k] === 'string') props[k] = (props[k] as string).replace(SENSITIVE_PARAMS, '$1$2=***');
+        }
+        return props;
+      },
+    });
+    posthog = ph;
+    for (const accion of pendientesPosthog.splice(0)) accion(ph);
+  });
+};
 
 /** Parámetros que nunca deben salir del dispositivo en una traza de error. */
 const SENSITIVE_PARAMS = /([?&])(lat|lng|latitude|longitude|code|token|token_hash|email)=[^&]*/gi;
@@ -25,6 +69,7 @@ const SENSITIVE_PARAMS = /([?&])(lat|lng|latitude|longitude|code|token|token_has
  * valor por defecto del SDK.
  */
 export const initObservability = () => {
+  initPosthog();
   if (!DSN) return;
 
   Sentry.init({
@@ -76,6 +121,8 @@ export const throwTestError = () => {
 
 /** Asocia los errores al usuario sin enviar datos personales. */
 export const identifyUser = (profileId: string | null, role?: string) => {
+  // En PostHog, sólo el id del perfil y el papel: ni nombre, ni correo.
+  conPosthog((ph) => (profileId ? ph.identify(profileId, { role: role ?? 'user' }) : ph.reset()));
   if (!DSN) return;
   Sentry.setUser(profileId ? { id: profileId, segment: role } : null);
 };
@@ -147,6 +194,11 @@ const flush = async () => {
  * código de la app puede llamar a `track()` sin condicionales por todas partes.
  */
 export const track = (name: AnalyticsEvent, props: Record<string, unknown> = {}) => {
+  conPosthog((ph) =>
+    name === 'page_view'
+      ? ph.capture('$pageview', { ...props, $current_url: window.location.origin + String(props.path ?? '') })
+      : ph.capture(name, props),
+  );
   if (import.meta.env.DEV) {
     console.debug('[analytics]', name, props);
     return;

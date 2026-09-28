@@ -96,7 +96,7 @@ export const legalDocs = (app: string, web: string, panel: string, miembro: stri
         },
         {
           title: 'Qué datos tratamos',
-          body: `Datos de cuenta: correo, nombre, fecha de nacimiento o edad, género, a quién quieres ver y teléfono. Fotografías: la foto del momento que haces con la cámara al entrar en una fiesta y, si las añades, las de tu perfil. Ubicación mientras usas la app para entrar en una fiesta. Actividad en ${app}: fiestas en las que dices que vas a ir o en las que entras, negocios que sigues, likes, supercrush, matches, mensajes, peticiones de canciones, retos, sorteos, vales, valoraciones, entradas compradas y apuntes a listas de invitados (nombre y número de acompañantes). Datos de pago: los gestionan Stripe o, en el iPhone, Apple; nosotros sólo recibimos el resultado, el producto y el importe, nunca el número de tarjeta. Datos técnicos: tipo de dispositivo, idioma, avisos push y registros de errores.`,
+          body: `Datos de cuenta: correo, nombre, fecha de nacimiento o edad, género, a quién quieres ver y teléfono. Fotografías: la foto del momento que haces con la cámara al entrar en una fiesta y, si las añades, las de tu perfil. Ubicación mientras usas la app para entrar en una fiesta. Actividad en ${app}: fiestas en las que dices que vas a ir o en las que entras, negocios que sigues, likes, supercrush, matches, mensajes, peticiones de canciones, retos, sorteos, vales, valoraciones, entradas compradas y apuntes a listas de invitados (nombre y número de acompañantes). Datos de pago: los gestionan Stripe o, en el iPhone, Apple; nosotros sólo recibimos el resultado, el producto y el importe, nunca el número de tarjeta. Datos técnicos: tipo de dispositivo, idioma, avisos push, registros de errores y cómo usas la app (pantallas que abres y botones que pulsas), asociado al identificador interno de tu cuenta, nunca a tu nombre ni a tu correo.`,
         },
         {
           title: 'Para qué los usamos',
@@ -124,7 +124,7 @@ export const legalDocs = (app: string, web: string, panel: string, miembro: stri
         },
         {
           title: 'Con quién los compartimos',
-          body: 'Con proveedores que tratan los datos por encargo nuestro y con contrato: Supabase (base de datos, cuentas y almacenamiento), Vercel (alojamiento de la web), Stripe (pagos y cobros de los negocios), Apple (compras dentro de la app de iPhone), Resend (correo), Twilio (SMS), Google Firebase Cloud Messaging y Apple Push Notification service (avisos al teléfono), Sightengine (moderación de imágenes), Sentry (registro de errores, sin datos personales) y CARTO (mapas). No vendemos datos ni los cedemos para publicidad. Algunos de estos proveedores están fuera del Espacio Económico Europeo; en ese caso la transferencia se ampara en el Marco de Privacidad de Datos UE-EE. UU. o en las cláusulas contractuales tipo de la Comisión Europea. También podemos comunicar datos a las autoridades cuando la ley lo exija.',
+          body: 'Con proveedores que tratan los datos por encargo nuestro y con contrato: Supabase (base de datos, cuentas y almacenamiento), Vercel (alojamiento de la web), Stripe (pagos y cobros de los negocios), Apple (compras dentro de la app de iPhone), Resend (correo), Twilio (SMS), Google Firebase Cloud Messaging y Apple Push Notification service (avisos al teléfono), Sightengine (moderación de imágenes), Sentry (registro de errores, sin datos personales), PostHog (estadísticas de uso, con servidores en la Unión Europea) y CARTO (mapas). No vendemos datos ni los cedemos para publicidad. Algunos de estos proveedores están fuera del Espacio Económico Europeo; en ese caso la transferencia se ampara en el Marco de Privacidad de Datos UE-EE. UU. o en las cláusulas contractuales tipo de la Comisión Europea. También podemos comunicar datos a las autoridades cuando la ley lo exija.',
         },
         {
           title: 'Cuánto tiempo los conservamos',
@@ -216,7 +216,7 @@ export const legalDocs = (app: string, web: string, panel: string, miembro: stri
         },
         {
           title: 'Qué no usamos',
-          body: 'No usamos cookies de publicidad, de redes sociales ni de seguimiento entre webs. Nuestras estadísticas de uso son propias, no guardan nada en tu dispositivo y no se comparten con terceros. El registro de errores (Sentry) no usa cookies ni recoge datos personales.',
+          body: 'No usamos cookies de publicidad, de redes sociales ni de seguimiento entre webs. Las estadísticas de uso (las nuestras y las de PostHog, con servidores en la Unión Europea) no guardan nada en tu dispositivo: sin cookies ni almacenamiento local, y sin grabar la pantalla. El registro de errores (Sentry) no usa cookies ni recoge datos personales.',
         },
         {
           title: 'Terceros',

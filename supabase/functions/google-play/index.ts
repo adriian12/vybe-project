@@ -1,4 +1,5 @@
 import { serve } from 'https://deno.land/std@0.193.0/http/server.ts';
+import { overLimit, tooManyRequests } from '../_shared/rate-limit.ts';
 import { json, preflight } from '../_shared/cors.ts';
 import { adminClient, getProfileId, getUser } from '../_shared/supabase.ts';
 import { storePrecheck } from '../_shared/iap-precheck.ts';
@@ -32,6 +33,7 @@ serve(async (req: Request): Promise<Response> => {
   try {
     const user = await getUser(req, supabase);
     if (!user) return json({ error: 'NOT_AUTHENTICATED' }, 401);
+    if (await overLimit(supabase, req, 'google-play', 20, { userId: user.id })) return tooManyRequests();
     const profileId = await getProfileId(supabase, user.id);
     if (!profileId) return json({ error: 'PROFILE_NOT_FOUND' }, 404);
 

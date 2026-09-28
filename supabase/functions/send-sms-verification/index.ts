@@ -1,4 +1,5 @@
 import { serve } from 'https://deno.land/std@0.193.0/http/server.ts';
+import { overLimit, tooManyRequests } from '../_shared/rate-limit.ts';
 import { json, preflight } from '../_shared/cors.ts';
 import { adminClient, getUser } from '../_shared/supabase.ts';
 import { sendSms, TwilioNotConfiguredError, TwilioSendError } from '../_shared/twilio.ts';
@@ -32,6 +33,7 @@ serve(async (req: Request): Promise<Response> => {
   try {
     const user = await getUser(req, supabase);
     if (!user) return json({ error: 'No autenticado' }, 401);
+    if (await overLimit(supabase, req, 'send-sms-verification', 5, { userId: user.id })) return tooManyRequests();
 
     const { phoneNumber } = (await req.json()) as { phoneNumber?: string };
     if (!phoneNumber || !/^\+?[0-9]{9,15}$/.test(phoneNumber)) {

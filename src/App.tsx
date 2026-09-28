@@ -23,6 +23,7 @@ import WhereNextPrompt from '@/components/where-next-prompt';
 import Index from './pages/Index';
 import NotFound from './pages/NotFound';
 import PageViewTracker from '@/components/page-view-tracker';
+import RateLimitNotice from '@/components/rate-limit-notice';
 import AuthPage from './pages/AuthPage';
 import LocationPage from './pages/LocationPage';
 import HomePage from './pages/HomePage';
@@ -162,6 +163,7 @@ const App = () => (
             <DevSentryCheck />
             <DeepLinks />
             <PageViewTracker />
+            <RateLimitNotice />
             <NativePushBridge />
             <StaffOnlyWeb />
             <WhereNextPrompt />
