@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { BadgeCheck, BellRing, Heart, MessageCircle, Timer, Zap } from 'lucide-react';
 
 /**
- * «Dos pantallas, un mismo ritmo»: la tarjeta de Vybe Check y el panel del
+ * «Dos pantallas, un mismo ritmo»: la tarjeta de Flechazo y el panel del
  * local, dibujados en HTML en vez de capturas. Pesan nada, se traducen solos y
  * no se quedan viejos cuando cambia la app.
  *

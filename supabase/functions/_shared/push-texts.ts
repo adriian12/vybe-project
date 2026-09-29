@@ -40,7 +40,7 @@ const TEXTS: Record<Locale, Texts> = {
       body: `A ${name} también le gustas. Escríbele antes de que acabe la noche.`,
     }),
     vybeCheck: (name) => ({
-      title: '¡Fiestea Check!',
+      title: '¡Flechazo!',
       body: `Tú y ${name} os habéis dado un súper like. Di hola.`,
     }),
     doorsOpen: (event, venue) => ({
@@ -103,7 +103,7 @@ const TEXTS: Record<Locale, Texts> = {
       body: `${name} likes you too. Say hi before the night is over.`,
     }),
     vybeCheck: (name) => ({
-      title: 'Fiestea Check!',
+      title: 'Flechazo!',
       body: `You and ${name} super-liked each other. Say hi.`,
     }),
     doorsOpen: (event, venue) => ({
@@ -164,7 +164,7 @@ const TEXTS: Record<Locale, Texts> = {
       body: `${name} mag dich auch. Schreib, bevor die Nacht vorbei ist.`,
     }),
     vybeCheck: (name) => ({
-      title: 'Fiestea Check!',
+      title: 'Flechazo!',
       body: `Du und ${name} habt euch ein Super-Like gegeben. Sag Hallo.`,
     }),
     doorsOpen: (event, venue) => ({
@@ -227,7 +227,7 @@ const TEXTS: Record<Locale, Texts> = {
       body: `A ${name} també li agrades. Escriu-li abans que s'acabi la nit.`,
     }),
     vybeCheck: (name) => ({
-      title: 'Fiestea Check!',
+      title: 'Flechazo!',
       body: `Tu i ${name} us heu fet un súper like. Digues hola.`,
     }),
     doorsOpen: (event, venue) => ({

@@ -394,7 +394,7 @@
     "matches": {
         "title": "Mis Crushes",
         "empty": "Aún no tienes conexiones",
-        "emptyBody": "Entra en un evento y haz Fiestea Check para conocer gente nueva.",
+        "emptyBody": "Entra en un evento y usa Flechazo para conocer gente nueva.",
         "noMessages": "Aún no hay mensajes. ¡Inicia la conversación!",
         "you": "Tú: ",
         "expiresIn": "Caduca en {{time}}",
@@ -2099,7 +2099,7 @@
         "title": "Avisos",
         "subtitle": "Lo que ha pasado mientras no mirabas.",
         "inside": "Sigues dentro de {{name}}",
-        "insideBody": "Vuelve a la pista para seguir haciendo Fiestea Check.",
+        "insideBody": "Vuelve a la pista para seguir con Flechazo.",
         "messages_one": "{{name}} te ha escrito",
         "messages_other": "{{name}} te ha escrito {{count}} mensajes",
         "newVybe": "Nuevo crush con {{name}}",
@@ -2338,7 +2338,7 @@
         "tastes": "Rollo nocturno y gustos",
         "nights": "noches",
         "vybes": "crushes",
-        "connectedTitle": "Conectados mediante Fiestea Check",
+        "connectedTitle": "Conectados con Flechazo",
         "connectedAgo": "Hicisteis match {{ago}}",
         "connectedAt": "en {{venue}}.",
         "expiresAt": "El chat efímero caduca a las {{time}}.",
@@ -2367,7 +2367,7 @@
             "titleStart": "La noche se vive en la pista.",
             "titleBrand": "Fiestea",
             "titleEnd": "conecta fiester@s y salas en tiempo real.",
-            "body": "Descubre las fiestas de tu zona, entra con el QR del negocio y haz Fiestea Check sólo con quien está dentro contigo. Y si tienes un negocio: aforo en directo, códigos para tus RRPP y promociones para quien ya está en la pista.",
+            "body": "Descubre las fiestas de tu zona, entra con el QR del negocio y usa Flechazo para conocer sólo a quien está dentro contigo. Y si tienes un negocio: aforo en directo, códigos para tus RRPP y promociones para quien ya está en la pista.",
             "ctaUser": "Descargar la app",
             "ctaVenue": "Fiestea para negocios",
             "imageAlt": "Gente bailando en una discoteca con luces amarillas",
@@ -2390,7 +2390,7 @@
                     "tag": "Código validado en el servidor y geocerca"
                 },
                 "check": {
-                    "title": "Haz Fiestea Check",
+                    "title": "Usa Flechazo",
                     "body": "Desliza entre las personas que han entrado en la misma fiesta, con filtros por edad e intereses. Si os gustáis los dos, es match.",
                     "tag": "Sólo gente de tu misma fiesta"
                 },
@@ -2491,7 +2491,7 @@
             "body": "Del móvil de quien baila al panel de quien dirige la sala.",
             "sample": "Vista de ejemplo",
             "phone": {
-                "title": "Fiestea Check",
+                "title": "Flechazo",
                 "inside": "Dentro de la fiesta",
                 "tag": "En pista ahora",
                 "name": "Lucía, 24",
@@ -2654,7 +2654,7 @@
     },
     "mobileOnly": {
         "title": "Fiestea se vive desde el móvil",
-        "body": "Esta web es para negocios y administración. Para descubrir fiestas, entrar con el QR y hacer Fiestea Check, descarga la app.",
+        "body": "Esta web es para negocios y administración. Para descubrir fiestas, entrar con el QR y usar Flechazo, descarga la app.",
         "venueAccess": "¿Tienes un negocio? Accede aquí",
         "reason": {
             "clubber": "Esta web es sólo para negocios y administración. Tu cuenta de Fiestea se usa desde la app, en la fiesta.",
@@ -2961,7 +2961,7 @@
                 "challenges": "Retos y sellos",
                 "songs": "Votar la canción",
                 "vibe": "Ambiente y cuánta gente",
-                "board": "Tablón, match y chat",
+                "board": "Flechazo: tablón, match y chat",
                 "premium": "Premium"
             }
         }

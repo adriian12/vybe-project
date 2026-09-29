@@ -394,7 +394,7 @@
     "matches": {
         "title": "My Crushes",
         "empty": "No connections yet",
-        "emptyBody": "Join an event and do a Fiestea Check to meet new people.",
+        "emptyBody": "Join an event and use Flechazo to meet new people.",
         "noMessages": "No messages yet. Start the conversation!",
         "you": "You: ",
         "expiresIn": "Expires in {{time}}",
@@ -2099,7 +2099,7 @@
         "title": "Updates",
         "subtitle": "What happened while you weren't looking.",
         "inside": "You're still at {{name}}",
-        "insideBody": "Head back to the floor to keep doing Fiestea Check.",
+        "insideBody": "Head back to the floor to keep using Flechazo.",
         "messages_one": "{{name}} messaged you",
         "messages_other": "{{name}} sent you {{count}} messages",
         "newVybe": "New crush with {{name}}",
@@ -2338,7 +2338,7 @@
         "tastes": "Nightlife vibe & tastes",
         "nights": "nights",
         "vybes": "crushes",
-        "connectedTitle": "Connected through Fiestea Check",
+        "connectedTitle": "Connected through Flechazo",
         "connectedAgo": "You matched {{ago}}",
         "connectedAt": "at {{venue}}.",
         "expiresAt": "The ephemeral chat expires at {{time}}.",
@@ -2367,7 +2367,7 @@
             "titleStart": "Nights are lived on the dance floor.",
             "titleBrand": "Fiestea",
             "titleEnd": "connects fiesters and venues in real time.",
-            "body": "Discover parties near you, get in with the venue's QR code and do a Fiestea Check only with people who are inside with you. And if you run a venue: live capacity, codes for your promoters and offers for people already on the floor.",
+            "body": "Discover parties near you, get in with the venue's QR code and use Flechazo to meet only the people inside with you. And if you run a venue: live capacity, codes for your promoters and offers for people already on the floor.",
             "ctaUser": "Get the app",
             "ctaVenue": "Fiestea for venues",
             "imageAlt": "People dancing in a club under yellow lights",
@@ -2390,7 +2390,7 @@
                     "tag": "Server-validated code and geofence"
                 },
                 "check": {
-                    "title": "Do a Fiestea Check",
+                    "title": "Use Flechazo",
                     "body": "Swipe through the people who got into the same party, with filters for age and interests. If you both like each other, it's a match.",
                     "tag": "Only people at your party"
                 },
@@ -2491,7 +2491,7 @@
             "body": "From the phone of the person dancing to the dashboard of the person running the venue.",
             "sample": "Sample view",
             "phone": {
-                "title": "Fiestea Check",
+                "title": "Flechazo",
                 "inside": "Inside the party",
                 "tag": "On the floor now",
                 "name": "Lucía, 24",
@@ -2654,7 +2654,7 @@
     },
     "mobileOnly": {
         "title": "Fiestea lives on your phone",
-        "body": "This website is for venues and admins. To discover parties, get in with the QR code and do a Fiestea Check, download the app.",
+        "body": "This website is for venues and admins. To discover parties, get in with the QR code and use Flechazo, download the app.",
         "venueAccess": "Run a venue? Log in here",
         "reason": {
             "clubber": "This site is only for venues and admins. Your Fiestea account works in the app, at the venue.",
@@ -2961,7 +2961,7 @@
                 "challenges": "Challenges and stamps",
                 "songs": "Vote for the song",
                 "vibe": "Vibe and how many people",
-                "board": "Board, match and chat",
+                "board": "Flechazo: board, match and chat",
                 "premium": "Premium"
             }
         }

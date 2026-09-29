@@ -12,7 +12,7 @@ const MOTIVOS: DownloadReason[] = ['clubber', 'verified', 'password'];
  * Lo que se ve en `app.vybes.es` al abrir una pantalla de clubber.
  *
  * La web es sólo para locales y administración: descubrir fiestas, entrar con
- * el QR y hacer Vybe Check se hace desde la app del móvil. Si el enlace venía de
+ * el QR y hacer Flechazo se hace desde la app del móvil. Si el enlace venía de
  * compartir una fiesta y la app está instalada, Android lo abre directamente en
  * la app y esta página ni llega a verse.
  *

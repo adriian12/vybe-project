@@ -394,7 +394,7 @@
     "matches": {
         "title": "Meine Crushes",
         "empty": "Noch keine Verbindungen",
-        "emptyBody": "Geh zu einem Event und mach einen Fiestea Check, um neue Leute kennenzulernen.",
+        "emptyBody": "Geh zu einem Event und nutze Flechazo, um neue Leute kennenzulernen.",
         "noMessages": "Noch keine Nachrichten. Fang das Gespräch an!",
         "you": "Du: ",
         "expiresIn": "Läuft ab in {{time}}",
@@ -2099,7 +2099,7 @@
         "title": "Hinweise",
         "subtitle": "Was passiert ist, während du nicht hingeschaut hast.",
         "inside": "Du bist noch bei {{name}}",
-        "insideBody": "Zurück auf die Tanzfläche, um weiter Fiestea Check zu machen.",
+        "insideBody": "Zurück auf die Tanzfläche, um weiter Flechazo zu nutzen.",
         "messages_one": "{{name}} hat dir geschrieben",
         "messages_other": "{{name}} hat dir {{count}} Nachrichten geschrieben",
         "newVybe": "Neuer Crush mit {{name}}",
@@ -2338,7 +2338,7 @@
         "tastes": "Nachtleben & Vorlieben",
         "nights": "Nächte",
         "vybes": "Crushes",
-        "connectedTitle": "Verbunden über Fiestea Check",
+        "connectedTitle": "Verbunden über Flechazo",
         "connectedAgo": "Ihr hattet ein Match {{ago}}",
         "connectedAt": "im {{venue}}.",
         "expiresAt": "Der Chat verfällt um {{time}}.",
@@ -2367,7 +2367,7 @@
             "titleStart": "Die Nacht erlebt man auf der Tanzfläche.",
             "titleBrand": "Fiestea",
             "titleEnd": "verbindet Fiester und Locations in Echtzeit.",
-            "body": "Entdecke Partys in deiner Nähe, komm mit dem QR-Code der Location rein und mach den Fiestea Check nur mit Leuten, die mit dir drin sind. Und wenn du eine Location hast: Live-Auslastung, Codes für deine Promoter und Angebote für alle, die schon auf der Tanzfläche sind.",
+            "body": "Entdecke Partys in deiner Nähe, komm mit dem QR-Code der Location rein und nutze Flechazo, um nur Leute kennenzulernen, die mit dir drin sind. Und wenn du eine Location hast: Live-Auslastung, Codes für deine Promoter und Angebote für alle, die schon auf der Tanzfläche sind.",
             "ctaUser": "App herunterladen",
             "ctaVenue": "Fiestea für Locations",
             "imageAlt": "Menschen tanzen in einem Club unter gelbem Licht",
@@ -2390,7 +2390,7 @@
                     "tag": "Serverseitig geprüfter Code und Geofence"
                 },
                 "check": {
-                    "title": "Mach den Fiestea Check",
+                    "title": "Nutze Flechazo",
                     "body": "Swipe durch die Leute, die auf derselben Party sind, mit Filtern nach Alter und Interessen. Wenn ihr euch beide gefallt, ist es ein Match.",
                     "tag": "Nur Leute auf deiner Party"
                 },
@@ -2491,7 +2491,7 @@
             "body": "Vom Handy der Leute auf der Tanzfläche bis zum Dashboard der Clubleitung.",
             "sample": "Beispielansicht",
             "phone": {
-                "title": "Fiestea Check",
+                "title": "Flechazo",
                 "inside": "Auf der Party",
                 "tag": "Jetzt auf der Tanzfläche",
                 "name": "Lucía, 24",
@@ -2654,7 +2654,7 @@
     },
     "mobileOnly": {
         "title": "Fiestea erlebst du auf dem Handy",
-        "body": "Diese Website ist für Locations und Administration. Um Partys zu entdecken, mit dem QR-Code reinzukommen und den Fiestea Check zu machen, lade die App herunter.",
+        "body": "Diese Website ist für Locations und Administration. Um Partys zu entdecken, mit dem QR-Code reinzukommen und Flechazo zu nutzen, lade die App herunter.",
         "venueAccess": "Du hast eine Location? Hier anmelden",
         "reason": {
             "clubber": "Diese Website ist nur für Locations und Administration. Dein Fiestea-Konto nutzt du in der App, vor Ort.",
@@ -2961,7 +2961,7 @@
                 "challenges": "Challenges und Stempel",
                 "songs": "Den Song wählen",
                 "vibe": "Stimmung und wie viele Leute",
-                "board": "Pinnwand, Match und Chat",
+                "board": "Flechazo: Pinnwand, Match und Chat",
                 "premium": "Premium"
             }
         }

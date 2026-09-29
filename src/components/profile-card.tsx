@@ -30,7 +30,7 @@ const DECISION_THRESHOLD = 90;
 const EXIT_MS = 260;
 
 /**
- * La tarjeta del «Vybe Check», según «Swipe Deck» de Stitch: la foto a sangre
+ * La tarjeta del «Flechazo», según «Swipe Deck» de Stitch: la foto a sangre
  * con 20 px de radio y, sobre el tercio de abajo, el nombre, a qué distancia
  * está y un par de intereses.
  *

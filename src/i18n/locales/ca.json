@@ -394,7 +394,7 @@
     "matches": {
         "title": "Els meus Crushes",
         "empty": "Encara no tens connexions",
-        "emptyBody": "Entra en un esdeveniment i fes un Fiestea Check per conèixer gent nova.",
+        "emptyBody": "Entra en un esdeveniment i fes servir Flechazo per conèixer gent nova.",
         "noMessages": "Encara no hi ha missatges. Comença la conversa!",
         "you": "Tu: ",
         "expiresIn": "Caduca en {{time}}",
@@ -2099,7 +2099,7 @@
         "title": "Avisos",
         "subtitle": "El que ha passat mentre no miraves.",
         "inside": "Encara ets a {{name}}",
-        "insideBody": "Torna a la pista per continuar fent Fiestea Check.",
+        "insideBody": "Torna a la pista per continuar amb Flechazo.",
         "messages_one": "{{name}} t'ha escrit",
         "messages_other": "{{name}} t'ha escrit {{count}} missatges",
         "newVybe": "Nou crush amb {{name}}",
@@ -2338,7 +2338,7 @@
         "tastes": "Rotllo nocturn i gustos",
         "nights": "nits",
         "vybes": "crushes",
-        "connectedTitle": "Connectats amb Fiestea Check",
+        "connectedTitle": "Connectats amb Flechazo",
         "connectedAgo": "Vau fer match {{ago}}",
         "connectedAt": "a {{venue}}.",
         "expiresAt": "El xat efímer caduca a les {{time}}.",
@@ -2367,7 +2367,7 @@
             "titleStart": "La nit es viu a la pista.",
             "titleBrand": "Fiestea",
             "titleEnd": "connecta fiester@s i sales en temps real.",
-            "body": "Descobreix les festes de la teva zona, entra amb el QR del negoci i fes Fiestea Check només amb qui és a dins amb tu. I si tens un negoci: aforament en directe, codis per als teus RRPP i promocions per a qui ja és a la pista.",
+            "body": "Descobreix les festes de la teva zona, entra amb el QR del negoci i fes servir Flechazo per conèixer només qui és a dins amb tu. I si tens un negoci: aforament en directe, codis per als teus RRPP i promocions per a qui ja és a la pista.",
             "ctaUser": "Descarregar l'app",
             "ctaVenue": "Fiestea per a negocis",
             "imageAlt": "Gent ballant en una discoteca amb llums grogues",
@@ -2390,7 +2390,7 @@
                     "tag": "Codi validat al servidor i geotanca"
                 },
                 "check": {
-                    "title": "Fes Fiestea Check",
+                    "title": "Fes servir Flechazo",
                     "body": "Llisca entre les persones que han entrat a la mateixa festa, amb filtres per edat i interessos. Si us agradeu tots dos, és match.",
                     "tag": "Només gent de la teva festa"
                 },
@@ -2491,7 +2491,7 @@
             "body": "Del mòbil de qui balla al tauler de qui dirigeix la sala.",
             "sample": "Vista d'exemple",
             "phone": {
-                "title": "Fiestea Check",
+                "title": "Flechazo",
                 "inside": "Dins la festa",
                 "tag": "A la pista ara",
                 "name": "Lucía, 24",
@@ -2654,7 +2654,7 @@
     },
     "mobileOnly": {
         "title": "Fiestea es viu des del mòbil",
-        "body": "Aquest web és per a negocis i administració. Per descobrir festes, entrar amb el QR i fer Fiestea Check, descarrega l'app.",
+        "body": "Aquest web és per a negocis i administració. Per descobrir festes, entrar amb el QR i fer servir Flechazo, descarrega l'app.",
         "venueAccess": "Tens un negoci? Accedeix aquí",
         "reason": {
             "clubber": "Aquesta web és només per a negocis i administració. El teu compte de Fiestea s'utilitza des de l'app, al negoci.",
@@ -2961,7 +2961,7 @@
                 "challenges": "Reptes i segells",
                 "songs": "Votar la cançó",
                 "vibe": "Ambient i quanta gent hi ha",
-                "board": "Tauler, match i xat",
+                "board": "Flechazo: tauler, match i xat",
                 "premium": "Premium"
             }
         }
