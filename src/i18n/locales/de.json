@@ -1743,7 +1743,9 @@
                 "nearest": "Nächste zuerst",
                 "newest": "Neueste zuerst",
                 "oldest": "Älteste zuerst"
-            }
+            },
+            "tabPast": "Vergangene ({{count}})",
+            "emptyPast": "Keine vergangenen Events."
         },
         "reports": {
             "title": "Nutzermeldungen",

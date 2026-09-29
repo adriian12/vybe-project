@@ -161,7 +161,7 @@ const AdminDashboardPage = () => {
   const [photoFilter, setPhotoFilter] = useState<'all' | 'event_photo' | 'face_verification'>('all');
   const [eventQuery, setEventQuery] = useState('');
   // Eventos: la lista de fiestas o los de Funout para añadir (migración 082).
-  const [pestanaEventos, setPestanaEventos] = useState<'list' | 'funout'>('list');
+  const [pestanaEventos, setPestanaEventos] = useState<'list' | 'past' | 'funout'>('list');
   // Orden de la lista: por defecto, lo más cercano a hoy primero.
   const [ordenEventos, setOrdenEventos] = useState<'nearest' | 'newest' | 'oldest'>('nearest');
   const [editandoEvento, setEditandoEvento] = useState<Event | null>(null);
@@ -259,22 +259,24 @@ const AdminDashboardPage = () => {
     [photos, photoFilter],
   );
 
+  // «Eventos» sólo enseña las que siguen en marcha o están por venir; las que
+  // ya terminaron van a «Pasados», para no llenar la vista general.
+  const terminada = (e: Event) => new Date(e.endDate).getTime() <= Date.now();
+  const numPasados = useMemo(() => events.filter(terminada).length, [events]);
+
   const eventosVisibles = useMemo(() => {
     const q = eventQuery.trim().toLocaleLowerCase();
-    const lista = q
-      ? events.filter((e) => `${e.name} ${e.placeName ?? ''} ${e.venueName ?? ''}`.toLocaleLowerCase().includes(q))
-      : [...events];
+    const pasados = pestanaEventos === 'past';
+    const lista = events
+      .filter((e) => terminada(e) === pasados)
+      .filter((e) => !q || `${e.name} ${e.placeName ?? ''} ${e.venueName ?? ''}`.toLocaleLowerCase().includes(q));
     const inicio = (e: Event) => new Date(e.startDate).getTime();
     if (ordenEventos === 'newest') return lista.sort((a, b) => inicio(b) - inicio(a));
     if (ordenEventos === 'oldest') return lista.sort((a, b) => inicio(a) - inicio(b));
-    // Más cercanos: las que siguen en marcha o están por venir, de la más
-    // próxima a la más lejana, y después las pasadas, de la última a la más
-    // antigua.
-    const ya = Date.now();
-    const vivas = lista.filter((e) => new Date(e.endDate).getTime() > ya).sort((a, b) => inicio(a) - inicio(b));
-    const pasadas = lista.filter((e) => new Date(e.endDate).getTime() <= ya).sort((a, b) => inicio(b) - inicio(a));
-    return [...vivas, ...pasadas];
-  }, [events, eventQuery, ordenEventos]);
+    // Más cercanos: en «Eventos», de la más próxima a la más lejana; en
+    // «Pasados», de la última que se celebró a la más antigua.
+    return lista.sort((a, b) => (pasados ? inicio(b) - inicio(a) : inicio(a) - inicio(b)));
+  }, [events, eventQuery, ordenEventos, pestanaEventos]);
 
   const salir = async () => {
     await logout();
@@ -1043,7 +1045,7 @@ const AdminDashboardPage = () => {
                 }
               />
               <div className="mb-3 inline-flex rounded-xl bg-white/10 p-1">
-                {(['list', 'funout'] as const).map((id) => (
+                {(['list', 'past', 'funout'] as const).map((id) => (
                   <button
                     key={id}
                     type="button"
@@ -1053,11 +1055,15 @@ const AdminDashboardPage = () => {
                       pestanaEventos === id ? 'bg-party-primary text-ink shadow-sm' : 'text-white/70 hover:text-white',
                     )}
                   >
-                    {id === 'list' ? t('admin.events.tabList') : 'FUNOUT'}
+                    {id === 'list'
+                      ? t('admin.events.tabList')
+                      : id === 'past'
+                        ? t('admin.events.tabPast', { count: numPasados })
+                        : 'FUNOUT'}
                   </button>
                 ))}
               </div>
-              {pestanaEventos === 'list' && (
+              {pestanaEventos !== 'funout' && (
                 <label className="mb-3 ml-3 inline-flex items-center gap-2 text-caption font-bold text-white/70">
                   {t('admin.events.sortBy')}
                   <select
@@ -1076,7 +1082,7 @@ const AdminDashboardPage = () => {
               {pestanaEventos === 'funout' ? (
                 <AdminFunout onImported={() => void loadAll(true)} />
               ) : eventosVisibles.length === 0 ? (
-                <Vacio text={t('admin.events.empty')} icon={CalendarDays} />
+                <Vacio text={t(pestanaEventos === 'past' ? 'admin.events.emptyPast' : 'admin.events.empty')} icon={CalendarDays} />
               ) : (
                 <div className="surface-light overflow-hidden rounded-2xl">
                   <table className="w-full text-left text-body-sm">

@@ -1743,7 +1743,9 @@
                 "nearest": "Més propers",
                 "newest": "Més recents",
                 "oldest": "Més antics"
-            }
+            },
+            "tabPast": "Passats ({{count}})",
+            "emptyPast": "No hi ha esdeveniments passats."
         },
         "reports": {
             "title": "Reports d'usuaris",
