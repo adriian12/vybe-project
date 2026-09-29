@@ -759,7 +759,8 @@
             "profile": "Perfil",
             "profileSubtitle": "Datos del negocio, promociones, equipo y plan.",
             "sales": "Ventas",
-            "business": "Negocio"
+            "business": "Negocio",
+            "settings": "Ajustes"
         },
         "qr": {
             "title": "Código de acceso",
@@ -1291,7 +1292,8 @@
             "promos": "Promociones",
             "plan": "Plan y facturación",
             "sales": "Ventas",
-            "business": "Negocio"
+            "business": "Negocio",
+            "settings": "Ajustes de la fiesta"
         },
         "live": "en directo",
         "noLive": "Ningún evento en directo",

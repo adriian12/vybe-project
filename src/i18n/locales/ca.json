@@ -759,7 +759,8 @@
             "profile": "Perfil",
             "profileSubtitle": "Dades del negoci, promocions, equip i pla.",
             "sales": "Vendes",
-            "business": "Negoci"
+            "business": "Negoci",
+            "settings": "Ajustos"
         },
         "qr": {
             "title": "Codi d'accés",
@@ -1291,7 +1292,8 @@
             "promos": "Promocions",
             "plan": "Pla i facturació",
             "sales": "Vendes",
-            "business": "Negoci"
+            "business": "Negoci",
+            "settings": "Ajustos de la festa"
         },
         "live": "en directe",
         "noLive": "Cap esdeveniment en directe",

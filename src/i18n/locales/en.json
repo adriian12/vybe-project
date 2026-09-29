@@ -759,7 +759,8 @@
             "profile": "Profile",
             "profileSubtitle": "Venue details, promotions, team and plan.",
             "sales": "Sales",
-            "business": "Business"
+            "business": "Business",
+            "settings": "Settings"
         },
         "qr": {
             "title": "Access code",
@@ -1291,7 +1292,8 @@
             "promos": "Promotions",
             "plan": "Plan & billing",
             "sales": "Sales",
-            "business": "Business"
+            "business": "Business",
+            "settings": "Party settings"
         },
         "live": "live",
         "noLive": "No event live",

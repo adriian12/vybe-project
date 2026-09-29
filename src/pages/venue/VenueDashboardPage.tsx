@@ -30,6 +30,7 @@ import {
   Users,
   DoorOpen,
   Pencil,
+  SlidersHorizontal,
   Wallet,
 } from 'lucide-react';
 import { useAppContext } from '@/context/app-context';
@@ -106,13 +107,13 @@ import { Event as VybeEvent, VenueStats } from '@/types/venue';
  * escritorio las seis van en la barra horizontal, como en los diseños de
  * escritorio de Stitch.
  */
-type Section = 'qr' | 'door' | 'events' | 'stats' | 'promos' | 'sales' | 'business' | 'team' | 'plan';
+type Section = 'qr' | 'door' | 'events' | 'stats' | 'promos' | 'sales' | 'business' | 'team' | 'settings' | 'plan';
 type Period = 'total' | 'year' | 'month' | 'week';
 type EventFilter = 'live' | 'scheduled' | 'past';
 type Drawer = null | 'menu' | 'venue' | 'documents' | 'broadcast';
 
 const PERIODS: Period[] = ['total', 'year', 'month', 'week'];
-const PROFILE_SECTIONS: Section[] = ['stats', 'promos', 'sales', 'business', 'team', 'plan'];
+const PROFILE_SECTIONS: Section[] = ['stats', 'promos', 'sales', 'business', 'team', 'settings', 'plan'];
 
 /**
  * Lo que ve cada cuenta del equipo (migración 072). El propietario, todo;
@@ -121,7 +122,7 @@ const PROFILE_SECTIONS: Section[] = ['stats', 'promos', 'sales', 'business', 'te
  * pone sus propios límites: esto sólo ordena el panel.
  */
 const SECCIONES_POR_ROL: Record<VenueRole, Section[]> = {
-  owner: ['qr', 'door', 'events', 'stats', 'promos', 'sales', 'business', 'team', 'plan'],
+  owner: ['qr', 'door', 'events', 'stats', 'promos', 'sales', 'business', 'team', 'settings', 'plan'],
   security: ['door', 'qr'],
 };
 
@@ -463,6 +464,7 @@ const VenueDashboardPage = () => {
       { section: 'sales', label: t('venue.nav.sales'), icon: Wallet },
       { section: 'business', label: t('venue.nav.business'), icon: Building2 },
       { section: 'team', label: t('venue.tabs.team'), icon: Users },
+      { section: 'settings', label: t('venue.nav.settings'), icon: SlidersHorizontal },
       { section: 'plan', label: t('venue.nav.plan'), icon: CreditCard },
     ] as { section: Section; label: string; icon: typeof QrCode; also?: Section[] }[]
   ).filter((tab) => puede(tab.section));
@@ -474,6 +476,7 @@ const VenueDashboardPage = () => {
       { section: 'sales', label: t('venue.tabs.sales') },
       { section: 'business', label: t('venue.tabs.business') },
       { section: 'team', label: t('venue.tabs.team') },
+      { section: 'settings', label: t('venue.tabs.settings') },
       { section: 'plan', label: t('venue.tabs.plan') },
     ] as { section: Section; label: string }[]
   ).filter((tab) => puede(tab.section));
@@ -767,9 +770,6 @@ const VenueDashboardPage = () => {
         {/* --------------------------------------------------------- puerta */}
         {section === 'door' && puede('door') && <VenueSosAlerts sos={sos} />}
         {section === 'door' && picker}
-        {section === 'door' && esPropietario && workingEventId && (
-          <EventLiveSettings key={`ajustes-${workingEventId}`} eventId={workingEventId} className="mb-4" />
-        )}
         {section === 'door' &&
           (workingEventId ? (
             <VenueDoor
@@ -1083,6 +1083,25 @@ const VenueDashboardPage = () => {
               events={myEvents}
               canCommission={plan !== null && planHas(plan.plan, 'commissions')}
             />
+          </div>
+        )}
+
+        {/* ------------------------------------------------------ ajustes */}
+        {/* Los ajustes de cada fiesta (Flechazo, recuento, % hombres y mujeres,
+            lista), con las pestañas por evento de Puerta. Sólo el propietario. */}
+        {section === 'settings' && (
+          <div className="mx-auto max-w-2xl space-y-4">
+            {picker}
+            {workingEventId ? (
+              <EventLiveSettings key={`ajustes-${workingEventId}`} eventId={workingEventId} />
+            ) : (
+              <Vacio
+                icon={SlidersHorizontal}
+                text={t('venue.door.noEvent')}
+                action={() => goTo('events')}
+                actionLabel={t('venue.events.newEvent')}
+              />
+            )}
           </div>
         )}
 

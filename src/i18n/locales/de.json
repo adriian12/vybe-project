@@ -759,7 +759,8 @@
             "profile": "Profil",
             "profileSubtitle": "Angaben zum Lokal, Aktionen, Team und Tarif.",
             "sales": "Verkäufe",
-            "business": "Betrieb"
+            "business": "Betrieb",
+            "settings": "Einstellungen"
         },
         "qr": {
             "title": "Zugangscode",
@@ -1291,7 +1292,8 @@
             "promos": "Aktionen",
             "plan": "Tarif & Abrechnung",
             "sales": "Verkäufe",
-            "business": "Betrieb"
+            "business": "Betrieb",
+            "settings": "Party-Einstellungen"
         },
         "live": "live",
         "noLive": "Kein Event live",
