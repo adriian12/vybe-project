@@ -741,7 +741,8 @@
         "lockedCount_other": "Li agrades a {{count}} persones",
         "lockedCount": "Li agrades a {{count}} persones",
         "lockedTap": "Fes-te Premium per veure qui és i tornar-li el like",
-        "someone": "Algú"
+        "someone": "Algú",
+        "expireNote": "Els m’agrada són d’aquella nit: si no els tornes, desapareixen quan acaba la festa. T’avisem una hora abans."
     },
     "venue": {
         "myVenue": "El meu negoci",

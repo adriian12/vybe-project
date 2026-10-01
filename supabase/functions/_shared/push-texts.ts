@@ -24,6 +24,8 @@ interface Texts {
   /** Por el ambiente que da el local: nunca su cifra. */
   fillingUpVibe: (event: string, level: VibeLevel) => { title: string; body: string };
   endingSoon: (event: string, vybes: number) => { title: string; body: string };
+  /** Una hora antes del final: los me gusta sin responder caducan con la fiesta (098). */
+  likesExpiring: (event: string, likes: number) => { title: string; body: string };
   raffleCreated: (event: string, prize: string, time: string | null) => { title: string; body: string };
   raffleWon: (event: string, prize: string) => { title: string; body: string };
   raffleWinner: (event: string, prize: string, winner: string) => { title: string; body: string };
@@ -69,6 +71,10 @@ const TEXTS: Record<Locale, Texts> = {
         vybes > 0
           ? `Tienes ${vybes} ${vybes === 1 ? 'crush' : 'crushes'} esta noche. Escribid y pulsad «Conservar» o la conversación caducará.`
           : 'Última media hora: aprovecha para conectar con alguien.',
+    }),
+    likesExpiring: (event, likes) => ({
+      title: likes === 1 ? 'Tienes 1 me gusta sin responder' : `Tienes ${likes} me gusta sin responder`,
+      body: `${event} termina en una hora y se borran con ella. Devuélvelos ahora y será crush.`,
     }),
     raffleCreated: (event, prize, time) => ({
       title: `Sorteo en ${event}`,
@@ -133,6 +139,10 @@ const TEXTS: Record<Locale, Texts> = {
           ? `You have ${vybes} ${vybes === 1 ? 'crush' : 'crushes'} tonight. Message them and both tap "Keep" or the chat will expire.`
           : 'Last half hour: make the most of it and connect with someone.',
     }),
+    likesExpiring: (event, likes) => ({
+      title: likes === 1 ? 'You have 1 like waiting' : `You have ${likes} likes waiting`,
+      body: `${event} ends in an hour and they disappear with it. Like them back now to make it a crush.`,
+    }),
     raffleCreated: (event, prize, time) => ({
       title: `Raffle at ${event}`,
       body: time ? `${prize} · at ${time}. Stay inside to take part.` : `${prize}. Stay inside to take part.`,
@@ -193,6 +203,10 @@ const TEXTS: Record<Locale, Texts> = {
         vybes > 0
           ? `Du hast heute ${vybes} ${vybes === 1 ? 'Crush' : 'Crushes'}. Schreibt euch und tippt beide auf „Behalten", sonst läuft der Chat ab.`
           : 'Letzte halbe Stunde: nutze sie, um jemanden kennenzulernen.',
+    }),
+    likesExpiring: (event, likes) => ({
+      title: likes === 1 ? 'Du hast 1 unbeantwortetes Like' : `Du hast ${likes} unbeantwortete Likes`,
+      body: `${event} endet in einer Stunde und sie verschwinden mit der Party. Gib sie jetzt zurück und es wird ein Crush.`,
     }),
     raffleCreated: (event, prize, time) => ({
       title: `Verlosung bei ${event}`,
@@ -256,6 +270,10 @@ const TEXTS: Record<Locale, Texts> = {
         vybes > 0
           ? `Tens ${vybes} ${vybes === 1 ? 'crush' : 'crushes'} aquesta nit. Escriviu-vos i premeu «Conservar» o la conversa caducarà.`
           : 'Darrera mitja hora: aprofita per connectar amb algú.',
+    }),
+    likesExpiring: (event, likes) => ({
+      title: likes === 1 ? 'Tens 1 m’agrada sense respondre' : `Tens ${likes} m’agrada sense respondre`,
+      body: `${event} acaba d’aquí a una hora i s’esborren amb ella. Torna’ls ara i serà crush.`,
     }),
     raffleCreated: (event, prize, time) => ({
       title: `Sorteig a ${event}`,

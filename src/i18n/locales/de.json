@@ -741,7 +741,8 @@
         "lockedCount_other": "{{count}} Personen mögen dich",
         "lockedCount": "{{count}} Personen mögen dich",
         "lockedTap": "Hol dir Premium, um zu sehen, wer es ist, und zurückzuliken",
-        "someone": "Jemand"
+        "someone": "Jemand",
+        "expireNote": "Likes gelten nur für diese Nacht: Wenn du sie nicht erwiderst, verschwinden sie am Ende der Party. Wir erinnern dich eine Stunde vorher."
     },
     "venue": {
         "myVenue": "Mein Lokal",

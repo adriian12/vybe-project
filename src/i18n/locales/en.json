@@ -741,7 +741,8 @@
         "lockedCount_other": "{{count}} people like you",
         "lockedCount": "{{count}} people like you",
         "lockedTap": "Go Premium to see who it is and like them back",
-        "someone": "Someone"
+        "someone": "Someone",
+        "expireNote": "Likes belong to that night: if you don’t like them back, they disappear when the party ends. We’ll remind you an hour before."
     },
     "venue": {
         "myVenue": "My venue",

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Heart, Loader2, Lock, Star, Zap } from 'lucide-react';
+import { Heart, Hourglass, Loader2, Lock, Star, Zap } from 'lucide-react';
 import Header from '@/components/header';
 import Footer from '@/components/footer';
 import ConnectionListItem from '@/components/connection-list-item';
@@ -137,6 +137,8 @@ const VybesPage = () => {
       if (isMatch) {
         track('match', { from: 'likes' });
         toast({ title: t('match.newConnection') });
+        // El crush acaba de crearse: sin recargar, el chat aún no lo conoce.
+        await refreshConnections();
         navigate(`/chat/${profileId}`);
       }
     } catch {
@@ -313,6 +315,10 @@ const VybesPage = () => {
                 <span className="block text-body-sm text-ink/70">{t('likes.lockedTap')}</span>
               </span>
             </button>
+            <p className="flex items-start gap-2 rounded-xl bg-card px-3 py-2.5 text-caption text-party-gray">
+              <Hourglass size={14} className="mt-0.5 shrink-0 text-party-primary" />
+              {t('likes.expireNote')}
+            </p>
             <ul className="grid grid-cols-2 gap-3">
               {vistaPrevia.map((like) => (
                 <li key={like.key} className="overflow-hidden rounded-2xl bg-white text-ink">
@@ -402,6 +408,10 @@ const VybesPage = () => {
         ) : (
           <>
             <p className="text-body-md text-party-gray">{t('likes.subtitle')}</p>
+            <p className="flex items-start gap-2 rounded-xl bg-card px-3 py-2.5 text-caption text-party-gray">
+              <Hourglass size={14} className="mt-0.5 shrink-0 text-party-primary" />
+              {t('likes.expireNote')}
+            </p>
             <ul className="grid grid-cols-2 gap-3">
               {likes.map((like) => (
                 <li key={like.id} className="overflow-hidden rounded-2xl bg-white text-ink">

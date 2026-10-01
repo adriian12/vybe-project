@@ -24,7 +24,7 @@ import { pushTexts, VibeLevel } from '../_shared/push-texts.ts';
 interface PendingPush {
   profile_id: string;
   event_id: string;
-  kind: 'doors_open' | 'filling_up' | 'ending_soon';
+  kind: 'doors_open' | 'filling_up' | 'ending_soon' | 'likes_expiring';
   event_name: string;
   venue_name: string;
   inside: number;
@@ -40,6 +40,11 @@ const compose = (push: PendingPush): { title: string; body: string; url: string 
 
   if (push.kind === 'doors_open') {
     return { ...texts.doorsOpen(push.event_name, push.venue_name), url: `/event/${push.event_id}/access` };
+  }
+
+  if (push.kind === 'likes_expiring') {
+    // `inside` lleva cuántos me gusta tiene sin responder.
+    return { ...texts.likesExpiring(push.event_name, Number(push.inside) || 0), url: '/likes' };
   }
 
   if (push.kind === 'ending_soon') {
@@ -160,7 +165,11 @@ serve(async (req: Request): Promise<Response> => {
       else deletedPhotos = rutas.length;
     }
 
-    return json({ eventPushes, broadcastPushes, deletedPhotos });
+    // Los me gusta sin crush de las fiestas terminadas caducan con ellas (098).
+    const { data: deletedLikes, error: likesError } = await supabase.rpc('purge_ended_event_likes', { p_limit: 5000 });
+    if (likesError) console.error('purge event likes:', likesError.message);
+
+    return json({ eventPushes, broadcastPushes, deletedPhotos, deletedLikes: Number(deletedLikes ?? 0) });
   } catch (error) {
     console.error('notify-events error:', error);
     return json({ error: 'Error interno del servidor' }, 500);

@@ -16,6 +16,7 @@ import {
   Trash2,
   X,
   UserRound,
+  Loader2,
 } from 'lucide-react';
 import { useAppContext } from '@/context/app-context';
 import ReportUserDialog from './report-user-dialog';
@@ -116,6 +117,19 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ matchId }) => {
 
   const connection = connections.find((c) => c.user.id === matchId);
   const match = connection?.user;
+
+  // Un crush recién creado (devolver el like en «Le gustas», un aviso push)
+  // aún no está en la lista cargada: se pide otra vez antes de decir que no
+  // existe. Una sola vez por conversación.
+  const yaEsta = Boolean(connection);
+  const intentado = useRef<string | null>(null);
+  const [buscando, setBuscando] = useState(false);
+  useEffect(() => {
+    if (yaEsta || intentado.current === matchId) return;
+    intentado.current = matchId;
+    setBuscando(true);
+    void refreshConnections().finally(() => setBuscando(false));
+  }, [yaEsta, matchId, refreshConnections]);
   const chatMessages = useMemo(() => messages[matchId] ?? [], [messages, matchId]);
 
   const sortedMessages = useMemo(
@@ -212,6 +226,13 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ matchId }) => {
   };
 
   if (!match || !connection) {
+    if (buscando || intentado.current !== matchId) {
+      return (
+        <div className="flex h-full items-center justify-center">
+          <Loader2 className="h-6 w-6 animate-spin text-party-primary" aria-label={t('common.loading')} />
+        </div>
+      );
+    }
     return (
       <div className="flex h-full flex-col items-center justify-center gap-4 p-4">
         <p className="text-party-gray">{t('chat.notFound')}</p>

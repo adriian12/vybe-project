@@ -741,7 +741,8 @@
         "lockedCount_other": "Le gustas a {{count}} personas",
         "lockedCount": "Le gustas a {{count}} personas",
         "lockedTap": "Hazte Premium para ver quién es y darle like",
-        "someone": "Alguien"
+        "someone": "Alguien",
+        "expireNote": "Los me gusta son de esa noche: si no los devuelves, desaparecen cuando termina la fiesta. Te avisamos una hora antes."
     },
     "venue": {
         "myVenue": "Mi Negocio",
