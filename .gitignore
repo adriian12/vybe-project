@@ -1,0 +1,74 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Variables de entorno (contienen claves del proyecto Supabase)
+.env
+.env.*
+!.env.example
+
+# Credenciales de prueba
+info.txt
+
+# Secretos generados para las Edge Functions
+supabase/.env.functions
+
+# Capacitor: los proyectos nativos sí van al repositorio —llevan permisos,
+# iconos y configuración propios— pero no lo que genera la compilación.
+android/app/build/
+android/build/
+android/.gradle/
+android/local.properties
+
+# Configuración de Firebase: no es secreta —viaja dentro del APK— pero es
+# de cada proyecto, y tenerla versionada invita a compilar contra la de otro.
+android/app/google-services.json
+android/app/google-services*.json.bak
+ios/App/App/GoogleService-Info.plist
+android/app/src/main/assets/public/
+ios/App/build/
+ios/App/Pods/
+ios/App/App/public/
+
+# Estado local del CLI de Supabase y ajustes personales de Claude Code
+supabase/.temp/
+.claude/settings.local.json
+
+# SQL generado por scripts/generate-seed.py: lleva la contraseña de las cuentas de prueba
+supabase/seeds/mallorca_test_data.sql
+
+# Claves de firma de Apple: nunca al repo
+*.p8
+*.p12
+*.mobileprovision
+
+# graphify: grafo de conocimiento del código (se regenera con `graphify update .`)
+graphify-out/
+.graphify_*
+
+# Cachés y cobertura
+.cache/
+.turbo/
+coverage/
+*.tmp

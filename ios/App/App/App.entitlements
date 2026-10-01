@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!--
+		Enlaces universales: un enlace de app.fiestea.es abre la aplicación instalada
+		en vez de Safari.
+
+		Para que funcione hay que publicar en el dominio el fichero
+		https://app.fiestea.es/.well-known/apple-app-site-association con el
+		identificador del equipo y el bundle id, y activar «Associated Domains»
+		en la capacidad del target en Xcode. Mientras no exista ese fichero,
+		iOS abre Safari sin dar ningún error.
+	-->
+	<key>com.apple.developer.associated-domains</key>
+	<array>
+		<string>applinks:app.fiestea.es</string>
+	</array>
+
+	<!-- Iniciar sesión con Apple (migración 075). -->
+	<key>com.apple.developer.applesignin</key>
+	<array>
+		<string>Default</string>
+	</array>
+
+	<!-- Notificaciones push: en producción, no en el entorno de desarrollo. -->
+	<key>aps-environment</key>
+	<string>production</string>
+</dict>
+</plist>

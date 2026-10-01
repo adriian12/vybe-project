@@ -1,0 +1,139 @@
+# Compilación de iOS en Codemagic (Fiestea) → .ipa y subida a TestFlight.
+#
+# Aquí no hay ningún Mac: el proyecto de iOS se genera con Capacitor desde
+# Windows, pero compilarlo y firmarlo exige Xcode. Codemagic pone el Mac.
+#
+# Lo que hace este flujo:
+#   1. instala dependencias y compila la web (Vite);
+#   2. sincroniza el proyecto nativo (`cap sync ios`) e instala los Pods;
+#   3. pone el identificador de la app y firma con la clave de App Store
+#      Connect, que crea sola el certificado, el identificador y el perfil;
+#   4. genera el `.ipa` y lo sube a TestFlight.
+#
+# En Codemagic, la variable segura APP_STORE_CONNECT_PRIVATE_KEY (grupo
+# «appstore») lleva el contenido del .p8. Los identificadores van aquí.
+#
+# La ficha «Fiestea» de App Store Connect (id 6815824600) usa el
+# identificador es.fiestea.app, con push y dominios asociados activados.
+#
+# Las variables VITE_ de abajo son públicas (viajan en el propio bundle que
+# sirve app.fiestea.es), así que van aquí y no hace falta grupo de variables.
+
+definitions:
+  env_vite: &env_vite
+    VITE_SUPABASE_URL: 'https://vipixvfplxownccuhrme.supabase.co'
+    VITE_SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZpcGl4dmZwbHhvd25jY3Vocm1lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUzNTYzNTEsImV4cCI6MjA4MDkzMjM1MX0.GlRefMBFX5Bi4Er6tfXkkC1JEfF0FJvyI7FZEDXNfMA'
+    VITE_VAPID_PUBLIC_KEY: 'BA21zQxSUvXqzebgizvCCJjMaMX8goGprLgTmlkiJrnCvalJWurL93qx0OJESaqRhQQQZMxJomHnrMULF91RTUU'
+    VITE_SENTRY_DSN: 'https://8cf9228ad407c2ce663926fb52ce41e7@o4512056017813504.ingest.de.sentry.io/4512056026398800'
+    VITE_CARTO_API_KEY: 'cb1_3ojw_1_4e25963353432396cdd7b2aa'
+    # «Continuar con Google» (migración 075). IDs de cliente OAuth de Google
+    # Cloud (no son secretos). Vacíos, el botón de Google no sale.
+    VITE_GOOGLE_WEB_CLIENT_ID: '563350138901-eaeqbgjtperrnnqsbmf94jv8o19b4o47.apps.googleusercontent.com'
+    VITE_GOOGLE_IOS_CLIENT_ID: '563350138901-oviodlaq6bhslcj014k0jfu4e08tucmr.apps.googleusercontent.com'
+
+workflows:
+  ios-fiestea:
+    name: Fiestea iOS
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    environment:
+      groups:
+        - appstore
+      vars:
+        <<: *env_vite
+        BUNDLE_ID: 'es.fiestea.app'
+        APP_STORE_APPLE_ID: '6815824600'
+        XCODE_SCHEME: 'App'
+        # Firma con la clave de App Store Connect por variables de entorno. El
+        # `app-store-connect` de Codemagic lee estas tres solo. Issuer y Key ID
+        # no son secretos y van aquí; la clave privada la añades tú en
+        # Codemagic (Environment variables) como APP_STORE_CONNECT_PRIVATE_KEY,
+        # marcada como «Secure», pegando el contenido del .p8 con sus líneas
+        # BEGIN/END. No se guarda en el repositorio.
+        APP_STORE_CONNECT_ISSUER_ID: '0f0d99a0-ebd4-4838-bb04-a98211ea3c7c'
+        APP_STORE_CONNECT_KEY_IDENTIFIER: '3793K45HAY'
+      # Capacitor 8 exige Node 22: con 20, `cap sync` se niega y el .ipa sale
+      # sin la web ni su configuración.
+      node: 22
+      xcode: latest
+      cocoapods: default
+    triggering:
+      # De momento se lanza a mano desde Codemagic (botón «Start new build»).
+      events: []
+    scripts:
+      - name: Instalar dependencias
+        script: |
+          npm ci
+
+      - name: Compilar la web
+        script: |
+          npm run build
+
+      - name: Preparar el proyecto de iOS
+        script: |
+          set -e
+          npx cap sync ios
+          test -f ios/App/App/capacitor.config.json
+          cd ios/App
+          pod install
+
+      - name: Esquema de Google en iOS
+        script: |
+          # Google vuelve a la app por su «reversed client id»: sin él, el
+          # inicio de sesión con Google se queda colgado en iOS.
+          if [ -n "$VITE_GOOGLE_IOS_CLIENT_ID" ]; then
+            ESQUEMA="com.googleusercontent.apps.${VITE_GOOGLE_IOS_CLIENT_ID%.apps.googleusercontent.com}"
+            PLIST=ios/App/App/Info.plist
+            /usr/libexec/PlistBuddy -c "Add :CFBundleURLTypes array" "$PLIST" 2>/dev/null || true
+            /usr/libexec/PlistBuddy -c "Add :CFBundleURLTypes:0 dict" "$PLIST" 2>/dev/null || true
+            /usr/libexec/PlistBuddy -c "Add :CFBundleURLTypes:0:CFBundleURLSchemes array" "$PLIST" 2>/dev/null || true
+            /usr/libexec/PlistBuddy -c "Add :CFBundleURLTypes:0:CFBundleURLSchemes:0 string $ESQUEMA" "$PLIST"
+          fi
+
+      - name: Identificador de la app
+        script: |
+          cd ios/App
+          sed -i '' "s/PRODUCT_BUNDLE_IDENTIFIER = [^;]*;/PRODUCT_BUNDLE_IDENTIFIER = $BUNDLE_ID;/g" App.xcodeproj/project.pbxproj
+
+      - name: Firmar
+        script: |
+          # El identificador ya tiene push y dominios asociados (activados por
+          # la API). Baja o crea el certificado de distribución y el perfil;
+          # CERTIFICATE_PRIVATE_KEY (grupo appstore) es la clave privada del
+          # certificado, para que las siguientes builds reutilicen el mismo.
+          keychain initialize
+          app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE --create             --certificate-key=@env:CERTIFICATE_PRIVATE_KEY
+          keychain add-certificates
+          xcode-project use-profiles --project ios/App/App.xcodeproj
+
+      - name: Número de build
+        script: |
+          # TestFlight exige un número mayor que el de la última subida.
+          ULTIMO=$(app-store-connect get-latest-testflight-build-number "$APP_STORE_APPLE_ID" 2>/dev/null || echo 0)
+          cd ios/App
+          agvtool new-version -all $((ULTIMO + 1))
+
+      - name: Compilar el .ipa
+        script: |
+          cd ios/App
+          xcode-project build-ipa --workspace App.xcworkspace --scheme "$XCODE_SCHEME"
+
+    artifacts:
+      - ios/App/build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+
+    publishing:
+      email:
+        recipients:
+          - inf4badroma1011@gmail.com
+        notify:
+          success: true
+          failure: true
+      app_store_connect:
+        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
+        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
+        # Sube a TestFlight para pruebas internas. Las externas exigen antes
+        # rellenar en App Store Connect la información de la beta (correo de
+        # comentarios y contacto para la revisión); entonces se pone a true.
+        submit_to_testflight: false

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Fondo de la app. Android 15+ dibuja de borde a borde y, con WebView
+         anteriores a la 140, Capacitor aparta la web de las barras con relleno:
+         lo que se ve detrás de la hora y de la barra de gestos es este color.
+         Sin él salía el blanco del tema y los iconos claros no se leían. -->
+    <color name="vybe_background">#111114</color>
+    <!-- El amarillo de la marca, para el icono de los avisos. -->
+    <color name="vybe_accent">#F8D000</color>
+</resources>

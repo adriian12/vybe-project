@@ -1,0 +1,115 @@
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Minus, Plus, Star } from 'lucide-react';
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
+import { PartyButton } from '@/components/ui-custom/party-button';
+import { PREMIUM_PRICES, usePremium } from '@/context/premium-context';
+import { storeMaxQuantity } from '@/services/iap';
+
+const MAX = 100;
+
+const dinero = (value: number, currency = 'EUR') =>
+  value.toLocaleString(undefined, { style: 'currency', currency, minimumFractionDigits: 0, maximumFractionDigits: 2 });
+
+/**
+ * Comprar supercrush: «¿Cuántos quieres?» con un contador de − y +, que nunca
+ * baja de 1. El total se enseña antes de pagar: con Stripe, 1 € × cantidad; en
+ * el iPhone, con la compra integrada de Apple a su precio (hasta 10 de una vez).
+ * Los comprados valen en cualquier evento.
+ */
+const SupercrushDialog = () => {
+  const { t } = useTranslation();
+  const { showSupercrushDialog, setShowSupercrushDialog, buySupercrush, supercrushBalance, storePurchases, storePrices } =
+    usePremium();
+  // En la app se compra en la tienda: su precio y, como mucho, 10 de una vez
+  // en Apple y 1 en Google Play.
+  const tope = storePurchases ? storeMaxQuantity() : MAX;
+  const tienda = storePurchases ? storePrices.supercrush : undefined;
+  const unidad = tienda?.amount ?? PREMIUM_PRICES.supercrush;
+  const moneda = tienda?.currency ?? 'EUR';
+  const [cantidad, setCantidad] = useState(1);
+  const [enviando, setEnviando] = useState(false);
+
+  // Cada vez que se abre empieza en 1.
+  useEffect(() => {
+    if (showSupercrushDialog) {
+      setCantidad(1);
+      setEnviando(false);
+    }
+  }, [showSupercrushDialog]);
+
+  const total = Math.round(cantidad * unidad * 100) / 100;
+
+  return (
+    <Dialog open={showSupercrushDialog} onOpenChange={(open) => !enviando && setShowSupercrushDialog(open)}>
+      <DialogContent className="gap-0 p-0 sm:max-w-sm">
+        <div className="bg-party-primary p-6 text-center text-ink">
+          <span className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-ink text-party-primary">
+            <Star size={24} className="fill-party-primary" />
+          </span>
+          <DialogTitle className="font-display text-headline-lg">{t('supercrush.buyTitle')}</DialogTitle>
+          <DialogDescription className="mt-1 text-body-md text-ink/75">{t('supercrush.buyBody')}</DialogDescription>
+        </div>
+
+        <div className="space-y-5 p-5">
+          <p className="text-center text-body-md font-bold">{t('supercrush.howMany')}</p>
+
+          <div className="flex items-center justify-center gap-5">
+            <button
+              type="button"
+              onClick={() => setCantidad((c) => Math.max(1, c - 1))}
+              disabled={cantidad <= 1 || enviando}
+              aria-label={t('supercrush.less')}
+              className="press flex h-12 w-12 items-center justify-center rounded-full bg-surface-high text-foreground disabled:opacity-40"
+            >
+              <Minus size={22} />
+            </button>
+            <span
+              className="min-w-[3ch] text-center font-display text-headline-xl tabular-nums"
+              aria-live="polite"
+            >
+              {cantidad}
+            </span>
+            <button
+              type="button"
+              onClick={() => setCantidad((c) => Math.min(tope, c + 1))}
+              disabled={cantidad >= tope || enviando}
+              aria-label={t('supercrush.more')}
+              className="press flex h-12 w-12 items-center justify-center rounded-full bg-party-primary text-ink disabled:opacity-40"
+            >
+              <Plus size={22} />
+            </button>
+          </div>
+
+          <p className="text-center text-body-sm text-party-gray">
+            {t('supercrush.priceLine', {
+              count: cantidad,
+              unit: tienda?.label ?? dinero(unidad, moneda),
+              total: dinero(total, moneda),
+            })}
+          </p>
+
+          <PartyButton
+            size="lg"
+            className="w-full"
+            disabled={enviando}
+            onClick={() => {
+              setEnviando(true);
+              void buySupercrush(cantidad).then((ok) => {
+                if (!ok) setEnviando(false);
+              });
+            }}
+          >
+            {enviando ? t('premium.redirecting') : t('supercrush.pay', { total: dinero(total, moneda) })}
+          </PartyButton>
+
+          <p className="text-center text-caption text-party-gray">
+            {t('supercrush.youHave', { count: supercrushBalance })}
+          </p>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+export default SupercrushDialog;

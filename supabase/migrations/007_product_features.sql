@@ -1,0 +1,1465 @@
+-- ============================================================================
+-- Vybe App - Migración 007
+-- Esquema de las funcionalidades de producto:
+--   intereses y filtros, grupos, reputación, chat efímero, moderación de fotos,
+--   suspensión de cuentas, SOS, push, límites de uso, consentimiento RGPD,
+--   borrado de cuenta, equipos de local, rotación de códigos, embudo de eventos,
+--   analítica y campos de Stripe.
+--
+-- Idempotente: se puede ejecutar varias veces.
+-- ============================================================================
+
+-- ============================================================================
+-- 1. ESTADO DE LA CUENTA (suspensión y borrado)
+-- ============================================================================
+
+ALTER TABLE public.profiles
+    ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'active',
+    ADD COLUMN IF NOT EXISTS suspended_until TIMESTAMPTZ,
+    ADD COLUMN IF NOT EXISTS suspension_reason TEXT,
+    ADD COLUMN IF NOT EXISTS deletion_requested_at TIMESTAMPTZ,
+    ADD COLUMN IF NOT EXISTS languages TEXT[] NOT NULL DEFAULT '{}',
+    ADD COLUMN IF NOT EXISTS plan_tonight TEXT,
+    ADD COLUMN IF NOT EXISTS locale TEXT NOT NULL DEFAULT 'es';
+
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'profiles_status_check') THEN
+        ALTER TABLE public.profiles
+            ADD CONSTRAINT profiles_status_check
+            CHECK (status IN ('active', 'suspended', 'pending_deletion', 'deleted'));
+    END IF;
+END $$;
+
+CREATE INDEX IF NOT EXISTS idx_profiles_status ON public.profiles(status)
+    WHERE status <> 'active';
+
+/** Una cuenta activa es la que no está suspendida ni pendiente de borrado. */
+CREATE OR REPLACE FUNCTION public.is_profile_active(p_profile_id UUID)
+RETURNS BOOLEAN
+LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public
+AS $$
+    SELECT EXISTS (
+        SELECT 1 FROM public.profiles
+        WHERE id = p_profile_id
+          AND status = 'active'
+          AND (suspended_until IS NULL OR suspended_until < NOW())
+    );
+$$;
+
+-- ============================================================================
+-- 2. INTERESES Y ETIQUETAS
+-- Hasta ahora el único criterio de match era la proximidad, que es un filtro,
+-- no un algoritmo.
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS public.interests (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    slug TEXT NOT NULL UNIQUE,
+    category TEXT NOT NULL,
+    sort_order INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS public.profile_interests (
+    profile_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+    interest_id UUID NOT NULL REFERENCES public.interests(id) ON DELETE CASCADE,
+    PRIMARY KEY (profile_id, interest_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_profile_interests_interest
+    ON public.profile_interests(interest_id);
+
+ALTER TABLE public.interests ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.profile_interests ENABLE ROW LEVEL SECURITY;
+
+-- Catálogo base. El `slug` es la clave de traducción en el cliente.
+INSERT INTO public.interests (slug, category, sort_order) VALUES
+    ('techno', 'music', 10), ('house', 'music', 20), ('reggaeton', 'music', 30),
+    ('pop', 'music', 40), ('rock', 'music', 50), ('jazz', 'music', 60),
+    ('latin', 'music', 70), ('rnb', 'music', 80),
+    ('dancing', 'vibe', 110), ('chill', 'vibe', 120), ('afterparty', 'vibe', 130),
+    ('live_music', 'vibe', 140), ('cocktails', 'vibe', 150), ('terrace', 'vibe', 160),
+    ('meet_people', 'goal', 210), ('friends', 'goal', 220), ('dating', 'goal', 230),
+    ('networking', 'goal', 240)
+ON CONFLICT (slug) DO NOTHING;
+
+-- ============================================================================
+-- 3. EQUIPOS DE LOCAL
+-- Un local necesita más de una cuenta: dueño, portero y marketing.
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS public.venue_members (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    venue_id UUID NOT NULL REFERENCES public.venues(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+    email TEXT,
+    role TEXT NOT NULL DEFAULT 'staff',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE (venue_id, user_id)
+);
+
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'venue_members_role_check') THEN
+        ALTER TABLE public.venue_members
+            ADD CONSTRAINT venue_members_role_check
+            CHECK (role IN ('owner', 'staff', 'marketing'));
+    END IF;
+END $$;
+
+CREATE INDEX IF NOT EXISTS idx_venue_members_user ON public.venue_members(user_id);
+ALTER TABLE public.venue_members ENABLE ROW LEVEL SECURITY;
+
+-- El dueño original pasa a ser miembro con rol owner.
+INSERT INTO public.venue_members (venue_id, user_id, email, role)
+SELECT v.id, v.venue_id, v.email, 'owner'
+FROM public.venues v
+ON CONFLICT (venue_id, user_id) DO NOTHING;
+
+/** Ahora contempla tanto al dueño como a los miembros del equipo. */
+CREATE OR REPLACE FUNCTION public.current_venue_id()
+RETURNS UUID
+LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public
+AS $$
+    SELECT COALESCE(
+        (SELECT id FROM public.venues WHERE venue_id = auth.uid() LIMIT 1),
+        (SELECT venue_id FROM public.venue_members WHERE user_id = auth.uid() LIMIT 1)
+    );
+$$;
+
+/** Rol del usuario dentro de su local. */
+CREATE OR REPLACE FUNCTION public.current_venue_role()
+RETURNS TEXT
+LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public
+AS $$
+    SELECT COALESCE(
+        (SELECT 'owner' FROM public.venues WHERE venue_id = auth.uid() LIMIT 1),
+        (SELECT role FROM public.venue_members WHERE user_id = auth.uid() LIMIT 1)
+    );
+$$;
+
+-- ============================================================================
+-- 4. INTENCIÓN DE ASISTIR ("voy a ir")
+-- Ataca el problema de la sala vacía: antes nadie veía a nadie hasta que
+-- alguien más ya había hecho check-in dentro.
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS public.event_intents (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    event_id UUID NOT NULL REFERENCES public.events(id) ON DELETE CASCADE,
+    profile_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE (event_id, profile_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_event_intents_event ON public.event_intents(event_id);
+ALTER TABLE public.event_intents ENABLE ROW LEVEL SECURITY;
+
+-- ============================================================================
+-- 5. GRUPOS
+-- Salir de fiesta es una actividad de grupo; ninguna app grande lo resuelve.
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS public.groups (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    event_id UUID NOT NULL REFERENCES public.events(id) ON DELETE CASCADE,
+    owner_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    join_code TEXT NOT NULL UNIQUE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS public.group_members (
+    group_id UUID NOT NULL REFERENCES public.groups(id) ON DELETE CASCADE,
+    profile_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+    joined_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    PRIMARY KEY (group_id, profile_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_groups_event ON public.groups(event_id);
+CREATE INDEX IF NOT EXISTS idx_group_members_profile ON public.group_members(profile_id);
+
+ALTER TABLE public.groups ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.group_members ENABLE ROW LEVEL SECURITY;
+
+/** Grupo del usuario en un evento concreto (como mucho uno). */
+CREATE OR REPLACE FUNCTION public.current_group_id(p_event_id UUID)
+RETURNS UUID
+LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public
+AS $$
+    SELECT gm.group_id
+    FROM public.group_members gm
+    JOIN public.groups g ON g.id = gm.group_id
+    WHERE gm.profile_id = public.current_profile_id()
+      AND g.event_id = p_event_id
+    LIMIT 1;
+$$;
+
+CREATE OR REPLACE FUNCTION public.is_group_member(p_group_id UUID)
+RETURNS BOOLEAN
+LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public
+AS $$
+    SELECT EXISTS (
+        SELECT 1 FROM public.group_members
+        WHERE group_id = p_group_id AND profile_id = public.current_profile_id()
+    );
+$$;
+
+-- ============================================================================
+-- 6. CHAT EFÍMERO
+-- La conversación caduca al terminar el evento salvo que ambos la conserven.
+-- Encaja con la premisa del producto y reduce la retención de datos.
+-- ============================================================================
+
+ALTER TABLE public.connections
+    ADD COLUMN IF NOT EXISTS event_id UUID REFERENCES public.events(id) ON DELETE SET NULL,
+    ADD COLUMN IF NOT EXISTS expires_at TIMESTAMPTZ,
+    ADD COLUMN IF NOT EXISTS kept_by_1 BOOLEAN NOT NULL DEFAULT FALSE,
+    ADD COLUMN IF NOT EXISTS kept_by_2 BOOLEAN NOT NULL DEFAULT FALSE;
+
+CREATE INDEX IF NOT EXISTS idx_connections_expires ON public.connections(expires_at)
+    WHERE expires_at IS NOT NULL;
+
+/** Marca que el usuario quiere conservar la conexión más allá del evento. */
+CREATE OR REPLACE FUNCTION public.keep_connection(p_connection_id UUID)
+RETURNS BOOLEAN
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = public
+AS $$
+DECLARE
+    v_profile_id UUID := public.current_profile_id();
+    v_conn RECORD;
+BEGIN
+    SELECT * INTO v_conn FROM public.connections WHERE id = p_connection_id;
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'CONNECTION_NOT_FOUND';
+    END IF;
+
+    IF v_conn.user_id_1 = v_profile_id THEN
+        UPDATE public.connections SET kept_by_1 = TRUE WHERE id = p_connection_id;
+    ELSIF v_conn.user_id_2 = v_profile_id THEN
+        UPDATE public.connections SET kept_by_2 = TRUE WHERE id = p_connection_id;
+    ELSE
+        RAISE EXCEPTION 'NOT_A_MEMBER';
+    END IF;
+
+    -- Cuando ambos la conservan, deja de caducar.
+    UPDATE public.connections
+    SET expires_at = NULL
+    WHERE id = p_connection_id AND kept_by_1 AND kept_by_2;
+
+    RETURN TRUE;
+END;
+$$;
+
+/** Borra conexiones caducadas y sus mensajes. Pensada para pg_cron o un job. */
+CREATE OR REPLACE FUNCTION public.purge_expired_connections()
+RETURNS INTEGER
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = public
+AS $$
+DECLARE
+    deleted_count INTEGER;
+BEGIN
+    WITH expired AS (
+        DELETE FROM public.connections
+        WHERE expires_at IS NOT NULL AND expires_at < NOW()
+        RETURNING id
+    )
+    SELECT COUNT(*) INTO deleted_count FROM expired;
+
+    RETURN deleted_count;
+END;
+$$;
+
+-- Los mensajes se borran en cascada al desaparecer los perfiles, pero no al
+-- desaparecer la conexión: los eliminamos explícitamente.
+CREATE OR REPLACE FUNCTION public.delete_connection_messages()
+RETURNS TRIGGER
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = public
+AS $$
+BEGIN
+    DELETE FROM public.messages m
+    WHERE (m.sender_id = OLD.user_id_1 AND m.receiver_id = OLD.user_id_2)
+       OR (m.sender_id = OLD.user_id_2 AND m.receiver_id = OLD.user_id_1);
+    RETURN OLD;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS on_connection_deleted ON public.connections;
+CREATE TRIGGER on_connection_deleted
+    AFTER DELETE ON public.connections
+    FOR EACH ROW EXECUTE FUNCTION public.delete_connection_messages();
+
+-- El match hereda el evento y la caducidad del swipe que lo generó.
+CREATE OR REPLACE FUNCTION public.check_match()
+RETURNS TRIGGER
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = public
+AS $$
+DECLARE
+    reverse_swipe RECORD;
+    v_end_date TIMESTAMPTZ;
+BEGIN
+    SELECT * INTO reverse_swipe
+    FROM public.swipes s
+    WHERE s.swiper_id = NEW.swiped_id
+      AND s.swiped_id = NEW.swiper_id
+      AND s.swipe_type IN ('like', 'super_like')
+    LIMIT 1;
+
+    IF FOUND THEN
+        IF NEW.event_id IS NOT NULL THEN
+            SELECT e.end_date INTO v_end_date FROM public.events e WHERE e.id = NEW.event_id;
+        END IF;
+
+        INSERT INTO public.connections (
+            user_id_1, user_id_2, connection_type, event_id, expires_at
+        )
+        VALUES (
+            LEAST(NEW.swiper_id, NEW.swiped_id),
+            GREATEST(NEW.swiper_id, NEW.swiped_id),
+            CASE WHEN NEW.swipe_type = 'super_like' OR reverse_swipe.swipe_type = 'super_like'
+                 THEN 'vybe_check' ELSE 'match' END,
+            NEW.event_id,
+            -- 24 h de cortesía después del evento para poder seguir hablando.
+            CASE WHEN v_end_date IS NOT NULL THEN v_end_date + INTERVAL '24 hours' END
+        )
+        ON CONFLICT (user_id_1, user_id_2) DO NOTHING;
+    END IF;
+
+    RETURN NEW;
+END;
+$$;
+
+-- ============================================================================
+-- 7. MODERACIÓN DE FOTOS
+-- Antes cualquiera publicaba al instante en un bucket público.
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS public.moderation_queue (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    profile_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+    bucket TEXT NOT NULL,
+    path TEXT NOT NULL,
+    url TEXT NOT NULL,
+    kind TEXT NOT NULL DEFAULT 'photo',
+    status TEXT NOT NULL DEFAULT 'pending',
+    score NUMERIC,
+    reason TEXT,
+    reviewed_by UUID REFERENCES auth.users(id),
+    reviewed_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'moderation_status_check') THEN
+        ALTER TABLE public.moderation_queue
+            ADD CONSTRAINT moderation_status_check
+            CHECK (status IN ('pending', 'approved', 'rejected'));
+    END IF;
+END $$;
+
+CREATE INDEX IF NOT EXISTS idx_moderation_status ON public.moderation_queue(status, created_at);
+CREATE INDEX IF NOT EXISTS idx_moderation_profile ON public.moderation_queue(profile_id);
+ALTER TABLE public.moderation_queue ENABLE ROW LEVEL SECURITY;
+
+/** Aprueba o rechaza una foto y la publica en el perfil si procede. */
+CREATE OR REPLACE FUNCTION public.review_photo(
+    p_item_id UUID,
+    p_approve BOOLEAN,
+    p_reason TEXT DEFAULT NULL
+)
+RETURNS VOID
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = public
+AS $$
+DECLARE
+    v_item RECORD;
+BEGIN
+    IF NOT public.is_admin() THEN
+        RAISE EXCEPTION 'NOT_AUTHORIZED';
+    END IF;
+
+    SELECT * INTO v_item FROM public.moderation_queue WHERE id = p_item_id;
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'ITEM_NOT_FOUND';
+    END IF;
+
+    UPDATE public.moderation_queue
+    SET status = CASE WHEN p_approve THEN 'approved' ELSE 'rejected' END,
+        reason = p_reason,
+        reviewed_by = auth.uid(),
+        reviewed_at = NOW()
+    WHERE id = p_item_id;
+
+    IF p_approve THEN
+        UPDATE public.profiles
+        SET photos = CASE
+                WHEN v_item.url = ANY(photos) THEN photos
+                ELSE array_append(photos, v_item.url)
+            END,
+            avatar = COALESCE(avatar, v_item.url)
+        WHERE id = v_item.profile_id;
+    END IF;
+END;
+$$;
+
+-- ============================================================================
+-- 8. BOTÓN DE EMERGENCIA
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS public.trusted_contacts (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    profile_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    phone TEXT,
+    email TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    CHECK (phone IS NOT NULL OR email IS NOT NULL)
+);
+
+CREATE TABLE IF NOT EXISTS public.sos_alerts (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    profile_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+    event_id UUID REFERENCES public.events(id) ON DELETE SET NULL,
+    latitude DOUBLE PRECISION,
+    longitude DOUBLE PRECISION,
+    note TEXT,
+    status TEXT NOT NULL DEFAULT 'active',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    resolved_at TIMESTAMPTZ
+);
+
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'sos_status_check') THEN
+        ALTER TABLE public.sos_alerts
+            ADD CONSTRAINT sos_status_check CHECK (status IN ('active', 'resolved', 'cancelled'));
+    END IF;
+END $$;
+
+CREATE INDEX IF NOT EXISTS idx_sos_active ON public.sos_alerts(status, created_at DESC)
+    WHERE status = 'active';
+CREATE INDEX IF NOT EXISTS idx_trusted_contacts_profile ON public.trusted_contacts(profile_id);
+
+ALTER TABLE public.trusted_contacts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.sos_alerts ENABLE ROW LEVEL SECURITY;
+
+-- ============================================================================
+-- 9. NOTIFICACIONES PUSH
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS public.push_subscriptions (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    profile_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+    endpoint TEXT NOT NULL UNIQUE,
+    p256dh TEXT NOT NULL,
+    auth TEXT NOT NULL,
+    user_agent TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    last_used_at TIMESTAMPTZ
+);
+
+CREATE INDEX IF NOT EXISTS idx_push_profile ON public.push_subscriptions(profile_id);
+ALTER TABLE public.push_subscriptions ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE public.profiles
+    ADD COLUMN IF NOT EXISTS notify_matches BOOLEAN NOT NULL DEFAULT TRUE,
+    ADD COLUMN IF NOT EXISTS notify_messages BOOLEAN NOT NULL DEFAULT TRUE;
+
+-- ============================================================================
+-- 10. LÍMITES DE USO
+-- Sin esto, la anon key permite scriptear miles de swipes o mensajes.
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS public.rate_limits (
+    profile_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+    action TEXT NOT NULL,
+    window_start TIMESTAMPTZ NOT NULL,
+    count INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (profile_id, action, window_start)
+);
+
+CREATE INDEX IF NOT EXISTS idx_rate_limits_window ON public.rate_limits(window_start);
+ALTER TABLE public.rate_limits ENABLE ROW LEVEL SECURITY;
+
+/**
+ * Cuenta una acción y devuelve FALSE si se ha superado el límite.
+ * La ventana se redondea para poder usar la PK como contador atómico.
+ */
+CREATE OR REPLACE FUNCTION public.consume_rate_limit(
+    p_action TEXT,
+    p_max INTEGER,
+    p_window_seconds INTEGER
+)
+RETURNS BOOLEAN
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = public
+AS $$
+DECLARE
+    v_profile_id UUID := public.current_profile_id();
+    v_window TIMESTAMPTZ;
+    v_count INTEGER;
+BEGIN
+    IF v_profile_id IS NULL THEN
+        RETURN FALSE;
+    END IF;
+
+    v_window := to_timestamp(floor(extract(epoch FROM NOW()) / p_window_seconds) * p_window_seconds);
+
+    INSERT INTO public.rate_limits (profile_id, action, window_start, count)
+    VALUES (v_profile_id, p_action, v_window, 1)
+    ON CONFLICT (profile_id, action, window_start)
+    DO UPDATE SET count = public.rate_limits.count + 1
+    RETURNING count INTO v_count;
+
+    RETURN v_count <= p_max;
+END;
+$$;
+
+/** Limpia ventanas antiguas. */
+CREATE OR REPLACE FUNCTION public.purge_rate_limits()
+RETURNS INTEGER
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = public
+AS $$
+DECLARE
+    deleted_count INTEGER;
+BEGIN
+    DELETE FROM public.rate_limits WHERE window_start < NOW() - INTERVAL '2 days';
+    GET DIAGNOSTICS deleted_count = ROW_COUNT;
+    RETURN deleted_count;
+END;
+$$;
+
+-- Aplicación en swipes y mensajes.
+CREATE OR REPLACE FUNCTION public.enforce_swipe_limit()
+RETURNS TRIGGER
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = public
+AS $$
+BEGIN
+    IF NOT public.consume_rate_limit('swipe', 300, 3600) THEN
+        RAISE EXCEPTION 'RATE_LIMITED_SWIPES';
+    END IF;
+    RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS enforce_swipe_limit_trigger ON public.swipes;
+CREATE TRIGGER enforce_swipe_limit_trigger
+    BEFORE INSERT ON public.swipes
+    FOR EACH ROW EXECUTE FUNCTION public.enforce_swipe_limit();
+
+CREATE OR REPLACE FUNCTION public.enforce_message_limit()
+RETURNS TRIGGER
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = public
+AS $$
+BEGIN
+    IF NOT public.consume_rate_limit('message', 200, 3600) THEN
+        RAISE EXCEPTION 'RATE_LIMITED_MESSAGES';
+    END IF;
+    RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS enforce_message_limit_trigger ON public.messages;
+CREATE TRIGGER enforce_message_limit_trigger
+    BEFORE INSERT ON public.messages
+    FOR EACH ROW EXECUTE FUNCTION public.enforce_message_limit();
+
+-- ============================================================================
+-- 11. CONSENTIMIENTO Y RGPD
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS public.user_consents (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+    document TEXT NOT NULL,
+    version TEXT NOT NULL,
+    accepted BOOLEAN NOT NULL DEFAULT TRUE,
+    accepted_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE (user_id, document, version)
+);
+
+CREATE INDEX IF NOT EXISTS idx_consents_user ON public.user_consents(user_id);
+ALTER TABLE public.user_consents ENABLE ROW LEVEL SECURITY;
+
+/** Solicita el borrado de la cuenta. El borrado duro lo hace la Edge Function. */
+CREATE OR REPLACE FUNCTION public.request_account_deletion()
+RETURNS VOID
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = public
+AS $$
+DECLARE
+    v_profile_id UUID := public.current_profile_id();
+BEGIN
+    IF v_profile_id IS NULL THEN
+        RAISE EXCEPTION 'PROFILE_NOT_FOUND';
+    END IF;
+
+    UPDATE public.profiles
+    SET status = 'pending_deletion',
+        deletion_requested_at = NOW(),
+        is_invisible = TRUE
+    WHERE id = v_profile_id;
+
+    -- Desaparece de inmediato del resto de usuarios.
+    DELETE FROM public.event_attendance WHERE profile_id = v_profile_id;
+    DELETE FROM public.event_intents WHERE profile_id = v_profile_id;
+END;
+$$;
+
+/** Exporta en JSON todo lo que guardamos del usuario (art. 20 RGPD). */
+CREATE OR REPLACE FUNCTION public.export_my_data()
+RETURNS JSONB
+LANGUAGE plpgsql STABLE SECURITY DEFINER SET search_path = public
+AS $$
+DECLARE
+    v_profile_id UUID := public.current_profile_id();
+    v_result JSONB;
+BEGIN
+    IF v_profile_id IS NULL THEN
+        RAISE EXCEPTION 'PROFILE_NOT_FOUND';
+    END IF;
+
+    SELECT jsonb_build_object(
+        'exported_at', NOW(),
+        'profile', (SELECT to_jsonb(p) - 'user_id' FROM public.profiles p WHERE p.id = v_profile_id),
+        'interests', (
+            SELECT COALESCE(jsonb_agg(i.slug), '[]'::jsonb)
+            FROM public.profile_interests pi
+            JOIN public.interests i ON i.id = pi.interest_id
+            WHERE pi.profile_id = v_profile_id
+        ),
+        'attendance', (
+            SELECT COALESCE(jsonb_agg(jsonb_build_object(
+                'event', e.name, 'venue', v.name, 'checked_in_at', ea.checked_in_at)), '[]'::jsonb)
+            FROM public.event_attendance ea
+            JOIN public.events e ON e.id = ea.event_id
+            JOIN public.venues v ON v.id = e.venue_id
+            WHERE ea.profile_id = v_profile_id
+        ),
+        'connections', (
+            SELECT COALESCE(jsonb_agg(jsonb_build_object(
+                'with', p.name, 'type', c.connection_type, 'created_at', c.created_at)), '[]'::jsonb)
+            FROM public.connections c
+            JOIN public.profiles p
+              ON p.id = CASE WHEN c.user_id_1 = v_profile_id THEN c.user_id_2 ELSE c.user_id_1 END
+            WHERE c.user_id_1 = v_profile_id OR c.user_id_2 = v_profile_id
+        ),
+        'messages', (
+            SELECT COALESCE(jsonb_agg(jsonb_build_object(
+                'direction', CASE WHEN m.sender_id = v_profile_id THEN 'sent' ELSE 'received' END,
+                'content', m.content, 'created_at', m.created_at) ORDER BY m.created_at), '[]'::jsonb)
+            FROM public.messages m
+            WHERE m.sender_id = v_profile_id OR m.receiver_id = v_profile_id
+        ),
+        'consents', (
+            SELECT COALESCE(jsonb_agg(jsonb_build_object(
+                'document', uc.document, 'version', uc.version, 'accepted_at', uc.accepted_at)), '[]'::jsonb)
+            FROM public.user_consents uc WHERE uc.user_id = auth.uid()
+        ),
+        'subscriptions', (
+            SELECT COALESCE(jsonb_agg(to_jsonb(ps)), '[]'::jsonb)
+            FROM public.premium_subscriptions ps WHERE ps.user_id = v_profile_id
+        )
+    ) INTO v_result;
+
+    RETURN v_result;
+END;
+$$;
+
+-- ============================================================================
+-- 12. MODERACIÓN: SUSPENSIÓN DE CUENTAS
+-- ============================================================================
+
+CREATE OR REPLACE FUNCTION public.suspend_profile(
+    p_profile_id UUID,
+    p_days INTEGER DEFAULT NULL,
+    p_reason TEXT DEFAULT NULL
+)
+RETURNS VOID
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = public
+AS $$
+BEGIN
+    IF NOT public.is_admin() THEN
+        RAISE EXCEPTION 'NOT_AUTHORIZED';
+    END IF;
+
+    UPDATE public.profiles
+    SET status = 'suspended',
+        suspended_until = CASE WHEN p_days IS NULL THEN NULL
+                               ELSE NOW() + (p_days || ' days')::interval END,
+        suspension_reason = p_reason,
+        is_invisible = TRUE
+    WHERE id = p_profile_id;
+
+    DELETE FROM public.event_attendance WHERE profile_id = p_profile_id;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION public.reinstate_profile(p_profile_id UUID)
+RETURNS VOID
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = public
+AS $$
+BEGIN
+    IF NOT public.is_admin() THEN
+        RAISE EXCEPTION 'NOT_AUTHORIZED';
+    END IF;
+
+    UPDATE public.profiles
+    SET status = 'active', suspended_until = NULL,
+        suspension_reason = NULL, is_invisible = FALSE
+    WHERE id = p_profile_id;
+END;
+$$;
+
+-- ============================================================================
+-- 13. STRIPE
+-- ============================================================================
+
+ALTER TABLE public.premium_subscriptions
+    ADD COLUMN IF NOT EXISTS stripe_customer_id TEXT,
+    ADD COLUMN IF NOT EXISTS stripe_subscription_id TEXT,
+    ADD COLUMN IF NOT EXISTS stripe_price_id TEXT,
+    ADD COLUMN IF NOT EXISTS cancel_at_period_end BOOLEAN NOT NULL DEFAULT FALSE;
+
+CREATE INDEX IF NOT EXISTS idx_subs_stripe
+    ON public.premium_subscriptions(stripe_subscription_id)
+    WHERE stripe_subscription_id IS NOT NULL;
+
+CREATE OR REPLACE FUNCTION public.is_premium(p_profile_id UUID DEFAULT NULL)
+RETURNS BOOLEAN
+LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public
+AS $$
+    SELECT EXISTS (
+        SELECT 1 FROM public.premium_subscriptions
+        WHERE user_id = COALESCE(p_profile_id, public.current_profile_id())
+          AND status = 'active'
+          AND (expires_at IS NULL OR expires_at > NOW())
+    );
+$$;
+
+-- ============================================================================
+-- 14. TICKETING
+-- El campo booking_url existía y no llevaba a ninguna parte.
+-- ============================================================================
+
+ALTER TABLE public.events
+    ADD COLUMN IF NOT EXISTS ticket_provider TEXT,
+    ADD COLUMN IF NOT EXISTS tickets_available BOOLEAN NOT NULL DEFAULT TRUE;
+
+CREATE TABLE IF NOT EXISTS public.booking_clicks (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    event_id UUID NOT NULL REFERENCES public.events(id) ON DELETE CASCADE,
+    profile_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_booking_clicks_event ON public.booking_clicks(event_id, created_at);
+ALTER TABLE public.booking_clicks ENABLE ROW LEVEL SECURITY;
+
+-- ============================================================================
+-- 15. ROTACIÓN AUTOMÁTICA DE CÓDIGOS
+-- Para que un código filtrado por WhatsApp deje de servir enseguida.
+-- ============================================================================
+
+ALTER TABLE public.event_codes
+    ADD COLUMN IF NOT EXISTS rotates_every_minutes INTEGER;
+
+/** Genera un código nuevo si el activo ha superado su ventana de rotación. */
+CREATE OR REPLACE FUNCTION public.rotate_event_code_if_needed(p_venue_id UUID)
+RETURNS TABLE (code TEXT, expires_at TIMESTAMPTZ, rotated BOOLEAN)
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = public
+AS $$
+#variable_conflict use_column
+DECLARE
+    v_current RECORD;
+    v_new_code TEXT;
+BEGIN
+    IF public.current_venue_id() IS DISTINCT FROM p_venue_id THEN
+        RAISE EXCEPTION 'NOT_AUTHORIZED';
+    END IF;
+
+    SELECT * INTO v_current
+    FROM public.event_codes ec
+    WHERE ec.venue_id = p_venue_id AND ec.active AND ec.expires_at > NOW()
+    ORDER BY ec.created_at DESC
+    LIMIT 1;
+
+    IF FOUND AND (
+        v_current.rotates_every_minutes IS NULL
+        OR v_current.created_at > NOW() - (v_current.rotates_every_minutes || ' minutes')::interval
+    ) THEN
+        RETURN QUERY SELECT v_current.code, v_current.expires_at, FALSE;
+        RETURN;
+    END IF;
+
+    IF NOT FOUND THEN
+        RETURN;
+    END IF;
+
+    UPDATE public.event_codes SET active = FALSE WHERE id = v_current.id;
+
+    v_new_code := lpad(floor(random() * 1000000)::text, 6, '0');
+
+    INSERT INTO public.event_codes (
+        venue_id, event_id, code, expires_at, active, rotates_every_minutes
+    )
+    VALUES (
+        p_venue_id, v_current.event_id, v_new_code,
+        v_current.expires_at, TRUE, v_current.rotates_every_minutes
+    );
+
+    RETURN QUERY SELECT v_new_code, v_current.expires_at, TRUE;
+END;
+$$;
+
+-- ============================================================================
+-- 16. ANALÍTICA DE PRODUCTO
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS public.analytics_events (
+    id BIGSERIAL PRIMARY KEY,
+    profile_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+    name TEXT NOT NULL,
+    props JSONB NOT NULL DEFAULT '{}'::jsonb,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_analytics_name_date
+    ON public.analytics_events(name, created_at DESC);
+ALTER TABLE public.analytics_events ENABLE ROW LEVEL SECURITY;
+
+-- ============================================================================
+-- 17. DESCUBRIMIENTO CON FILTROS E INTERESES
+-- ============================================================================
+
+DROP FUNCTION IF EXISTS public.get_nearby_profiles(UUID, DOUBLE PRECISION, DOUBLE PRECISION, INTEGER, UUID);
+
+CREATE FUNCTION public.get_nearby_profiles(
+    p_user_id UUID,
+    p_latitude DOUBLE PRECISION,
+    p_longitude DOUBLE PRECISION,
+    p_radius_meters INTEGER DEFAULT 5000,
+    p_event_id UUID DEFAULT NULL,
+    p_min_age INTEGER DEFAULT NULL,
+    p_max_age INTEGER DEFAULT NULL,
+    p_interest_slugs TEXT[] DEFAULT NULL
+)
+RETURNS TABLE (
+    id UUID,
+    name TEXT,
+    age INTEGER,
+    bio TEXT,
+    photos TEXT[],
+    avatar TEXT,
+    distance_meters DOUBLE PRECISION,
+    is_verified BOOLEAN,
+    interests TEXT[],
+    shared_interests INTEGER
+)
+LANGUAGE plpgsql STABLE SECURITY DEFINER SET search_path = public
+AS $$
+#variable_conflict use_column
+DECLARE
+    v_my_interests UUID[];
+BEGIN
+    SELECT COALESCE(array_agg(pi.interest_id), '{}')
+    INTO v_my_interests
+    FROM public.profile_interests pi
+    WHERE pi.profile_id = p_user_id;
+
+    RETURN QUERY
+    WITH nearby AS (
+        SELECT
+            p.id,
+            p.name,
+            p.age,
+            p.bio,
+            p.photos,
+            p.avatar,
+            p.is_verified,
+            public.get_distance(p_latitude, p_longitude, p.latitude, p.longitude) AS distance_meters,
+            COALESCE(
+                (SELECT array_agg(i.slug ORDER BY i.sort_order)
+                   FROM public.profile_interests pi
+                   JOIN public.interests i ON i.id = pi.interest_id
+                  WHERE pi.profile_id = p.id),
+                '{}'
+            ) AS interests,
+            (SELECT COUNT(*)::INTEGER
+               FROM public.profile_interests pi
+              WHERE pi.profile_id = p.id
+                AND pi.interest_id = ANY(v_my_interests)) AS shared_interests
+        FROM public.profiles p
+        WHERE p.id <> p_user_id
+          AND p.latitude IS NOT NULL
+          AND p.longitude IS NOT NULL
+          AND p.is_verified = TRUE
+          AND p.is_invisible = FALSE
+          AND p.status = 'active'
+          AND (p.suspended_until IS NULL OR p.suspended_until < NOW())
+          AND (p_min_age IS NULL OR p.age >= p_min_age)
+          AND (p_max_age IS NULL OR p.age <= p_max_age)
+          AND (
+              p_event_id IS NULL
+              OR EXISTS (
+                  SELECT 1 FROM public.event_attendance ea
+                  WHERE ea.event_id = p_event_id
+                    AND ea.profile_id = p.id
+                    AND ea.last_seen_at > NOW() - INTERVAL '12 hours'
+              )
+          )
+          AND (
+              p_interest_slugs IS NULL
+              OR EXISTS (
+                  SELECT 1 FROM public.profile_interests pi
+                  JOIN public.interests i ON i.id = pi.interest_id
+                  WHERE pi.profile_id = p.id AND i.slug = ANY(p_interest_slugs)
+              )
+          )
+          AND NOT EXISTS (
+              SELECT 1 FROM public.blocks b
+              WHERE (b.blocker_id = p_user_id AND b.blocked_id = p.id)
+                 OR (b.blocker_id = p.id AND b.blocked_id = p_user_id)
+          )
+          AND NOT EXISTS (
+              SELECT 1 FROM public.swipes s
+              WHERE s.swiper_id = p_user_id
+                AND s.swiped_id = p.id
+                AND (p_event_id IS NULL OR s.event_id = p_event_id OR s.event_id IS NULL)
+          )
+    )
+    SELECT
+        nearby.id, nearby.name, nearby.age, nearby.bio, nearby.photos, nearby.avatar,
+        nearby.distance_meters, nearby.is_verified, nearby.interests, nearby.shared_interests
+    FROM nearby
+    WHERE nearby.distance_meters <= p_radius_meters
+    -- Los intereses en común pesan más que la distancia pura.
+    ORDER BY nearby.shared_interests DESC, nearby.distance_meters ASC
+    LIMIT 50;
+END;
+$$;
+
+-- ============================================================================
+-- 18. QUIÉN TE HA DADO LIKE (función Premium que estaba vendida sin implementar)
+-- ============================================================================
+
+CREATE OR REPLACE FUNCTION public.get_likes_received()
+RETURNS TABLE (
+    id UUID,
+    name TEXT,
+    age INTEGER,
+    bio TEXT,
+    photos TEXT[],
+    avatar TEXT,
+    swipe_type TEXT,
+    event_name TEXT,
+    liked_at TIMESTAMPTZ
+)
+LANGUAGE plpgsql STABLE SECURITY DEFINER SET search_path = public
+AS $$
+#variable_conflict use_column
+DECLARE
+    v_profile_id UUID := public.current_profile_id();
+BEGIN
+    IF v_profile_id IS NULL THEN
+        RETURN;
+    END IF;
+
+    IF NOT public.is_premium(v_profile_id) THEN
+        RAISE EXCEPTION 'PREMIUM_REQUIRED';
+    END IF;
+
+    RETURN QUERY
+    SELECT
+        p.id, p.name, p.age, p.bio, p.photos, p.avatar,
+        s.swipe_type, e.name, s.created_at
+    FROM public.swipes s
+    JOIN public.profiles p ON p.id = s.swiper_id
+    LEFT JOIN public.events e ON e.id = s.event_id
+    WHERE s.swiped_id = v_profile_id
+      AND s.swipe_type IN ('like', 'super_like')
+      AND p.status = 'active'
+      AND p.is_verified = TRUE
+      -- Si ya hay conexión, no es un "like pendiente".
+      AND NOT public.are_connected(v_profile_id, s.swiper_id)
+      AND NOT EXISTS (
+          SELECT 1 FROM public.swipes mine
+          WHERE mine.swiper_id = v_profile_id AND mine.swiped_id = s.swiper_id
+      )
+    ORDER BY s.created_at DESC
+    LIMIT 50;
+END;
+$$;
+
+-- ============================================================================
+-- 19. REPUTACIÓN E HISTORIAL
+-- La confianza es el cuello de botella de este tipo de apps.
+-- ============================================================================
+
+CREATE OR REPLACE FUNCTION public.get_profile_reputation(p_profile_id UUID)
+RETURNS TABLE (
+    events_attended BIGINT,
+    connections_made BIGINT,
+    reports_received BIGINT,
+    member_since TIMESTAMPTZ,
+    is_verified BOOLEAN
+)
+LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public
+AS $$
+    SELECT
+        (SELECT COUNT(*) FROM public.event_attendance ea WHERE ea.profile_id = p_profile_id),
+        (SELECT COUNT(*) FROM public.connections c
+          WHERE c.user_id_1 = p_profile_id OR c.user_id_2 = p_profile_id),
+        (SELECT COUNT(*) FROM public.reports r
+          WHERE r.reported_id = p_profile_id AND r.status = 'resolved'),
+        (SELECT p.created_at FROM public.profiles p WHERE p.id = p_profile_id),
+        (SELECT p.is_verified FROM public.profiles p WHERE p.id = p_profile_id);
+$$;
+
+/** Historial de eventos del propio usuario. */
+CREATE OR REPLACE FUNCTION public.get_my_event_history()
+RETURNS TABLE (
+    event_id UUID,
+    event_name TEXT,
+    venue_name TEXT,
+    start_date TIMESTAMPTZ,
+    checked_in_at TIMESTAMPTZ,
+    connections_made BIGINT
+)
+LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public
+AS $$
+    SELECT
+        e.id, e.name, v.name, e.start_date, ea.checked_in_at,
+        (SELECT COUNT(*) FROM public.connections c
+          WHERE c.event_id = e.id
+            AND (c.user_id_1 = ea.profile_id OR c.user_id_2 = ea.profile_id))
+    FROM public.event_attendance ea
+    JOIN public.events e ON e.id = ea.event_id
+    JOIN public.venues v ON v.id = e.venue_id
+    WHERE ea.profile_id = public.current_profile_id()
+    ORDER BY ea.checked_in_at DESC
+    LIMIT 100;
+$$;
+
+-- ============================================================================
+-- 20. EMBUDO Y MÉTRICAS DEL LOCAL
+-- Un local paga por saber a qué hora se llena, no por cuatro contadores.
+-- ============================================================================
+
+CREATE OR REPLACE FUNCTION public.get_event_funnel(p_event_id UUID)
+RETURNS TABLE (
+    intents BIGINT,
+    check_ins BIGINT,
+    active_swipers BIGINT,
+    swipes BIGINT,
+    matches BIGINT,
+    booking_clicks BIGINT
+)
+LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public
+AS $$
+    SELECT
+        (SELECT COUNT(*) FROM public.event_intents ei WHERE ei.event_id = p_event_id),
+        (SELECT COUNT(*) FROM public.event_attendance ea WHERE ea.event_id = p_event_id),
+        (SELECT COUNT(DISTINCT s.swiper_id) FROM public.swipes s WHERE s.event_id = p_event_id),
+        (SELECT COUNT(*) FROM public.swipes s WHERE s.event_id = p_event_id),
+        (SELECT COUNT(*) FROM public.connections c WHERE c.event_id = p_event_id),
+        (SELECT COUNT(*) FROM public.booking_clicks bc WHERE bc.event_id = p_event_id);
+$$;
+
+/** Check-ins por hora: la curva que dice a qué hora se llena el local. */
+CREATE OR REPLACE FUNCTION public.get_event_hourly(p_event_id UUID)
+RETURNS TABLE (hour TIMESTAMPTZ, check_ins BIGINT, matches BIGINT)
+LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public
+AS $$
+    WITH bounds AS (
+        SELECT date_trunc('hour', e.start_date) AS from_ts,
+               date_trunc('hour', LEAST(e.end_date, NOW())) AS to_ts
+        FROM public.events e WHERE e.id = p_event_id
+    ),
+    series AS (
+        SELECT generate_series(b.from_ts, GREATEST(b.to_ts, b.from_ts), INTERVAL '1 hour') AS hour
+        FROM bounds b
+    )
+    SELECT
+        s.hour,
+        (SELECT COUNT(*) FROM public.event_attendance ea
+          WHERE ea.event_id = p_event_id
+            AND ea.checked_in_at >= s.hour
+            AND ea.checked_in_at < s.hour + INTERVAL '1 hour'),
+        (SELECT COUNT(*) FROM public.connections c
+          WHERE c.event_id = p_event_id
+            AND c.created_at >= s.hour
+            AND c.created_at < s.hour + INTERVAL '1 hour')
+    FROM series s
+    ORDER BY s.hour;
+$$;
+
+/** Resumen por evento para comparar y exportar a CSV. */
+CREATE OR REPLACE FUNCTION public.get_venue_events_summary(
+    p_venue_id UUID,
+    p_since TIMESTAMPTZ DEFAULT NULL
+)
+RETURNS TABLE (
+    event_id UUID,
+    event_name TEXT,
+    start_date TIMESTAMPTZ,
+    end_date TIMESTAMPTZ,
+    intents BIGINT,
+    check_ins BIGINT,
+    swipes BIGINT,
+    matches BIGINT,
+    booking_clicks BIGINT
+)
+LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public
+AS $$
+    SELECT
+        e.id, e.name, e.start_date, e.end_date,
+        (SELECT COUNT(*) FROM public.event_intents ei WHERE ei.event_id = e.id),
+        (SELECT COUNT(*) FROM public.event_attendance ea WHERE ea.event_id = e.id),
+        (SELECT COUNT(*) FROM public.swipes s WHERE s.event_id = e.id),
+        (SELECT COUNT(*) FROM public.connections c WHERE c.event_id = e.id),
+        (SELECT COUNT(*) FROM public.booking_clicks bc WHERE bc.event_id = e.id)
+    FROM public.events e
+    WHERE e.venue_id = p_venue_id
+      AND (p_since IS NULL OR e.start_date >= p_since)
+    ORDER BY e.start_date DESC;
+$$;
+
+-- ============================================================================
+-- 21. CONTADORES PÚBLICOS DE EVENTO (sala vacía)
+-- ============================================================================
+
+CREATE OR REPLACE FUNCTION public.get_events_activity(p_event_ids UUID[])
+RETURNS TABLE (event_id UUID, going BIGINT, inside BIGINT)
+LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public
+AS $$
+    SELECT
+        e.id,
+        (SELECT COUNT(*) FROM public.event_intents ei WHERE ei.event_id = e.id),
+        (SELECT COUNT(*) FROM public.event_attendance ea
+          WHERE ea.event_id = e.id AND ea.last_seen_at > NOW() - INTERVAL '3 hours')
+    FROM public.events e
+    WHERE e.id = ANY(p_event_ids);
+$$;
+
+-- ============================================================================
+-- 22. GRUPOS: crear, unirse y emparejar
+-- ============================================================================
+
+CREATE OR REPLACE FUNCTION public.create_group(p_event_id UUID, p_name TEXT)
+RETURNS TABLE (group_id UUID, join_code TEXT)
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = public
+AS $$
+#variable_conflict use_column
+DECLARE
+    v_profile_id UUID := public.current_profile_id();
+    v_group_id UUID;
+    v_code TEXT;
+BEGIN
+    IF v_profile_id IS NULL THEN
+        RAISE EXCEPTION 'PROFILE_NOT_FOUND';
+    END IF;
+
+    IF public.current_group_id(p_event_id) IS NOT NULL THEN
+        RAISE EXCEPTION 'ALREADY_IN_GROUP';
+    END IF;
+
+    v_code := upper(substring(md5(random()::text) FROM 1 FOR 6));
+
+    INSERT INTO public.groups (event_id, owner_id, name, join_code)
+    VALUES (p_event_id, v_profile_id, p_name, v_code)
+    RETURNING id INTO v_group_id;
+
+    INSERT INTO public.group_members (group_id, profile_id) VALUES (v_group_id, v_profile_id);
+
+    RETURN QUERY SELECT v_group_id, v_code;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION public.join_group(p_join_code TEXT)
+RETURNS UUID
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = public
+AS $$
+DECLARE
+    v_profile_id UUID := public.current_profile_id();
+    v_group RECORD;
+BEGIN
+    SELECT * INTO v_group FROM public.groups WHERE join_code = upper(btrim(p_join_code));
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'GROUP_NOT_FOUND';
+    END IF;
+
+    -- Sólo se puede entrar en un grupo del evento en el que estás.
+    IF NOT EXISTS (
+        SELECT 1 FROM public.event_attendance ea
+        WHERE ea.event_id = v_group.event_id AND ea.profile_id = v_profile_id
+    ) THEN
+        RAISE EXCEPTION 'NOT_AT_EVENT';
+    END IF;
+
+    IF (SELECT COUNT(*) FROM public.group_members WHERE group_id = v_group.id) >= 8 THEN
+        RAISE EXCEPTION 'GROUP_FULL';
+    END IF;
+
+    INSERT INTO public.group_members (group_id, profile_id)
+    VALUES (v_group.id, v_profile_id)
+    ON CONFLICT DO NOTHING;
+
+    RETURN v_group.id;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION public.leave_group(p_group_id UUID)
+RETURNS VOID
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = public
+AS $$
+DECLARE
+    v_profile_id UUID := public.current_profile_id();
+BEGIN
+    DELETE FROM public.group_members
+    WHERE group_id = p_group_id AND profile_id = v_profile_id;
+
+    -- Un grupo sin miembros se elimina.
+    DELETE FROM public.groups g
+    WHERE g.id = p_group_id
+      AND NOT EXISTS (SELECT 1 FROM public.group_members gm WHERE gm.group_id = g.id);
+END;
+$$;
+
+/** Otros grupos presentes en el mismo evento. */
+CREATE OR REPLACE FUNCTION public.get_event_groups(p_event_id UUID)
+RETURNS TABLE (
+    group_id UUID,
+    name TEXT,
+    member_count BIGINT,
+    avatars TEXT[],
+    is_mine BOOLEAN
+)
+LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public
+AS $$
+    SELECT
+        g.id,
+        g.name,
+        (SELECT COUNT(*) FROM public.group_members gm WHERE gm.group_id = g.id),
+        COALESCE((
+            SELECT array_agg(COALESCE(p.avatar, p.photos[1]))
+            FROM public.group_members gm
+            JOIN public.profiles p ON p.id = gm.profile_id
+            WHERE gm.group_id = g.id
+        ), '{}'),
+        g.id = public.current_group_id(p_event_id)
+    FROM public.groups g
+    WHERE g.event_id = p_event_id
+    ORDER BY g.created_at DESC
+    LIMIT 50;
+$$;
+
+-- ============================================================================
+-- 23. POLICIES DE LAS TABLAS NUEVAS
+-- ============================================================================
+
+-- ---------- interests (catálogo, lectura para autenticados) ----------
+DROP POLICY IF EXISTS "Interests are readable" ON public.interests;
+CREATE POLICY "Interests are readable"
+    ON public.interests FOR SELECT TO authenticated USING (TRUE);
+
+-- ---------- profile_interests ----------
+DROP POLICY IF EXISTS "Users manage own interests" ON public.profile_interests;
+DROP POLICY IF EXISTS "Users view own interests" ON public.profile_interests;
+
+CREATE POLICY "Users view own interests"
+    ON public.profile_interests FOR SELECT TO authenticated
+    USING (profile_id = public.current_profile_id());
+
+CREATE POLICY "Users manage own interests"
+    ON public.profile_interests FOR ALL TO authenticated
+    USING (profile_id = public.current_profile_id())
+    WITH CHECK (profile_id = public.current_profile_id());
+
+-- ---------- venue_members ----------
+DROP POLICY IF EXISTS "Venue team can view members" ON public.venue_members;
+DROP POLICY IF EXISTS "Venue owner can manage members" ON public.venue_members;
+
+CREATE POLICY "Venue team can view members"
+    ON public.venue_members FOR SELECT TO authenticated
+    USING (venue_id = public.current_venue_id() OR public.is_admin());
+
+CREATE POLICY "Venue owner can manage members"
+    ON public.venue_members FOR ALL TO authenticated
+    USING (venue_id = public.current_venue_id() AND public.current_venue_role() = 'owner')
+    WITH CHECK (venue_id = public.current_venue_id() AND public.current_venue_role() = 'owner');
+
+-- ---------- event_intents ----------
+DROP POLICY IF EXISTS "Users manage own intents" ON public.event_intents;
+DROP POLICY IF EXISTS "Venues see intents of own events" ON public.event_intents;
+
+CREATE POLICY "Users manage own intents"
+    ON public.event_intents FOR ALL TO authenticated
+    USING (profile_id = public.current_profile_id())
+    WITH CHECK (profile_id = public.current_profile_id());
+
+CREATE POLICY "Venues see intents of own events"
+    ON public.event_intents FOR SELECT TO authenticated
+    USING (EXISTS (
+        SELECT 1 FROM public.events e
+        WHERE e.id = event_intents.event_id AND e.venue_id = public.current_venue_id()
+    ));
+
+-- ---------- groups / group_members ----------
+DROP POLICY IF EXISTS "Groups visible to event attendees" ON public.groups;
+DROP POLICY IF EXISTS "Group members visible to group" ON public.group_members;
+
+CREATE POLICY "Groups visible to event attendees"
+    ON public.groups FOR SELECT TO authenticated
+    USING (EXISTS (
+        SELECT 1 FROM public.event_attendance ea
+        WHERE ea.event_id = groups.event_id AND ea.profile_id = public.current_profile_id()
+    ));
+
+CREATE POLICY "Group members visible to group"
+    ON public.group_members FOR SELECT TO authenticated
+    USING (public.is_group_member(group_id));
+
+-- ---------- moderation_queue ----------
+DROP POLICY IF EXISTS "Users view own moderation items" ON public.moderation_queue;
+DROP POLICY IF EXISTS "Users create own moderation items" ON public.moderation_queue;
+DROP POLICY IF EXISTS "Admins manage moderation queue" ON public.moderation_queue;
+
+CREATE POLICY "Users view own moderation items"
+    ON public.moderation_queue FOR SELECT TO authenticated
+    USING (profile_id = public.current_profile_id());
+
+CREATE POLICY "Users create own moderation items"
+    ON public.moderation_queue FOR INSERT TO authenticated
+    WITH CHECK (profile_id = public.current_profile_id());
+
+CREATE POLICY "Admins manage moderation queue"
+    ON public.moderation_queue FOR ALL TO authenticated
+    USING (public.is_admin()) WITH CHECK (public.is_admin());
+
+-- ---------- trusted_contacts / sos_alerts ----------
+DROP POLICY IF EXISTS "Users manage own contacts" ON public.trusted_contacts;
+DROP POLICY IF EXISTS "Users manage own alerts" ON public.sos_alerts;
+DROP POLICY IF EXISTS "Admins view alerts" ON public.sos_alerts;
+
+CREATE POLICY "Users manage own contacts"
+    ON public.trusted_contacts FOR ALL TO authenticated
+    USING (profile_id = public.current_profile_id())
+    WITH CHECK (profile_id = public.current_profile_id());
+
+CREATE POLICY "Users manage own alerts"
+    ON public.sos_alerts FOR ALL TO authenticated
+    USING (profile_id = public.current_profile_id())
+    WITH CHECK (profile_id = public.current_profile_id());
+
+CREATE POLICY "Admins view alerts"
+    ON public.sos_alerts FOR SELECT TO authenticated
+    USING (public.is_admin());
+
+-- ---------- push_subscriptions ----------
+DROP POLICY IF EXISTS "Users manage own push subscriptions" ON public.push_subscriptions;
+CREATE POLICY "Users manage own push subscriptions"
+    ON public.push_subscriptions FOR ALL TO authenticated
+    USING (profile_id = public.current_profile_id())
+    WITH CHECK (profile_id = public.current_profile_id());
+
+-- ---------- rate_limits (sólo el servidor escribe) ----------
+DROP POLICY IF EXISTS "Users view own rate limits" ON public.rate_limits;
+CREATE POLICY "Users view own rate limits"
+    ON public.rate_limits FOR SELECT TO authenticated
+    USING (profile_id = public.current_profile_id());
+
+-- ---------- user_consents ----------
+DROP POLICY IF EXISTS "Users manage own consents" ON public.user_consents;
+CREATE POLICY "Users manage own consents"
+    ON public.user_consents FOR ALL TO authenticated
+    USING (user_id = auth.uid()) WITH CHECK (user_id = auth.uid());
+
+-- ---------- booking_clicks ----------
+DROP POLICY IF EXISTS "Users register own booking clicks" ON public.booking_clicks;
+DROP POLICY IF EXISTS "Venues view own booking clicks" ON public.booking_clicks;
+
+CREATE POLICY "Users register own booking clicks"
+    ON public.booking_clicks FOR INSERT TO authenticated
+    WITH CHECK (profile_id IS NULL OR profile_id = public.current_profile_id());
+
+CREATE POLICY "Venues view own booking clicks"
+    ON public.booking_clicks FOR SELECT TO authenticated
+    USING (EXISTS (
+        SELECT 1 FROM public.events e
+        WHERE e.id = booking_clicks.event_id AND e.venue_id = public.current_venue_id()
+    ));
+
+-- ---------- analytics_events ----------
+DROP POLICY IF EXISTS "Users insert own analytics" ON public.analytics_events;
+DROP POLICY IF EXISTS "Admins read analytics" ON public.analytics_events;
+
+CREATE POLICY "Users insert own analytics"
+    ON public.analytics_events FOR INSERT TO authenticated
+    WITH CHECK (profile_id IS NULL OR profile_id = public.current_profile_id());
+
+CREATE POLICY "Admins read analytics"
+    ON public.analytics_events FOR SELECT TO authenticated
+    USING (public.is_admin());
+
+-- ============================================================================
+-- 24. PERMISOS
+-- ============================================================================
+
+DO $$
+DECLARE
+    fn TEXT;
+BEGIN
+    FOREACH fn IN ARRAY ARRAY[
+        'public.is_profile_active(uuid)',
+        'public.current_venue_role()',
+        'public.current_group_id(uuid)',
+        'public.is_group_member(uuid)',
+        'public.keep_connection(uuid)',
+        'public.review_photo(uuid, boolean, text)',
+        'public.consume_rate_limit(text, integer, integer)',
+        'public.request_account_deletion()',
+        'public.export_my_data()',
+        'public.suspend_profile(uuid, integer, text)',
+        'public.reinstate_profile(uuid)',
+        'public.is_premium(uuid)',
+        'public.rotate_event_code_if_needed(uuid)',
+        'public.get_likes_received()',
+        'public.get_profile_reputation(uuid)',
+        'public.get_my_event_history()',
+        'public.get_event_funnel(uuid)',
+        'public.get_event_hourly(uuid)',
+        'public.get_venue_events_summary(uuid, timestamptz)',
+        'public.get_events_activity(uuid[])',
+        'public.create_group(uuid, text)',
+        'public.join_group(text)',
+        'public.leave_group(uuid)',
+        'public.get_event_groups(uuid)',
+        'public.get_nearby_profiles(uuid, double precision, double precision, integer, uuid, integer, integer, text[])'
+    ]
+    LOOP
+        EXECUTE format('REVOKE ALL ON FUNCTION %s FROM PUBLIC', fn);
+        EXECUTE format('GRANT EXECUTE ON FUNCTION %s TO authenticated', fn);
+    END LOOP;
+END $$;
+
+-- Las funciones de purga sólo las ejecuta el servidor (cron / service role).
+REVOKE ALL ON FUNCTION public.purge_expired_connections() FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.purge_rate_limits() FROM PUBLIC;
+
+-- ============================================================================
+-- 25. CIERRE DEL ACCESO ANÓNIMO
+-- La 006 ya lo hace, pero esta migración crea tablas y secuencias nuevas
+-- (analytics_events usa BIGSERIAL) que hay que cerrar igual.
+-- ============================================================================
+
+REVOKE ALL ON ALL TABLES IN SCHEMA public FROM anon;
+REVOKE ALL ON ALL SEQUENCES IN SCHEMA public FROM anon;
+
+-- ============================================================================
+-- 26. COMENTARIOS
+-- ============================================================================
+
+COMMENT ON TABLE public.event_intents IS 'Intención de asistir. Permite mostrar actividad antes de que nadie haya entrado.';
+COMMENT ON TABLE public.moderation_queue IS 'Cola de revisión de fotos. Nada se publica en el perfil sin aprobarse.';
+COMMENT ON TABLE public.rate_limits IS 'Contador por ventana. Lo aplican triggers en swipes y messages.';
+COMMENT ON FUNCTION public.export_my_data IS 'Exportación de datos personales (art. 20 RGPD).';
+COMMENT ON FUNCTION public.keep_connection IS 'Conserva una conexión más allá del evento cuando ambas partes lo piden.';

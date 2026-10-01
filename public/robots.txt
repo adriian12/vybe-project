@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /venue/
+Disallow: /admin/
+Disallow: /tickets/
+Disallow: /equipo/
+Disallow: /contador/
+
+Sitemap: https://fiestea.es/sitemap.xml

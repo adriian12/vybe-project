@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://fiestea.es/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://fiestea.es/legal</loc><changefreq>monthly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://fiestea.es/legal/privacidad</loc><changefreq>monthly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://fiestea.es/legal/terminos</loc><changefreq>monthly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://fiestea.es/legal/cookies</loc><changefreq>monthly</changefreq><priority>0.2</priority></url>
+  <url><loc>https://fiestea.es/legal/aviso-legal</loc><changefreq>monthly</changefreq><priority>0.2</priority></url>
+  <url><loc>https://fiestea.es/legal/compras</loc><changefreq>monthly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://fiestea.es/legal/negocios</loc><changefreq>monthly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://fiestea.es/legal/soporte</loc><changefreq>monthly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://fiestea.es/legal/eliminar-cuenta</loc><changefreq>monthly</changefreq><priority>0.2</priority></url>
+</urlset>

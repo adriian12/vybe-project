@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Icono pequeño de los avisos: la V del logotipo en blanco. Android pinta la
+     barra de estado sólo con la silueta; con el icono de colores del lanzador
+     saldría un cuadrado blanco. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="64"
+    android:viewportHeight="64">
+    <group
+        android:translateX="-18"
+        android:translateY="-13">
+        <path
+            android:fillColor="#FFFFFFFF"
+            android:pathData="M28,28 L50,72 L72,28 L60,28 L50,52 L40,28 Z" />
+        <path
+            android:fillColor="#FFFFFFFF"
+            android:pathData="M46,22 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0 Z" />
+    </group>
+</vector>

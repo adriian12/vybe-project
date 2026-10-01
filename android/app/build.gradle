@@ -1,0 +1,78 @@
+apply plugin: 'com.android.application'
+
+// Clave de subida a Google Play, fuera del repositorio
+// (`D:\Webs\Vybe App\firma-android\keystore.properties`, o la ruta de
+// FIESTEA_KEYSTORE_PROPERTIES). Sin ella, la versión de publicación sale sin firmar.
+def firmaProps = new Properties()
+def firmaFichero = file(System.getenv('FIESTEA_KEYSTORE_PROPERTIES') ?: '../../../firma-android/keystore.properties')
+if (firmaFichero.exists()) {
+    firmaFichero.withInputStream { firmaProps.load(it) }
+}
+
+android {
+    namespace = "com.vybe.app"
+    compileSdk = rootProject.ext.compileSdkVersion
+    defaultConfig {
+        applicationId "es.fiestea.app"  // el mismo que iOS; no se podrá cambiar tras subirla a Play
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        // Google Play exige un número mayor en cada subida: lo pone
+        // `scripts/build-aab.mjs` con el número de commits (`-PfiesteaVersionCode`).
+        versionCode((project.findProperty('fiesteaVersionCode') ?: '1') as int)
+        versionName "1.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        aaptOptions {
+             // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
+             // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
+            ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
+        }
+    }
+    signingConfigs {
+        release {
+            if (firmaProps['storeFile']) {
+                storeFile file(firmaProps['storeFile'])
+                storePassword firmaProps['storePassword']
+                keyAlias firmaProps['keyAlias']
+                keyPassword firmaProps['keyPassword']
+            }
+        }
+    }
+    buildTypes {
+        release {
+            if (firmaProps['storeFile']) {
+                signingConfig signingConfigs.release
+            }
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+repositories {
+    flatDir{
+        dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
+    implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
+    implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
+    implementation project(':capacitor-android')
+    testImplementation "junit:junit:$junitVersion"
+    androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
+    implementation project(':capacitor-cordova-android-plugins')
+}
+
+apply from: 'capacitor.build.gradle'
+
+try {
+    def servicesJSON = file('google-services.json')
+    if (servicesJSON.text) {
+        apply plugin: 'com.google.gms.google-services'
+    }
+} catch(Exception e) {
+    logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
+}

@@ -1,0 +1,75 @@
+name: iOS sin firmar
+
+# Compila la app de iOS en un Mac de GitHub y deja un `.ipa` SIN FIRMAR para
+# descargar. Sirve para probar en un iPhone o iPad propio sin tener Mac ni la
+# cuenta de pago de Apple: el `.ipa` se firma e instala desde Windows con
+# Sideloadly y un Apple ID gratuito (la app caduca a los 7 días y no recibe
+# avisos push ni abre enlaces de vybes.es; ver SETUP.md).
+#
+# Sólo se lanza a mano (Actions → «iOS sin firmar» → Run workflow): un minuto de
+# macOS cuenta por diez de Linux y no tiene sentido gastarlos en cada push.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  ipa:
+    runs-on: macos-latest
+    timeout-minutes: 40
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      # El bundle web va dentro del .ipa, así que necesita las variables reales.
+      # Se guardan en Settings → Secrets and variables → Actions.
+      - name: Compilar la web
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          VITE_CARTO_API_KEY: ${{ secrets.VITE_CARTO_API_KEY }}
+          VITE_SENTRY_DSN: ${{ secrets.VITE_SENTRY_DSN }}
+        run: |
+          if [ -z "$VITE_SUPABASE_URL" ] || [ -z "$VITE_SUPABASE_ANON_KEY" ]; then
+            echo "::error::Faltan los secretos VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY"
+            exit 1
+          fi
+          npm run build
+
+      # En macOS `cap sync` sí ejecuta `pod install` (en Windows no).
+      - name: Copiar al proyecto de iOS
+        run: npx cap sync ios
+
+      - name: Compilar para iPhone sin firmar
+        run: |
+          xcodebuild \
+            -workspace ios/App/App.xcworkspace \
+            -scheme App \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            build
+
+      # Un .ipa es un zip con la app dentro de una carpeta Payload.
+      - name: Empaquetar el .ipa
+        run: |
+          mkdir Payload
+          cp -R build/Build/Products/Release-iphoneos/App.app Payload/
+          zip -qr Vybe-sin-firmar.ipa Payload
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Vybe-ios-sin-firmar
+          path: Vybe-sin-firmar.ipa
+          retention-days: 14
