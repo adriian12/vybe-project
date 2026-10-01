@@ -30,6 +30,16 @@ const OPT_OUT_KEY = 'vybe_pushOff';
 const ASKED_KEY = 'vybe_pushAsked';
 
 let currentToken: string | null = null;
+/**
+ * El token guardado DE VERDAD en el servidor.
+ *
+ * Tener permiso del sistema no basta: el token llega después, por el
+ * escuchador `registration`, y el guardado puede fallar. Antes ese fallo sólo
+ * se escribía en la consola mientras la pantalla ya había dicho «activadas»,
+ * así que el teléfono no recibía nada y el interruptor seguía en verde.
+ */
+let tokenSaved: string | null = null;
+let savingToken: Promise<void> | null = null;
 let handlers: NativePushHandlers | null = null;
 let listenersReady: Promise<void> | null = null;
 
@@ -73,7 +83,7 @@ export const initNativePush = (): Promise<void> => {
 
       await PushNotifications.addListener('registration', (token) => {
         currentToken = token.value;
-        void saveToken(token.value);
+        savingToken = saveToken(token.value);
       });
 
       await PushNotifications.addListener('registrationError', (error) => {
@@ -121,6 +131,19 @@ export const initNativePush = (): Promise<void> => {
  * el registro de quien ya dijo que sí: al abrir la app, al iniciar sesión con
  * otra cuenta en el mismo móvil o si Firebase ha cambiado el token.
  */
+/** Espera, como mucho `ms`, a que el escuchador reciba el token y lo guarde. */
+const esperarTokenGuardado = async (ms = 8000): Promise<void> => {
+  const limite = Date.now() + ms;
+  while (Date.now() < limite) {
+    if (savingToken) {
+      await savingToken;
+      return;
+    }
+    if (tokenSaved) return;
+    await new Promise((r) => setTimeout(r, 150));
+  }
+};
+
 export const syncNativePush = async ({ ask }: { ask: boolean }): Promise<boolean> => {
   if (!isNative()) return false;
 
@@ -139,9 +162,17 @@ export const syncNativePush = async ({ ask }: { ask: boolean }): Promise<boolean
 
     if (!granted) return false;
 
-    // El token llega por el escuchador `registration`, que lo guarda.
+    // El token llega por el escuchador `registration`, que lo guarda. Se
+    // espera a que ESE guardado termine: si no, se decía que las
+    // notificaciones estaban activadas antes de saber si el servidor se había
+    // enterado, y cuando fallaba no se enteraba nadie.
+    // Se limpia el resultado anterior: si no, la espera de abajo vería la
+    // promesa ya resuelta del registro previo y volvería antes de tiempo.
+    tokenSaved = null;
+    savingToken = null;
     await PushNotifications.register();
-    return true;
+    await esperarTokenGuardado();
+    return tokenSaved !== null;
   } catch (error) {
     console.error('Error registrando las notificaciones:', error);
     return false;
@@ -171,7 +202,9 @@ export const isNativePushEnabled = async (): Promise<boolean> => {
   try {
     const { PushNotifications } = await import('@capacitor/push-notifications');
     const status = await PushNotifications.checkPermissions();
-    return status.receive === 'granted' && currentToken !== null;
+    // El servidor tiene que tener el token: con el permiso y un token sólo en
+    // memoria se decía que sí y no llegaba ningún aviso.
+    return status.receive === 'granted' && tokenSaved !== null;
   } catch {
     return false;
   }
@@ -188,7 +221,13 @@ const saveToken = async (token: string): Promise<void> => {
     p_device_model: navigator.userAgent.slice(0, 120),
   });
 
-  if (error) console.error('No se pudo guardar el token de notificaciones:', error);
+  if (error) {
+    tokenSaved = null;
+    console.error('No se pudo guardar el token de notificaciones:', error);
+    return;
+  }
+
+  tokenSaved = token;
 };
 
 /**
@@ -220,6 +259,8 @@ export const unregisterNativePush = async ({ optOut = false }: { optOut?: boolea
   }
 
   currentToken = null;
+  tokenSaved = null;
+  savingToken = null;
 };
 
 /**

@@ -397,21 +397,22 @@ export const socialService = {
     const { data: profileId } = await supabase.rpc('current_profile_id');
     if (!profileId) throw new ApiError('PROFILE_NOT_FOUND', 'errors.generic');
 
-    if (going) {
-      await supabase
-        .from('event_intents')
-        .upsert({ event_id: eventId, profile_id: profileId }, { onConflict: 'event_id,profile_id' });
-    } else {
-      await supabase
-        .from('event_intents')
-        .delete()
-        .eq('event_id', eventId)
-        .eq('profile_id', profileId);
-    }
+    // El constructor de consultas NO rechaza la promesa cuando la base
+    // devuelve error, así que sin mirar `error` esto se resolvía igual estando
+    // sin conexión o con RLS denegando: la pantalla confirmaba «Voy a ir»,
+    // subía el contador, y al volver a montar se revertía solo.
+    const { error } = going
+      ? await supabase
+          .from('event_intents')
+          .upsert({ event_id: eventId, profile_id: profileId }, { onConflict: 'event_id,profile_id' })
+      : await supabase.from('event_intents').delete().eq('event_id', eventId).eq('profile_id', profileId);
+
+    if (error) throw new ApiError(error.code ?? 'INTENT_FAILED', 'errors.generic');
   },
 
   getMyIntents: async (): Promise<string[]> => {
-    const { data } = await supabase.from('event_intents').select('event_id');
+    const { data, error } = await supabase.from('event_intents').select('event_id');
+    if (error) throw new ApiError(error.code ?? 'INTENTS_FAILED', 'errors.generic');
     return (data ?? []).map((row) => row.event_id);
   },
 

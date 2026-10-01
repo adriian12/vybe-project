@@ -87,7 +87,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { api } from '@/services/api';
-import { openExternal } from '@/services/native';
+import { isNative, openExternal } from '@/services/native';
 import {
   venueService,
   EventOccupancy,
@@ -274,7 +274,11 @@ const VenueDashboardPage = () => {
         setToBoost(null);
         return;
       }
-      window.location.href = url;
+      if (isNative()) {
+        await openExternal(url, { system: true });
+      } else {
+        window.location.href = url;
+      }
     } catch {
       toast({ title: t('common.error'), description: t('venue.plan.checkoutFailed'), variant: 'destructive' });
     } finally {
@@ -1089,7 +1093,7 @@ const VenueDashboardPage = () => {
         {/* ------------------------------------------------------ ajustes */}
         {/* Los ajustes de cada fiesta (Flechazo, recuento, % hombres y mujeres,
             lista), con las pestañas por evento de Puerta. Sólo el propietario. */}
-        {section === 'settings' && (
+        {section === 'settings' && puede('settings') && (
           <div className="mx-auto max-w-2xl space-y-4">
             {picker}
             {workingEventId ? (

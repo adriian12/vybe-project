@@ -5,6 +5,24 @@ import { Tables, TablesUpdate } from '@/integrations/supabase/types';
 import { calculateDistance } from '@/services/geo';
 import { isNative } from '@/services/native';
 import { APP_URL } from '@/lib/hosts';
+import { safeHttpUrl } from '@/lib/safe-url';
+
+/**
+ * Código de seis cifras con el generador criptográfico. Con `Math.random()`
+ * (xorshift128+) el estado se reconstruye observando unas pocas salidas, y los
+ * códigos de acceso siguientes se podían predecir. Se descarta el último tramo
+ * incompleto para que el módulo no sesgue el reparto.
+ */
+const sixDigitCode = (): string => {
+  const buf = new Uint32Array(1);
+  const limite = Math.floor(0x1_0000_0000 / 900000) * 900000;
+  let v = 0;
+  do {
+    crypto.getRandomValues(buf);
+    v = buf[0];
+  } while (v >= limite);
+  return String(100000 + (v % 900000));
+};
 
 type ProfileRow = Tables<'profiles'>;
 type EventRow = Tables<'events'>;
@@ -99,7 +117,7 @@ const dbEventToEvent = (dbEvent: EventRow, venue?: VenueRow): Event => ({
   theme: dbEvent.theme ?? undefined,
   dressCode: dbEvent.dress_code ?? undefined,
   price: dbEvent.price !== null ? Number(dbEvent.price) : undefined,
-  bookingUrl: dbEvent.booking_url ?? undefined,
+  bookingUrl: safeHttpUrl(dbEvent.booking_url as string | null | undefined),
   posterUrl: dbEvent.poster_url ?? undefined,
   qrCode: dbEvent.qr_code ?? undefined,
   description: dbEvent.description ?? undefined,
@@ -1159,7 +1177,7 @@ export const api = {
         min_age: eventData.minAge ?? null,
         max_age: eventData.maxAge ?? null,
         price: eventData.price ?? null,
-        booking_url: eventData.bookingUrl ?? null,
+        booking_url: safeHttpUrl(eventData.bookingUrl) ?? null,
         poster_url: eventData.posterUrl ?? null,
         max_capacity: eventData.maxCapacity ?? null,
         recurrence: eventData.recurrence ?? 'none',
@@ -1245,7 +1263,7 @@ export const api = {
 
     // 6 dígitos, con reintento si colisiona con un código ya existente.
     for (let attempt = 0; attempt < 5; attempt += 1) {
-      const manualCode = Math.floor(100000 + Math.random() * 900000).toString();
+      const manualCode = sixDigitCode();
 
       const { error } = await supabase.from('event_codes').insert({
         venue_id: venueId,
@@ -1289,7 +1307,7 @@ export const api = {
         dress_code: eventData.dressCode ?? null,
         min_age: eventData.minAge ?? null,
         price: eventData.price ?? null,
-        booking_url: eventData.bookingUrl ?? null,
+        booking_url: safeHttpUrl(eventData.bookingUrl) ?? null,
         poster_url: eventData.posterUrl ?? null,
         max_capacity: eventData.maxCapacity ?? null,
       })
