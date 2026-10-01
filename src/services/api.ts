@@ -6,6 +6,12 @@ import { calculateDistance } from '@/services/geo';
 import { isNative } from '@/services/native';
 import { APP_URL } from '@/lib/hosts';
 import { safeHttpUrl } from '@/lib/safe-url';
+import {
+  canonicalPhotoUrl,
+  signedPhotoUrl,
+  signPhotosOf,
+  signPhotosOfOne,
+} from '@/services/storage-urls';
 
 /**
  * Código de seis cifras con el generador criptográfico. Con `Math.random()`
@@ -46,6 +52,19 @@ export class ApiError extends Error {
     this.name = 'ApiError';
   }
 }
+
+/**
+ * Las columnas de `venues` que puede leer cualquier usuario.
+ *
+ * La tabla ya no deja leer `tax_id`, `documents`, `stripe_account_id`,
+ * `stripe_requirements`, `platform_fee_percent` ni `email` (migración 094):
+ * con un `select('*')` cualquiera se descargaba el NIF, las rutas de los
+ * documentos subidos y la comisión negociada de todos los locales
+ * aprobados. El dueño lee su ficha completa por `get_my_venue()` y la
+ * administración por `admin_pending_venues()`.
+ */
+const VENUE_PUBLICO =
+  'id, name, is_platform, type, event_radius, city, region, address, latitude, longitude';
 
 const profileToUser = (profile: ProfileRow, distance?: number): User => ({
   id: profile.id,
@@ -97,7 +116,7 @@ const venueRowToVenue = (venue: VenueRow): Venue => ({
       : undefined,
 });
 
-const dbEventToEvent = (dbEvent: EventRow, venue?: VenueRow): Event => ({
+const dbEventToEvent = (dbEvent: EventRow, venue?: Partial<VenueRow>): Event => ({
   id: dbEvent.id,
   name: dbEvent.name,
   venueId: dbEvent.venue_id,
@@ -277,7 +296,7 @@ export const api = {
       startDate: row.start_date,
       endDate: row.end_date,
       distanceMeters: null,
-      photoUrl: row.photo_url,
+      photoUrl: await signedPhotoUrl(row.photo_url),
       mode: (row.mode as 'vyber' | 'guest' | null) ?? null,
     };
   },
@@ -345,7 +364,9 @@ export const api = {
     if (error) throw new ApiError('MODE_FAILED', 'errors.generic');
 
     if (mode === 'guest') {
-      const path = photoUrl?.split('/event-photos/')[1];
+      // La interfaz maneja la URL firmada: se vuelve a la pública para sacar
+      // la ruta, o el fichero se quedaría sin borrar.
+      const path = api.storagePathFromUrl('event-photos', canonicalPhotoUrl(photoUrl));
       if (path) await api.deleteFile('event-photos', path);
     }
   },
@@ -368,7 +389,7 @@ export const api = {
     const { error } = await supabase.rpc('leave_event', { p_event_id: eventId });
     if (error) console.error('Error leaving event:', error);
 
-    const path = photoUrl?.split('/event-photos/')[1];
+    const path = api.storagePathFromUrl('event-photos', canonicalPhotoUrl(photoUrl));
     if (path) await api.deleteFile('event-photos', path);
   },
 
@@ -506,16 +527,18 @@ export const api = {
       return [];
     }
 
-    return (data ?? []).map((p) => ({
-      id: p.id,
-      name: p.name,
-      age: p.age,
-      bio: p.bio || '',
-      photos: p.photos || [],
-      avatar: p.avatar || undefined,
-      isVerified: p.is_verified,
-      distance: Math.round(p.distance_meters),
-    }));
+    return signPhotosOf(
+      (data ?? []).map((p) => ({
+        id: p.id,
+        name: p.name,
+        age: p.age,
+        bio: p.bio || '',
+        photos: p.photos || [],
+        avatar: p.avatar || undefined,
+        isVerified: p.is_verified,
+        distance: Math.round(p.distance_meters),
+      })),
+    );
   },
 
   /** Registra un swipe. Devuelve true si ha resultado en match. */
@@ -584,7 +607,7 @@ export const api = {
       return [];
     }
 
-    return connections
+    const matches = connections
       .map((conn): MatchConnection | null => {
         const isFirst = conn.user_id_1 === profileId;
         const other = isFirst ? conn.profile2 : conn.profile1;
@@ -601,6 +624,9 @@ export const api = {
         };
       })
       .filter((c): c is MatchConnection => c !== null);
+
+    await signPhotosOf(matches.map((m) => m.user));
+    return matches;
   },
 
   // ==========================================================================
@@ -706,13 +732,13 @@ export const api = {
     const userId = await authUserId();
     if (!userId) return null;
 
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('user_id', userId)
-      .maybeSingle();
-
-    return profile ? profileToUser(profile) : null;
+    const { data, error } = await supabase.rpc('get_my_profile');
+    if (error) {
+      console.error('Error getting current profile:', error);
+      return null;
+    }
+    const profile = (Array.isArray(data) ? data[0] : data) as ProfileRow | null;
+    return profile ? signPhotosOfOne(profileToUser(profile)) : null;
   },
 
   updateProfile: async (updates: {
@@ -742,19 +768,14 @@ export const api = {
     if (updates.planTonight !== undefined) payload.plan_tonight = updates.planTonight;
     if (updates.locale !== undefined) payload.locale = updates.locale;
 
-    const { data, error } = await supabase
-      .from('profiles')
-      .update(payload)
-      .eq('id', profileId)
-      .select()
-      .single();
+    const { error } = await supabase.from('profiles').update(payload).eq('id', profileId);
 
-    if (error || !data) {
+    if (error) {
       console.error('Error updating profile:', error);
       throw new ApiError('UPDATE_FAILED', 'No se pudo guardar tu perfil');
     }
 
-    return profileToUser(data);
+    return api.getCurrentProfile();
   },
 
   /**
@@ -970,8 +991,10 @@ export const api = {
   },
 
   /** Quita una foto del perfil y borra también el fichero. */
-  removePhoto: async (photoUrl: string): Promise<User | null> => {
+  removePhoto: async (firmada: string): Promise<User | null> => {
     const profileId = await requireProfileId();
+    // Lo guardado es la URL pública; la pantalla trae la firmada.
+    const photoUrl = canonicalPhotoUrl(firmada);
 
     const { data: profile } = await supabase
       .from('profiles')
@@ -988,7 +1011,7 @@ export const api = {
       .from('profiles')
       .update({ photos, avatar })
       .eq('id', profileId)
-      .select()
+      .select('id')
       .single();
 
     if (error || !data) throw new ApiError('UPDATE_FAILED', 'No se pudo eliminar la foto');
@@ -999,7 +1022,7 @@ export const api = {
       await api.deleteFile(photoUrl.includes('/avatars/') ? 'avatars' : 'event-photos', path);
     }
 
-    return profileToUser(data);
+    return api.getCurrentProfile();
   },
 
   /** Convierte un data URL de canvas en Blob para poder subirlo. */
@@ -1120,7 +1143,7 @@ export const api = {
   getEvents: async (): Promise<Event[]> => {
     const { data: events, error } = await supabase
       .from('events')
-      .select('*, venues!inner(*)')
+      .select(`*, venues!inner(${VENUE_PUBLICO})`)
       .gt('end_date', new Date().toISOString())
       .order('start_date', { ascending: true });
 
@@ -1138,7 +1161,7 @@ export const api = {
   getEventById: async (eventId: string): Promise<Event | null> => {
     const { data, error } = await supabase
       .from('events')
-      .select('*, venues!inner(*)')
+      .select(`*, venues!inner(${VENUE_PUBLICO})`)
       .eq('id', eventId)
       .maybeSingle();
 
@@ -1156,7 +1179,7 @@ export const api = {
     // equipo del local, que entra con su propia cuenta.
     const { data: venue } = await supabase
       .from('venues')
-      .select('*')
+      .select('id, latitude, longitude')
       .eq('id', eventData.venueId)
       .maybeSingle();
 
@@ -1206,12 +1229,14 @@ export const api = {
     const userId = await authUserId();
     if (!userId) return null;
 
-    const { data: venue } = await supabase
-      .from('venues')
-      .select('*')
-      .eq('venue_id', userId)
-      .maybeSingle();
-
+    // Por función: la tabla ya no deja leer NIF, documentos ni datos de
+    // Stripe, y el panel del dueño sí los necesita.
+    const { data, error } = await supabase.rpc('get_my_venue');
+    if (error) {
+      console.error('Error getting current venue:', error);
+      return null;
+    }
+    const venue = (Array.isArray(data) ? data[0] : data) as VenueRow | null;
     return venue ? venueRowToVenue(venue) : null;
   },
 
@@ -1438,18 +1463,14 @@ export const api = {
   },
 
   getPendingVenues: async (): Promise<Venue[]> => {
-    const { data, error } = await supabase
-      .from('venues')
-      .select('*')
-      .eq('verification_status', 'pending')
-      .order('created_at', { ascending: true });
+    const { data, error } = await supabase.rpc('admin_pending_venues');
 
     if (error || !data) {
       if (error) console.error('Error getting pending venues:', error);
       return [];
     }
 
-    return data.map(venueRowToVenue);
+    return (data as unknown as VenueRow[]).map(venueRowToVenue);
   },
 
   reviewVenue: async (venueId: string, approve: boolean): Promise<void> => {
@@ -1467,7 +1488,7 @@ export const api = {
   getAllEventsForAdmin: async (): Promise<Event[]> => {
     const { data, error } = await supabase
       .from('events')
-      .select('*, venues(*)')
+      .select(`*, venues(${VENUE_PUBLICO})`)
       .order('start_date', { ascending: false })
       .limit(500);
 

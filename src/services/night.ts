@@ -1,6 +1,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { ApiError } from '@/services/api';
 import { isVibeLevel, VibeLevel } from '@/lib/vibe';
+import { signPhotosOf } from '@/services/storage-urls';
 import type { Json } from '@/integrations/supabase/types';
 
 /**
@@ -583,15 +584,17 @@ export const nightService = {
   getIntentList: async (eventId: string): Promise<IntentPerson[]> => {
     const { data, error } = await supabase.rpc('get_event_intent_list', { p_event_id: eventId });
     if (error || !data) return [];
-    return data.map((row) => ({
-      profileId: row.profile_id,
-      firstName: row.first_name,
-      age: row.age,
-      gender: row.gender,
-      avatar: row.avatar,
-      markedAt: row.marked_at,
-      arrived: row.arrived,
-    }));
+    return signPhotosOf(
+      data.map((row) => ({
+        profileId: row.profile_id,
+        firstName: row.first_name,
+        age: row.age,
+        gender: row.gender,
+        avatar: row.avatar,
+        markedAt: row.marked_at,
+        arrived: row.arrived,
+      })),
+    );
   },
 
   // ------------------------------------------------------ puerta y termómetro

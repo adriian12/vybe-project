@@ -2,6 +2,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { ApiError } from '@/services/api';
 import { User } from '@/types/user';
 import { isVibeLevel, VibeLevel } from '@/lib/vibe';
+import { signPhotosOf } from '@/services/storage-urls';
 
 export interface Interest {
   id: string;
@@ -261,18 +262,20 @@ export const socialService = {
       return [];
     }
 
-    return (data ?? []).map((p) => ({
-      id: p.id,
-      name: p.name,
-      age: p.age,
-      bio: p.bio || '',
-      photos: p.photos || [],
-      avatar: p.avatar || undefined,
-      isVerified: p.is_verified,
-      distance: Math.round(p.distance_meters),
-      interests: p.interests || [],
-      sharedInterests: p.shared_interests,
-    }));
+    return signPhotosOf(
+      (data ?? []).map((p) => ({
+        id: p.id,
+        name: p.name,
+        age: p.age,
+        bio: p.bio || '',
+        photos: p.photos || [],
+        avatar: p.avatar || undefined,
+        isVerified: p.is_verified,
+        distance: Math.round(p.distance_meters),
+        interests: p.interests || [],
+        sharedInterests: p.shared_interests,
+      })),
+    );
   },
 
   // ==========================================================================
@@ -305,17 +308,19 @@ export const socialService = {
       return [];
     }
 
-    return (data ?? []).map((row) => ({
-      id: row.id,
-      name: row.name,
-      age: row.age,
-      bio: row.bio || '',
-      photos: row.photos || [],
-      avatar: row.avatar || undefined,
-      swipeType: row.swipe_type as 'like' | 'super_like',
-      eventName: row.event_name || undefined,
-      likedAt: row.liked_at,
-    }));
+    return signPhotosOf(
+      (data ?? []).map((row) => ({
+        id: row.id,
+        name: row.name,
+        age: row.age,
+        bio: row.bio || '',
+        photos: row.photos || [],
+        avatar: row.avatar || undefined,
+        swipeType: row.swipe_type as 'like' | 'super_like',
+        eventName: row.event_name || undefined,
+        likedAt: row.liked_at,
+      })),
+    );
   },
 
   // ==========================================================================

@@ -3659,6 +3659,10 @@ export type Database = {
         Args: { p_profile_id: string; p_quantity: number }
         Returns: number
       }
+      admin_pending_venues: {
+        Args: never
+        Returns: Database["public"]["Tables"]["venues"]["Row"][]
+      }
       admin_create_event: {
         Args: {
           p_capacity?: number
@@ -4410,6 +4414,14 @@ export type Database = {
           type_name: string
           venue_name: string
         }[]
+      }
+      get_my_profile: {
+        Args: never
+        Returns: Database["public"]["Tables"]["profiles"]["Row"][]
+      }
+      get_my_venue: {
+        Args: never
+        Returns: Database["public"]["Tables"]["venues"]["Row"][]
       }
       get_my_venue_membership: {
         Args: never
