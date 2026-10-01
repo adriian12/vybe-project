@@ -35,6 +35,24 @@ export const sendTicketEmail = async (supabase: SupabaseClient, orderId: string)
   if (!pedido || pedido.emailSentAt) return false;
   const { data, token } = pedido;
 
+  // Reserva el envío ANTES de mandar nada, en una sola escritura condicional.
+  // Leer `email_sent_at` al principio y escribirlo al final dejaba que dos
+  // entregas simultáneas del webhook de Stripe pasaran las dos la
+  // comprobación, y el comprador recibía los PDF por duplicado.
+  const { data: reserva, error: errorReserva } = await supabase
+    .from('ticket_orders')
+    .update({ email_sent_at: new Date().toISOString() })
+    .eq('id', orderId)
+    .is('email_sent_at', null)
+    .select('id');
+  if (errorReserva) throw errorReserva;
+  if (!reserva || reserva.length === 0) return false;
+
+  /** Si no sale ni un correo, se suelta la reserva para poder reintentar. */
+  const soltarReserva = async () => {
+    await supabase.from('ticket_orders').update({ email_sent_at: null }).eq('id', orderId);
+  };
+
   // Cada entrada se reconoce por el nombre de quien la lleva, no por su código.
   const nombreDe = (codigo: string, i: number) =>
     data.tickets.find((t) => t.code === codigo)?.holderName?.trim() || `${data.typeName} ${i + 1}`;
@@ -81,7 +99,14 @@ export const sendTicketEmail = async (supabase: SupabaseClient, orderId: string)
   };
 
   const todos = data.tickets.map((t) => t.code);
-  if (pedido.buyerEmail) await enviar(pedido.buyerEmail, todos);
+  if (pedido.buyerEmail) {
+    try {
+      await enviar(pedido.buyerEmail, todos);
+    } catch (error) {
+      await soltarReserva();
+      throw error;
+    }
+  }
 
   // Cada asistente con su propio correo recibe también la suya.
   const comprador = (pedido.buyerEmail ?? '').toLowerCase();
@@ -96,6 +121,5 @@ export const sendTicketEmail = async (supabase: SupabaseClient, orderId: string)
     }
   }
 
-  await supabase.from('ticket_orders').update({ email_sent_at: new Date().toISOString() }).eq('id', orderId);
   return true;
 };

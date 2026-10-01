@@ -1,5 +1,5 @@
 import { serve } from 'https://deno.land/std@0.193.0/http/server.ts';
-import { overLimit, tooManyRequests } from '../_shared/rate-limit.ts';
+import { clientIp, overLimit, tooManyRequests } from '../_shared/rate-limit.ts';
 import { json, preflight } from '../_shared/cors.ts';
 import { BRAND, renderEmail } from '../_shared/email.ts';
 import { adminClient } from '../_shared/supabase.ts';
@@ -234,8 +234,7 @@ serve(async (req: Request): Promise<Response> => {
     const email = (body.email ?? '').trim().toLowerCase();
     const action: Action = body.action ?? 'signup';
 
-    const ipCheck =
-      req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? req.headers.get('cf-connecting-ip');
+    const ipCheck = clientIp(req);
 
     /** ¿Correo o móvil ya registrados? Lo pregunta el formulario de alta. */
     const disponibilidad = async (phone: string | undefined) => {
@@ -266,9 +265,7 @@ serve(async (req: Request): Promise<Response> => {
       return json({ error: 'WEAK_PASSWORD' }, 400);
     }
 
-    const ip =
-      req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
-      req.headers.get('cf-connecting-ip');
+    const ip = clientIp(req);
 
     if (!(await allowed(supabase, email, ip))) {
       return json({ error: 'TOO_MANY_REQUESTS' }, 429);
@@ -322,13 +319,21 @@ serve(async (req: Request): Promise<Response> => {
       }
     };
 
+    // La contraseña y los metadatos sólo se aceptan en el alta. Con `resend`
+    // el tipo de enlace también es `signup`, y GoTrue, sobre una cuenta que
+    // existe pero todavía no está confirmada, ACTUALIZA la contraseña en vez
+    // de fallar: se le podía fijar la contraseña a la cuenta pendiente de otra
+    // persona, que luego la confirmaba desde su propio correo. Un reenvío
+    // legítimo nunca manda contraseña, así que aquí va siempre vacía.
+    const esAlta = action === 'signup';
+
     const { data, error } = await supabase.auth.admin.generateLink({
       type: linkType,
       email,
-      ...(linkType === 'signup' ? { password: body.password ?? '' } : {}),
+      ...(linkType === 'signup' ? { password: esAlta ? (body.password ?? '') : '' } : {}),
       options: {
         redirectTo,
-        ...(linkType === 'signup' ? { data: body.metadata ?? {} } : {}),
+        ...(linkType === 'signup' && esAlta ? { data: body.metadata ?? {} } : {}),
       },
     } as Parameters<typeof supabase.auth.admin.generateLink>[0]);
 

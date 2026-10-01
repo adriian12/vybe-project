@@ -12,27 +12,46 @@ import { stripeSecretKey } from '../_shared/stripe-env.ts';
  * Al eliminar auth.users, las tablas con ON DELETE CASCADE se limpian solas.
  */
 
+// Los de una persona, que van todos en `<uid>/`. `venue-logos` NO entra: va
+// por carpeta del negocio (`<venue_id>/`) y el logo es del local, que puede
+// tener más gente, no de la cuenta que se borra.
 const BUCKETS = ['avatars', 'event-photos', 'documents'] as const;
 
-/** Borra recursivamente todo lo que hay bajo `<uid>/` en un bucket. */
+const PAGINA = 100;
+
+/** Un borrado que no se completa no puede darse por bueno. */
+class PurgeError extends Error {}
+
+/**
+ * Borra TODO lo que hay bajo `<uid>/` en un bucket, paginando hasta agotarlo.
+ * Antes pedía una sola página de 1000 objetos y se tragaba cualquier fallo
+ * devolviendo 0: quien tuviera más de 1000 ficheros conservaba el resto en un
+ * bucket público, sin ninguna fila que permitiera encontrarlo, y la respuesta
+ * decía que el borrado había ido bien.
+ */
 const purgeBucket = async (
   supabase: ReturnType<typeof adminClient>,
   bucket: string,
   userId: string,
 ): Promise<number> => {
-  const { data: files, error } = await supabase.storage.from(bucket).list(userId, { limit: 1000 });
+  let borrados = 0;
 
-  if (error || !files || files.length === 0) return 0;
+  for (;;) {
+    const { data: files, error } = await supabase.storage
+      .from(bucket)
+      .list(userId, { limit: PAGINA, offset: 0 });
+    if (error) throw new PurgeError(`listando ${bucket}: ${error.message}`);
+    if (!files || files.length === 0) return borrados;
 
-  const paths = files.map((file) => `${userId}/${file.name}`);
-  const { error: removeError } = await supabase.storage.from(bucket).remove(paths);
+    const paths = files.map((file) => `${userId}/${file.name}`);
+    const { error: removeError } = await supabase.storage.from(bucket).remove(paths);
+    if (removeError) throw new PurgeError(`borrando ${bucket}: ${removeError.message}`);
 
-  if (removeError) {
-    console.error(`Error borrando ${bucket}:`, removeError);
-    return 0;
+    borrados += paths.length;
+    // Se vuelve a pedir desde el principio porque lo anterior ya no está; si
+    // la página no se llenó, no queda nada más.
+    if (files.length < PAGINA) return borrados;
   }
-
-  return paths.length;
 };
 
 serve(async (req: Request): Promise<Response> => {
@@ -91,9 +110,17 @@ serve(async (req: Request): Promise<Response> => {
       await supabase.from('booking_clicks').delete().eq('profile_id', profileId);
     }
 
+    // Si los ficheros no se pueden borrar, NO se borra la cuenta: con el
+    // usuario de auth fuera ya no habría forma de encontrarlos ni de
+    // reintentarlo, y el RGPD no se cumple a medias.
     let deletedFiles = 0;
-    for (const bucket of BUCKETS) {
-      deletedFiles += await purgeBucket(supabase, bucket, user.id);
+    try {
+      for (const bucket of BUCKETS) {
+        deletedFiles += await purgeBucket(supabase, bucket, user.id);
+      }
+    } catch (purgeError) {
+      console.error('Account deletion purge:', purgeError);
+      return json({ error: 'PURGE_FAILED' }, 500);
     }
 
     // Elimina al usuario de auth: el resto cae por ON DELETE CASCADE.

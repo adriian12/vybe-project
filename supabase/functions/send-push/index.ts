@@ -241,6 +241,7 @@ const fromRaffle = async (
     .from('event_attendance')
     .select('profile_id, profiles(locale)')
     .eq('event_id', raffle.event_id)
+    .is('left_at', null)
     .gt('last_seen_at', desde)
     .limit(2000);
 
@@ -438,9 +439,12 @@ serve(async (req: Request): Promise<Response> => {
     return json({ error: 'PUSH_NOT_CONFIGURED' }, 200);
   }
 
-  // El hook de base de datos se autentica con un secreto compartido.
+  // El hook de base de datos se autentica con un secreto compartido. La
+  // función va con `verify_jwt = false`, así que sin secreto configurado
+  // cualquiera podría mandar notificaciones a cualquier perfil: si falta, se
+  // rechaza en vez de dejar pasar (igual que `notify-events`).
   const expected = Deno.env.get('PUSH_HOOK_SECRET');
-  if (expected && req.headers.get('x-push-secret') !== expected) {
+  if (!expected || req.headers.get('x-push-secret') !== expected) {
     return json({ error: 'No autorizado' }, 401);
   }
 

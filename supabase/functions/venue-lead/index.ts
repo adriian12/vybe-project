@@ -3,6 +3,7 @@ import { json, preflight } from '../_shared/cors.ts';
 import { adminClient } from '../_shared/supabase.ts';
 import { isResendConfigured, sendEmail } from '../_shared/resend.ts';
 import { renderEmail } from '../_shared/email.ts';
+import { clientIp } from '../_shared/rate-limit.ts';
 
 /**
  * Formulario «Solicitar demo» de la landing.
@@ -72,7 +73,7 @@ serve(async (req: Request): Promise<Response> => {
   if (body.consent !== true) return json({ error: 'CONSENT_REQUIRED' }, 400);
 
   const supabase = adminClient();
-  const ip = (req.headers.get('x-forwarded-for') ?? '').split(',')[0].trim() || 'unknown';
+  const ip = clientIp(req) ?? 'unknown';
   const ipHash = await hashIp(ip);
 
   const hourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
