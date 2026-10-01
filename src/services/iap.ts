@@ -40,8 +40,19 @@ export const STORE_PRODUCTS: Record<StorePlan, string> = {
 /** Plan base de la suscripción en Play Console. */
 const GOOGLE_BASE_PLAN = 'monthly';
 
+/**
+ * Compilaciones de prueba (`VITE_STORE_BILLING=off`): la app instalada cobra
+ * con Stripe, como la web. Una APK instalada a mano no puede usar Google Play
+ * Billing (sólo funciona instalada desde Play por un tester), y así se puede
+ * probar todo con las tarjetas de prueba de Stripe. El AAB para Play se niega
+ * a compilar con este interruptor apagado (`scripts/build-aab.mjs`): Google y
+ * Apple exigen su cobro para el contenido digital.
+ */
+const storeBillingOff = () => import.meta.env.VITE_STORE_BILLING === 'off';
+
 /** De qué tienda son las compras en este dispositivo (null: web, con Stripe). */
 export const storePlatform = (): Store | null => {
+  if (storeBillingOff()) return null;
   const p = Capacitor.getPlatform();
   return p === 'ios' ? 'apple' : p === 'android' ? 'google' : null;
 };

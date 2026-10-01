@@ -14,7 +14,7 @@
  * cuidados de Windows que `build-apk.mjs`.
  */
 import { execSync, spawnSync } from 'node:child_process';
-import { copyFileSync, existsSync, statSync } from 'node:fs';
+import { copyFileSync, existsSync, readFileSync, statSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { root } from './supabase-project.mjs';
 import { findJava21 } from './java21.mjs';
@@ -24,6 +24,20 @@ const android = resolve(root, 'android');
 const origen = resolve(android, 'app/build/outputs/bundle/release/app-release.aab');
 const destino = resolve(root, '..', NOMBRE);
 const firma = process.env.FIESTEA_KEYSTORE_PROPERTIES ?? resolve(root, '..', 'firma-android', 'keystore.properties');
+
+// Un AAB para Play con el cobro de la tienda apagado vendería Premium con
+// Stripe dentro de la app, y Google lo rechaza (y puede retirar la app).
+const ficherosEnv = ['.env', '.env.local', '.env.production', '.env.production.local'];
+const apagado =
+  process.env.VITE_STORE_BILLING === 'off' ||
+  ficherosEnv.some((f) => {
+    const ruta = resolve(root, f);
+    return existsSync(ruta) && /^\s*VITE_STORE_BILLING\s*=\s*['"]?off['"]?\s*$/m.test(readFileSync(ruta, 'utf8'));
+  });
+if (apagado) {
+  console.error('VITE_STORE_BILLING=off: quítalo del .env antes de compilar para Google Play (las compras deben ir por Google Play Billing).');
+  process.exit(1);
+}
 
 if (!existsSync(firma)) {
   console.error(`Falta la clave de subida: ${firma}`);
