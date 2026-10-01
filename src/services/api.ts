@@ -40,7 +40,7 @@ const RECENT_MESSAGES_LIMIT = 200;
 /** Tamaño de página al desplazarse hacia atrás dentro de un chat. */
 const CONVERSATION_PAGE_SIZE = 50;
 
-export type StorageBucket = 'avatars' | 'event-photos' | 'documents';
+export type StorageBucket = 'avatars' | 'event-photos' | 'event-posters' | 'documents';
 
 /** Error de dominio con un código estable que la UI puede traducir. */
 export class ApiError extends Error {
@@ -760,8 +760,11 @@ export const api = {
     if (updates.name !== undefined) payload.name = updates.name;
     if (updates.age !== undefined) payload.age = updates.age;
     if (updates.bio !== undefined) payload.bio = updates.bio;
-    if (updates.photos !== undefined) payload.photos = updates.photos;
-    if (updates.avatar !== undefined) payload.avatar = updates.avatar;
+    // La pantalla maneja URLs firmadas; lo que se guarda es la forma pública. Sin
+    // esto, el disparador de `profiles` rechazaría el avatar en silencio (no
+    // coincidiría con ninguna foto guardada).
+    if (updates.photos !== undefined) payload.photos = updates.photos.map(canonicalPhotoUrl);
+    if (updates.avatar !== undefined) payload.avatar = updates.avatar ? canonicalPhotoUrl(updates.avatar) : updates.avatar;
     if (updates.isInvisible !== undefined) payload.is_invisible = updates.isInvisible;
     if (updates.languages !== undefined) payload.languages = updates.languages;
     if (updates.wants !== undefined) payload.wants = updates.wants;

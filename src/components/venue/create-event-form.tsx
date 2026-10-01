@@ -169,7 +169,8 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onCreated, onClose, e
       let posterUrl: string | undefined = posterPreview && !posterFile ? posterPreview : undefined;
       if (posterFile) {
         try {
-          posterUrl = (await api.uploadFile('event-photos', posterFile, posterFile.name)).url;
+          // Los carteles son públicos: su propio bucket, no el privado de las fotos.
+          posterUrl = (await api.uploadFile('event-posters', posterFile, posterFile.name)).url;
         } catch (error) {
           console.error('Error uploading poster:', error);
           toast({ title: t('venue.events.posterFailed'), variant: 'destructive' });

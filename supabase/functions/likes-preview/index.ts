@@ -3,6 +3,7 @@ import { overLimit, tooManyRequests } from '../_shared/rate-limit.ts';
 import { Image } from 'https://deno.land/x/imagescript@1.3.0/mod.ts';
 import { json, preflight } from '../_shared/cors.ts';
 import { adminClient, getProfileId, getUser } from '../_shared/supabase.ts';
+import { downloadPhoto, signEventPhotosDeep } from '../_shared/photo-urls.ts';
 
 /**
  * «Le gustas» para quien no es premium.
@@ -19,12 +20,14 @@ import { adminClient, getProfileId, getUser } from '../_shared/supabase.ts';
 const ANCHO = 10;
 const ALTO = 12;
 
-const miniatura = async (url: string | null): Promise<string | null> => {
+// La foto de la noche está en un bucket privado (migración 094): se descarga
+// con `service_role`, no por su URL pública.
+const miniatura = async (admin: ReturnType<typeof adminClient>, url: string | null): Promise<string | null> => {
   if (!url) return null;
   try {
-    const response = await fetch(url);
-    if (!response.ok) return null;
-    const image = await Image.decode(new Uint8Array(await response.arrayBuffer()));
+    const bytes = await downloadPhoto(admin, url);
+    if (!bytes) return null;
+    const image = await Image.decode(bytes);
     const tiny = image.cover(ANCHO, ALTO);
     const png = await tiny.encode();
     let binary = '';
@@ -81,7 +84,7 @@ serve(async (req: Request): Promise<Response> => {
           name: superLike ? row.name : null,
           age: superLike ? row.age : null,
           photo: superLike ? row.photo_url : null,
-          preview: superLike ? null : await miniatura(row.photo_url),
+          preview: superLike ? null : await miniatura(supabase, row.photo_url),
           swipeType: row.swipe_type,
           eventName: row.event_name,
           likedAt: row.liked_at,
@@ -89,7 +92,8 @@ serve(async (req: Request): Promise<Response> => {
       }),
     );
 
-    return json({ premium: false, likes });
+    // El super like se enseña con su foto: firmada, que el bucket es privado.
+    return json({ premium: false, likes: await signEventPhotosDeep(supabase, likes) });
   } catch (error) {
     console.error('likes-preview:', error);
     return json({ error: 'Error interno del servidor' }, 500);

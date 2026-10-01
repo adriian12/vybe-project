@@ -2,7 +2,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { ApiError } from '@/services/api';
 import { User } from '@/types/user';
 import { isVibeLevel, VibeLevel } from '@/lib/vibe';
-import { signPhotosOf } from '@/services/storage-urls';
+import { signedPhotoMap, signPhotosOf } from '@/services/storage-urls';
 
 export interface Interest {
   id: string;
@@ -466,11 +466,12 @@ export const socialService = {
     const { data, error } = await supabase.rpc('get_group_messages', { p_group_id: groupId });
     if (error || !data) return [];
 
+    const firmadas = await signedPhotoMap(data.map((row) => row.author_photo));
     return data.map((row) => ({
       id: row.id,
       profileId: row.profile_id,
       authorName: row.author_name,
-      authorPhoto: row.author_photo,
+      authorPhoto: row.author_photo ? (firmadas.get(row.author_photo) ?? row.author_photo) : row.author_photo,
       content: row.content,
       createdAt: row.created_at,
     }));
@@ -491,10 +492,11 @@ export const socialService = {
     const { data, error } = await supabase.rpc('get_group_members', { p_group_id: groupId });
     if (error || !data) return [];
 
+    const firmadas = await signedPhotoMap(data.map((row) => row.photo));
     return data.map((row) => ({
       profileId: row.profile_id,
       name: row.name,
-      photo: row.photo,
+      photo: row.photo ? (firmadas.get(row.photo) ?? row.photo) : row.photo,
       isOwner: row.is_owner,
       joinedAt: row.joined_at,
     }));

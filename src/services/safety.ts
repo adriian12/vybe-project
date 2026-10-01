@@ -1,5 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import { ApiError } from '@/services/api';
+import { signedPhotoMap } from '@/services/storage-urls';
 
 export interface TrustedContact {
   id: string;
@@ -213,11 +214,13 @@ export const safetyService = {
       return [];
     }
 
+    // `event-photos` es privado (094): las fotos a revisar se firman para verlas.
+    const firmadas = await signedPhotoMap(data.map((row) => row.url));
     return data.map((row) => ({
       id: row.id,
       profileId: row.profile_id,
       profileName: row.profile_name ?? undefined,
-      url: row.url,
+      url: firmadas.get(row.url) ?? row.url,
       kind: row.kind ?? undefined,
       score: row.score ?? undefined,
       createdAt: row.created_at,

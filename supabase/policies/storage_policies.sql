@@ -38,6 +38,18 @@ ON CONFLICT (id) DO UPDATE
         file_size_limit = EXCLUDED.file_size_limit,
         allowed_mime_types = EXCLUDED.allowed_mime_types;
 
+-- Carteles de las fiestas: públicos (migración 095). Antes se subían a
+-- `event-photos`, que ahora es privado.
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES (
+    'event-posters', 'event-posters', TRUE, 10485760,
+    ARRAY['image/jpeg', 'image/png', 'image/webp']
+)
+ON CONFLICT (id) DO UPDATE
+    SET public = EXCLUDED.public,
+        file_size_limit = EXCLUDED.file_size_limit,
+        allowed_mime_types = EXCLUDED.allowed_mime_types;
+
 -- Documentación de verificación de venues: privado.
 INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 VALUES (
@@ -84,6 +96,31 @@ CREATE POLICY "Users can delete own avatar"
     );
 
 -- ============================================================================
+-- EVENT-POSTERS (carteles de las fiestas, públicos)
+-- ============================================================================
+
+DROP POLICY IF EXISTS "Event posters are publicly readable" ON storage.objects;
+DROP POLICY IF EXISTS "Users can upload own event posters" ON storage.objects;
+DROP POLICY IF EXISTS "Users can update own event posters" ON storage.objects;
+DROP POLICY IF EXISTS "Users can delete own event posters" ON storage.objects;
+
+CREATE POLICY "Event posters are publicly readable"
+    ON storage.objects FOR SELECT
+    USING (bucket_id = 'event-posters');
+
+CREATE POLICY "Users can upload own event posters"
+    ON storage.objects FOR INSERT TO authenticated
+    WITH CHECK (bucket_id = 'event-posters' AND (storage.foldername(name))[1] = auth.uid()::text);
+
+CREATE POLICY "Users can update own event posters"
+    ON storage.objects FOR UPDATE TO authenticated
+    USING (bucket_id = 'event-posters' AND (storage.foldername(name))[1] = auth.uid()::text);
+
+CREATE POLICY "Users can delete own event posters"
+    ON storage.objects FOR DELETE TO authenticated
+    USING (bucket_id = 'event-posters' AND (storage.foldername(name))[1] = auth.uid()::text);
+
+-- ============================================================================
 -- EVENT-PHOTOS (fotos tomadas dentro del evento)
 -- ============================================================================
 
@@ -92,9 +129,10 @@ DROP POLICY IF EXISTS "Event photos are readable by peers" ON storage.objects;
 DROP POLICY IF EXISTS "Users can upload own event photos" ON storage.objects;
 DROP POLICY IF EXISTS "Users can delete own event photos" ON storage.objects;
 
--- Igual que en la migración 094: su dueño, quien comparte fiesta con él ahora
--- mismo, sus matches y administración. La primera carpeta de la ruta es el uid
--- de auth, que es lo que exige la policy de subida de aquí abajo.
+-- Igual que en las migraciones 094 y 095: su dueño, administración y quien
+-- diga `can_view_event_photo()` (sus matches, quien comparte fiesta con él
+-- ahora, su grupo y el equipo del negocio de una fiesta suya). La función la
+-- crea la 095: este fichero se ejecuta después de las migraciones.
 CREATE POLICY "Event photos are readable by peers"
     ON storage.objects FOR SELECT TO authenticated
     USING (
@@ -102,15 +140,7 @@ CREATE POLICY "Event photos are readable by peers"
         AND (
             (storage.foldername(name))[1] = auth.uid()::text
             OR public.is_admin()
-            OR EXISTS (
-                SELECT 1
-                FROM public.profiles p
-                WHERE p.user_id::text = (storage.foldername(name))[1]
-                  AND (
-                      public.are_connected(public.current_profile_id(), p.id)
-                      OR public.shares_active_event(public.current_profile_id(), p.id)
-                  )
-            )
+            OR public.can_view_event_photo((storage.foldername(name))[1])
         )
     );
 
