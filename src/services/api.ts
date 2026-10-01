@@ -66,6 +66,16 @@ export class ApiError extends Error {
 const VENUE_PUBLICO =
   'id, name, is_platform, type, event_radius, city, region, address, latitude, longitude';
 
+/**
+ * Columnas de otra persona que el móvil puede leer (094). Nunca `profiles(*)`:
+ * con privilegios por columna, el `*` incluye el teléfono o el correo y
+ * PostgREST rechaza la consulta entera. Así se quedaron vacíos los crushes.
+ */
+const PERFIL_PUBLICO =
+  'id, user_id, name, age, bio, photos, avatar, gender, wants, is_verified, face_verified, phone_verified, ' +
+  'account_type, is_invisible, languages, plan_tonight, profile_completed_at, role, status, ' +
+  'notify_matches, notify_messages';
+
 const profileToUser = (profile: ProfileRow, distance?: number): User => ({
   id: profile.id,
   name: profile.name,
@@ -595,8 +605,8 @@ export const api = {
         kept_by_1,
         kept_by_2,
         created_at,
-        profile1:profiles!connections_user_id_1_fkey(*),
-        profile2:profiles!connections_user_id_2_fkey(*)
+        profile1:profiles!connections_user_id_1_fkey(${PERFIL_PUBLICO}),
+        profile2:profiles!connections_user_id_2_fkey(${PERFIL_PUBLICO})
       `,
       )
       .or(`user_id_1.eq.${profileId},user_id_2.eq.${profileId}`)

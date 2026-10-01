@@ -916,7 +916,12 @@
             "locationSearch": "Busca la dirección del negocio",
             "locationMissing": "Falta la ubicación del evento",
             "locationHelp": "Arrastra el punto o toca el mapa para ajustarlo. Con esta ubicación se comprueba que la gente está dentro.",
-            "repeat": "Repetir"
+            "repeat": "Repetir",
+            "repeatTitle": "Repetir «{{name}}»",
+            "repeatHelp": "Misma configuración: datos, cartel, ajustes de la fiesta y tipos de entrada. Elige la fecha de esta edición.",
+            "repeatDate": "Nueva fecha",
+            "pastDate": "Esa fecha ya ha pasado. Elige una fecha futura.",
+            "repeatPartial": "La fiesta se ha creado, pero no se han podido copiar todos sus ajustes o entradas. Revísalos."
         },
         "team": {
             "title": "Equipo",

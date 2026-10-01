@@ -916,7 +916,12 @@
             "locationSearch": "Cerca l'adreça del negoci",
             "locationMissing": "Falta la ubicació de l'esdeveniment",
             "locationHelp": "Arrossega el punt o toca el mapa per ajustar-lo. Amb aquesta ubicació es comprova que la gent és a dins.",
-            "repeat": "Repetir"
+            "repeat": "Repetir",
+            "repeatTitle": "Repetir «{{name}}»",
+            "repeatHelp": "Mateixa configuració: dades, cartell, ajustos de la festa i tipus d’entrada. Tria la data d’aquesta edició.",
+            "repeatDate": "Nova data",
+            "pastDate": "Aquesta data ja ha passat. Tria una data futura.",
+            "repeatPartial": "La festa s’ha creat, però no s’han pogut copiar tots els ajustos o entrades. Revisa-ho."
         },
         "team": {
             "title": "Equip",

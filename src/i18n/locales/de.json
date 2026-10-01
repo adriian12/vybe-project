@@ -916,7 +916,12 @@
             "locationSearch": "Adresse der Location suchen",
             "locationMissing": "Der Ort des Events fehlt",
             "locationHelp": "Zieh den Punkt oder tipp auf die Karte, um ihn anzupassen. Mit diesem Ort wird geprüft, ob die Leute drinnen sind.",
-            "repeat": "Wiederholen"
+            "repeat": "Wiederholen",
+            "repeatTitle": "„{{name}}“ wiederholen",
+            "repeatHelp": "Gleiche Einstellungen: Angaben, Plakat, Party-Einstellungen und Ticketarten. Wähle das Datum dieser Ausgabe.",
+            "repeatDate": "Neues Datum",
+            "pastDate": "Dieses Datum liegt in der Vergangenheit. Wähle ein zukünftiges Datum.",
+            "repeatPartial": "Die Party wurde erstellt, aber nicht alle Einstellungen oder Tickets konnten kopiert werden. Bitte prüfe sie."
         },
         "team": {
             "title": "Team",

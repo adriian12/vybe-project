@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { ImagePlus, X } from 'lucide-react';
+import { CopyPlus, ImagePlus, X } from 'lucide-react';
 import { useAppContext } from '@/context/app-context';
 import { useToast } from '@/components/ui/use-toast';
 import { api } from '@/services/api';
 import { venueService } from '@/services/venue-service';
+import { eventSettingsService } from '@/services/event-settings';
+import { ticketsService } from '@/services/tickets';
 import LocationPicker, { PickedLocation } from '@/components/venue/location-picker';
 import { track } from '@/lib/observability';
 import { cn } from '@/lib/utils';
@@ -46,9 +48,17 @@ interface CreateEventFormProps {
 }
 
 /** La misma fecha de la semana que viene, en formato de campo. */
-const dentroDeUnaSemana = (iso: string): string => {
+/**
+ * Al repetir: el mismo día de la semana, la próxima vez que llegue. Sumar una
+ * semana a la original no basta: si fue hace un mes, seguiría en el pasado.
+ */
+const proximaFecha = (iso: string): string => {
   const d = new Date(iso);
-  d.setDate(d.getDate() + 7);
+  const hoy = new Date();
+  hoy.setHours(0, 0, 0, 0);
+  do {
+    d.setDate(d.getDate() + 7);
+  } while (d < hoy);
   const dos = (n: number) => String(n).padStart(2, '0');
   return `${d.getFullYear()}-${dos(d.getMonth() + 1)}-${dos(d.getDate())}`;
 };
@@ -79,6 +89,44 @@ const combinar = (date: string, start: string, end: string) => {
  * de inicio: una fiesta de 23:30 a 06:00 es lo normal, y pedir dos fechas
  * completas hacía que media lista de eventos acabara antes de empezar.
  */
+/** Ajustes y tipos de entrada de `origen` en la fiesta nueva. `false` si algo falló. */
+const copiarConfiguracion = async (origen: Event, destinoId: string, nuevoInicio: Date): Promise<boolean> => {
+  let ok = true;
+  try {
+    const ajustes = await eventSettingsService.get(origen.id);
+    if (ajustes) await eventSettingsService.save(destinoId, ajustes);
+  } catch {
+    ok = false;
+  }
+  // Sin el plan de entradas, `getSales` da PLAN_REQUIRED: no hay nada que copiar.
+  const tipos = await ticketsService.getSales(origen.id).catch(() => []);
+  const desfase = nuevoInicio.getTime() - new Date(origen.startDate).getTime();
+  const mover = (iso: string | null) => (iso ? new Date(new Date(iso).getTime() + desfase).toISOString() : null);
+  for (const tipo of tipos.filter((x) => x.active)) {
+    try {
+      await ticketsService.saveType({
+        eventId: destinoId,
+        kind: tipo.kind,
+        name: tipo.name,
+        description: tipo.description,
+        priceCents: tipo.priceCents,
+        capacity: tipo.capacity,
+        guests: tipo.guests,
+        minSpendCents: tipo.minSpendCents,
+        maxPerOrder: tipo.maxPerOrder,
+        active: true,
+        minAge: tipo.minAge,
+        dressCode: tipo.dressCode,
+        salesStartAt: mover(tipo.salesStartAt),
+        salesEndAt: mover(tipo.salesEndAt),
+      });
+    } catch {
+      ok = false;
+    }
+  }
+  return ok;
+};
+
 const CreateEventForm: React.FC<CreateEventFormProps> = ({ onCreated, onClose, event, template }) => {
   const { t } = useTranslation();
   const { currentVenue, createEvent, refreshEvents } = useAppContext();
@@ -89,7 +137,10 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onCreated, onClose, e
   const base = event ?? template;
 
   const [isLoading, setIsLoading] = useState(false);
-  const [recurrence, setRecurrence] = useState<'none' | 'weekly' | 'biweekly'>('none');
+  const repitiendo = Boolean(template && !event);
+  const [recurrence, setRecurrence] = useState<'none' | 'weekly' | 'biweekly'>(
+    repitiendo ? (template?.recurrence ?? 'none') : 'none',
+  );
 
   // El cartel se guarda aparte del formulario: el fichero no viaja por
   // react-hook-form, sólo la vista previa para enseñarlo antes de crear.
@@ -111,7 +162,7 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onCreated, onClose, e
       ? {
           name: base.name,
           description: base.description ?? '',
-          date: event ? fechaLocal(base.startDate).date : dentroDeUnaSemana(base.startDate),
+          date: event ? fechaLocal(base.startDate).date : proximaFecha(base.startDate),
           startTime: fechaLocal(base.startDate).time,
           endTime: fechaLocal(base.endDate).time,
           capacity: base.maxCapacity ? String(base.maxCapacity) : '',
@@ -150,6 +201,12 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onCreated, onClose, e
 
     if (Number.isNaN(inicio.getTime()) || Number.isNaN(fin.getTime())) {
       toast({ title: t('venue.events.badDates'), description: t('venue.events.badDatesBody'), variant: 'destructive' });
+      return;
+    }
+
+    // Una fiesta nueva no puede haber terminado ya (al repetir es fácil dejar la fecha vieja).
+    if (!event && fin.getTime() <= Date.now()) {
+      toast({ title: t('venue.events.pastDate'), variant: 'destructive' });
       return;
     }
 
@@ -220,6 +277,12 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onCreated, onClose, e
         if (eventData.maxCapacity) {
           await venueService.setCapacity(newEvent.id, eventData.maxCapacity, 0.9).catch(() => undefined);
         }
+        // Repetir copia también lo que no está en el formulario: ajustes de la
+        // fiesta y tipos de entrada (con su ventana de venta en la fecha nueva).
+        if (template) {
+          const copiado = await copiarConfiguracion(template, newEvent.id, inicio);
+          if (!copiado) toast({ title: t('venue.events.repeatPartial'), variant: 'destructive' });
+        }
         track('venue_event_created', { eventId: newEvent.id, recurrence });
         reset();
         setRecurrence('none');
@@ -236,7 +299,11 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onCreated, onClose, e
   return (
     <div className="rounded-[20px] bg-white p-5 text-ink">
       <div className="mb-5 flex items-center justify-between gap-3">
-        <h2 className="font-display text-headline-lg">{t(editando ? 'venue.events.editEvent' : 'venue.events.newEvent')}</h2>
+        <h2 className="font-display text-headline-lg">
+          {repitiendo && template
+            ? t('venue.events.repeatTitle', { name: template.name })
+            : t(editando ? 'venue.events.editEvent' : 'venue.events.newEvent')}
+        </h2>
         {onClose && (
           <button
             type="button"
@@ -283,15 +350,23 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onCreated, onClose, e
           <LocationPicker value={ubicacion} onChange={setUbicacion} />
         </div>
 
-        <div>
+        <div className={cn(repitiendo && '-mx-2 rounded-2xl bg-party-primary/25 p-2')}>
+          {repitiendo && (
+            <p className="mb-2 flex items-start gap-2 text-body-sm font-bold text-ink">
+              <CopyPlus size={16} className="mt-0.5 shrink-0" />
+              {t('venue.events.repeatHelp')}
+            </p>
+          )}
           <label htmlFor="ev-date" className={etiqueta}>
-            {t('venue.events.date')} *
+            {t(repitiendo ? 'venue.events.repeatDate' : 'venue.events.date')} *
           </label>
           <input
             id="ev-date"
             type="date"
+            autoFocus={repitiendo}
+            min={repitiendo ? fechaLocal(new Date().toISOString()).date : undefined}
             {...register('date', { required: t('auth.errors.checkForm') })}
-            className={campo}
+            className={cn(campo, repitiendo && 'ring-2 ring-ink')}
           />
           {errors.date && <p className="mt-1 text-caption font-bold text-ink">{errors.date.message}</p>}
         </div>

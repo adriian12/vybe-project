@@ -916,7 +916,12 @@
             "locationSearch": "Search for the venue's address",
             "locationMissing": "The event location is missing",
             "locationHelp": "Drag the pin or tap the map to adjust it. This location is used to check that people are inside.",
-            "repeat": "Repeat"
+            "repeat": "Repeat",
+            "repeatTitle": "Repeat “{{name}}”",
+            "repeatHelp": "Same setup: details, poster, party settings and ticket types. Pick the date of this edition.",
+            "repeatDate": "New date",
+            "pastDate": "That date has already passed. Pick a future date.",
+            "repeatPartial": "The party was created, but some settings or tickets couldn’t be copied. Please check them."
         },
         "team": {
             "title": "Team",
