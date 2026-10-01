@@ -2214,10 +2214,13 @@
                 "soldOut": "They've sold out. Try another ticket.",
                 "closed": "Sales are closed.",
                 "quantity": "That quantity isn't allowed.",
-                "checkout": "Couldn't open the payment. Try again."
+                "checkout": "Couldn't open the payment. Try again.",
+                "notStarted": "Sales for this ticket haven’t started yet."
             },
             "free": "Free",
-            "getFree": "Buy ticket"
+            "getFree": "Buy ticket",
+            "salesFrom": "On sale {{date}}",
+            "salesUntil": "On sale until {{date}}"
         },
         "mine": {
             "title": "Your tickets",
@@ -3040,7 +3043,8 @@
         "noEvents": "You have no upcoming parties or parties from the last 30 days.",
         "tabs": {
             "tickets": "Tickets and tables",
-            "promoters": "Promoter commissions"
+            "promoters": "Promoter commissions",
+            "manage": "Ticket management"
         },
         "sold": "Sold",
         "revenue": "Revenue",
@@ -3077,7 +3081,10 @@
             "priceHelp": "€0 for a free ticket. Otherwise, from €0.50.",
             "minAge": "Minimum age",
             "dressCode": "Dress code",
-            "fromEvent": "The party's"
+            "fromEvent": "The party's",
+            "salesStart": "On sale from",
+            "salesEnd": "On sale until",
+            "salesWindowHelp": "Optional. Leave empty to sell from now until the party ends. Useful for early bird or opening the box office at a set time."
         },
         "saved": "Saved",
         "ended": "The party is over: you can't sell any more.",
@@ -3101,7 +3108,8 @@
             "ticketRefunded": "That ticket has been refunded.",
             "invalidCommission": "Invalid commission (up to 100 % or €1,000 per person).",
             "form": "Check the name, price and quantity.",
-            "invalidMinAge": "Minimum age must be between 14 and 99."
+            "invalidMinAge": "Minimum age must be between 14 and 99.",
+            "salesWindow": "The sales end must be after the start."
         },
         "promoters": {
             "total": "Tonight's commissions",
@@ -3172,7 +3180,127 @@
         "deleteBodySold_one": "{{count}} has already been sold and will still work at the door. The ticket stops selling and leaves the list.",
         "deleteBodySold_other": "{{count}} have already been sold and will still work at the door. The ticket stops selling and leaves the list.",
         "deletedType": "Ticket deleted",
-        "archivedType": "Ticket withdrawn from sale"
+        "archivedType": "Ticket withdrawn from sale",
+        "manage": {
+            "views": {
+                "overview": "Overview",
+                "types": "Ticket types",
+                "orders": "Orders",
+                "attendees": "Attendees",
+                "comps": "Guest tickets"
+            },
+            "kpi": {
+                "gross": "Revenue",
+                "orders_one": "{{count}} order",
+                "orders_other": "{{count}} orders",
+                "net": "For the business",
+                "netHint": "After the Fiestea fee",
+                "sold": "Tickets",
+                "withComps_one": "Includes {{count}} guest ticket",
+                "withComps_other": "Includes {{count}} guest tickets",
+                "noComps": "No guest tickets",
+                "checkIn": "Checked in",
+                "validated_one": "{{count}} validated",
+                "validated_other": "{{count}} validated",
+                "avgOrder": "Average order",
+                "avgOrderHint": "Excluding guest tickets",
+                "refunds": "Refunds",
+                "noRefunds": "None"
+            },
+            "capacity": "Capacity on sale",
+            "legend": {
+                "sold": "Sold: {{count}}",
+                "comps": "Guest tickets: {{count}}",
+                "left": "Left: {{count}}"
+            },
+            "daily": "Sales per day",
+            "noSalesYet": "No sales yet.",
+            "tickets_one": "{{count}} ticket",
+            "tickets_other": "{{count}} tickets",
+            "latest": "Latest orders",
+            "seeAll": "See all",
+            "comp": "Guest ticket",
+            "online": "Online",
+            "byType": "By ticket type",
+            "state": {
+                "onSale": "On sale",
+                "scheduled": "Scheduled",
+                "soldOut": "Sold out",
+                "paused": "Paused",
+                "closed": "Sales closed"
+            },
+            "compsCount_one": "{{count}} guest ticket",
+            "compsCount_other": "{{count}} guest tickets",
+            "startsAt": "on sale {{date}}",
+            "endsAt": "until {{date}}",
+            "searchOrders": "Search by name, email or number",
+            "filters": {
+                "all": "All",
+                "paid": "Paid",
+                "comp": "Guest tickets",
+                "refunded": "Refunded"
+            },
+            "noMatches": "Nothing matches your search.",
+            "usedOf": "{{used}} of {{total}} inside",
+            "detail": {
+                "order": "Order",
+                "email": "Email",
+                "source": "Source",
+                "amount": "Amount",
+                "net": "For the business",
+                "refunded": "Refunded",
+                "note": "Note"
+            },
+            "resend": "Resend tickets",
+            "resent": "Tickets resent to {{email}}",
+            "attendees": {
+                "issued": "Tickets",
+                "inside": "Inside",
+                "pending": "Still to come",
+                "search": "Search by name, email or code",
+                "status": "Status",
+                "all": "All",
+                "statusValid": "Still to come",
+                "statusUsed": "Inside",
+                "statusRefunded": "Refunded",
+                "type": "Type",
+                "allTypes": "All types",
+                "empty": "No tickets issued yet.",
+                "inAt": "came in {{time}}",
+                "undo": "Undo",
+                "checkIn": "Check in"
+            },
+            "comps": {
+                "title": "Issue guest tickets",
+                "help": "Free tickets in someone’s name: artists, press, friends of the house. They count towards capacity, carry their QR and arrive by email with the PDF.",
+                "noTypes": "Create a ticket type first in “Ticket types”.",
+                "full": "All ticket types are sold out.",
+                "type": "Ticket type",
+                "left_one": "{{count}} left",
+                "left_other": "{{count}} left",
+                "quantity": "Quantity",
+                "less": "One less",
+                "more": "One more",
+                "name": "Full name",
+                "email": "Email (optional)",
+                "emailHelp": "The tickets are sent here. If they have a Fiestea account, they’ll also see them in the app.",
+                "note": "Internal note (optional)",
+                "notePlaceholder": "Guest DJ, press…",
+                "submit_one": "Issue {{count}} guest ticket",
+                "submit_other": "Issue {{count}} guest tickets",
+                "list": "Guest tickets issued",
+                "none": "You haven’t issued any yet.",
+                "issued_one": "{{count}} guest ticket issued",
+                "issued_other": "{{count}} guest tickets issued",
+                "emailed": "Sent to {{email}}.",
+                "noEmailSent": "No email: it’s in “Attendees” for the door."
+            },
+            "errors": {
+                "name": "Enter the name (at least 2 letters).",
+                "email": "The email isn’t valid.",
+                "noEmail": "This order has no email to send to."
+            }
+        }
     },
     "forecast": {
         "title": "Forecast",

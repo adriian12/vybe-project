@@ -8,6 +8,16 @@ export const adminClient = (): SupabaseClient =>
     { auth: { persistSession: false } },
   );
 
+/**
+ * Cliente con la sesión de quien llama: las funciones SQL ven su `auth.uid()`
+ * y deciden ellas los permisos, como desde la app.
+ */
+export const userClient = (req: Request): SupabaseClient =>
+  createClient(Deno.env.get('SUPABASE_URL') ?? '', Deno.env.get('SUPABASE_ANON_KEY') ?? '', {
+    auth: { persistSession: false },
+    global: { headers: { Authorization: req.headers.get('Authorization') ?? '' } },
+  });
+
 export interface AuthedUser {
   id: string;
   email?: string;

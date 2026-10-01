@@ -80,6 +80,8 @@ describe('entradas en la ficha', () => {
         guests: null,
         minSpendCents: null,
         maxPerOrder: 6,
+        salesStartAt: null,
+        salesEndAt: null,
       },
     ];
     render(<EventTickets eventId="e1" />);
@@ -104,11 +106,34 @@ describe('entradas en la ficha', () => {
         guests: 6,
         minSpendCents: 30000,
         maxPerOrder: 1,
+        salesStartAt: null,
+        salesEndAt: null,
       },
     ];
     render(<EventTickets eventId="e1" />);
     expect(await screen.findByText('tickets.buy.soldOut')).toBeTruthy();
     expect(screen.queryByRole('button', { name: 'tickets.buy.reserve' })).toBeNull();
+  });
+
+  it('antes de la ventana de venta se ve, pero no se compra', async () => {
+    tipos = [
+      {
+        id: 't3',
+        kind: 'entry',
+        name: 'Early bird',
+        description: null,
+        priceCents: 1000,
+        remaining: 50,
+        guests: null,
+        minSpendCents: null,
+        maxPerOrder: 6,
+        salesStartAt: new Date(Date.now() + 86_400_000).toISOString(),
+        salesEndAt: null,
+      },
+    ];
+    render(<EventTickets eventId="e1" />);
+    expect(await screen.findByText('tickets.buy.salesFrom')).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'tickets.buy.buy' })).toBeNull();
   });
 });
 

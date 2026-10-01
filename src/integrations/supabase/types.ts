@@ -123,6 +123,24 @@ export type Database = {
           },
         ]
       }
+      api_request_counters: {
+        Row: {
+          bucket: string
+          hits: number
+          key: string
+        }
+        Insert: {
+          bucket: string
+          hits?: number
+          key: string
+        }
+        Update: {
+          bucket?: string
+          hits?: number
+          key?: string
+        }
+        Relationships: []
+      }
       apple_transactions: {
         Row: {
           created_at: string
@@ -2668,13 +2686,16 @@ export type Database = {
           event_id: string
           holders: Json | null
           id: string
+          issued_by: string | null
           marketing_opt_in: boolean
+          note: string | null
           paid_at: string | null
           payment_intent_id: string | null
           profile_id: string | null
           quantity: number
           refunded_at: string | null
           refunded_by: string | null
+          source: string
           status: string
           stripe_account_id: string | null
           stripe_session_id: string | null
@@ -2694,13 +2715,16 @@ export type Database = {
           event_id: string
           holders?: Json | null
           id?: string
+          issued_by?: string | null
           marketing_opt_in?: boolean
+          note?: string | null
           paid_at?: string | null
           payment_intent_id?: string | null
           profile_id?: string | null
           quantity: number
           refunded_at?: string | null
           refunded_by?: string | null
+          source?: string
           status?: string
           stripe_account_id?: string | null
           stripe_session_id?: string | null
@@ -2720,13 +2744,16 @@ export type Database = {
           event_id?: string
           holders?: Json | null
           id?: string
+          issued_by?: string | null
           marketing_opt_in?: boolean
+          note?: string | null
           paid_at?: string | null
           payment_intent_id?: string | null
           profile_id?: string | null
           quantity?: number
           refunded_at?: string | null
           refunded_by?: string | null
+          source?: string
           status?: string
           stripe_account_id?: string | null
           stripe_session_id?: string | null
@@ -2783,6 +2810,8 @@ export type Database = {
           min_spend_cents: number | null
           name: string
           price_cents: number
+          sales_end_at: string | null
+          sales_start_at: string | null
           updated_at: string
           venue_id: string
         }
@@ -2802,6 +2831,8 @@ export type Database = {
           min_spend_cents?: number | null
           name: string
           price_cents: number
+          sales_end_at?: string | null
+          sales_start_at?: string | null
           updated_at?: string
           venue_id: string
         }
@@ -2821,6 +2852,8 @@ export type Database = {
           min_spend_cents?: number | null
           name?: string
           price_cents?: number
+          sales_end_at?: string | null
+          sales_start_at?: string | null
           updated_at?: string
           venue_id?: string
         }
@@ -3659,10 +3692,6 @@ export type Database = {
         Args: { p_profile_id: string; p_quantity: number }
         Returns: number
       }
-      admin_pending_venues: {
-        Args: never
-        Returns: Database["public"]["Tables"]["venues"]["Row"][]
-      }
       admin_create_event: {
         Args: {
           p_capacity?: number
@@ -3770,6 +3799,51 @@ export type Database = {
           verification_status: string
         }[]
       }
+      admin_pending_venues: {
+        Args: never
+        Returns: {
+          address: string | null
+          avg_spend: number | null
+          business_terms: string | null
+          city: string | null
+          contact_email: string | null
+          created_at: string | null
+          description: string | null
+          documents: string[] | null
+          email: string
+          event_radius: number | null
+          id: string
+          instagram: string | null
+          is_platform: boolean
+          is_verified: boolean | null
+          latitude: number | null
+          logo_url: string | null
+          longitude: number | null
+          name: string
+          opening_hours: Json | null
+          phone: string | null
+          platform_fee_percent: number
+          region: string | null
+          stripe_account_id: string | null
+          stripe_charges_enabled: boolean
+          stripe_details_submitted: boolean
+          stripe_payouts_enabled: boolean
+          stripe_requirements: Json | null
+          stripe_updated_at: string | null
+          tax_id: string | null
+          type: string
+          updated_at: string | null
+          venue_id: string
+          verification_status: string
+          website: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "venues"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       admin_reset_test_lab: {
         Args: {
           p_latitude: number
@@ -3838,6 +3912,7 @@ export type Database = {
           total: number
         }[]
       }
+      api_rate_guard: { Args: never; Returns: undefined }
       app_guest_list: { Args: { p_event_id: string }; Returns: string }
       apply_event_headcount: {
         Args: {
@@ -3871,8 +3946,16 @@ export type Database = {
       }
       can_count_event: { Args: { p_event_id: string }; Returns: boolean }
       can_handle_sos: { Args: { p_event_id: string }; Returns: boolean }
+      can_manage_ticket_order: {
+        Args: { p_order_id: string }
+        Returns: boolean
+      }
       can_read_event_metrics: { Args: { p_event_id: string }; Returns: boolean }
       can_read_venue_metrics: { Args: { p_venue_id: string }; Returns: boolean }
+      can_view_event_photo: {
+        Args: { p_owner_folder: string }
+        Returns: boolean
+      }
       cancel_broadcast: { Args: { p_broadcast_id: string }; Returns: undefined }
       cancel_raffle: { Args: { p_raffle_id: string }; Returns: undefined }
       cancel_ticket_order: {
@@ -4041,6 +4124,11 @@ export type Database = {
       event_trend: { Args: { p_event_id: string }; Returns: string }
       event_women_share: { Args: { p_event_id: string }; Returns: number }
       export_my_data: { Args: never; Returns: Json }
+      fiestea_client_ip: { Args: never; Returns: string }
+      fiestea_require_location: {
+        Args: { p_latitude: number; p_longitude: number; p_requires: boolean }
+        Returns: undefined
+      }
       filling_up_threshold: { Args: never; Returns: number }
       fresh_headcount: {
         Args: { p_event_id: string }
@@ -4089,6 +4177,24 @@ export type Database = {
           event: string
           ocurrencias: number
           ultima: string
+        }[]
+      }
+      get_event_attendees: {
+        Args: { p_event_id: string }
+        Returns: {
+          buyer: string
+          code: string
+          holder_email: string
+          holder_name: string
+          holder_phone: string
+          id: string
+          kind: string
+          order_id: string
+          paid_at: string
+          source: string
+          status: string
+          type_name: string
+          used_at: string
         }[]
       }
       get_event_attendees_preview: {
@@ -4256,6 +4362,8 @@ export type Database = {
           name: string
           price_cents: number
           remaining: number
+          sales_end_at: string
+          sales_start_at: string
         }[]
       }
       get_events_activity: {
@@ -4384,6 +4492,50 @@ export type Database = {
           venue_name: string
         }[]
       }
+      get_my_profile: {
+        Args: never
+        Returns: {
+          account_type: string
+          age: number
+          avatar: string | null
+          bio: string | null
+          created_at: string | null
+          deletion_requested_at: string | null
+          email: string | null
+          face_verified: boolean | null
+          gender: string | null
+          id: string
+          is_invisible: boolean
+          is_verified: boolean | null
+          languages: string[]
+          latitude: number | null
+          locale: string
+          longitude: number | null
+          name: string
+          notify_events: boolean
+          notify_matches: boolean
+          notify_messages: boolean
+          phone: string | null
+          phone_verified: boolean | null
+          photos: string[] | null
+          plan_tonight: string | null
+          profile_completed_at: string | null
+          role: string
+          staff_only: boolean
+          status: string
+          suspended_until: string | null
+          suspension_reason: string | null
+          updated_at: string | null
+          user_id: string
+          wants: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "profiles"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       get_my_stamp_card: {
         Args: { p_event_id: string }
         Returns: {
@@ -4415,13 +4567,50 @@ export type Database = {
           venue_name: string
         }[]
       }
-      get_my_profile: {
-        Args: never
-        Returns: Database["public"]["Tables"]["profiles"]["Row"][]
-      }
       get_my_venue: {
         Args: never
-        Returns: Database["public"]["Tables"]["venues"]["Row"][]
+        Returns: {
+          address: string | null
+          avg_spend: number | null
+          business_terms: string | null
+          city: string | null
+          contact_email: string | null
+          created_at: string | null
+          description: string | null
+          documents: string[] | null
+          email: string
+          event_radius: number | null
+          id: string
+          instagram: string | null
+          is_platform: boolean
+          is_verified: boolean | null
+          latitude: number | null
+          logo_url: string | null
+          longitude: number | null
+          name: string
+          opening_hours: Json | null
+          phone: string | null
+          platform_fee_percent: number
+          region: string | null
+          stripe_account_id: string | null
+          stripe_charges_enabled: boolean
+          stripe_details_submitted: boolean
+          stripe_payouts_enabled: boolean
+          stripe_requirements: Json | null
+          stripe_updated_at: string | null
+          tax_id: string | null
+          type: string
+          updated_at: string | null
+          venue_id: string
+          verification_status: string
+          website: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "venues"
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
       get_my_venue_membership: {
         Args: never
@@ -4597,14 +4786,18 @@ export type Database = {
         Returns: {
           amount_cents: number
           buyer: string
+          buyer_email: string
           id: string
           kind: string
           net_cents: number
+          note: string
           paid_at: string
           quantity: number
           refundable: boolean
           refunded_at: string
+          source: string
           status: string
+          type_id: string
           type_name: string
           used: number
         }[]
@@ -4614,6 +4807,7 @@ export type Database = {
         Returns: {
           active: boolean
           capacity: number
+          comps: number
           description: string
           dress_code: string
           guests: number
@@ -4625,6 +4819,8 @@ export type Database = {
           name: string
           price_cents: number
           revenue_cents: number
+          sales_end_at: string
+          sales_start_at: string
           sold: number
           used: number
         }[]
@@ -4819,6 +5015,16 @@ export type Database = {
         Args: { p_other_user_id: string; p_user_id: string }
         Returns: boolean
       }
+      issue_comp_tickets: {
+        Args: {
+          p_holder_email?: string
+          p_holder_name: string
+          p_note?: string
+          p_quantity: number
+          p_type_id: string
+        }
+        Returns: string
+      }
       issue_prize_ticket: {
         Args: { p_profile_id: string; p_promotion_id: string }
         Returns: string
@@ -4984,6 +5190,7 @@ export type Database = {
         }[]
       }
       perform_raffle_draw: { Args: { p_raffle_id: string }; Returns: string }
+      purge_api_counters: { Args: never; Returns: undefined }
       purge_auth_throttle: { Args: never; Returns: number }
       purge_email_events: { Args: never; Returns: number }
       purge_ended_event_photos: {
@@ -5125,6 +5332,8 @@ export type Database = {
           p_min_spend_cents?: number
           p_name: string
           p_price_cents: number
+          p_sales_end_at?: string
+          p_sales_start_at?: string
         }
         Returns: string
       }
@@ -5187,6 +5396,13 @@ export type Database = {
       set_ticket_archived: {
         Args: { p_archived: boolean; p_ticket_id: string }
         Returns: undefined
+      }
+      set_ticket_checked_in: {
+        Args: { p_checked_in: boolean; p_ticket_id: string }
+        Returns: {
+          status: string
+          used_at: string
+        }[]
       }
       set_venue_avg_spend: { Args: { p_amount: number }; Returns: undefined }
       set_venue_stamp_card: {

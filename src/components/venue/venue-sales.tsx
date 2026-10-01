@@ -9,6 +9,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/components/ui/use-toast';
 import PanelTabs from '@/components/venue/panel-tabs';
 import VenuePayments from '@/components/venue/venue-payments';
+import TicketOverview from '@/components/venue/tickets/ticket-overview';
+import TicketOrders from '@/components/venue/tickets/ticket-orders';
+import TicketAttendees from '@/components/venue/tickets/ticket-attendees';
+import TicketComps from '@/components/venue/tickets/ticket-comps';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -31,6 +35,7 @@ import {
 } from '@/services/tickets';
 import type { VenuePlanStatus } from '@/services/venue-service';
 import { planHas } from '@/lib/venue-plans';
+import { SALE_STATE_CLASS, saleState } from '@/lib/ticket-stats';
 import { cn } from '@/lib/utils';
 import { Event as VybeEvent } from '@/types/venue';
 
@@ -39,7 +44,9 @@ interface VenueSalesProps {
   plan: VenuePlanStatus | null;
 }
 
-type Pestana = 'tickets' | 'promoters';
+type Pestana = 'manage' | 'promoters';
+/** Gestión de entradas: cada parte de una plataforma de venta de entradas. */
+type Vista = 'overview' | 'types' | 'orders' | 'attendees' | 'comps';
 
 interface Borrador {
   id: string | null;
@@ -55,7 +62,25 @@ interface Borrador {
   /** Vacíos: valen los de la fiesta. */
   minAge: string;
   dressCode: string;
+  /** `datetime-local` (hora del navegador); vacíos: sin límite. */
+  salesStart: string;
+  salesEnd: string;
 }
+
+/** ISO → valor de `<input type="datetime-local">` en la hora local. */
+const aLocal = (iso: string | null): string => {
+  if (!iso) return '';
+  const d = new Date(iso);
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+};
+
+/** Valor de `datetime-local` → ISO (o null si está vacío o mal). */
+const aIso = (local: string): string | null => {
+  if (!local.trim()) return null;
+  const d = new Date(local);
+  return Number.isNaN(d.getTime()) ? null : d.toISOString();
+};
 
 const vacio = (kind: TicketKind): Borrador => ({
   id: null,
@@ -70,6 +95,8 @@ const vacio = (kind: TicketKind): Borrador => ({
   active: true,
   minAge: '',
   dressCode: '',
+  salesStart: '',
+  salesEnd: '',
 });
 
 const aCentimos = (texto: string): number | null => {
@@ -127,7 +154,10 @@ const VenueSales = ({ events, plan }: VenueSalesProps) => {
   const evento = lista.find((e) => e.id === actual) ?? null;
   const terminado = evento ? new Date(evento.endDate).getTime() <= Date.now() : false;
 
-  const [pestana, setPestana] = useState<Pestana>('tickets');
+  const [pestana, setPestana] = useState<Pestana>('manage');
+  const [vista, setVista] = useState<Vista>('overview');
+  /** Sube cuando cambia algo que la lista de asistentes debe recargar. */
+  const [version, setVersion] = useState(0);
   const [ventas, setVentas] = useState<TicketSale[]>([]);
   const [pedidos, setPedidos] = useState<TicketOrder[]>([]);
   const [liquidacion, setLiquidacion] = useState<PromoterSettlement[]>([]);
@@ -194,6 +224,12 @@ const VenueSales = ({ events, plan }: VenueSalesProps) => {
       toast({ title: t('common.error'), description: t('sales.errors.form'), variant: 'destructive' });
       return;
     }
+    const inicio = aIso(borrador.salesStart);
+    const fin = aIso(borrador.salesEnd);
+    if (inicio && fin && new Date(fin) <= new Date(inicio)) {
+      toast({ title: t('common.error'), description: t('sales.errors.salesWindow'), variant: 'destructive' });
+      return;
+    }
     setGuardando(true);
     try {
       await ticketsService.saveType({
@@ -210,6 +246,8 @@ const VenueSales = ({ events, plan }: VenueSalesProps) => {
         active: borrador.active,
         minAge: borrador.minAge.trim() ? entero(borrador.minAge) : null,
         dressCode: borrador.dressCode.trim() || null,
+        salesStartAt: inicio,
+        salesEndAt: fin,
       });
       setBorrador(null);
       toast({ title: t('sales.saved') });
@@ -248,6 +286,8 @@ const VenueSales = ({ events, plan }: VenueSalesProps) => {
       active: venta.active,
       minAge: venta.minAge !== null ? String(venta.minAge) : '',
       dressCode: venta.dressCode ?? '',
+      salesStart: aLocal(venta.salesStartAt),
+      salesEnd: aLocal(venta.salesEndAt),
     });
 
   const guardarComision = async (codeId: string) => {
@@ -284,6 +324,19 @@ const VenueSales = ({ events, plan }: VenueSalesProps) => {
       await ticketsService.refundOrder(pedido.id);
       toast({ title: t('sales.payments.refunded') });
       await load();
+      setVersion((v) => v + 1);
+    } catch (error) {
+      fail(error);
+    } finally {
+      setOcupado(null);
+    }
+  };
+
+  const reenviar = async (pedido: TicketOrder) => {
+    setOcupado(pedido.id);
+    try {
+      await ticketsService.resendOrder(pedido.id);
+      toast({ title: t('sales.manage.resent', { email: pedido.buyerEmail ?? '' }) });
     } catch (error) {
       fail(error);
     } finally {
@@ -317,9 +370,6 @@ const VenueSales = ({ events, plan }: VenueSalesProps) => {
     URL.revokeObjectURL(url);
   };
 
-  const vendidas = ventas.reduce((n, v) => n + v.sold, 0);
-  const ingresos = ventas.reduce((n, v) => n + v.revenueCents, 0);
-  const validadas = ventas.reduce((n, v) => n + v.used, 0);
   const aPagar = liquidacion.reduce((n, r) => n + r.commissionCents, 0);
   const pendiente = liquidacion.filter((r) => !r.paidAt).reduce((n, r) => n + r.commissionCents, 0);
 
@@ -343,12 +393,39 @@ const VenueSales = ({ events, plan }: VenueSalesProps) => {
 
       <PanelTabs
         tabs={[
-          { id: 'tickets', label: t('sales.tabs.tickets') },
+          { id: 'manage', label: t('sales.tabs.manage') },
           { id: 'promoters', label: t('sales.tabs.promoters'), count: liquidacion.length },
         ]}
         value={pestana}
         onChange={(v) => setPestana(v as Pestana)}
       />
+
+      {pestana === 'manage' && (
+        <nav className="no-scrollbar -mx-1 flex gap-1 overflow-x-auto border-b border-black/10 px-1" aria-label={t('sales.tabs.manage')}>
+          {(
+            [
+              ['overview', t('sales.manage.views.overview')],
+              ['types', t('sales.manage.views.types')],
+              ['orders', t('sales.manage.views.orders')],
+              ['attendees', t('sales.manage.views.attendees')],
+              ['comps', t('sales.manage.views.comps')],
+            ] as [Vista, string][]
+          ).map(([id, label]) => (
+            <button
+              key={id}
+              type="button"
+              aria-current={vista === id ? 'page' : undefined}
+              onClick={() => setVista(id)}
+              className={cn(
+                'press -mb-px shrink-0 border-b-2 px-3 pb-2.5 pt-1 text-body-sm font-bold transition-colors',
+                vista === id ? 'border-party-primary text-foreground' : 'border-transparent text-party-gray hover:text-foreground',
+              )}
+            >
+              {label}
+            </button>
+          ))}
+        </nav>
+      )}
 
       {cargando && (
         <div className="flex justify-center py-6">
@@ -356,26 +433,43 @@ const VenueSales = ({ events, plan }: VenueSalesProps) => {
         </div>
       )}
 
-      {/* -------------------------------------------------- entradas y mesas */}
-      {pestana === 'tickets' && !cargando && (
+      {/* ------------------------------------------- gestión de entradas */}
+      {pestana === 'manage' && !cargando && vista === 'overview' && (
+        <div className="space-y-4">
+          <VenuePayments onStatus={setPagos} />
+          <TicketOverview ventas={ventas} pedidos={pedidos} eventEnded={terminado} onOpenOrders={() => setVista('orders')} />
+        </div>
+      )}
+      {pestana === 'manage' && !cargando && vista === 'orders' && (
+        <TicketOrders
+          pedidos={pedidos}
+          eventName={evento?.name ?? ''}
+          busy={ocupado}
+          onRefund={setADevolver}
+          onResend={(p) => void reenviar(p)}
+        />
+      )}
+      {pestana === 'manage' && vista === 'attendees' && actual && (
+        <TicketAttendees eventId={actual} eventName={evento?.name ?? ''} version={version} onChanged={() => void load()} />
+      )}
+      {pestana === 'manage' && !cargando && vista === 'comps' && (
+        <TicketComps
+          ventas={ventas}
+          pedidos={pedidos}
+          eventEnded={terminado}
+          busy={ocupado}
+          onIssued={() => {
+            void load();
+            setVersion((v) => v + 1);
+          }}
+          onResend={(p) => void reenviar(p)}
+        />
+      )}
+
+      {/* -------------------------------------------------- tipos de entrada */}
+      {pestana === 'manage' && !cargando && vista === 'types' && (
         <div className="grid gap-4 lg:grid-cols-12">
           <div className="space-y-4 lg:col-span-7">
-            {/* Cobros: sin cuenta de Stripe activa no se vende. */}
-            <VenuePayments onStatus={setPagos} />
-
-            <div className="grid grid-cols-3 gap-3">
-              {[
-                { label: t('sales.sold'), value: vendidas },
-                { label: t('sales.revenue'), value: euros(ingresos) },
-                { label: t('sales.validated'), value: validadas },
-              ].map((item) => (
-                <div key={item.label} className="surface-light rounded-2xl p-4">
-                  <p className="font-display text-headline-md tabular">{item.value}</p>
-                  <p className="mt-1 text-caption uppercase tracking-wide text-party-gray">{item.label}</p>
-                </div>
-              ))}
-            </div>
-
             <div className="surface-light rounded-2xl p-4">
               <h3 className="mb-3 font-display text-title-card uppercase tracking-wide">{t('sales.types')}</h3>
               {ventas.length > 0 && pagos && !pagos.chargesEnabled && (
@@ -399,7 +493,14 @@ const VenueSales = ({ events, plan }: VenueSalesProps) => {
                         <div className="min-w-0 flex-1">
                           <p className="truncate text-body-md font-bold">
                             {venta.name}
-                            {!venta.active && <span className="ml-2 text-caption font-normal">({t('sales.paused')})</span>}
+                            <span
+                              className={cn(
+                                'ml-2 rounded-full px-2 py-0.5 align-middle text-caption font-bold',
+                                SALE_STATE_CLASS[saleState(venta, terminado)],
+                              )}
+                            >
+                              {t(`sales.manage.state.${saleState(venta, terminado)}`)}
+                            </span>
                           </p>
                           <p className="text-caption text-party-gray">
                             {venta.priceCents ? euros(venta.priceCents) : t('tickets.buy.free')}
@@ -565,6 +666,25 @@ const VenueSales = ({ events, plan }: VenueSalesProps) => {
                         onChange={(e) => setBorrador({ ...borrador, dressCode: e.target.value })}
                       />
                     </div>
+                    <div className="space-y-1">
+                      <Label htmlFor="tt-start" className="text-caption">{t('sales.form.salesStart')}</Label>
+                      <Input
+                        id="tt-start"
+                        type="datetime-local"
+                        value={borrador.salesStart}
+                        onChange={(e) => setBorrador({ ...borrador, salesStart: e.target.value })}
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label htmlFor="tt-end" className="text-caption">{t('sales.form.salesEnd')}</Label>
+                      <Input
+                        id="tt-end"
+                        type="datetime-local"
+                        value={borrador.salesEnd}
+                        onChange={(e) => setBorrador({ ...borrador, salesEnd: e.target.value })}
+                      />
+                    </div>
+                    <p className="text-caption text-party-gray sm:col-span-2">{t('sales.form.salesWindowHelp')}</p>
                   </div>
                   <label className="flex items-center justify-between gap-3 text-body-sm">
                     {t('sales.form.onSale')}
@@ -608,62 +728,12 @@ const VenueSales = ({ events, plan }: VenueSalesProps) => {
                 </div>
               )}
             </div>
-            <p className="text-caption text-party-gray">{t('sales.note')}</p>
           </div>
 
           <div className="space-y-4 lg:col-span-5">
-            <div className="surface-light rounded-2xl p-4">
-              <h3 className="mb-3 font-display text-title-card uppercase tracking-wide">{t('sales.orders')}</h3>
-              {pedidos.length === 0 ? (
-                <p className="text-body-sm text-party-gray">{t('sales.noOrders')}</p>
-              ) : (
-                <ul className="divide-y divide-black/[0.06]">
-                  {pedidos.map((pedido) => (
-                    <li
-                      key={pedido.id}
-                      className={cn('flex items-center justify-between gap-3 py-2.5', pedido.status === 'refunded' && 'opacity-50')}
-                    >
-                      <div className="min-w-0">
-                        <p className="truncate text-body-sm font-bold">
-                          {pedido.buyer || '—'} · {pedido.quantity} × {pedido.typeName}
-                        </p>
-                        {pedido.status === 'refunded' ? (
-                          <p className="text-caption font-bold text-destructive">{t('sales.payments.refundedTag')}</p>
-                        ) : pedido.netCents !== pedido.amountCents ? (
-                          <p className="text-caption text-party-gray">
-                            {t('sales.payments.youGet', { amount: euros(pedido.netCents) })}
-                          </p>
-                        ) : null}
-                        <p className="text-caption text-party-gray">
-                          {pedido.paidAt
-                            ? new Date(pedido.paidAt).toLocaleString(undefined, {
-                                day: 'numeric',
-                                month: 'short',
-                                hour: '2-digit',
-                                minute: '2-digit',
-                              })
-                            : ''}
-                        </p>
-                      </div>
-                      <div className="shrink-0 text-right">
-                        <p className="text-body-sm font-bold tabular">{euros(pedido.amountCents)}</p>
-                        {pedido.refundable && (
-                          <button
-                            type="button"
-                            disabled={ocupado === pedido.id}
-                            onClick={() => setADevolver(pedido)}
-                            className="press mt-0.5 inline-flex items-center gap-1 text-caption text-party-gray hover:text-destructive disabled:opacity-50"
-                          >
-                            {ocupado === pedido.id ? <Loader2 size={11} className="animate-spin" /> : <Undo2 size={11} />}
-                            {t('sales.payments.refund')}
-                          </button>
-                        )}
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
+            {/* Cobros: sin cuenta de Stripe activa no se vende. */}
+            <VenuePayments onStatus={setPagos} />
+            <p className="text-caption text-party-gray">{t('sales.note')}</p>
           </div>
         </div>
       )}

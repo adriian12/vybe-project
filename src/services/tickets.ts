@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import { ApiError } from '@/services/api';
+import { ApiError, functionErrorCode } from '@/services/api';
 import { isNative } from '@/services/native';
 import { APP_URL } from '@/lib/hosts';
 
@@ -25,6 +25,9 @@ export interface TicketType {
   guests: number | null;
   minSpendCents: number | null;
   maxPerOrder: number;
+  /** Ventana de venta (096): antes de `salesStartAt` se ve pero no se compra. */
+  salesStartAt: string | null;
+  salesEndAt: string | null;
 }
 
 export interface MyTicket {
@@ -136,7 +139,14 @@ export interface TicketSale {
   /** Propios de la entrada; sin ellos valen los de la fiesta. */
   minAge: number | null;
   dressCode: string | null;
+  salesStartAt: string | null;
+  salesEndAt: string | null;
+  /** Invitaciones emitidas (van dentro de `sold`, a 0 €). */
+  comps: number;
 }
+
+/** Origen de un pedido: compra en la app o invitación del negocio. */
+export type TicketOrderSource = 'online' | 'comp';
 
 export interface TicketOrder {
   id: string;
@@ -153,6 +163,35 @@ export interface TicketOrder {
   /** Entradas del pedido ya validadas en la puerta. */
   used: number;
   refundable: boolean;
+  buyerEmail: string | null;
+  source: TicketOrderSource;
+  note: string | null;
+  typeId: string;
+}
+
+/** Una entrada emitida, para la lista de asistentes. */
+export interface TicketAttendee {
+  id: string;
+  code: string;
+  holderName: string;
+  holderEmail: string | null;
+  holderPhone: string | null;
+  typeName: string;
+  kind: TicketKind;
+  status: 'valid' | 'used' | 'refunded';
+  usedAt: string | null;
+  orderId: string;
+  source: TicketOrderSource;
+  buyer: string;
+  paidAt: string | null;
+}
+
+export interface IssueCompsInput {
+  typeId: string;
+  quantity: number;
+  name: string;
+  email?: string | null;
+  note?: string | null;
 }
 
 /** Estado de la cuenta de Stripe del local (Connect, migración 069). */
@@ -178,6 +217,8 @@ export interface TicketTypeInput {
   active?: boolean;
   minAge?: number | null;
   dressCode?: string | null;
+  salesStartAt?: string | null;
+  salesEndAt?: string | null;
 }
 
 export interface ValidatedTicket {
@@ -213,6 +254,12 @@ const ERRORES: Record<string, string> = {
   CAPACITY_BELOW_SOLD: 'sales.errors.capacityBelowSold',
   SOLD_OUT: 'tickets.buy.errors.soldOut',
   SALES_CLOSED: 'tickets.buy.errors.closed',
+  SALES_NOT_STARTED: 'tickets.buy.errors.notStarted',
+  INVALID_SALES_WINDOW: 'sales.errors.salesWindow',
+  BAD_NAME: 'sales.manage.errors.name',
+  BAD_EMAIL: 'sales.manage.errors.email',
+  NO_EMAIL: 'sales.manage.errors.noEmail',
+  TICKET_TYPE_NOT_FOUND: 'sales.errors.ticketNotFound',
   BAD_QUANTITY: 'tickets.buy.errors.quantity',
   TICKET_NOT_FOUND: 'sales.errors.ticketNotFound',
   TICKET_REFUNDED: 'sales.errors.ticketRefunded',
@@ -243,6 +290,14 @@ const connect = async <T,>(body: Record<string, unknown>): Promise<T> => {
       code = 'SERVER_ERROR';
     }
   }
+  if (code) throw new ApiError(code, ERRORES[code] ?? 'errors.generic');
+  return data as T;
+};
+
+/** Llama a `ticket-admin` (invitaciones, reenviar el correo). */
+const ticketAdmin = async <T,>(body: Record<string, unknown>): Promise<T> => {
+  const { data, error } = await supabase.functions.invoke('ticket-admin', { body });
+  const code = error ? await functionErrorCode(error) : (data as { error?: string } | null)?.error;
   if (code) throw new ApiError(code, ERRORES[code] ?? 'errors.generic');
   return data as T;
 };
@@ -290,6 +345,8 @@ export const ticketsService = {
       guests: row.guests,
       minSpendCents: row.min_spend_cents,
       maxPerOrder: row.max_per_order,
+      salesStartAt: row.sales_start_at ?? null,
+      salesEndAt: row.sales_end_at ?? null,
     }));
   },
 
@@ -440,6 +497,9 @@ export const ticketsService = {
       revenueCents: Number(row.revenue_cents),
       minAge: row.min_age ?? null,
       dressCode: row.dress_code ?? null,
+      salesStartAt: row.sales_start_at ?? null,
+      salesEndAt: row.sales_end_at ?? null,
+      comps: row.comps ?? 0,
     }));
   },
 
@@ -459,7 +519,49 @@ export const ticketsService = {
       refundedAt: row.refunded_at,
       used: row.used,
       refundable: row.refundable,
+      buyerEmail: row.buyer_email ?? null,
+      source: (row.source === 'comp' ? 'comp' : 'online') as TicketOrderSource,
+      note: row.note ?? null,
+      typeId: row.type_id,
     }));
+  },
+
+  /** Una fila por entrada emitida, con su estado (asistentes). */
+  getAttendees: async (eventId: string): Promise<TicketAttendee[]> => {
+    const { data, error } = await supabase.rpc('get_event_attendees', { p_event_id: eventId });
+    if (error) throw fallo(error.message);
+    return (data ?? []).map((row) => ({
+      id: row.id,
+      code: row.code,
+      holderName: row.holder_name,
+      holderEmail: row.holder_email ?? null,
+      holderPhone: row.holder_phone ?? null,
+      typeName: row.type_name,
+      kind: row.kind as TicketKind,
+      status: row.status as TicketAttendee['status'],
+      usedAt: row.used_at ?? null,
+      orderId: row.order_id,
+      source: (row.source === 'comp' ? 'comp' : 'online') as TicketOrderSource,
+      buyer: row.buyer,
+      paidAt: row.paid_at ?? null,
+    }));
+  },
+
+  /** Check-in a mano (o deshacerlo). */
+  setCheckedIn: async (ticketId: string, checkedIn: boolean): Promise<{ status: TicketAttendee['status']; usedAt: string | null }> => {
+    const { data, error } = await supabase.rpc('set_ticket_checked_in', { p_ticket_id: ticketId, p_checked_in: checkedIn });
+    if (error) throw fallo(error.message);
+    const row = data?.[0];
+    return { status: (row?.status ?? (checkedIn ? 'used' : 'valid')) as TicketAttendee['status'], usedAt: row?.used_at ?? null };
+  },
+
+  /** Invitaciones: entradas de 0 € a nombre de alguien, con su correo. */
+  issueComps: async (input: IssueCompsInput): Promise<{ orderId: string; emailed: boolean }> =>
+    ticketAdmin<{ orderId: string; emailed: boolean }>({ action: 'issue', ...input }),
+
+  /** Vuelve a mandar el correo con las entradas de un pedido. */
+  resendOrder: async (orderId: string): Promise<void> => {
+    await ticketAdmin({ action: 'resend', orderId });
   },
 
   /** Borra un tipo de entrada sin ventas; si ya tiene, lo retira de la venta. */
@@ -484,6 +586,8 @@ export const ticketsService = {
       p_active: input.active ?? true,
       p_min_age: input.minAge ?? null,
       p_dress_code: input.dressCode ?? null,
+      p_sales_start_at: input.salesStartAt ?? null,
+      p_sales_end_at: input.salesEndAt ?? null,
     } as never);
     if (error) throw fallo(error.message);
     return String(data ?? '');

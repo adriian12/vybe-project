@@ -39,6 +39,10 @@ const EventTickets = ({ eventId }: { eventId: string }) => {
       <ul className="flex flex-col gap-2">
         {types.map((tipo) => {
           const agotada = tipo.remaining !== null && tipo.remaining <= 0;
+          // Ventana de venta (096): antes de la hora se ve, pero aún no se compra.
+          const programada = Boolean(tipo.salesStartAt && new Date(tipo.salesStartAt).getTime() > Date.now());
+          const fechaVenta = (iso: string) =>
+            new Date(iso).toLocaleString(undefined, { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
           const tope = Math.max(1, Math.min(tipo.maxPerOrder, tipo.remaining ?? tipo.maxPerOrder));
           const cantidad = Math.min(cantidades[tipo.id] ?? 1, tope);
           const esMesa = tipo.kind === 'table';
@@ -64,6 +68,11 @@ const EventTickets = ({ eventId }: { eventId: string }) => {
                   {tipo.description && (
                     <p className="mt-0.5 line-clamp-3 whitespace-pre-line text-caption text-ink/60">{tipo.description}</p>
                   )}
+                  {!programada && !agotada && tipo.salesEndAt && (
+                    <p className="mt-0.5 text-caption font-bold text-ink/70">
+                      {t('tickets.buy.salesUntil', { date: fechaVenta(tipo.salesEndAt) })}
+                    </p>
+                  )}
                   {tipo.remaining !== null && !agotada && tipo.remaining <= 20 && (
                     <p className="mt-0.5 text-caption font-bold text-destructive">
                       {t('tickets.buy.remaining', { count: tipo.remaining })}
@@ -81,6 +90,10 @@ const EventTickets = ({ eventId }: { eventId: string }) => {
               {agotada ? (
                 <p className="mt-3 rounded-lg bg-black/[0.05] py-2 text-center text-caption font-bold uppercase">
                   {t('tickets.buy.soldOut')}
+                </p>
+              ) : programada && tipo.salesStartAt ? (
+                <p className="mt-3 rounded-lg bg-sky-100 py-2 text-center text-caption font-bold text-sky-900">
+                  {t('tickets.buy.salesFrom', { date: fechaVenta(tipo.salesStartAt) })}
                 </p>
               ) : (
                 <div className="mt-3 flex items-center gap-2">

@@ -2214,10 +2214,13 @@
                 "soldOut": "Ausverkauft. Versuch ein anderes Ticket.",
                 "closed": "Der Verkauf ist geschlossen.",
                 "quantity": "Diese Menge ist nicht erlaubt.",
-                "checkout": "Die Zahlung konnte nicht geöffnet werden. Versuch es erneut."
+                "checkout": "Die Zahlung konnte nicht geöffnet werden. Versuch es erneut.",
+                "notStarted": "Der Verkauf dieses Tickets hat noch nicht begonnen."
             },
             "free": "Gratis",
-            "getFree": "Ticket kaufen"
+            "getFree": "Ticket kaufen",
+            "salesFrom": "Im Verkauf ab {{date}}",
+            "salesUntil": "Verkauf bis {{date}}"
         },
         "mine": {
             "title": "Deine Tickets",
@@ -3040,7 +3043,8 @@
         "noEvents": "Du hast keine kommenden Partys oder Partys der letzten 30 Tage.",
         "tabs": {
             "tickets": "Tickets und Tische",
-            "promoters": "Promoter-Provisionen"
+            "promoters": "Promoter-Provisionen",
+            "manage": "Ticketverwaltung"
         },
         "sold": "Verkauft",
         "revenue": "Umsatz",
@@ -3077,7 +3081,10 @@
             "priceHelp": "0 € für ein Gratis-Ticket. Sonst ab 0,50 €.",
             "minAge": "Mindestalter",
             "dressCode": "Dresscode",
-            "fromEvent": "Wie die Party"
+            "fromEvent": "Wie die Party",
+            "salesStart": "Verkauf ab",
+            "salesEnd": "Verkauf bis",
+            "salesWindowHelp": "Optional. Leer: Verkauf ab sofort bis zum Ende der Party. Praktisch für Early Bird oder um die Abendkasse zu einer bestimmten Uhrzeit zu öffnen."
         },
         "saved": "Gespeichert",
         "ended": "Die Party ist vorbei: Es kann nichts mehr verkauft werden.",
@@ -3101,7 +3108,8 @@
             "ticketRefunded": "Dieses Ticket wurde erstattet.",
             "invalidCommission": "Ungültige Provision (bis 100 % oder 1.000 € pro Person).",
             "form": "Prüfe Name, Preis und Menge.",
-            "invalidMinAge": "Das Mindestalter muss zwischen 14 und 99 liegen."
+            "invalidMinAge": "Das Mindestalter muss zwischen 14 und 99 liegen.",
+            "salesWindow": "Das Verkaufsende muss nach dem Beginn liegen."
         },
         "promoters": {
             "total": "Provisionen der Nacht",
@@ -3172,7 +3180,127 @@
         "deleteBodySold_one": "Es wurde schon {{count}} verkauft und gilt weiterhin am Eingang. Das Ticket wird nicht mehr verkauft und verschwindet aus der Liste.",
         "deleteBodySold_other": "Es wurden schon {{count}} verkauft und gelten weiterhin am Eingang. Das Ticket wird nicht mehr verkauft und verschwindet aus der Liste.",
         "deletedType": "Ticket gelöscht",
-        "archivedType": "Ticket aus dem Verkauf genommen"
+        "archivedType": "Ticket aus dem Verkauf genommen",
+        "manage": {
+            "views": {
+                "overview": "Übersicht",
+                "types": "Ticketarten",
+                "orders": "Bestellungen",
+                "attendees": "Gäste",
+                "comps": "Freikarten"
+            },
+            "kpi": {
+                "gross": "Umsatz",
+                "orders_one": "{{count}} Bestellung",
+                "orders_other": "{{count}} Bestellungen",
+                "net": "Für das Lokal",
+                "netHint": "Nach der Fiestea-Gebühr",
+                "sold": "Tickets",
+                "withComps_one": "Inkl. {{count}} Freikarte",
+                "withComps_other": "Inkl. {{count}} Freikarten",
+                "noComps": "Keine Freikarten",
+                "checkIn": "Eingelassen",
+                "validated_one": "{{count}} entwertet",
+                "validated_other": "{{count}} entwertet",
+                "avgOrder": "Ø Bestellung",
+                "avgOrderHint": "Ohne Freikarten",
+                "refunds": "Erstattungen",
+                "noRefunds": "Keine"
+            },
+            "capacity": "Kapazität im Verkauf",
+            "legend": {
+                "sold": "Verkauft: {{count}}",
+                "comps": "Freikarten: {{count}}",
+                "left": "Übrig: {{count}}"
+            },
+            "daily": "Verkäufe pro Tag",
+            "noSalesYet": "Noch keine Verkäufe.",
+            "tickets_one": "{{count}} Ticket",
+            "tickets_other": "{{count}} Tickets",
+            "latest": "Letzte Bestellungen",
+            "seeAll": "Alle ansehen",
+            "comp": "Freikarte",
+            "online": "Online",
+            "byType": "Nach Ticketart",
+            "state": {
+                "onSale": "Im Verkauf",
+                "scheduled": "Geplant",
+                "soldOut": "Ausverkauft",
+                "paused": "Pausiert",
+                "closed": "Verkauf beendet"
+            },
+            "compsCount_one": "{{count}} Freikarte",
+            "compsCount_other": "{{count}} Freikarten",
+            "startsAt": "Verkauf ab {{date}}",
+            "endsAt": "bis {{date}}",
+            "searchOrders": "Nach Name, E-Mail oder Nummer suchen",
+            "filters": {
+                "all": "Alle",
+                "paid": "Bezahlt",
+                "comp": "Freikarten",
+                "refunded": "Erstattet"
+            },
+            "noMatches": "Keine Treffer.",
+            "usedOf": "{{used}} von {{total}} drinnen",
+            "detail": {
+                "order": "Bestellung",
+                "email": "E-Mail",
+                "source": "Herkunft",
+                "amount": "Betrag",
+                "net": "Für das Lokal",
+                "refunded": "Erstattet",
+                "note": "Notiz"
+            },
+            "resend": "Tickets erneut senden",
+            "resent": "Tickets erneut an {{email}} gesendet",
+            "attendees": {
+                "issued": "Tickets",
+                "inside": "Drinnen",
+                "pending": "Noch nicht da",
+                "search": "Nach Name, E-Mail oder Code suchen",
+                "status": "Status",
+                "all": "Alle",
+                "statusValid": "Noch nicht da",
+                "statusUsed": "Drinnen",
+                "statusRefunded": "Erstattet",
+                "type": "Art",
+                "allTypes": "Alle Arten",
+                "empty": "Noch keine Tickets ausgestellt.",
+                "inAt": "eingelassen {{time}}",
+                "undo": "Rückgängig",
+                "checkIn": "Einlass"
+            },
+            "comps": {
+                "title": "Freikarten ausstellen",
+                "help": "Kostenlose Tickets auf einen Namen: Künstler, Presse, Freunde des Hauses. Sie zählen zur Kapazität, haben ihren QR-Code und kommen per E-Mail mit dem PDF.",
+                "noTypes": "Lege zuerst unter „Ticketarten“ eine Ticketart an.",
+                "full": "Alle Ticketarten sind ausverkauft.",
+                "type": "Ticketart",
+                "left_one": "noch {{count}}",
+                "left_other": "noch {{count}}",
+                "quantity": "Anzahl",
+                "less": "Eine weniger",
+                "more": "Eine mehr",
+                "name": "Vor- und Nachname",
+                "email": "E-Mail (optional)",
+                "emailHelp": "Die Tickets werden hierhin geschickt. Mit einem Fiestea-Konto erscheinen sie auch in der App.",
+                "note": "Interne Notiz (optional)",
+                "notePlaceholder": "Gast-DJ, Presse…",
+                "submit_one": "{{count}} Freikarte ausstellen",
+                "submit_other": "{{count}} Freikarten ausstellen",
+                "list": "Ausgestellte Freikarten",
+                "none": "Noch keine ausgestellt.",
+                "issued_one": "{{count}} Freikarte ausgestellt",
+                "issued_other": "{{count}} Freikarten ausgestellt",
+                "emailed": "An {{email}} gesendet.",
+                "noEmailSent": "Ohne E-Mail: Sie steht unter „Gäste“ für den Einlass."
+            },
+            "errors": {
+                "name": "Gib den Namen ein (mindestens 2 Buchstaben).",
+                "email": "Die E-Mail ist ungültig.",
+                "noEmail": "Diese Bestellung hat keine E-Mail-Adresse."
+            }
+        }
     },
     "forecast": {
         "title": "Prognose",

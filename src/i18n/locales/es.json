@@ -2214,10 +2214,13 @@
                 "soldOut": "Se han agotado. Prueba con otra entrada.",
                 "closed": "La venta está cerrada.",
                 "quantity": "Esa cantidad no está permitida.",
-                "checkout": "No se ha podido abrir el pago. Inténtalo de nuevo."
+                "checkout": "No se ha podido abrir el pago. Inténtalo de nuevo.",
+                "notStarted": "La venta de esta entrada aún no ha empezado."
             },
             "free": "Gratis",
-            "getFree": "Comprar entrada"
+            "getFree": "Comprar entrada",
+            "salesFrom": "A la venta el {{date}}",
+            "salesUntil": "Venta hasta el {{date}}"
         },
         "mine": {
             "title": "Tus entradas",
@@ -3040,7 +3043,8 @@
         "noEvents": "No tienes fiestas próximas ni de los últimos 30 días.",
         "tabs": {
             "tickets": "Entradas y mesas",
-            "promoters": "Comisiones RRPP"
+            "promoters": "Comisiones RRPP",
+            "manage": "Gestión de entradas"
         },
         "sold": "Vendidas",
         "revenue": "Ingresos",
@@ -3077,7 +3081,10 @@
             "priceHelp": "0 € para una entrada gratuita. Si no, desde 0,50 €.",
             "minAge": "Edad mínima",
             "dressCode": "Dress code",
-            "fromEvent": "La de la fiesta"
+            "fromEvent": "La de la fiesta",
+            "salesStart": "Venta desde",
+            "salesEnd": "Venta hasta",
+            "salesWindowHelp": "Opcional. Vacíos: se vende desde ya hasta el final de la fiesta. Sirve para early bird o para abrir la taquilla a una hora."
         },
         "saved": "Guardado",
         "ended": "La fiesta ya terminó: no se puede vender más.",
@@ -3101,7 +3108,8 @@
             "ticketRefunded": "Esa entrada está reembolsada.",
             "invalidCommission": "Comisión no válida (hasta 100 % o 1.000 € por persona).",
             "form": "Revisa el nombre, el precio y la cantidad.",
-            "invalidMinAge": "La edad mínima tiene que estar entre 14 y 99."
+            "invalidMinAge": "La edad mínima tiene que estar entre 14 y 99.",
+            "salesWindow": "El fin de la venta tiene que ser posterior al inicio."
         },
         "promoters": {
             "total": "Comisiones de la noche",
@@ -3172,7 +3180,127 @@
         "deleteBodySold_one": "Ya se ha vendido {{count}}: seguirá valiendo en la puerta. La entrada deja de venderse y sale de la lista.",
         "deleteBodySold_other": "Ya se han vendido {{count}}: seguirán valiendo en la puerta. La entrada deja de venderse y sale de la lista.",
         "deletedType": "Entrada eliminada",
-        "archivedType": "Entrada retirada de la venta"
+        "archivedType": "Entrada retirada de la venta",
+        "manage": {
+            "views": {
+                "overview": "Resumen",
+                "types": "Tipos de entrada",
+                "orders": "Pedidos",
+                "attendees": "Asistentes",
+                "comps": "Invitaciones"
+            },
+            "kpi": {
+                "gross": "Ingresos",
+                "orders_one": "{{count}} pedido",
+                "orders_other": "{{count}} pedidos",
+                "net": "Para el negocio",
+                "netHint": "Tras la comisión de Fiestea",
+                "sold": "Entradas",
+                "withComps_one": "Incluye {{count}} invitación",
+                "withComps_other": "Incluye {{count}} invitaciones",
+                "noComps": "Sin invitaciones",
+                "checkIn": "Han entrado",
+                "validated_one": "{{count}} validada",
+                "validated_other": "{{count}} validadas",
+                "avgOrder": "Pedido medio",
+                "avgOrderHint": "Sin invitaciones",
+                "refunds": "Devoluciones",
+                "noRefunds": "Ninguna"
+            },
+            "capacity": "Aforo a la venta",
+            "legend": {
+                "sold": "Vendidas: {{count}}",
+                "comps": "Invitaciones: {{count}}",
+                "left": "Quedan: {{count}}"
+            },
+            "daily": "Ventas por día",
+            "noSalesYet": "Todavía no hay ventas.",
+            "tickets_one": "{{count}} entrada",
+            "tickets_other": "{{count}} entradas",
+            "latest": "Últimos pedidos",
+            "seeAll": "Ver todos",
+            "comp": "Invitación",
+            "online": "Online",
+            "byType": "Por tipo de entrada",
+            "state": {
+                "onSale": "En venta",
+                "scheduled": "Programada",
+                "soldOut": "Agotada",
+                "paused": "Pausada",
+                "closed": "Venta cerrada"
+            },
+            "compsCount_one": "{{count}} invitación",
+            "compsCount_other": "{{count}} invitaciones",
+            "startsAt": "a la venta el {{date}}",
+            "endsAt": "hasta el {{date}}",
+            "searchOrders": "Buscar por nombre, correo o número",
+            "filters": {
+                "all": "Todos",
+                "paid": "Pagados",
+                "comp": "Invitaciones",
+                "refunded": "Devueltos"
+            },
+            "noMatches": "Nada coincide con la búsqueda.",
+            "usedOf": "{{used}} de {{total}} dentro",
+            "detail": {
+                "order": "Pedido",
+                "email": "Correo",
+                "source": "Origen",
+                "amount": "Importe",
+                "net": "Para el negocio",
+                "refunded": "Devuelto",
+                "note": "Nota"
+            },
+            "resend": "Reenviar entradas",
+            "resent": "Entradas reenviadas a {{email}}",
+            "attendees": {
+                "issued": "Entradas",
+                "inside": "Dentro",
+                "pending": "Por llegar",
+                "search": "Buscar por nombre, correo o código",
+                "status": "Estado",
+                "all": "Todas",
+                "statusValid": "Por llegar",
+                "statusUsed": "Dentro",
+                "statusRefunded": "Devuelta",
+                "type": "Tipo",
+                "allTypes": "Todos los tipos",
+                "empty": "Todavía no hay entradas emitidas.",
+                "inAt": "entró {{time}}",
+                "undo": "Deshacer",
+                "checkIn": "Entrada"
+            },
+            "comps": {
+                "title": "Emitir invitaciones",
+                "help": "Entradas gratis a nombre de alguien: artistas, prensa, amigos de la casa. Cuentan para el aforo, llevan su QR y llegan por correo con el PDF.",
+                "noTypes": "Crea antes un tipo de entrada en «Tipos de entrada».",
+                "full": "Todos los tipos de entrada están agotados.",
+                "type": "Tipo de entrada",
+                "left_one": "queda {{count}}",
+                "left_other": "quedan {{count}}",
+                "quantity": "Cantidad",
+                "less": "Una menos",
+                "more": "Una más",
+                "name": "Nombre y apellidos",
+                "email": "Correo (opcional)",
+                "emailHelp": "Le llegan las entradas. Si tiene cuenta en Fiestea, también las verá en la app.",
+                "note": "Nota interna (opcional)",
+                "notePlaceholder": "DJ invitado, prensa…",
+                "submit_one": "Emitir {{count}} invitación",
+                "submit_other": "Emitir {{count}} invitaciones",
+                "list": "Invitaciones emitidas",
+                "none": "Aún no has emitido ninguna.",
+                "issued_one": "{{count}} invitación emitida",
+                "issued_other": "{{count}} invitaciones emitidas",
+                "emailed": "Enviada a {{email}}.",
+                "noEmailSent": "Sin correo: está en «Asistentes» para la puerta."
+            },
+            "errors": {
+                "name": "Escribe el nombre (mínimo 2 letras).",
+                "email": "El correo no es válido.",
+                "noEmail": "Este pedido no tiene correo al que enviar."
+            }
+        }
     },
     "forecast": {
         "title": "Previsión",

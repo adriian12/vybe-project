@@ -22,6 +22,8 @@ import type { SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.49.4
 export interface TicketPdfData {
   orderId: string;
   eventId: string;
+  /** Invitación del negocio (096): 0 €, sin compra. */
+  isComp: boolean;
   eventName: string;
   /** Cartel público de la fiesta (bucket `event-posters` o enlace externo). */
   posterUrl: string | null;
@@ -391,7 +393,7 @@ export const loadTicketOrder = async (supabase: SupabaseClient, filtro: { orderI
   let q = supabase
     .from('ticket_orders')
     .select(
-      'id, status, quantity, unit_cents, buyer_email, download_token, email_sent_at, profile_id, event_id, venue_id, ' +
+      'id, status, quantity, unit_cents, buyer_email, download_token, email_sent_at, profile_id, event_id, venue_id, source, ' +
         'ticket_types(name, kind, description, guests, min_age, dress_code), ' +
         'events(name, start_date, end_date, city, latitude, longitude, theme, place_name, address, min_age, dress_code, poster_url), ' +
         'venues(name, logo_url, address, city, contact_email, business_terms, is_platform), profiles(name, email)',
@@ -449,6 +451,7 @@ export const loadTicketOrder = async (supabase: SupabaseClient, filtro: { orderI
   const data: TicketPdfData = {
     orderId: order.id,
     eventId: order.event_id as string,
+    isComp: order.source === 'comp',
     eventName: ev.name,
     posterUrl: ev.poster_url,
     startDate: ev.start_date,

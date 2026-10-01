@@ -2214,10 +2214,13 @@
                 "soldOut": "S'han esgotat. Prova amb una altra entrada.",
                 "closed": "La venda és tancada.",
                 "quantity": "Aquesta quantitat no està permesa.",
-                "checkout": "No s'ha pogut obrir el pagament. Torna-ho a provar."
+                "checkout": "No s'ha pogut obrir el pagament. Torna-ho a provar.",
+                "notStarted": "La venda d’aquesta entrada encara no ha començat."
             },
             "free": "Gratis",
-            "getFree": "Comprar entrada"
+            "getFree": "Comprar entrada",
+            "salesFrom": "A la venda el {{date}}",
+            "salesUntil": "Venda fins al {{date}}"
         },
         "mine": {
             "title": "Les teves entrades",
@@ -3040,7 +3043,8 @@
         "noEvents": "No tens festes properes ni dels últims 30 dies.",
         "tabs": {
             "tickets": "Entrades i taules",
-            "promoters": "Comissions RRPP"
+            "promoters": "Comissions RRPP",
+            "manage": "Gestió d’entrades"
         },
         "sold": "Venudes",
         "revenue": "Ingressos",
@@ -3077,7 +3081,10 @@
             "priceHelp": "0 € per a una entrada gratuïta. Si no, des de 0,50 €.",
             "minAge": "Edat mínima",
             "dressCode": "Dress code",
-            "fromEvent": "La de la festa"
+            "fromEvent": "La de la festa",
+            "salesStart": "Venda des de",
+            "salesEnd": "Venda fins a",
+            "salesWindowHelp": "Opcional. Buits: es ven des d’ara fins al final de la festa. Serveix per a early bird o per obrir la taquilla a una hora."
         },
         "saved": "Desat",
         "ended": "La festa ja ha acabat: no es pot vendre més.",
@@ -3101,7 +3108,8 @@
             "ticketRefunded": "Aquesta entrada està reemborsada.",
             "invalidCommission": "Comissió no vàlida (fins a 100 % o 1.000 € per persona).",
             "form": "Revisa el nom, el preu i la quantitat.",
-            "invalidMinAge": "L'edat mínima ha d'estar entre 14 i 99."
+            "invalidMinAge": "L'edat mínima ha d'estar entre 14 i 99.",
+            "salesWindow": "El final de la venda ha de ser posterior a l’inici."
         },
         "promoters": {
             "total": "Comissions de la nit",
@@ -3172,7 +3180,127 @@
         "deleteBodySold_one": "Ja se n’ha venuda {{count}}: continuarà sent vàlida a la porta. L’entrada deixa de vendre’s i surt de la llista.",
         "deleteBodySold_other": "Ja se n’han venut {{count}}: continuaran sent vàlides a la porta. L’entrada deixa de vendre’s i surt de la llista.",
         "deletedType": "Entrada eliminada",
-        "archivedType": "Entrada retirada de la venda"
+        "archivedType": "Entrada retirada de la venda",
+        "manage": {
+            "views": {
+                "overview": "Resum",
+                "types": "Tipus d’entrada",
+                "orders": "Comandes",
+                "attendees": "Assistents",
+                "comps": "Invitacions"
+            },
+            "kpi": {
+                "gross": "Ingressos",
+                "orders_one": "{{count}} comanda",
+                "orders_other": "{{count}} comandes",
+                "net": "Per al negoci",
+                "netHint": "Després de la comissió de Fiestea",
+                "sold": "Entrades",
+                "withComps_one": "Inclou {{count}} invitació",
+                "withComps_other": "Inclou {{count}} invitacions",
+                "noComps": "Sense invitacions",
+                "checkIn": "Han entrat",
+                "validated_one": "{{count}} validada",
+                "validated_other": "{{count}} validades",
+                "avgOrder": "Comanda mitjana",
+                "avgOrderHint": "Sense invitacions",
+                "refunds": "Devolucions",
+                "noRefunds": "Cap"
+            },
+            "capacity": "Aforament a la venda",
+            "legend": {
+                "sold": "Venudes: {{count}}",
+                "comps": "Invitacions: {{count}}",
+                "left": "En queden: {{count}}"
+            },
+            "daily": "Vendes per dia",
+            "noSalesYet": "Encara no hi ha vendes.",
+            "tickets_one": "{{count}} entrada",
+            "tickets_other": "{{count}} entrades",
+            "latest": "Darreres comandes",
+            "seeAll": "Veure-les totes",
+            "comp": "Invitació",
+            "online": "En línia",
+            "byType": "Per tipus d’entrada",
+            "state": {
+                "onSale": "A la venda",
+                "scheduled": "Programada",
+                "soldOut": "Exhaurida",
+                "paused": "Aturada",
+                "closed": "Venda tancada"
+            },
+            "compsCount_one": "{{count}} invitació",
+            "compsCount_other": "{{count}} invitacions",
+            "startsAt": "a la venda el {{date}}",
+            "endsAt": "fins al {{date}}",
+            "searchOrders": "Cerca per nom, correu o número",
+            "filters": {
+                "all": "Totes",
+                "paid": "Pagades",
+                "comp": "Invitacions",
+                "refunded": "Retornades"
+            },
+            "noMatches": "No hi ha cap coincidència.",
+            "usedOf": "{{used}} de {{total}} a dins",
+            "detail": {
+                "order": "Comanda",
+                "email": "Correu",
+                "source": "Origen",
+                "amount": "Import",
+                "net": "Per al negoci",
+                "refunded": "Retornada",
+                "note": "Nota"
+            },
+            "resend": "Tornar a enviar les entrades",
+            "resent": "Entrades reenviades a {{email}}",
+            "attendees": {
+                "issued": "Entrades",
+                "inside": "A dins",
+                "pending": "Per arribar",
+                "search": "Cerca per nom, correu o codi",
+                "status": "Estat",
+                "all": "Totes",
+                "statusValid": "Per arribar",
+                "statusUsed": "A dins",
+                "statusRefunded": "Retornada",
+                "type": "Tipus",
+                "allTypes": "Tots els tipus",
+                "empty": "Encara no s’ha emès cap entrada.",
+                "inAt": "ha entrat {{time}}",
+                "undo": "Desfer",
+                "checkIn": "Entrada"
+            },
+            "comps": {
+                "title": "Emetre invitacions",
+                "help": "Entrades gratuïtes a nom d’algú: artistes, premsa, amics de la casa. Compten per a l’aforament, porten el seu QR i arriben per correu amb el PDF.",
+                "noTypes": "Crea abans un tipus d’entrada a «Tipus d’entrada».",
+                "full": "Tots els tipus d’entrada estan exhaurits.",
+                "type": "Tipus d’entrada",
+                "left_one": "en queda {{count}}",
+                "left_other": "en queden {{count}}",
+                "quantity": "Quantitat",
+                "less": "Una menys",
+                "more": "Una més",
+                "name": "Nom i cognoms",
+                "email": "Correu (opcional)",
+                "emailHelp": "Hi arriben les entrades. Si té compte a Fiestea, també les veurà a l’app.",
+                "note": "Nota interna (opcional)",
+                "notePlaceholder": "DJ convidat, premsa…",
+                "submit_one": "Emetre {{count}} invitació",
+                "submit_other": "Emetre {{count}} invitacions",
+                "list": "Invitacions emeses",
+                "none": "Encara no n’has emès cap.",
+                "issued_one": "{{count}} invitació emesa",
+                "issued_other": "{{count}} invitacions emeses",
+                "emailed": "Enviada a {{email}}.",
+                "noEmailSent": "Sense correu: és a «Assistents» per a la porta."
+            },
+            "errors": {
+                "name": "Escriu el nom (mínim 2 lletres).",
+                "email": "El correu no és vàlid.",
+                "noEmail": "Aquesta comanda no té cap correu on enviar."
+            }
+        }
     },
     "forecast": {
         "title": "Previsió",
