@@ -5,8 +5,15 @@
  * La cuenta sale de `GOOGLE_SERVICE_ACCOUNT_JSON` (el JSON entero de la
  * clave) o, si no está, de la de Firebase que ya usan los avisos
  * (`FCM_CLIENT_EMAIL` y `FCM_PRIVATE_KEY`). Basta con dar permisos a esa
- * cuenta en Play Console o en la consola de Wallet.
+ * cuenta en Play Console.
+ *
+ * Google Wallet usa su propia cuenta (`GOOGLE_WALLET_SERVICE_ACCOUNT_JSON`),
+ * del proyecto de Google Cloud «Fiestea», invitada como Desarrollador en la
+ * consola de Wallet.
  */
+
+/** `wallet`: la cuenta de Google Wallet; `default`: Play y lo demás. */
+export type GoogleAccountKind = 'default' | 'wallet';
 
 interface Cuenta {
   clientEmail: string;
@@ -20,7 +27,20 @@ const limpiarClave = (clave: string) =>
     // Guardada como variable, los saltos de línea llegan escapados (a veces dos veces).
     .replace(/\\+n/g, '\n');
 
-export const googleServiceAccount = (): Cuenta | null => {
+const desdeJson = (nombre: string): Cuenta | null => {
+  const json = Deno.env.get(nombre);
+  if (!json) return null;
+  try {
+    const d = JSON.parse(json) as { client_email?: string; private_key?: string };
+    if (d.client_email && d.private_key) return { clientEmail: d.client_email, privateKey: limpiarClave(d.private_key) };
+  } catch {
+    console.error(`${nombre} no es un JSON válido`);
+  }
+  return null;
+};
+
+export const googleServiceAccount = (kind: GoogleAccountKind = 'default'): Cuenta | null => {
+  if (kind === 'wallet') return desdeJson('GOOGLE_WALLET_SERVICE_ACCOUNT_JSON');
   const json = Deno.env.get('GOOGLE_SERVICE_ACCOUNT_JSON');
   if (json) {
     try {
@@ -52,8 +72,11 @@ const importarClave = (pem: string): Promise<CryptoKey> => {
 };
 
 /** Firma un JWT RS256 con la clave de la cuenta de servicio. */
-export const signGoogleJwt = async (claims: Record<string, unknown>): Promise<string> => {
-  const cuenta = googleServiceAccount();
+export const signGoogleJwt = async (
+  claims: Record<string, unknown>,
+  kind: GoogleAccountKind = 'default',
+): Promise<string> => {
+  const cuenta = googleServiceAccount(kind);
   if (!cuenta) throw new Error('GOOGLE_NOT_CONFIGURED');
   const header = base64url(JSON.stringify({ alg: 'RS256', typ: 'JWT' }));
   const cuerpo = base64url(JSON.stringify(claims));
@@ -68,11 +91,12 @@ export const signGoogleJwt = async (claims: Record<string, unknown>): Promise<st
 const cache = new Map<string, { value: string; expiresAt: number }>();
 
 /** Token OAuth para un ámbito, guardado mientras dure (una hora). */
-export const googleAccessToken = async (scope: string): Promise<string> => {
-  const guardado = cache.get(scope);
+export const googleAccessToken = async (scope: string, kind: GoogleAccountKind = 'default'): Promise<string> => {
+  const clave = `${kind}:${scope}`;
+  const guardado = cache.get(clave);
   if (guardado && guardado.expiresAt > Date.now() + 60_000) return guardado.value;
 
-  const cuenta = googleServiceAccount();
+  const cuenta = googleServiceAccount(kind);
   if (!cuenta) throw new Error('GOOGLE_NOT_CONFIGURED');
   const ahora = Math.floor(Date.now() / 1000);
   const assertion = await signGoogleJwt({
@@ -81,7 +105,7 @@ export const googleAccessToken = async (scope: string): Promise<string> => {
     aud: 'https://oauth2.googleapis.com/token',
     iat: ahora,
     exp: ahora + 3600,
-  });
+  }, kind);
   const r = await fetch('https://oauth2.googleapis.com/token', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -89,6 +113,6 @@ export const googleAccessToken = async (scope: string): Promise<string> => {
   });
   if (!r.ok) throw new Error(`Token de Google: ${r.status} ${await r.text()}`);
   const d = (await r.json()) as { access_token: string; expires_in: number };
-  cache.set(scope, { value: d.access_token, expiresAt: Date.now() + d.expires_in * 1000 });
+  cache.set(clave, { value: d.access_token, expiresAt: Date.now() + d.expires_in * 1000 });
   return d.access_token;
 };

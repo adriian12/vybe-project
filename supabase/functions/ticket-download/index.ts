@@ -4,6 +4,7 @@ import { corsHeaders, json } from '../_shared/cors.ts';
 import { adminClient } from '../_shared/supabase.ts';
 import { loadTicketOrder, renderTicketsPdf } from '../_shared/ticket-pdf.ts';
 import { buildWalletPass, walletConfigured } from '../_shared/wallet-pass.ts';
+import { googleWalletConfigured, googleWalletSaveUrl } from '../_shared/google-wallet.ts';
 
 /**
  * Descargar las entradas de un pedido (migración 077):
@@ -11,6 +12,7 @@ import { buildWalletPass, walletConfigured } from '../_shared/wallet-pass.ts';
  *   GET ?t=<download_token>                    → PDF con todas las entradas
  *   GET ?t=<download_token>&code=E-XXXX        → PDF de esa entrada
  *   GET ?t=<download_token>&code=E-XXXX&format=pkpass → pase de Apple Wallet
+ *   GET ?t=<download_token>&code=E-XXXX&format=gwallet → redirige a «Guardar en Google Wallet»
  *
  * Sin JWT: se abre desde el correo o desde el navegador del móvil. Lo que
  * protege es el token del pedido (144 bits aleatorios).
@@ -34,6 +36,12 @@ serve(async (req: Request): Promise<Response> => {
     if (code && !pedido.data.tickets.some((t) => t.code === code)) return json({ error: 'NOT_FOUND' }, 404);
 
     const nombre = pedido.data.eventName.replace(/[^\w\s-]/g, '').trim().replace(/\s+/g, '-').slice(0, 40) || 'entrada';
+
+    if (format === 'gwallet') {
+      if (!googleWalletConfigured() || !code) return json({ error: 'WALLET_NOT_AVAILABLE' }, 404);
+      const destino = await googleWalletSaveUrl(pedido.data, code);
+      return new Response(null, { status: 302, headers: { ...corsHeaders, Location: destino, 'Cache-Control': 'private, no-store' } });
+    }
 
     if (format === 'pkpass') {
       if (!walletConfigured() || !code) return json({ error: 'WALLET_NOT_AVAILABLE' }, 404);

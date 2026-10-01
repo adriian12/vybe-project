@@ -5,16 +5,22 @@ import { ticketDownloadUrl } from '@/services/tickets';
 import { cn } from '@/lib/utils';
 
 /**
- * Descargar el PDF de las entradas y añadirlas a Apple Wallet.
+ * Descargar el PDF de las entradas y añadirlas a Apple Wallet o a Google
+ * Wallet.
  *
  * Los ficheros los sirve `ticket-download` con el token del pedido, así que se
- * abren fuera de la app: el navegador del sistema descarga el PDF y, en un
- * iPhone, Safari enseña «Añadir a Wallet» al abrir el `.pkpass`.
+ * abren fuera de la app: el navegador del sistema descarga el PDF; en un
+ * iPhone, Safari enseña «Añadir a Wallet» al abrir el `.pkpass`, y en Android
+ * el enlace `gwallet` lleva a «Guardar en Google Wallet».
  */
 
 /** Apple Wallet sólo existe en iPhone, iPad y Mac. */
 export const canUseAppleWallet = (): boolean =>
   isNative() ? platform() === 'ios' : /iPhone|iPad|Macintosh/.test(navigator.userAgent);
+
+/** Google Wallet, en los Android. */
+const canUseGoogleWallet = (): boolean =>
+  isNative() ? platform() === 'android' : /Android/i.test(navigator.userAgent);
 
 const abrir = (url: string) => void openExternal(url, { system: true });
 
@@ -35,6 +41,9 @@ const TicketDownloadButtons = ({ token, code, walletCodes, names, tone = 'dark',
   const { t } = useTranslation();
   const codigos = walletCodes ?? (code ? [code] : []);
   const wallet = canUseAppleWallet() && codigos.length > 0;
+  const googleWallet = !wallet && canUseGoogleWallet() && codigos.length > 0;
+  const etiqueta = (c: string, una: string, varias: string) =>
+    codigos.length > 1 || names?.[c] ? t(varias, { code: names?.[c]?.trim() || c }) : t(una);
 
   return (
     <div className={cn('flex flex-col gap-2', className)}>
@@ -58,9 +67,19 @@ const TicketDownloadButtons = ({ token, code, walletCodes, names, tone = 'dark',
             className="press flex h-11 items-center justify-center gap-2 rounded-xl bg-black px-4 font-bold text-white ring-1 ring-white/15"
           >
             <Wallet size={16} />
-            {codigos.length > 1 || names?.[c]
-              ? t('tickets.download.walletCode', { code: names?.[c]?.trim() || c })
-              : t('tickets.download.wallet')}
+            {etiqueta(c, 'tickets.download.wallet', 'tickets.download.walletCode')}
+          </button>
+        ))}
+      {googleWallet &&
+        codigos.map((c) => (
+          <button
+            key={c}
+            type="button"
+            onClick={() => abrir(ticketDownloadUrl(token, c, 'gwallet'))}
+            className="press flex h-11 items-center justify-center gap-2 rounded-xl bg-black px-4 font-bold text-white ring-1 ring-white/15"
+          >
+            <Wallet size={16} />
+            {etiqueta(c, 'tickets.download.googleWallet', 'tickets.download.googleWalletCode')}
           </button>
         ))}
     </div>

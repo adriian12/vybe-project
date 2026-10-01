@@ -21,7 +21,10 @@ import type { SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.49.4
 
 export interface TicketPdfData {
   orderId: string;
+  eventId: string;
   eventName: string;
+  /** Cartel público de la fiesta (bucket `event-posters` o enlace externo). */
+  posterUrl: string | null;
   startDate: string;
   endDate: string;
   venueName: string;
@@ -390,7 +393,7 @@ export const loadTicketOrder = async (supabase: SupabaseClient, filtro: { orderI
     .select(
       'id, status, quantity, unit_cents, buyer_email, download_token, email_sent_at, profile_id, event_id, venue_id, ' +
         'ticket_types(name, kind, description, guests, min_age, dress_code), ' +
-        'events(name, start_date, end_date, city, latitude, longitude, theme, place_name, address, min_age, dress_code), ' +
+        'events(name, start_date, end_date, city, latitude, longitude, theme, place_name, address, min_age, dress_code, poster_url), ' +
         'venues(name, logo_url, address, city, contact_email, business_terms, is_platform), profiles(name, email)',
     )
     .limit(1);
@@ -424,6 +427,7 @@ export const loadTicketOrder = async (supabase: SupabaseClient, filtro: { orderI
     address: string | null;
     min_age: number | null;
     dress_code: string | null;
+    poster_url: string | null;
   };
   const ve = order.venues as unknown as {
     name: string;
@@ -444,7 +448,9 @@ export const loadTicketOrder = async (supabase: SupabaseClient, filtro: { orderI
 
   const data: TicketPdfData = {
     orderId: order.id,
+    eventId: order.event_id as string,
     eventName: ev.name,
+    posterUrl: ev.poster_url,
     startDate: ev.start_date,
     endDate: ev.end_date,
     venueName: ve.is_platform && ev.place_name ? ev.place_name : ve.name,

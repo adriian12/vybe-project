@@ -261,9 +261,10 @@ export const euros = (cents: number): string =>
 /**
  * Descarga de las entradas de un pedido (Edge Function `ticket-download`, sin
  * sesión: la protege el token). Sin `code`, el PDF con todas; con `pkpass`, el
- * pase de Apple Wallet de esa entrada.
+ * pase de Apple Wallet de esa entrada, y con `gwallet`, «Guardar en Google
+ * Wallet».
  */
-export const ticketDownloadUrl = (token: string, code?: string, format?: 'pkpass'): string => {
+export const ticketDownloadUrl = (token: string, code?: string, format?: 'pkpass' | 'gwallet'): string => {
   const base = `${String(import.meta.env.VITE_SUPABASE_URL ?? '').replace(/\/+$/, '')}/functions/v1/ticket-download`;
   const params = new URLSearchParams({ t: token });
   if (code) params.set('code', code);

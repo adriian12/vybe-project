@@ -2296,7 +2296,9 @@
             "pdfOne": "Download ticket (PDF)",
             "pdfAll": "Download tickets (PDF)",
             "wallet": "Add to Apple Wallet",
-            "walletCode": "Apple Wallet · {{code}}"
+            "walletCode": "Apple Wallet · {{code}}",
+            "googleWallet": "Add to Google Wallet",
+            "googleWalletCode": "Google Wallet · {{code}}"
         }
     },
     "vybes": {

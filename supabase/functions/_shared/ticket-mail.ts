@@ -3,6 +3,7 @@ import { escapeHtml, renderEmail, BRAND } from './email.ts';
 import { isResendConfigured, sendEmail } from './resend.ts';
 import { loadTicketOrder, renderTicketsPdf } from './ticket-pdf.ts';
 import { walletConfigured } from './wallet-pass.ts';
+import { googleWalletConfigured } from './google-wallet.ts';
 
 /**
  * El correo con las entradas de un pedido (migración 077): siempre llega una
@@ -68,6 +69,15 @@ export const sendTicketEmail = async (supabase: SupabaseClient, orderId: string)
         botones.push({
           text: `Apple Wallet · ${nombres[i]}`,
           url: `${base()}?t=${token}&code=${encodeURIComponent(c)}&format=pkpass`,
+          style: 'secondary',
+        } as never);
+      }
+    }
+    if (googleWalletConfigured()) {
+      for (const [i, c] of codigos.slice(0, 10).entries()) {
+        botones.push({
+          text: `Google Wallet · ${nombres[i]}`,
+          url: `${base()}?t=${token}&code=${encodeURIComponent(c)}&format=gwallet`,
           style: 'secondary',
         } as never);
       }
