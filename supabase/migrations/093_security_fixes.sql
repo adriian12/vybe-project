@@ -369,6 +369,22 @@ ALTER TABLE public.push_subscriptions
     ADD COLUMN IF NOT EXISTS native_token TEXT,
     ADD COLUMN IF NOT EXISTS device_model TEXT;
 
+-- Una fila nativa no tiene claves de Web Push, y en la 007 las dos eran NOT
+-- NULL: en producción ya están como nulables (se cambió a mano), así que el
+-- INSERT de abajo funciona allí pero reventaría en una base recreada desde
+-- las migraciones. Se iguala.
+ALTER TABLE public.push_subscriptions
+    ALTER COLUMN p256dh DROP NOT NULL,
+    ALTER COLUMN auth   DROP NOT NULL;
+
+-- `platform` es NOT NULL en producción, y hace falta que lo sea: `send-push`
+-- manda por Firebase todo lo que no sea 'web', así que una fila web con el
+-- valor a NULL se trataría como un móvil y se quedaría sin recibir nada. El
+-- alta web (`push.ts`) no escribe la columna, de ahí el valor por defecto.
+UPDATE public.push_subscriptions SET platform = 'web' WHERE platform IS NULL;
+ALTER TABLE public.push_subscriptions ALTER COLUMN platform SET DEFAULT 'web';
+ALTER TABLE public.push_subscriptions ALTER COLUMN platform SET NOT NULL;
+
 CREATE INDEX IF NOT EXISTS idx_push_native_token
     ON public.push_subscriptions(native_token)
     WHERE native_token IS NOT NULL;
