@@ -24,9 +24,13 @@ ON CONFLICT (id) DO UPDATE
         file_size_limit = EXCLUDED.file_size_limit,
         allowed_mime_types = EXCLUDED.allowed_mime_types;
 
+-- PRIVADO (migración 094): en un bucket público Supabase sirve por
+-- /object/public/… sin consultar RLS siquiera, así que la foto de esta noche
+-- se descargaba sin sesión con sólo conocer la ruta. El cliente la firma al
+-- pintarla. Si esto vuelve a TRUE, se deshace ese arreglo entero.
 INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 VALUES (
-    'event-photos', 'event-photos', TRUE, 5242880,
+    'event-photos', 'event-photos', FALSE, 5242880,
     ARRAY['image/jpeg', 'image/png', 'image/webp']
 )
 ON CONFLICT (id) DO UPDATE
@@ -84,12 +88,31 @@ CREATE POLICY "Users can delete own avatar"
 -- ============================================================================
 
 DROP POLICY IF EXISTS "Event photos are publicly readable" ON storage.objects;
+DROP POLICY IF EXISTS "Event photos are readable by peers" ON storage.objects;
 DROP POLICY IF EXISTS "Users can upload own event photos" ON storage.objects;
 DROP POLICY IF EXISTS "Users can delete own event photos" ON storage.objects;
 
-CREATE POLICY "Event photos are publicly readable"
-    ON storage.objects FOR SELECT
-    USING (bucket_id = 'event-photos');
+-- Igual que en la migración 094: su dueño, quien comparte fiesta con él ahora
+-- mismo, sus matches y administración. La primera carpeta de la ruta es el uid
+-- de auth, que es lo que exige la policy de subida de aquí abajo.
+CREATE POLICY "Event photos are readable by peers"
+    ON storage.objects FOR SELECT TO authenticated
+    USING (
+        bucket_id = 'event-photos'
+        AND (
+            (storage.foldername(name))[1] = auth.uid()::text
+            OR public.is_admin()
+            OR EXISTS (
+                SELECT 1
+                FROM public.profiles p
+                WHERE p.user_id::text = (storage.foldername(name))[1]
+                  AND (
+                      public.are_connected(public.current_profile_id(), p.id)
+                      OR public.shares_active_event(public.current_profile_id(), p.id)
+                  )
+            )
+        )
+    );
 
 CREATE POLICY "Users can upload own event photos"
     ON storage.objects FOR INSERT TO authenticated
