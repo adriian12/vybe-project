@@ -53,19 +53,30 @@ serve(async (req: Request): Promise<Response> => {
     const isOwner = venue?.venue_id === user.id || membership?.role === 'owner';
     if (!isOwner) return json({ error: 'NOT_AUTHORIZED' }, 403);
 
-    // Buscamos la cuenta por email. listUsers pagina; con el filtro basta una.
+    // Buscamos la cuenta por correo. `listUsers` NO admite filtro, sólo
+    // pagina: pedir una sola página de 200 hacía que, pasadas las 200 cuentas
+    // del proyecto, añadir a alguien del equipo devolviera USER_NOT_FOUND para
+    // siempre, sin forma de distinguirlo de una cuenta que no existe.
     const normalised = email.trim().toLowerCase();
-    const { data: list, error: listError } = await supabase.auth.admin.listUsers({
-      page: 1,
-      perPage: 200,
-    });
+    const POR_PAGINA = 1000;
+    const MAX_PAGINAS = 50;
 
-    if (listError) {
-      console.error('Error listing users:', listError);
-      return json({ error: 'LOOKUP_FAILED' }, 500);
+    let target: { id: string; email?: string } | undefined;
+    for (let page = 1; page <= MAX_PAGINAS; page += 1) {
+      const { data: list, error: listError } = await supabase.auth.admin.listUsers({
+        page,
+        perPage: POR_PAGINA,
+      });
+
+      if (listError) {
+        console.error('Error listing users:', listError);
+        return json({ error: 'LOOKUP_FAILED' }, 500);
+      }
+
+      target = list.users.find((u) => u.email?.toLowerCase() === normalised);
+      if (target || list.users.length < POR_PAGINA) break;
     }
 
-    const target = list.users.find((u) => u.email?.toLowerCase() === normalised);
     if (!target) return json({ error: 'USER_NOT_FOUND' }, 404);
 
     const { error } = await supabase.from('venue_members').upsert(

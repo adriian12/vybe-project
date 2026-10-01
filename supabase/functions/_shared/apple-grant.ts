@@ -1,5 +1,6 @@
 import type { SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.49.4';
 import { APPLE_BUNDLE_IDS, AppleTransaction, productKind } from './apple-jws.ts';
+import { eventPurchaseAllowed } from './iap-precheck.ts';
 
 /**
  * Activa lo comprado en una transacción de Apple ya verificada, con las mismas
@@ -19,12 +20,23 @@ export type GrantResult =
 
 const iso = (ms?: number) => (ms ? new Date(ms).toISOString() : null);
 
+/**
+ * Apple firma las compras de Sandbox y TestFlight con la misma cadena que las
+ * de producción y con el mismo identificador de paquete, así que sin esta
+ * comprobación una compra gratuita de prueba activa Premium de verdad. Las
+ * renovaciones de sandbox duran minutos: se podría acuñar sin fin.
+ */
+const ALLOW_SANDBOX = (Deno.env.get('APPLE_ALLOW_SANDBOX') ?? '').toLowerCase() === 'true';
+
 export const grantAppleTransaction = async (
   supabase: SupabaseClient,
   tx: AppleTransaction,
   opts: { profileId: string | null; eventId?: string | null },
 ): Promise<GrantResult> => {
   if (!APPLE_BUNDLE_IDS.includes(tx.bundleId)) return { ok: false, error: 'WRONG_APP' };
+  if (!ALLOW_SANDBOX && tx.environment && tx.environment !== 'Production') {
+    return { ok: false, error: 'SANDBOX_TRANSACTION' };
+  }
   const kind = productKind(tx.bundleId, tx.productId);
   if (!kind) return { ok: false, error: 'UNKNOWN_PRODUCT' };
 
@@ -43,13 +55,22 @@ export const grantAppleTransaction = async (
     .select('transaction_id, event_id')
     .eq('transaction_id', tx.transactionId)
     .maybeSingle();
-  if (kind === 'event' && !eventId) {
-    eventId = previa?.event_id ?? null;
-    if (!eventId) {
-      const { data: activo } = await supabase.rpc('active_event_of', { p_profile_id: profileId });
-      eventId = (activo as string | null) ?? null;
+  if (kind === 'event') {
+    if (eventId && eventId !== previa?.event_id) {
+      // La manda la app, así que se vuelve a comprobar aquí: `verify` no
+      // repetía el `precheck` y valía cualquier fiesta.
+      if (!(await eventPurchaseAllowed(supabase, profileId, eventId))) {
+        return { ok: false, error: 'NOT_AT_EVENT' };
+      }
     }
-    if (!eventId) return { ok: false, error: 'EVENT_REQUIRED' };
+    if (!eventId) {
+      eventId = previa?.event_id ?? null;
+      if (!eventId) {
+        const { data: activo } = await supabase.rpc('active_event_of', { p_profile_id: profileId });
+        eventId = (activo as string | null) ?? null;
+      }
+      if (!eventId) return { ok: false, error: 'EVENT_REQUIRED' };
+    }
   }
 
   if (!previa) {

@@ -23,5 +23,21 @@ export const stripeVar = (name: string): string | undefined =>
 
 export const stripeSecretKey = () => stripeVar('STRIPE_SECRET_KEY');
 
-export const stripeWebhookSecrets = (): string[] =>
-  [stripeVar('STRIPE_WEBHOOK_SECRET'), stripeVar('STRIPE_CONNECT_WEBHOOK_SECRET')].filter((s): s is string => Boolean(s));
+export type StripeWebhookOrigin = 'platform' | 'connect';
+
+export interface StripeWebhookSecret {
+  origin: StripeWebhookOrigin;
+  secret: string;
+}
+
+/**
+ * Los secretos con su procedencia. Hay que saber cuál firmó: los eventos de la
+ * plataforma y los de Connect NO son intercambiables, y aceptar cualquiera de
+ * los dos para cualquier evento dejaba que un negocio con acceso a su propia
+ * cuenta de Stripe provocara concesiones de la plataforma.
+ */
+export const stripeWebhookSecretList = (): StripeWebhookSecret[] =>
+  [
+    { origin: 'platform' as const, secret: stripeVar('STRIPE_WEBHOOK_SECRET') },
+    { origin: 'connect' as const, secret: stripeVar('STRIPE_CONNECT_WEBHOOK_SECRET') },
+  ].filter((s): s is StripeWebhookSecret => Boolean(s.secret));

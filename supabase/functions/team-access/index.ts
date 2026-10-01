@@ -1,6 +1,7 @@
 import { serve } from 'https://deno.land/std@0.193.0/http/server.ts';
 import { json, preflight } from '../_shared/cors.ts';
 import { adminClient } from '../_shared/supabase.ts';
+import { signEventPhotosDeep } from '../_shared/photo-urls.ts';
 
 /**
  * Enlaces del equipo, sin cuenta (migración 072): Seguridad y Camareros para
@@ -108,7 +109,8 @@ serve(async (req: Request): Promise<Response> => {
   const tokenHash = await sha256(token);
   if (tooMany(tokenHash)) return json({ error: 'TOO_MANY_REQUESTS' }, 429);
 
-  const { data, error } = await adminClient().rpc('team_link_action', {
+  const admin = adminClient();
+  const { data, error } = await admin.rpc('team_link_action', {
     p_token_hash: tokenHash,
     p_action: action,
     p_args: args,
@@ -124,5 +126,7 @@ serve(async (req: Request): Promise<Response> => {
     return json({ error: 'INTERNAL' }, 500);
   }
 
-  return json({ data });
+  // Quien abre un enlace del equipo no tiene sesión y no puede firmar las fotos
+  // de la noche (bucket privado, migración 094): van firmadas desde aquí.
+  return json({ data: await signEventPhotosDeep(admin, data) });
 });

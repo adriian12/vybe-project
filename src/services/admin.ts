@@ -1,5 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import { ApiError } from '@/services/api';
+import { safeHttpUrl } from '@/lib/safe-url';
 
 /**
  * Lo que puede hacer administración sobre las cuentas.
@@ -224,7 +225,7 @@ export const adminService = {
       p_place_name: event.placeName ?? null,
       p_address: event.address ?? null,
       p_dress_code: event.dressCode ?? null,
-      p_booking_url: event.bookingUrl ?? null,
+      p_booking_url: safeHttpUrl(event.bookingUrl) ?? null,
       p_poster_url: event.posterUrl ?? null,
     } as never);
     if (error) fallo(error.message);

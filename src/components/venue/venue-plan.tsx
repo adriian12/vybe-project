@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { useToast } from '@/components/ui/use-toast';
 import { venueService, VenuePlanStatus } from '@/services/venue-service';
 import { ApiError } from '@/services/api';
+import { isNative, openExternal } from '@/services/native';
 import { BOOST_PRICE, PLAN_FEATURES, PLAN_PRICES, PLANS, TRIAL_DAYS } from '@/lib/venue-plans';
 
 interface VenuePlanProps {
@@ -73,7 +74,15 @@ const VenuePlan = ({ plan, onUpgrade }: VenuePlanProps) => {
         return;
       }
 
-      window.location.href = url;
+      // En la app instalada tiene que ser el navegador del sistema: iOS va con
+      // `limitsNavigationsToAppBoundDomains` y sin `WKAppBoundDomains` en el
+      // Info.plist, así que la webview se niega a ir a checkout.stripe.com y la
+      // compra se queda a medias.
+      if (isNative()) {
+        await openExternal(url, { system: true });
+      } else {
+        window.location.href = url;
+      }
     } catch (error) {
       toast({
         title: t('common.error'),

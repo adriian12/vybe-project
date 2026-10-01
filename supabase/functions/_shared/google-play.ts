@@ -1,5 +1,6 @@
 import type { SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.49.4';
 import { googleAccessToken } from './google-auth.ts';
+import { eventPurchaseAllowed } from './iap-precheck.ts';
 
 /**
  * Compras de Google Play (migración 090): comprobar una compra con la Google
@@ -22,6 +23,9 @@ const API = `https://androidpublisher.googleapis.com/androidpublisher/v3/applica
 const SCOPE = 'https://www.googleapis.com/auth/androidpublisher';
 
 export type GoogleKind = 'monthly' | 'event' | 'supercrush';
+
+/** Igual que en Apple: las compras de prueba no activan Premium de verdad. */
+const ALLOW_TEST = (Deno.env.get('GOOGLE_ALLOW_TEST') ?? '').toLowerCase() === 'true';
 
 export const googleProductKind = (productId: string): GoogleKind | null => {
   if (productId === `${GOOGLE_PACKAGE}.premium.monthly`) return 'monthly';
@@ -149,6 +153,7 @@ export const grantGooglePurchase = async (
     return { ok: false, error: 'WRONG_ACCOUNT' };
   }
   if (!compra.valid) return { ok: false, error: compra.kind === 'monthly' ? 'EXPIRED' : 'NOT_PURCHASED' };
+  if (!ALLOW_TEST && compra.test) return { ok: false, error: 'TEST_PURCHASE' };
 
   const { data: previa } = await supabase
     .from('google_purchases')
@@ -158,13 +163,20 @@ export const grantGooglePurchase = async (
   if (previa?.voided_at) return { ok: false, error: 'REVOKED' };
 
   let eventId = opts.eventId ?? null;
-  if (compra.kind === 'event' && !eventId) {
-    eventId = previa?.event_id ?? null;
-    if (!eventId) {
-      const { data: activo } = await supabase.rpc('active_event_of', { p_profile_id: profileId });
-      eventId = (activo as string | null) ?? null;
+  if (compra.kind === 'event') {
+    if (eventId && eventId !== previa?.event_id) {
+      if (!(await eventPurchaseAllowed(supabase, profileId, eventId))) {
+        return { ok: false, error: 'NOT_AT_EVENT' };
+      }
     }
-    if (!eventId) return { ok: false, error: 'EVENT_REQUIRED' };
+    if (!eventId) {
+      eventId = previa?.event_id ?? null;
+      if (!eventId) {
+        const { data: activo } = await supabase.rpc('active_event_of', { p_profile_id: profileId });
+        eventId = (activo as string | null) ?? null;
+      }
+      if (!eventId) return { ok: false, error: 'EVENT_REQUIRED' };
+    }
   }
 
   if (!previa) {

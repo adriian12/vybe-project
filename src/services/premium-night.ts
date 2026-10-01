@@ -1,5 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import { ApiError } from '@/services/api';
+import { signPhotosOf } from '@/services/storage-urls';
 
 /**
  * Lo que Premium añade a una noche concreta.
@@ -81,11 +82,13 @@ export const premiumNight = {
 
     if (error) fail(error, 'ATTENDEES_FAILED', 'errors.generic');
 
-    return (data ?? []).map((row) => ({
-      id: row.id,
-      name: row.name,
-      avatar: row.avatar ?? undefined,
-    }));
+    return signPhotosOf(
+      (data ?? []).map((row) => ({
+        id: row.id,
+        name: row.name,
+        avatar: row.avatar ?? undefined,
+      })),
+    );
   },
 
   /** A quién descartaste en este evento. */
@@ -96,14 +99,16 @@ export const premiumNight = {
 
     if (error) fail(error, 'PASSED_FAILED', 'errors.generic');
 
-    return (data ?? []).map((row) => ({
-      id: row.id,
-      name: row.name,
-      age: row.age,
-      avatar: row.avatar ?? undefined,
-      photos: row.photos ?? [],
-      passedAt: row.passed_at,
-    }));
+    return signPhotosOf(
+      (data ?? []).map((row) => ({
+        id: row.id,
+        name: row.name,
+        age: row.age,
+        avatar: row.avatar ?? undefined,
+        photos: row.photos ?? [],
+        passedAt: row.passed_at,
+      })),
+    );
   },
 
   /** Devuelve a alguien al tablón. */

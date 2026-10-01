@@ -21,6 +21,7 @@ import type { VenueRole } from '@/services/venue-service';
 import { siteMode } from '@/lib/hosts';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { clearSignedPhotoCache } from '@/services/storage-urls';
 
 export type UserType = 'user' | 'venue' | 'admin';
 
@@ -706,6 +707,9 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     // token y quien entrase después en este móvil recibiría estos avisos.
     await unregisterNativePush();
     await supabase.auth.signOut();
+    // Las firmas de las fotos son de la sesión anterior: no valen y no deben
+    // quedarse en memoria para quien entre después en este mismo navegador.
+    clearSignedPhotoCache();
     localStorage.removeItem(ACTIVE_EVENT_KEY);
     setUserType(null);
     setCurrentUser(null);

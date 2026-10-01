@@ -1,5 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import { ApiError } from '@/services/api';
+import { signedPhotoMap } from '@/services/storage-urls';
 
 /** Mapea los errores de las funciones de local a claves de traducción. */
 const VENUE_ERROR_KEYS: Record<string, string> = {
@@ -791,11 +792,13 @@ export const venueService = {
     const { data, error } = await supabase.rpc('get_venue_sos_alerts');
     if (error || !data) return [];
 
+    // Fotos de la noche firmadas (bucket privado, 094 y 095).
+    const firmadas = await signedPhotoMap(data.map((row) => row.profile_photo));
     return data.map((row) => ({
       id: row.id,
       eventId: row.event_id,
       profileName: row.profile_name,
-      profilePhoto: row.profile_photo,
+      profilePhoto: row.profile_photo ? (firmadas.get(row.profile_photo) ?? row.profile_photo) : row.profile_photo,
       eventName: row.event_name,
       note: row.note,
       latitude: row.latitude,
@@ -820,11 +823,12 @@ export const venueService = {
     const { data, error } = await supabase.rpc('get_venue_reports', { p_event_id: eventId });
     if (error || !data) return [];
 
+    const firmadas = await signedPhotoMap(data.map((row) => row.reported_photo));
     return data.map((row) => ({
       reportId: row.report_id,
       reportedProfileId: row.reported_profile_id,
       reportedName: row.reported_name,
-      reportedPhoto: row.reported_photo,
+      reportedPhoto: row.reported_photo ? (firmadas.get(row.reported_photo) ?? row.reported_photo) : row.reported_photo,
       reportType: row.report_type,
       description: row.description,
       createdAt: row.created_at,

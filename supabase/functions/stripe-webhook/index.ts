@@ -1,7 +1,7 @@
 import { serve } from 'https://deno.land/std@0.193.0/http/server.ts';
 import { adminClient } from '../_shared/supabase.ts';
 import { sendTicketEmail } from '../_shared/ticket-mail.ts';
-import { stripeWebhookSecrets } from '../_shared/stripe-env.ts';
+import { StripeWebhookOrigin, stripeWebhookSecretList } from '../_shared/stripe-env.ts';
 
 /**
  * Webhook de Stripe: activa, renueva y cancela las suscripciones.
@@ -17,6 +17,8 @@ import { stripeWebhookSecrets } from '../_shared/stripe-env.ts';
 
 interface StripeEvent {
   type: string;
+  /** Sólo en los eventos de Connect: la cuenta del negocio donde ocurrieron. */
+  account?: string;
   data: { object: Record<string, unknown> };
 }
 
@@ -33,16 +35,20 @@ const verifySignature = async (
   header: string,
   secret: string,
 ): Promise<boolean> => {
-  const parts = Object.fromEntries(
-    header.split(',').map((part) => {
-      const [key, value] = part.split('=');
-      return [key.trim(), value];
-    }),
-  );
-
-  const timestamp = parts.t;
-  const signature = parts.v1;
-  if (!timestamp || !signature) return false;
+  // Al rotar el secreto Stripe manda VARIAS `v1` en la misma cabecera y vale
+  // cualquiera de ellas. Quedarse sólo con la última (lo que hacía
+  // `Object.fromEntries`) rompía el cambio de secreto.
+  let timestamp: string | undefined;
+  const firmas: string[] = [];
+  for (const part of header.split(',')) {
+    const corte = part.indexOf('=');
+    if (corte < 0) continue;
+    const key = part.slice(0, corte).trim();
+    const value = part.slice(corte + 1).trim();
+    if (key === 't') timestamp = value;
+    else if (key === 'v1') firmas.push(value);
+  }
+  if (!timestamp || firmas.length === 0) return false;
 
   // Rechazamos eventos de más de cinco minutos para evitar repeticiones.
   const age = Math.abs(Date.now() / 1000 - Number(timestamp));
@@ -61,12 +67,13 @@ const verifySignature = async (
   );
 
   // Comparación en tiempo constante.
-  if (expected.length !== signature.length) return false;
-  let diff = 0;
-  for (let i = 0; i < expected.length; i += 1) {
-    diff |= expected.charCodeAt(i) ^ signature.charCodeAt(i);
-  }
-  return diff === 0;
+  const iguales = (a: string, b: string): boolean => {
+    if (a.length !== b.length) return false;
+    let diff = 0;
+    for (let i = 0; i < a.length; i += 1) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+    return diff === 0;
+  };
+  return firmas.some((firma) => iguales(expected, firma));
 };
 
 /**
@@ -103,7 +110,7 @@ serve(async (req: Request): Promise<Response> => {
 
   // Dos webhooks llegan aquí: el de la plataforma y el de Connect (los cargos
   // directos ocurren en la cuenta del negocio). Cada uno firma con su secreto.
-  const secrets = stripeWebhookSecrets();
+  const secrets = stripeWebhookSecretList();
   if (secrets.length === 0) return new Response('Webhook no configurado', { status: 500 });
 
   const signature = req.headers.get('Stripe-Signature');
@@ -111,20 +118,40 @@ serve(async (req: Request): Promise<Response> => {
 
   const payload = await req.text();
 
-  let firmaOk = false;
-  for (const secret of secrets) {
+  let origen: StripeWebhookOrigin | null = null;
+  for (const { origin, secret } of secrets) {
     if (await verifySignature(payload, signature, secret)) {
-      firmaOk = true;
+      origen = origin;
       break;
     }
   }
-  if (!firmaOk) return new Response('Firma no válida', { status: 400 });
+  if (!origen) return new Response('Firma no válida', { status: 400 });
 
   const supabase = adminClient();
 
   try {
     const event = JSON.parse(payload) as StripeEvent;
     const object = event.data.object;
+    const cuentaConectada = typeof event.account === 'string' ? event.account : null;
+
+    /**
+     * Lo que concede la plataforma (Premium, supercrush, destacados y planes)
+     * exige las dos cosas: que firme el secreto de la plataforma y que el
+     * evento no haya ocurrido en la cuenta de un negocio. Antes valía
+     * cualquiera de los dos secretos para cualquier evento y `account` no se
+     * miraba nunca, así que un negocio con acceso a su propia cuenta de Stripe
+     * creaba una sesión de 0 € con los metadatos que quisiera y se regalaba
+     * supercrush, Premium, destacados o el plan «business».
+     *
+     * No se rechaza la petición: los eventos que de verdad son de un negocio
+     * (`account.updated`, devoluciones) se siguen procesando igual, vengan por
+     * el endpoint que vengan.
+     */
+    const soloPlataforma = (que: string): boolean => {
+      if (origen === 'platform' && !cuentaConectada) return true;
+      console.error(`stripe-webhook: ${que} ignorado, no viene de la plataforma`);
+      return false;
+    };
 
     switch (event.type) {
       case 'checkout.session.completed': {
@@ -138,6 +165,21 @@ serve(async (req: Request): Promise<Response> => {
 
         // Entradas y mesas: se emiten una sola vez por pedido.
         if (metadata.kind === 'tickets' && metadata.order_id) {
+          // Los cargos de entradas son directos en la cuenta del negocio, así
+          // que el aviso llega por Connect y tiene que venir de la cuenta que
+          // vende ESE pedido: si no, cualquier negocio emitiría entradas sin
+          // pagar de los pedidos de otro.
+          const { data: duenyo } = await supabase
+            .from('ticket_orders')
+            .select('stripe_account_id')
+            .eq('id', metadata.order_id)
+            .maybeSingle();
+          const vendedor = (duenyo?.stripe_account_id as string | null) ?? null;
+          if (vendedor !== cuentaConectada) {
+            console.error('stripe-webhook: la cuenta del evento no vende ese pedido');
+            break;
+          }
+
           const { error } = await supabase.rpc('fulfill_ticket_order', {
             p_order_id: metadata.order_id,
             p_session_id: object.id as string,
@@ -161,6 +203,7 @@ serve(async (req: Request): Promise<Response> => {
 
         // Supercrush comprados: se suman al saldo una sola vez por sesión.
         if (metadata.kind === 'supercrush' && profileId) {
+          if (!soloPlataforma('supercrush')) break;
           const { error } = await supabase.rpc('credit_supercrush_purchase', {
             p_profile_id: profileId,
             p_quantity: Number(metadata.quantity ?? 0),
@@ -174,6 +217,7 @@ serve(async (req: Request): Promise<Response> => {
         // Destacar un evento: queda destacado hasta que termina. El pago se
         // guarda una vez por sesión (Stripe puede repetir el aviso).
         if (metadata.kind === 'event_boost' && metadata.event_id && metadata.venue_id) {
+          if (!soloPlataforma('event_boost')) break;
           const { data: evento } = await supabase
             .from('events')
             .select('end_date')
@@ -198,6 +242,7 @@ serve(async (req: Request): Promise<Response> => {
         // El plan de un local va a su propia tabla: no es Premium de nadie, es
         // una suscripción de empresa y la paga el local.
         if (metadata.venue_id) {
+          if (!soloPlataforma('plan de negocio')) break;
           const expira = new Date();
           expira.setMonth(expira.getMonth() + 1);
 
@@ -220,6 +265,7 @@ serve(async (req: Request): Promise<Response> => {
         }
 
         if (!profileId) break;
+        if (!soloPlataforma('Premium')) break;
 
         // Premium de un evento: vale hasta una hora después de que acabe, lo
         // mismo que duran sus matches. Sin evento válido no se activa nada.
@@ -296,6 +342,7 @@ serve(async (req: Request): Promise<Response> => {
       }
 
       case 'invoice.paid': {
+        if (!soloPlataforma('invoice.paid')) break;
         // Renovación: empujamos la fecha de caducidad un mes más.
         //
         // La suscripción puede ser de un usuario o de un local, y desde aquí no
@@ -324,13 +371,21 @@ serve(async (req: Request): Promise<Response> => {
         break;
       }
 
-      case 'customer.subscription.deleted':
       case 'invoice.payment_failed': {
-        // En `customer.subscription.deleted` el objeto es la suscripción; en
-        // `invoice.payment_failed`, la factura (su id es el de la factura, no
-        // el de la suscripción).
-        const subscriptionId =
-          event.type === 'customer.subscription.deleted' ? (object.id as string | null) : invoiceSubscription(object);
+        // Stripe deja la suscripción en `past_due` y sigue reintentando
+        // durante días. Cancelar al primer fallo quitaba Premium (y al local
+        // su plan, con la venta de entradas incluida) a quien todavía estaba a
+        // tiempo de pagar, y `cancel_at_period_end` ya no se volvía a poner a
+        // false cuando el reintento prosperaba. Lo que caduca de verdad lo
+        // marca `expires_at`, que `invoice.paid` ya empuja. Sólo revoca
+        // `customer.subscription.deleted`.
+        console.log('stripe-webhook: cobro fallido, Stripe sigue reintentando');
+        break;
+      }
+
+      case 'customer.subscription.deleted': {
+        if (!soloPlataforma('customer.subscription.deleted')) break;
+        const subscriptionId = object.id as string | null;
         if (!subscriptionId) break;
 
         await Promise.all([

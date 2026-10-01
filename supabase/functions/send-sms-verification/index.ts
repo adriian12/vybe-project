@@ -23,6 +23,23 @@ import { sendSms, TwilioNotConfiguredError, TwilioSendError } from '../_shared/t
 const CODE_TTL_MINUTES = 10;
 const MAX_CODES_PER_HOUR = 5;
 
+/**
+ * Código de seis cifras con el generador criptográfico. `Math.random()` es
+ * xorshift128+: con unas pocas salidas se reconstruye el estado del isolate y
+ * se predicen los códigos siguientes, incluidos los de otras personas.
+ * Se descarta el último tramo incompleto para que el módulo no sesgue.
+ */
+const sixDigitCode = (): string => {
+  const buf = new Uint32Array(1);
+  const limite = Math.floor(0x1_0000_0000 / 900000) * 900000;
+  let v = 0;
+  do {
+    crypto.getRandomValues(buf);
+    v = buf[0];
+  } while (v >= limite);
+  return String(100000 + (v % 900000));
+};
+
 serve(async (req: Request): Promise<Response> => {
   const early = preflight(req);
   if (early) return early;
@@ -53,7 +70,7 @@ serve(async (req: Request): Promise<Response> => {
     }
 
     // El código lo decide el servidor: nunca se acepta el del cliente.
-    const code = String(Math.floor(100000 + Math.random() * 900000));
+    const code = sixDigitCode();
     const expiresAt = new Date(Date.now() + CODE_TTL_MINUTES * 60 * 1000).toISOString();
 
     const { error: insertError } = await supabase.from('verification_codes').insert({

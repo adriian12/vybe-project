@@ -102,14 +102,13 @@ serve(async (req: Request): Promise<Response> => {
     if (!user) return json({ error: 'No autenticado' }, 401);
     if (await overLimit(supabase, req, 'moderate-photo', 15, { userId: user.id })) return tooManyRequests();
 
-    const body = (await req.json()) as { itemId?: string; url?: string };
-    const url = body.url;
-    if (!body.itemId || !url) return json({ error: 'Faltan parámetros' }, 400);
+    const body = (await req.json()) as { itemId?: string };
+    if (!body.itemId) return json({ error: 'Faltan parámetros' }, 400);
 
     // El elemento debe pertenecer a quien llama.
     const { data: item } = await supabase
       .from('moderation_queue')
-      .select('id, profile_id, kind, event_id, profiles!inner(user_id)')
+      .select('id, profile_id, kind, event_id, url, bucket, path, profiles!inner(user_id)')
       .eq('id', body.itemId)
       .maybeSingle();
 
@@ -117,7 +116,24 @@ serve(async (req: Request): Promise<Response> => {
     if (!item || owner !== user.id) return json({ error: 'No autorizado' }, 403);
     itemId = body.itemId;
 
-    const analysis = await scorePhoto(url);
+    // La URL sale de la fila de la cola (`url` es NOT NULL), nunca del cuerpo:
+    // aceptando la del cliente se analiza una imagen y se publica otra, y
+    // después basta con cambiar lo que sirve esa dirección.
+    const url = (item as { url: string }).url;
+
+    // `event-photos` es privado (migración 094) y Sightengine se descarga la
+    // imagen por HTTP: hay que firmarla. Lo que se guarda después sigue
+    // siendo `url`, la forma pública canónica.
+    const fila = item as { bucket: string | null; path: string | null };
+    let urlAnalisis = url;
+    if (fila.bucket && fila.path) {
+      const { data: firmada } = await supabase.storage
+        .from(fila.bucket)
+        .createSignedUrl(fila.path, 600);
+      if (firmada?.signedUrl) urlAnalisis = firmada.signedUrl;
+    }
+
+    const analysis = await scorePhoto(urlAnalisis);
     if (!analysis) return await unavailable();
 
     const threshold = Number(Deno.env.get('MODERATION_THRESHOLD') ?? DEFAULT_THRESHOLD);

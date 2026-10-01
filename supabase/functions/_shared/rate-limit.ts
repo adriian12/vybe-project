@@ -12,8 +12,19 @@ import { json } from './cors.ts';
  * pasa.
  */
 
-export const clientIp = (req: Request): string | null =>
-  req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || req.headers.get('cf-connecting-ip') || null;
+export const clientIp = (req: Request): string | null => {
+  // `cf-connecting-ip` la pone el borde y el cliente no la puede fijar.
+  const cf = req.headers.get('cf-connecting-ip')?.trim();
+  if (cf) return cf;
+  // En `x-forwarded-for` cada proxy AÑADE al final, así que la última entrada
+  // es la que escribió el proxy de confianza; la primera la manda el cliente y
+  // se falsifica rotándola para estrenar cubo en cada petición.
+  const partes = (req.headers.get('x-forwarded-for') ?? '')
+    .split(',')
+    .map((p) => p.trim())
+    .filter(Boolean);
+  return partes.length ? partes[partes.length - 1] : null;
+};
 
 /**
  * `true` si quien llama se ha pasado del límite.

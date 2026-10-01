@@ -2,6 +2,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { ApiError } from '@/services/api';
 import { User } from '@/types/user';
 import { isVibeLevel, VibeLevel } from '@/lib/vibe';
+import { signedPhotoMap, signPhotosOf } from '@/services/storage-urls';
 
 export interface Interest {
   id: string;
@@ -261,18 +262,20 @@ export const socialService = {
       return [];
     }
 
-    return (data ?? []).map((p) => ({
-      id: p.id,
-      name: p.name,
-      age: p.age,
-      bio: p.bio || '',
-      photos: p.photos || [],
-      avatar: p.avatar || undefined,
-      isVerified: p.is_verified,
-      distance: Math.round(p.distance_meters),
-      interests: p.interests || [],
-      sharedInterests: p.shared_interests,
-    }));
+    return signPhotosOf(
+      (data ?? []).map((p) => ({
+        id: p.id,
+        name: p.name,
+        age: p.age,
+        bio: p.bio || '',
+        photos: p.photos || [],
+        avatar: p.avatar || undefined,
+        isVerified: p.is_verified,
+        distance: Math.round(p.distance_meters),
+        interests: p.interests || [],
+        sharedInterests: p.shared_interests,
+      })),
+    );
   },
 
   // ==========================================================================
@@ -305,17 +308,19 @@ export const socialService = {
       return [];
     }
 
-    return (data ?? []).map((row) => ({
-      id: row.id,
-      name: row.name,
-      age: row.age,
-      bio: row.bio || '',
-      photos: row.photos || [],
-      avatar: row.avatar || undefined,
-      swipeType: row.swipe_type as 'like' | 'super_like',
-      eventName: row.event_name || undefined,
-      likedAt: row.liked_at,
-    }));
+    return signPhotosOf(
+      (data ?? []).map((row) => ({
+        id: row.id,
+        name: row.name,
+        age: row.age,
+        bio: row.bio || '',
+        photos: row.photos || [],
+        avatar: row.avatar || undefined,
+        swipeType: row.swipe_type as 'like' | 'super_like',
+        eventName: row.event_name || undefined,
+        likedAt: row.liked_at,
+      })),
+    );
   },
 
   // ==========================================================================
@@ -397,21 +402,22 @@ export const socialService = {
     const { data: profileId } = await supabase.rpc('current_profile_id');
     if (!profileId) throw new ApiError('PROFILE_NOT_FOUND', 'errors.generic');
 
-    if (going) {
-      await supabase
-        .from('event_intents')
-        .upsert({ event_id: eventId, profile_id: profileId }, { onConflict: 'event_id,profile_id' });
-    } else {
-      await supabase
-        .from('event_intents')
-        .delete()
-        .eq('event_id', eventId)
-        .eq('profile_id', profileId);
-    }
+    // El constructor de consultas NO rechaza la promesa cuando la base
+    // devuelve error, así que sin mirar `error` esto se resolvía igual estando
+    // sin conexión o con RLS denegando: la pantalla confirmaba «Voy a ir»,
+    // subía el contador, y al volver a montar se revertía solo.
+    const { error } = going
+      ? await supabase
+          .from('event_intents')
+          .upsert({ event_id: eventId, profile_id: profileId }, { onConflict: 'event_id,profile_id' })
+      : await supabase.from('event_intents').delete().eq('event_id', eventId).eq('profile_id', profileId);
+
+    if (error) throw new ApiError(error.code ?? 'INTENT_FAILED', 'errors.generic');
   },
 
   getMyIntents: async (): Promise<string[]> => {
-    const { data } = await supabase.from('event_intents').select('event_id');
+    const { data, error } = await supabase.from('event_intents').select('event_id');
+    if (error) throw new ApiError(error.code ?? 'INTENTS_FAILED', 'errors.generic');
     return (data ?? []).map((row) => row.event_id);
   },
 
@@ -460,11 +466,12 @@ export const socialService = {
     const { data, error } = await supabase.rpc('get_group_messages', { p_group_id: groupId });
     if (error || !data) return [];
 
+    const firmadas = await signedPhotoMap(data.map((row) => row.author_photo));
     return data.map((row) => ({
       id: row.id,
       profileId: row.profile_id,
       authorName: row.author_name,
-      authorPhoto: row.author_photo,
+      authorPhoto: row.author_photo ? (firmadas.get(row.author_photo) ?? row.author_photo) : row.author_photo,
       content: row.content,
       createdAt: row.created_at,
     }));
@@ -485,10 +492,11 @@ export const socialService = {
     const { data, error } = await supabase.rpc('get_group_members', { p_group_id: groupId });
     if (error || !data) return [];
 
+    const firmadas = await signedPhotoMap(data.map((row) => row.photo));
     return data.map((row) => ({
       profileId: row.profile_id,
       name: row.name,
-      photo: row.photo,
+      photo: row.photo ? (firmadas.get(row.photo) ?? row.photo) : row.photo,
       isOwner: row.is_owner,
       joinedAt: row.joined_at,
     }));
