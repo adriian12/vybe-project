@@ -269,11 +269,16 @@ $$;
 -- completa: un PATCH directo se saltaba todos los controles de
 -- `set_account_type()` (límite de cambios al mes, perfil completo) y no dejaba
 -- fila de auditoría.
+--
+-- Sigue siendo SECURITY INVOKER, como desde la migración 045: con SECURITY
+-- DEFINER `current_user` sería su propietario, la primera condición se
+-- cumpliría siempre y el disparador no protegería nada (cualquiera podría
+-- ponerse `role = 'admin'`).
 -- ---------------------------------------------------------------------------
 CREATE OR REPLACE FUNCTION public.protect_profile_fields()
 RETURNS TRIGGER
 LANGUAGE plpgsql
-SECURITY DEFINER
+SECURITY INVOKER
 SET search_path = public
 AS $function$
 BEGIN
@@ -354,9 +359,15 @@ $$;
 -- las notificaciones estaban activadas. `push_subscriptions` tampoco tenía las
 -- columnas que `send-push` ya lee.
 -- ---------------------------------------------------------------------------
+-- OJO: estas funciones ya existían en producción (se crearon a mano). Este
+-- bloque las deja en el repositorio con el MISMO comportamiento que tienen allí:
+-- el token va tal cual en `endpoint` y en `native_token`, y el modelo en
+-- `device_model`. Guardarlo como `native:<token>` duplicaría cada móvil que ya
+-- tenía los avisos activados.
 ALTER TABLE public.push_subscriptions
     ADD COLUMN IF NOT EXISTS platform TEXT,
-    ADD COLUMN IF NOT EXISTS native_token TEXT;
+    ADD COLUMN IF NOT EXISTS native_token TEXT,
+    ADD COLUMN IF NOT EXISTS device_model TEXT;
 
 CREATE INDEX IF NOT EXISTS idx_push_native_token
     ON public.push_subscriptions(native_token)
@@ -372,53 +383,38 @@ SECURITY DEFINER
 SET search_path = public
 AS $$
 DECLARE
-    v_profile_id UUID;
+    v_profile_id UUID := public.current_profile_id();
 BEGIN
-    v_profile_id := public.current_profile_id();
     IF v_profile_id IS NULL THEN
         RAISE EXCEPTION 'PROFILE_NOT_FOUND';
     END IF;
-    IF p_token IS NULL OR length(trim(p_token)) = 0 THEN
-        RAISE EXCEPTION 'TOKEN_REQUIRED';
-    END IF;
-    IF COALESCE(p_platform, '') NOT IN ('ios', 'android') THEN
+
+    IF p_platform NOT IN ('android', 'ios') THEN
         RAISE EXCEPTION 'INVALID_PLATFORM';
     END IF;
 
-    -- `endpoint` es NOT NULL UNIQUE y en nativo no hay endpoint web: se usa el
-    -- token. Si el teléfono cambia de dueño, la fila pasa al nuevo perfil en
-    -- vez de seguir mandando los avisos de la persona anterior.
-    INSERT INTO public.push_subscriptions AS ps
-        (profile_id, endpoint, p256dh, auth, user_agent, platform, native_token, last_used_at)
-    VALUES
-        (v_profile_id, 'native:' || p_token, '', '', p_device_model, p_platform, p_token, NOW())
+    INSERT INTO public.push_subscriptions (
+        profile_id, endpoint, native_token, platform, device_model, last_used_at
+    )
+    VALUES (v_profile_id, p_token, p_token, p_platform, p_device_model, NOW())
     ON CONFLICT (endpoint) DO UPDATE
-        SET profile_id   = EXCLUDED.profile_id,
-            platform     = EXCLUDED.platform,
+        SET profile_id = EXCLUDED.profile_id,
             native_token = EXCLUDED.native_token,
-            user_agent   = EXCLUDED.user_agent,
+            platform = EXCLUDED.platform,
+            device_model = EXCLUDED.device_model,
             last_used_at = NOW();
 END;
 $$;
 
 CREATE OR REPLACE FUNCTION public.remove_native_push_token(p_token TEXT)
 RETURNS VOID
-LANGUAGE plpgsql
+LANGUAGE sql
 SECURITY DEFINER
 SET search_path = public
 AS $$
-DECLARE
-    v_profile_id UUID;
-BEGIN
-    v_profile_id := public.current_profile_id();
-    IF v_profile_id IS NULL THEN
-        RETURN;
-    END IF;
-
     DELETE FROM public.push_subscriptions
-     WHERE profile_id = v_profile_id
-       AND (native_token = p_token OR endpoint = 'native:' || p_token);
-END;
+    WHERE native_token = p_token
+      AND profile_id = public.current_profile_id();
 $$;
 
 REVOKE ALL ON FUNCTION public.save_native_push_token(TEXT, TEXT, TEXT) FROM PUBLIC, anon;
