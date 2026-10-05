@@ -153,3 +153,6 @@ verify_jwt = true
 
 [functions.google-play-notifications]
 verify_jwt = false
+
+[functions.welcome-email]
+verify_jwt = false
