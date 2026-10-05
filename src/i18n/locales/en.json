@@ -1005,7 +1005,7 @@
             "reportsSubtitle": "From the last 24 hours. You can remove their access to the event.",
             "reportsTotal": "{{count}} reports in total",
             "revoke": "Remove",
-            "revoked": "{{name}} is no longer at the event",
+            "revoked": "{{name}} removed from the party",
             "noEvent": "Create an event to use this screen.",
             "capacitySaved": "Capacity saved",
             "capacityPlaceholder": "Maximum capacity",
@@ -1020,7 +1020,7 @@
             "uses": "uses",
             "createCode": "Create new code",
             "priority": "Priority",
-            "revokeAccess": "Remove access",
+            "revokeAccess": "Remove",
             "closeEntry": "Close door",
             "closeEntryTitle": "Close the door?",
             "closeEntryBody": "Nobody else will be able to get in with the app: no code will work. People already inside stay, and you can reopen whenever you want.",
@@ -1037,7 +1037,9 @@
                 "notices": "Notifications",
                 "promoters": "Promoters",
                 "lists": "Lists"
-            }
+            },
+            "expelled": "Removed",
+            "expelConfirm": "Remove {{name}}? They will leave the Flechazo, lose their photo of the night and won’t be able to enter this party again."
         },
         "codes": {
             "title": "Codes and who brings people",
@@ -1779,7 +1781,9 @@
                 "dismissed": "Dismissed",
                 "reviewed": "Reviewed",
                 "pending": "Pending"
-            }
+            },
+            "expel": "Remove from {{event}}",
+            "expelled": "Removed from the party"
         },
         "photos": {
             "title": "Pending photos",
@@ -2021,7 +2025,7 @@
             }
         },
         "eventForm": {
-            "platformSwipeHelp": "This is a Fiestea party: there is no QR or code at the door. With swipe on, the page shows “I’m here” and people enter by location; with it off, only “I’m going”.",
+            "platformSwipeHelp": "This is a Fiestea party: there is no QR or code at the door. With a location and Flechazo on, the page shows “Enter the party” and people get in by being there (GPS is checked); with it off, only “I’m going”.",
             "settingsTitle": "Party settings",
             "settingsAfterCreate": "Swipe, live headcount, men/women split and Fiestea list are set by editing the party once it is created."
         }
@@ -2141,7 +2145,7 @@
         "viewPoster": "View poster",
         "locationOff": "No location",
         "locationOffBody": "Turn on the app's location in your phone settings to see how far it is.",
-        "imHere": "I’m here"
+        "imHere": "Enter the party"
     },
     "venueTypes": {
         "discoteca": "Club",
@@ -3499,5 +3503,11 @@
         "more": "More",
         "copied": "Link copied",
         "instagramHint": "Paste it in an Instagram chat or story."
+    },
+    "event": {
+        "expelledTitle": "You are no longer at the party",
+        "expelledBody": "The venue has removed your access to {{name}} after a report.",
+        "leftFarTitle": "You have left the party",
+        "leftFarBody": "You are far from {{name}}, so you no longer appear in its Flechazo. If you go back, enter again."
     }
 }

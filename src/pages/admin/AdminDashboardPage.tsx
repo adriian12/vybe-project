@@ -30,6 +30,7 @@ import {
   Store,
   UsersRound,
   X,
+  UserMinus,
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
@@ -312,6 +313,20 @@ const AdminDashboardPage = () => {
       },
       status === 'resolved' ? 'admin.reports.resolved' : 'admin.reports.dismissed',
     );
+
+  // Saca a la persona denunciada de la fiesta y le impide volver (101).
+  const expulsar = (report: Report) => {
+    if (!report.eventId) return;
+    if (!window.confirm(t('venue.door.expelConfirm', { name: report.reportedName ?? '' }))) return;
+    void run(
+      report.id,
+      async () => {
+        await api.expelFromEvent(report.eventId as string, report.reportedId);
+        setReports((prev) => prev.map((r) => (r.id === report.id ? { ...r, status: 'resolved' } : r)));
+      },
+      'admin.reports.expelled',
+    );
+  };
 
   if (isLoading) {
     return (
@@ -909,6 +924,19 @@ const AdminDashboardPage = () => {
                           <p className="mt-3 rounded-xl bg-black/[0.04] p-3 text-body-sm italic text-ink/70">
                             “{report.description}”
                           </p>
+                        )}
+
+                        {/* Denunciada dentro de una fiesta: se la puede sacar de ella. */}
+                        {pendiente && report.eventId && (
+                          <button
+                            type="button"
+                            disabled={busyId === report.id}
+                            onClick={() => void expulsar(report)}
+                            className="press mt-3 flex h-10 w-full items-center justify-center gap-1.5 rounded-lg bg-destructive text-caption font-bold text-white disabled:opacity-50"
+                          >
+                            <UserMinus size={14} />
+                            {t('admin.reports.expel', { event: report.eventName ?? '' })}
+                          </button>
                         )}
 
                         {pendiente && (

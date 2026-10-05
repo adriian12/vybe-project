@@ -251,7 +251,19 @@ const REDEEM_ERRORS: Record<string, string> = {
   LOCATION_REQUIRED: 'Activa la ubicación para entrar.',
   EVENT_WITHOUT_LOCATION: 'Esta fiesta todavía no tiene ubicación.',
   CODE_REQUIRED: 'Para entrar hace falta el código del negocio.',
+  LOCATION_IMPRECISE: 'Tu ubicación no es lo bastante precisa. Sal a un sitio abierto o activa el GPS y vuelve a intentarlo.',
+  LOCATION_MOCKED: 'Tu móvil está usando una ubicación simulada. Desactívala para entrar.',
+  TOO_MANY_ATTEMPTS: 'Demasiados intentos seguidos. Espera unos minutos y vuelve a probar.',
+  EXPELLED: 'El negocio te ha retirado el acceso a esta fiesta.',
 };
+
+/** Precisión y si es simulada: el servidor las comprueba al entrar (migración 101). */
+export interface EntryLocation {
+  latitude?: number;
+  longitude?: number;
+  accuracy?: number;
+  mocked?: boolean;
+}
 
 const parseRedeemError = (message: string): ApiError => {
   const code = Object.keys(REDEEM_ERRORS).find((key) => message.includes(key));
@@ -415,15 +427,33 @@ export const api = {
     code: string,
     latitude?: number,
     longitude?: number,
+    extra: Pick<EntryLocation, 'accuracy' | 'mocked'> = {},
   ): Promise<EventAccess> => {
     const { data, error } = await supabase.rpc('redeem_event_code', {
       p_code: code,
       p_latitude: latitude ?? null,
       p_longitude: longitude ?? null,
-    });
+      p_accuracy: extra.accuracy ?? null,
+      p_mocked: extra.mocked ?? false,
+    } as never);
 
     if (error) throw parseRedeemError(error.message);
-    const row = data?.[0];
+    // Desde la 101 el error llega en `error_code` (así el intento cuenta).
+    const row = (data as unknown as unknown[] | null)?.[0] as
+      | {
+          event_id: string;
+          event_name: string;
+          venue_id: string;
+          venue_name: string;
+          venue_type: string;
+          event_radius: number;
+          start_date: string;
+          end_date: string;
+          distance_meters: number | null;
+          error_code?: string | null;
+        }
+      | undefined;
+    if (row?.error_code) throw parseRedeemError(row.error_code);
     if (!row) throw new ApiError('INVALID_CODE', REDEEM_ERRORS.INVALID_CODE);
 
     return {
@@ -443,14 +473,22 @@ export const api = {
    * Fiestas de Fiestea (migración 076): se entra con la ubicación, sin código.
    * El servidor comprueba que la fiesta es de la casa y que estás en su radio.
    */
-  enterPlatformEvent: async (eventId: string, latitude?: number, longitude?: number): Promise<EventAccess> => {
+  enterPlatformEvent: async (
+    eventId: string,
+    latitude?: number,
+    longitude?: number,
+    extra: Pick<EntryLocation, 'accuracy' | 'mocked'> = {},
+  ): Promise<EventAccess> => {
     const { data, error } = await supabase.rpc('enter_platform_event', {
       p_event_id: eventId,
       p_latitude: latitude ?? null,
       p_longitude: longitude ?? null,
+      p_accuracy: extra.accuracy ?? null,
+      p_mocked: extra.mocked ?? false,
     } as never);
     if (error) throw parseRedeemError(error.message);
-    const row = (data as { event_id: string; event_name: string; venue_id: string; venue_name: string; venue_type: string; event_radius: number; start_date: string; end_date: string; distance_meters: number | null }[] | null)?.[0];
+    const row = (data as { event_id: string; event_name: string; venue_id: string; venue_name: string; venue_type: string; event_radius: number; start_date: string; end_date: string; distance_meters: number | null; error_code?: string | null }[] | null)?.[0];
+    if (row?.error_code) throw parseRedeemError(row.error_code);
     if (!row) throw new ApiError('NO_ACTIVE_EVENT', REDEEM_ERRORS.NO_ACTIVE_EVENT);
     return {
       eventId: row.event_id,
@@ -466,16 +504,17 @@ export const api = {
   },
 
   /** Refresca la asistencia para que el usuario siga contando como presente. */
-  heartbeatAttendance: async (
-    eventId: string,
-    latitude?: number,
-    longitude?: number,
-  ): Promise<void> => {
-    await supabase.rpc('heartbeat_event_attendance', {
+  heartbeatAttendance: async (eventId: string, location: EntryLocation = {}): Promise<'ok' | 'left' | 'expelled'> => {
+    const { data } = await supabase.rpc('heartbeat_event_attendance', {
       p_event_id: eventId,
-      p_latitude: latitude ?? null,
-      p_longitude: longitude ?? null,
-    });
+      p_latitude: location.latitude ?? null,
+      p_longitude: location.longitude ?? null,
+      p_accuracy: location.accuracy ?? null,
+      p_mocked: location.mocked ?? false,
+    } as never);
+    // Desde la 101: 'left' si te has alejado mucho (o la ubicación es simulada)
+    // y 'expelled' si el negocio te ha expulsado tras una denuncia.
+    return data === 'left' || data === 'expelled' ? data : 'ok';
   },
 
   /** Eventos a los que el usuario ha hecho check-in y siguen vigentes. */
@@ -1513,6 +1552,12 @@ export const api = {
     });
   },
 
+  /** Expulsa de una fiesta (administración, propietario o Seguridad). */
+  expelFromEvent: async (eventId: string, profileId: string): Promise<void> => {
+    const { error } = await supabase.rpc('expel_from_event', { p_event_id: eventId, p_profile_id: profileId } as never);
+    if (error) throw new ApiError('EXPEL_FAILED', error.message);
+  },
+
   getReports: async (): Promise<Report[]> => {
     const { data, error } = await supabase
       .from('reports')
@@ -1520,7 +1565,8 @@ export const api = {
         `
         *,
         reporter:profiles!reports_reporter_id_fkey(name),
-        reported:profiles!reports_reported_id_fkey(name)
+        reported:profiles!reports_reported_id_fkey(name),
+        event:events!reports_event_id_fkey(name)
       `,
       )
       .order('created_at', { ascending: false })
@@ -1535,9 +1581,12 @@ export const api = {
       const record = row as Tables<'reports'> & {
         reporter: { name: string } | null;
         reported: { name: string } | null;
+        event: { name: string } | null;
       };
       return {
         id: record.id,
+        eventId: (record as { event_id?: string | null }).event_id ?? undefined,
+        eventName: record.event?.name,
         reporterId: record.reporter_id,
         reportedId: record.reported_id,
         reporterName: record.reporter?.name,

@@ -75,6 +75,9 @@ export interface Report {
   description?: string;
   status: 'pending' | 'reviewed' | 'resolved' | 'dismissed';
   createdAt: string;
+  /** Fiesta en la que estaba la persona denunciada (migración 101). */
+  eventId?: string;
+  eventName?: string;
 }
 
 /** Una conexión con su metadato de caducidad, para el chat efímero. */

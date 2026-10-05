@@ -28,7 +28,7 @@ interface PushRequest {
 }
 
 interface WebhookPayload {
-  type: 'INSERT' | 'RAFFLE_CREATED' | 'RAFFLE_DRAWN' | 'EVENT_PUBLISHED' | 'PHOTOS_PENDING' | 'SOS';
+  type: 'INSERT' | 'RAFFLE_CREATED' | 'RAFFLE_DRAWN' | 'EVENT_PUBLISHED' | 'PHOTOS_PENDING' | 'SOS' | 'REPORT' | 'EXPELLED';
   table: 'connections' | 'messages' | 'raffles' | 'venue_events' | 'moderation_queue' | 'sos_alerts';
   record: Record<string, unknown>;
 }
@@ -171,6 +171,89 @@ const fromSos = async (
     url,
     tag: `sos-${alertId}`,
   }));
+};
+
+/**
+ * Denuncia dentro de una fiesta (disparador `push_on_report`, migración 101):
+ * al propietario y a Seguridad del negocio que tienen la app; si la fiesta es
+ * de Fiestea (sin negocio), a administración. No se puede desactivar.
+ */
+const fromReport = async (
+  supabase: ReturnType<typeof adminClient>,
+  payload: WebhookPayload,
+): Promise<PushRequest[]> => {
+  const reportId = (payload.record as { id?: string }).id;
+  if (!reportId) return [];
+
+  const { data: denuncia } = await supabase
+    .from('reports')
+    .select('id, reporter_id, reported_id, event_id, status')
+    .eq('id', reportId)
+    .maybeSingle();
+  if (!denuncia?.event_id || denuncia.status !== 'pending') return [];
+
+  const [{ data: persona }, { data: evento }] = await Promise.all([
+    supabase.from('profiles').select('name').eq('id', denuncia.reported_id).maybeSingle(),
+    supabase.from('events').select('name, venue_id, venues(is_platform)').eq('id', denuncia.event_id).maybeSingle(),
+  ]);
+  if (!evento) return [];
+  const nombre = ((persona?.name as string | undefined) ?? '').trim() || '—';
+  const deFiestea = Boolean((evento.venues as { is_platform?: boolean } | null)?.is_platform);
+
+  const destinatarios = new Map<string, { locale: string | null; url: string }>();
+  if (!deFiestea) {
+    const { data: miembros } = await supabase
+      .from('venue_members')
+      .select('user_id')
+      .eq('venue_id', evento.venue_id)
+      .in('role', ['owner', 'security']);
+    const userIds = (miembros ?? []).map((m) => m.user_id as string);
+    if (userIds.length > 0) {
+      const { data: perfiles } = await supabase.from('profiles').select('id, locale').in('user_id', userIds);
+      for (const perfil of perfiles ?? []) {
+        destinatarios.set(perfil.id as string, { locale: perfil.locale ?? null, url: '/venue/dashboard?seccion=door' });
+      }
+    }
+  } else {
+    const { data: admins } = await supabase.from('profiles').select('id, locale').eq('role', 'admin').limit(50);
+    for (const admin of admins ?? []) {
+      destinatarios.set(admin.id as string, { locale: admin.locale ?? null, url: '/admin/dashboard?seccion=reports' });
+    }
+  }
+  // Ni quien denuncia ni la persona denunciada reciben este aviso.
+  destinatarios.delete(denuncia.reporter_id as string);
+  destinatarios.delete(denuncia.reported_id as string);
+
+  return [...destinatarios].map(([profileId, { locale, url }]) => ({
+    profileId,
+    kind: 'admin' as const,
+    ...pushTexts(locale).reportReceived(nombre, evento.name as string),
+    url,
+    tag: `report-${reportId}`,
+  }));
+};
+
+/** A quien han expulsado de una fiesta tras una denuncia (migración 101). */
+const fromExpelled = async (
+  supabase: ReturnType<typeof adminClient>,
+  payload: WebhookPayload,
+): Promise<PushRequest[]> => {
+  const { event_id: eventId, profile_id: profileId } = payload.record as { event_id?: string; profile_id?: string };
+  if (!eventId || !profileId) return [];
+  const [{ data: evento }, { data: perfil }] = await Promise.all([
+    supabase.from('events').select('name').eq('id', eventId).maybeSingle(),
+    supabase.from('profiles').select('locale').eq('id', profileId).maybeSingle(),
+  ]);
+  if (!evento) return [];
+  return [
+    {
+      profileId,
+      kind: 'admin' as const,
+      ...pushTexts(perfil?.locale ?? null).expelled(evento.name as string),
+      url: '/home',
+      tag: `expelled-${eventId}`,
+    },
+  ];
 };
 
 /**
@@ -463,7 +546,11 @@ serve(async (req: Request): Promise<Response> => {
               ? await fromPendingPhotos(supabase)
               : body.table === 'sos_alerts'
                 ? await fromSos(supabase, body)
-                : await fromWebhook(supabase, body)
+                : body.type === 'REPORT'
+                  ? await fromReport(supabase, body)
+                  : body.type === 'EXPELLED'
+                    ? await fromExpelled(supabase, body)
+                    : await fromWebhook(supabase, body)
         : [body as PushRequest];
 
     // De veinte en veinte: un sorteo avisa a toda la sala y, uno a uno, se

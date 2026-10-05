@@ -479,7 +479,7 @@ const EventDetailPage = () => {
               <Undo2 size={20} />
               {t('home.goBack')}
             </button>
-          ) : live && (!event.byPlatform || event.swipeEnabled) ? (
+          ) : live && (!event.byPlatform || (event.swipeEnabled && event.location)) ? (
             // En directo lo que toca es entrar; decir que vas sigue en el
             // marcador de arriba. Las fiestas de Fiestea no tienen QR ni código
             // en la puerta: sólo se entra (por ubicación) si administración ha

@@ -53,6 +53,8 @@ interface ReportRow {
   reported_photo: string | null;
   report_type: string;
   reports_total: number;
+  /** Ya expulsado de esta fiesta (migración 101). */
+  expelled?: boolean;
 }
 
 type Tab = 'door' | 'lists' | 'tickets' | 'reports';
@@ -217,7 +219,7 @@ const TeamSecurity = ({
   }, [cargarDenuncias]);
 
   const retirar = async (report: ReportRow) => {
-    if (!window.confirm(t('team.security.revokeConfirm', { name: report.reported_name }))) return;
+    if (!window.confirm(t('venue.door.expelConfirm', { name: report.reported_name }))) return;
     setBusy(true);
     try {
       await client.call('revoke', { profileId: report.reported_profile_id });
@@ -235,7 +237,7 @@ const TeamSecurity = ({
     { id: 'door', label: t('team.tabs.door'), icon: ShieldCheck, badge: abiertas },
     { id: 'lists', label: t('team.tabs.lists'), icon: ClipboardList },
     ...(state.features.tickets ? [{ id: 'tickets' as const, label: t('team.tabs.tickets'), icon: ScanLine }] : []),
-    { id: 'reports', label: t('team.tabs.reports'), icon: Flag, badge: reports?.length ?? 0 },
+    { id: 'reports', label: t('team.tabs.reports'), icon: Flag, badge: reports?.filter((r) => !r.expelled).length ?? 0 },
   ];
 
   return (
@@ -299,15 +301,21 @@ const TeamSecurity = ({
                       {report.reports_total > 1 ? ` · ${t('venue.door.reportsTotal', { count: report.reports_total })}` : ''}
                     </p>
                   </div>
-                  <button
-                    type="button"
-                    disabled={busy}
-                    onClick={() => void retirar(report)}
-                    className="press flex h-9 shrink-0 items-center gap-1 rounded-lg border border-destructive px-2.5 text-caption font-bold text-destructive disabled:opacity-50"
-                  >
-                    <UserMinus size={13} />
-                    {t('venue.door.revokeAccess')}
-                  </button>
+                  {report.expelled ? (
+                    <span className="shrink-0 rounded-lg bg-black/[0.07] px-2.5 py-1.5 text-caption font-bold text-party-gray">
+                      {t('venue.door.expelled')}
+                    </span>
+                  ) : (
+                    <button
+                      type="button"
+                      disabled={busy}
+                      onClick={() => void retirar(report)}
+                      className="press flex h-9 shrink-0 items-center gap-1 rounded-lg border border-destructive px-2.5 text-caption font-bold text-destructive disabled:opacity-50"
+                    >
+                      <UserMinus size={13} />
+                      {t('venue.door.revokeAccess')}
+                    </button>
+                  )}
                 </li>
               ))}
             </ul>

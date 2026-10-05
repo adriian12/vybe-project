@@ -1005,7 +1005,7 @@
             "reportsSubtitle": "Aus den letzten 24 Stunden. Du kannst ihnen den Zugang entziehen.",
             "reportsTotal": "insgesamt {{count}} Meldungen",
             "revoke": "Entfernen",
-            "revoked": "{{name}} ist nicht mehr auf dem Event",
+            "revoked": "{{name}} von der Party entfernt",
             "noEvent": "Lege ein Event an, um diese Ansicht zu nutzen.",
             "capacitySaved": "Kapazität gespeichert",
             "capacityPlaceholder": "Maximale Kapazität",
@@ -1020,7 +1020,7 @@
             "uses": "Nutzungen",
             "createCode": "Neuen Code erstellen",
             "priority": "Priorität",
-            "revokeAccess": "Zugang entziehen",
+            "revokeAccess": "Rauswerfen",
             "closeEntry": "Tür schließen",
             "closeEntryTitle": "Tür schließen?",
             "closeEntryBody": "Niemand kommt mehr mit der App rein: Kein Code funktioniert. Wer drinnen ist, bleibt, und du kannst jederzeit wieder öffnen.",
@@ -1037,7 +1037,9 @@
                 "notices": "Mitteilungen",
                 "promoters": "Promoter",
                 "lists": "Listen"
-            }
+            },
+            "expelled": "Rausgeworfen",
+            "expelConfirm": "{{name}} rauswerfen? Die Person verschwindet aus dem Flechazo, verliert ihr Foto der Nacht und kann diese Party nicht mehr betreten."
         },
         "codes": {
             "title": "Codes und wer Leute bringt",
@@ -1779,7 +1781,9 @@
                 "dismissed": "Verworfen",
                 "reviewed": "Geprüft",
                 "pending": "Offen"
-            }
+            },
+            "expel": "Von {{event}} entfernen",
+            "expelled": "Von der Party entfernt"
         },
         "photos": {
             "title": "Ausstehende Fotos",
@@ -2021,7 +2025,7 @@
             }
         },
         "eventForm": {
-            "platformSwipeHelp": "Das ist eine Fiestea-Party: Vor Ort gibt es weder QR-Code noch Code. Mit Swipe zeigt die Seite „Ich bin da“ und man kommt per Standort rein; ohne nur „Ich gehe hin“.",
+            "platformSwipeHelp": "Das ist eine Fiestea-Party: Vor Ort gibt es weder QR-Code noch Code. Mit Standort und Flechazo zeigt die Seite „Zur Party“ und man kommt rein, wenn man vor Ort ist (GPS wird geprüft); ohne nur „Ich gehe hin“.",
             "settingsTitle": "Party-Einstellungen",
             "settingsAfterCreate": "Swipe, Live-Zählung, Anteil Männer/Frauen und Fiestea-Liste stellst du nach dem Erstellen beim Bearbeiten ein."
         }
@@ -2141,7 +2145,7 @@
         "viewPoster": "Plakat ansehen",
         "locationOff": "Kein Standort",
         "locationOffBody": "Aktiviere den Standort der App in den Handy-Einstellungen, um die Entfernung zu sehen.",
-        "imHere": "Ich bin da"
+        "imHere": "Zur Party"
     },
     "venueTypes": {
         "discoteca": "Club",
@@ -3499,5 +3503,11 @@
         "more": "Mehr",
         "copied": "Link kopiert",
         "instagramHint": "Füge ihn in einen Instagram-Chat oder deine Story ein."
+    },
+    "event": {
+        "expelledTitle": "Du bist nicht mehr auf der Party",
+        "expelledBody": "Das Lokal hat dir nach einer Meldung den Zugang zu {{name}} entzogen.",
+        "leftFarTitle": "Du hast die Party verlassen",
+        "leftFarBody": "Du bist weit weg von {{name}} und erscheinst nicht mehr im Flechazo. Wenn du zurückkommst, tritt erneut ein."
     }
 }

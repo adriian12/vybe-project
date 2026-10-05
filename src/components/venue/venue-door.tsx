@@ -218,6 +218,7 @@ const VenueDoor = ({ eventId, plan, onUpgrade, startsAt }: VenueDoorProps) => {
   };
 
   const revoke = async (profileId: string, name: string) => {
+    if (!window.confirm(t('venue.door.expelConfirm', { name }))) return;
     setIsBusy(true);
     try {
       await venueService.revokeCheckIn(eventId, profileId);
@@ -447,15 +448,21 @@ const VenueDoor = ({ eventId, plan, onUpgrade, startsAt }: VenueDoorProps) => {
                         {report.reportsTotal > 1 ? ` · ${t('venue.door.reportsTotal', { count: report.reportsTotal })}` : ''}
                       </p>
                     </div>
-                    <button
-                      type="button"
-                      disabled={isBusy}
-                      onClick={() => void revoke(report.reportedProfileId, report.reportedName)}
-                      className="press flex h-8 shrink-0 items-center gap-1 rounded-lg border border-destructive px-2.5 text-caption font-bold text-destructive disabled:opacity-50"
-                    >
-                      <UserMinus size={13} />
-                      {t('venue.door.revokeAccess')}
-                    </button>
+                    {report.expelled ? (
+                      <span className="shrink-0 rounded-lg bg-black/[0.07] px-2.5 py-1.5 text-caption font-bold text-party-gray">
+                        {t('venue.door.expelled')}
+                      </span>
+                    ) : (
+                      <button
+                        type="button"
+                        disabled={isBusy}
+                        onClick={() => void revoke(report.reportedProfileId, report.reportedName)}
+                        className="press flex h-8 shrink-0 items-center gap-1 rounded-lg border border-destructive px-2.5 text-caption font-bold text-destructive disabled:opacity-50"
+                      >
+                        <UserMinus size={13} />
+                        {t('venue.door.revokeAccess')}
+                      </button>
+                    )}
                   </li>
                 ))}
               </ul>

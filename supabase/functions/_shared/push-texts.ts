@@ -33,6 +33,10 @@ interface Texts {
   photosPending: (count: number) => { title: string; body: string };
   /** Alguien pide ayuda dentro de una fiesta: al equipo del local y a administración. */
   sosHelp: (name: string, event: string) => { title: string; body: string };
+  /** Una denuncia dentro de la fiesta (101): al negocio, a Seguridad o a administración. */
+  reportReceived: (name: string, event: string) => { title: string; body: string };
+  /** A quien han expulsado de la fiesta tras una denuncia (101). */
+  expelled: (event: string) => { title: string; body: string };
 }
 
 const TEXTS: Record<Locale, Texts> = {
@@ -98,6 +102,14 @@ const TEXTS: Record<Locale, Texts> = {
       title: 'Tienes imágenes por revisar',
       body: `${count} foto(s) esperan revisión manual: la revisión automática no ha respondido.`,
     }),
+    reportReceived: (name, event) => ({
+      title: `Denuncia en ${event}`,
+      body: `Han denunciado a ${name}. Revísalo y, si hace falta, expúlsale de la fiesta.`,
+    }),
+    expelled: (event) => ({
+      title: `Ya no estás en ${event}`,
+      body: 'El negocio te ha retirado el acceso a esta fiesta tras una denuncia.',
+    }),
     sosHelp: (name, event) => ({
       title: event ? `${name} pide ayuda en ${event}` : `${name} pide ayuda`,
       body: 'Emergencia dentro de la fiesta. Abre Puerta en el panel del local.',
@@ -162,6 +174,14 @@ const TEXTS: Record<Locale, Texts> = {
     photosPending: (count) => ({
       title: 'You have images to review',
       body: `${count} photo(s) are waiting for manual review: the automatic check didn't respond.`,
+    }),
+    reportReceived: (name, event) => ({
+      title: `Report at ${event}`,
+      body: `${name} has been reported. Check it and remove them from the party if needed.`,
+    }),
+    expelled: (event) => ({
+      title: `You're no longer at ${event}`,
+      body: 'The venue has removed your access to this party after a report.',
     }),
     sosHelp: (name, event) => ({
       title: event ? `${name} needs help at ${event}` : `${name} needs help`,
@@ -230,6 +250,14 @@ const TEXTS: Record<Locale, Texts> = {
       title: 'Du hast Bilder zu prüfen',
       body: `${count} Foto(s) warten auf manuelle Prüfung: Die automatische Prüfung hat nicht geantwortet.`,
     }),
+    reportReceived: (name, event) => ({
+      title: `Meldung bei ${event}`,
+      body: `${name} wurde gemeldet. Prüfe es und entferne die Person bei Bedarf von der Party.`,
+    }),
+    expelled: (event) => ({
+      title: `Du bist nicht mehr bei ${event}`,
+      body: 'Das Lokal hat dir nach einer Meldung den Zugang zu dieser Party entzogen.',
+    }),
     sosHelp: (name, event) => ({
       title: event ? `${name} braucht Hilfe bei ${event}` : `${name} braucht Hilfe`,
       body: 'Notfall auf der Party. Öffne „Tür“ im Panel des Lokals.',
@@ -296,6 +324,14 @@ const TEXTS: Record<Locale, Texts> = {
     photosPending: (count) => ({
       title: 'Tens imatges per revisar',
       body: `${count} foto(s) esperen revisió manual: la revisió automàtica no ha respost.`,
+    }),
+    reportReceived: (name, event) => ({
+      title: `Denúncia a ${event}`,
+      body: `Han denunciat ${name}. Revisa-ho i, si cal, expulsa'l de la festa.`,
+    }),
+    expelled: (event) => ({
+      title: `Ja no ets a ${event}`,
+      body: "El negoci t'ha retirat l'accés a aquesta festa després d'una denúncia.",
     }),
     sosHelp: (name, event) => ({
       title: event ? `${name} demana ajuda a ${event}` : `${name} demana ajuda`,

@@ -160,6 +160,8 @@ export interface VenueReport {
   description: string | null;
   createdAt: string;
   reportsTotal: number;
+  /** Ya expulsado de esta fiesta (migración 101). */
+  expelled: boolean;
 }
 
 export interface DemographicBucket {
@@ -833,10 +835,14 @@ export const venueService = {
       description: row.description,
       createdAt: row.created_at,
       reportsTotal: Number(row.reports_total),
+      expelled: Boolean((row as { expelled?: boolean }).expelled),
     }));
   },
 
-  /** Retira el acceso al evento sin suspender la cuenta. */
+  /**
+   * Expulsa de la fiesta tras una denuncia (migración 101): sale del tablón,
+   * pierde la foto de la noche y no puede volver a entrar. No suspende la cuenta.
+   */
   revokeCheckIn: async (eventId: string, profileId: string): Promise<void> => {
     const { error } = await supabase.rpc('revoke_event_checkin', {
       p_event_id: eventId,

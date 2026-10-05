@@ -1,4 +1,4 @@
-import { Capacitor } from '@capacitor/core';
+import { Capacitor, registerPlugin } from '@capacitor/core';
 import { supabase } from '@/integrations/supabase/client';
 
 /**
@@ -139,6 +139,8 @@ export interface NativePosition {
   latitude: number;
   longitude: number;
   accuracy?: number;
+  /** Sólo Android: la posición viene de una app de ubicación falsa. */
+  mocked?: boolean;
 }
 
 /**
@@ -148,6 +150,16 @@ export interface NativePosition {
  * tienda de aplicaciones, y funciona con el GPS del teléfono en vez de con la
  * aproximación del navegador.
  */
+/** Plugin propio de Android (`FiesteaLocationPlugin.java`). */
+const FiesteaLocation = registerPlugin<{
+  getPosition(options: { enableHighAccuracy: boolean; timeout: number; maximumAge: number }): Promise<{
+    latitude: number;
+    longitude: number;
+    accuracy: number | null;
+    isMock: boolean;
+  }>;
+}>('FiesteaLocation');
+
 export const getNativePosition = async (options?: PositionOptions): Promise<NativePosition | null> => {
   if (!isNative()) return null;
 
@@ -158,6 +170,26 @@ export const getNativePosition = async (options?: PositionOptions): Promise<Nati
     const asked = await Geolocation.requestPermissions();
     if (asked.location !== 'granted') {
       throw new Error('LOCATION_DENIED');
+    }
+  }
+
+  // En Android, el plugin propio dice además si la ubicación es simulada
+  // (migración 101). Si fallara, se sigue con el de Capacitor.
+  if (platform() === 'android') {
+    try {
+      const pos = await FiesteaLocation.getPosition({
+        enableHighAccuracy: options?.enableHighAccuracy ?? true,
+        timeout: options?.timeout ?? 15000,
+        maximumAge: options?.maximumAge ?? 0,
+      });
+      return {
+        latitude: pos.latitude,
+        longitude: pos.longitude,
+        accuracy: pos.accuracy ?? undefined,
+        mocked: pos.isMock,
+      };
+    } catch (error) {
+      if (error instanceof Error && /LOCATION_DENIED/.test(error.message)) throw new Error('LOCATION_DENIED');
     }
   }
 

@@ -315,7 +315,10 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const redeemEventCode = useCallback(
     async (code: string, coords?: Coordinates): Promise<EventAccess> => {
       const position = coords ?? lastKnownPosition.current ?? undefined;
-      const access = await api.redeemEventCode(code, position?.latitude, position?.longitude);
+      const access = await api.redeemEventCode(code, position?.latitude, position?.longitude, {
+        accuracy: position?.accuracy,
+        mocked: position?.mocked,
+      });
       // La ubicación del canje vale para el tablón: no hace falta pedirla otra vez.
       if (position) lastKnownPosition.current = position;
       setActiveEvent(access);
@@ -326,7 +329,10 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
   const enterPlatformEvent = useCallback(async (eventId: string, coords?: Coordinates): Promise<EventAccess> => {
     const position = coords ?? lastKnownPosition.current ?? undefined;
-    const access = await api.enterPlatformEvent(eventId, position?.latitude, position?.longitude);
+    const access = await api.enterPlatformEvent(eventId, position?.latitude, position?.longitude, {
+      accuracy: position?.accuracy,
+      mocked: position?.mocked,
+    });
     if (position) lastKnownPosition.current = position;
     setActiveEvent(access);
     return access;
@@ -350,15 +356,40 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     if (!activeEvent || userType !== 'user') return;
 
-    const beat = () => {
-      const coords = lastKnownPosition.current;
-      void api.heartbeatAttendance(activeEvent.eventId, coords?.latitude, coords?.longitude);
+    // Cada latido comprueba también dónde estás (migración 101): si te has
+    // alejado mucho de la fiesta o la ubicación es simulada, sales del
+    // tablón; si el negocio te ha expulsado, la app te lo dice y te saca.
+    const beat = async () => {
+      let coords = lastKnownPosition.current;
+      if (document.visibilityState === 'visible') {
+        const nueva = await getCurrentPosition({ enableHighAccuracy: false, timeout: 8000, maximumAge: 60_000 }).catch(
+          () => null,
+        );
+        if (nueva) {
+          lastKnownPosition.current = nueva;
+          coords = nueva;
+        }
+      }
+      const estado = await api.heartbeatAttendance(activeEvent.eventId, coords ?? {}).catch(() => 'ok' as const);
+      if (estado === 'ok') return;
+      toast({
+        title: t(estado === 'expelled' ? 'event.expelledTitle' : 'event.leftFarTitle'),
+        description: t(estado === 'expelled' ? 'event.expelledBody' : 'event.leftFarBody', { name: activeEvent.eventName }),
+        variant: estado === 'expelled' ? 'destructive' : undefined,
+      });
+      if (estado === 'left') {
+        leaveEvent();
+      } else {
+        setActiveEvent(null);
+        setNearbyProfiles([]);
+        setCurrentProfile(null);
+      }
     };
 
-    beat();
-    const interval = setInterval(beat, HEARTBEAT_INTERVAL_MS);
+    void beat();
+    const interval = setInterval(() => void beat(), HEARTBEAT_INTERVAL_MS);
     return () => clearInterval(interval);
-  }, [activeEvent, userType]);
+  }, [activeEvent, userType, leaveEvent, toast, t]);
 
   // Expulsa automáticamente cuando el evento termina.
   useEffect(() => {

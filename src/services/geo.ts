@@ -4,6 +4,8 @@ export interface Coordinates {
   latitude: number;
   longitude: number;
   accuracy?: number;
+  /** Android la marca como simulada (app de ubicación falsa): no vale para entrar. */
+  mocked?: boolean;
 }
 
 export class GeolocationError extends Error {

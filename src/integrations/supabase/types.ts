@@ -471,6 +471,8 @@ export type Database = {
           checked_in_at: string
           code_id: string | null
           event_id: string
+          expelled_at: string | null
+          expelled_by: string | null
           id: string
           last_seen_at: string
           latitude: number | null
@@ -485,6 +487,8 @@ export type Database = {
           checked_in_at?: string
           code_id?: string | null
           event_id: string
+          expelled_at?: string | null
+          expelled_by?: string | null
           id?: string
           last_seen_at?: string
           latitude?: number | null
@@ -499,6 +503,8 @@ export type Database = {
           checked_in_at?: string
           code_id?: string | null
           event_id?: string
+          expelled_at?: string | null
+          expelled_by?: string | null
           id?: string
           last_seen_at?: string
           latitude?: number | null
@@ -1052,6 +1058,35 @@ export type Database = {
             columns: ["venue_id"]
             isOneToOne: false
             referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_swipe_totals: {
+        Row: {
+          captured_at: string
+          event_id: string
+          swipers: number
+          swipes: number
+        }
+        Insert: {
+          captured_at?: string
+          event_id: string
+          swipers?: number
+          swipes?: number
+        }
+        Update: {
+          captured_at?: string
+          event_id?: string
+          swipers?: number
+          swipes?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_swipe_totals_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: true
+            referencedRelation: "events"
             referencedColumns: ["id"]
           },
         ]
@@ -2290,6 +2325,7 @@ export type Database = {
         Row: {
           created_at: string | null
           description: string | null
+          event_id: string | null
           id: string
           report_type: string
           reported_id: string
@@ -2301,6 +2337,7 @@ export type Database = {
         Insert: {
           created_at?: string | null
           description?: string | null
+          event_id?: string | null
           id?: string
           report_type: string
           reported_id: string
@@ -2312,6 +2349,7 @@ export type Database = {
         Update: {
           created_at?: string | null
           description?: string | null
+          event_id?: string | null
           id?: string
           report_type?: string
           reported_id?: string
@@ -2321,6 +2359,13 @@ export type Database = {
           status?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "reports_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "reports_reported_id_fkey"
             columns: ["reported_id"]
@@ -4108,7 +4153,34 @@ export type Database = {
       demographics_min_bucket: { Args: never; Returns: number }
       draw_raffle: { Args: { p_raffle_id: string }; Returns: string }
       enter_platform_event: {
-        Args: { p_event_id: string; p_latitude: number; p_longitude: number }
+        Args: {
+          p_accuracy?: number
+          p_event_id: string
+          p_latitude?: number
+          p_longitude?: number
+          p_mocked?: boolean
+        }
+        Returns: {
+          distance_meters: number
+          end_date: string
+          error_code: string
+          event_id: string
+          event_name: string
+          event_radius: number
+          start_date: string
+          venue_id: string
+          venue_name: string
+          venue_type: string
+        }[]
+      }
+      enter_platform_event_inner: {
+        Args: {
+          p_accuracy?: number
+          p_event_id: string
+          p_latitude: number
+          p_longitude: number
+          p_mocked?: boolean
+        }
         Returns: {
           distance_meters: number
           end_date: string
@@ -4123,6 +4195,10 @@ export type Database = {
       }
       event_trend: { Args: { p_event_id: string }; Returns: string }
       event_women_share: { Args: { p_event_id: string }; Returns: number }
+      expel_from_event: {
+        Args: { p_event_id: string; p_profile_id: string }
+        Returns: undefined
+      }
       export_my_data: { Args: never; Returns: Json }
       fiestea_client_ip: { Args: never; Returns: string }
       fiestea_require_location: {
@@ -4926,6 +5002,7 @@ export type Database = {
         Returns: {
           created_at: string
           description: string
+          expelled: boolean
           report_id: string
           report_type: string
           reported_name: string
@@ -4997,8 +5074,14 @@ export type Database = {
         }[]
       }
       heartbeat_event_attendance: {
-        Args: { p_event_id: string; p_latitude?: number; p_longitude?: number }
-        Returns: undefined
+        Args: {
+          p_accuracy?: number
+          p_event_id: string
+          p_latitude?: number
+          p_longitude?: number
+          p_mocked?: boolean
+        }
+        Returns: string
       }
       is_admin: { Args: never; Returns: boolean }
       is_current_user_verified: { Args: never; Returns: boolean }
@@ -5193,6 +5276,7 @@ export type Database = {
       purge_api_counters: { Args: never; Returns: undefined }
       purge_auth_throttle: { Args: never; Returns: number }
       purge_email_events: { Args: never; Returns: number }
+      purge_ended_event_likes: { Args: { p_limit?: number }; Returns: number }
       purge_ended_event_photos: {
         Args: { p_limit?: number }
         Returns: {
@@ -5250,7 +5334,34 @@ export type Database = {
       }
       recompute_my_verification: { Args: never; Returns: boolean }
       redeem_event_code: {
-        Args: { p_code: string; p_latitude?: number; p_longitude?: number }
+        Args: {
+          p_accuracy?: number
+          p_code: string
+          p_latitude?: number
+          p_longitude?: number
+          p_mocked?: boolean
+        }
+        Returns: {
+          distance_meters: number
+          end_date: string
+          error_code: string
+          event_id: string
+          event_name: string
+          event_radius: number
+          start_date: string
+          venue_id: string
+          venue_name: string
+          venue_type: string
+        }[]
+      }
+      redeem_event_code_inner: {
+        Args: {
+          p_accuracy?: number
+          p_code: string
+          p_latitude?: number
+          p_longitude?: number
+          p_mocked?: boolean
+        }
         Returns: {
           distance_meters: number
           end_date: string

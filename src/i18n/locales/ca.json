@@ -1005,7 +1005,7 @@
             "reportsSubtitle": "De les últimes 24 hores. Els pots retirar l'accés a l'esdeveniment.",
             "reportsTotal": "{{count}} denúncies en total",
             "revoke": "Treure",
-            "revoked": "{{name}} ja no és a l'esdeveniment",
+            "revoked": "{{name}} expulsat de la festa",
             "noEvent": "Crea un esdeveniment per fer servir aquesta pantalla.",
             "capacitySaved": "Aforament desat",
             "capacityPlaceholder": "Aforament màxim",
@@ -1020,7 +1020,7 @@
             "uses": "usos",
             "createCode": "Crear codi nou",
             "priority": "Prioritat",
-            "revokeAccess": "Retirar accés",
+            "revokeAccess": "Expulsar",
             "closeEntry": "Tancar la porta",
             "closeEntryTitle": "Tancar la porta?",
             "closeEntryBody": "Ningú més podrà entrar amb l'app: cap codi funcionarà. Qui ja és a dins continua a dins i pots reobrir quan vulguis.",
@@ -1037,7 +1037,9 @@
                 "notices": "Notificacions",
                 "promoters": "RRPP",
                 "lists": "Llistes"
-            }
+            },
+            "expelled": "Expulsat",
+            "expelConfirm": "Expulsar {{name}}? Sortirà del Flechazo, perdrà la foto de la nit i no podrà tornar a entrar en aquesta festa."
         },
         "codes": {
             "title": "Codis i qui porta gent",
@@ -1779,7 +1781,9 @@
                 "dismissed": "Descartat",
                 "reviewed": "Revisat",
                 "pending": "Pendent"
-            }
+            },
+            "expel": "Expulsar de {{event}}",
+            "expelled": "Expulsat de la festa"
         },
         "photos": {
             "title": "Fotos pendents",
@@ -2021,7 +2025,7 @@
             }
         },
         "eventForm": {
-            "platformSwipeHelp": "És una festa de Fiestea: allà no hi ha QR ni codi. Amb el swipe encès, la fitxa mostra «Soc aquí» i s’entra per ubicació; apagat, només «Hi aniré».",
+            "platformSwipeHelp": "És una festa de Fiestea: allà no hi ha QR ni codi. Amb ubicació i el Flechazo encès, la fitxa mostra «Entrar a l'esdeveniment» i s'entra sent-hi (es comprova el GPS); apagat, només «Hi aniré».",
             "settingsTitle": "Ajustos de la festa",
             "settingsAfterCreate": "El swipe, el recompte en directe, el % d’homes i dones i la Llista Fiestea s’ajusten editant la festa un cop creada."
         }
@@ -2141,7 +2145,7 @@
         "viewPoster": "Veure el cartell",
         "locationOff": "Sense ubicació",
         "locationOffBody": "Activa la ubicació de l'app als ajustos del mòbil per veure a quina distància és.",
-        "imHere": "Soc aquí"
+        "imHere": "Entrar a l'esdeveniment"
     },
     "venueTypes": {
         "discoteca": "Discoteca",
@@ -3499,5 +3503,11 @@
         "more": "Més",
         "copied": "Enllaç copiat",
         "instagramHint": "Enganxa’l en un xat o a la teva història d’Instagram."
+    },
+    "event": {
+        "expelledTitle": "Ja no ets a la festa",
+        "expelledBody": "El negoci t'ha retirat l'accés a {{name}} després d'una denúncia.",
+        "leftFarTitle": "Has sortit de la festa",
+        "leftFarBody": "Ets lluny de {{name}}, així que ja no surts al seu Flechazo. Si hi tornes, torna a entrar."
     }
 }

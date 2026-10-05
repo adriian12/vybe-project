@@ -65,6 +65,16 @@ describe('redeemEventCode', () => {
       p_code: '100001',
       p_latitude: 39.57,
       p_longitude: 2.65,
+      p_accuracy: null,
+      p_mocked: false,
+    });
+  });
+
+  it('lee el error que devuelve la fila (101) y no da por buena la entrada', async () => {
+    rpc.mockResolvedValue({ data: [{ ...row, event_id: null, error_code: 'LOCATION_MOCKED' }], error: null });
+
+    await expect(api.redeemEventCode('100001', 39.57, 2.65, { mocked: true })).rejects.toMatchObject({
+      code: 'LOCATION_MOCKED',
     });
   });
 

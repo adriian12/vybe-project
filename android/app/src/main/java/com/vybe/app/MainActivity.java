@@ -1,6 +1,7 @@
 package com.vybe.app;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.util.Log;
 import com.getcapacitor.BridgeActivity;
 import com.getcapacitor.Plugin;
@@ -15,6 +16,13 @@ import ee.forgr.capacitor.social.login.SocialLoginPlugin;
  * esta interfaz el plugin se niega a abrir el inicio de sesión.
  */
 public class MainActivity extends BridgeActivity implements ModifiedMainActivityForSocialLoginPlugin {
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        // Plugin propio: ubicación con aviso de «simulada» (migración 101).
+        registerPlugin(FiesteaLocationPlugin.class);
+        super.onCreate(savedInstanceState);
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
