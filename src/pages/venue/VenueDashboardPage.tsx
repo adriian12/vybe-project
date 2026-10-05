@@ -1077,7 +1077,33 @@ const VenueDashboardPage = () => {
         {/* ------------------------------------------------------- ventas */}
         {section === 'sales' && <VenueSales events={myEvents} plan={plan} />}
 
-        {section === 'business' && <VenueBusinessProfile venueId={currentVenue.id} />}
+        {/* Negocio: lo que el público ve en su ficha (datos, logo, ubicación,
+            descripción y horario) y cuánta gente le sigue, sin nombres. */}
+        {section === 'business' && (
+          <div className="mx-auto max-w-3xl space-y-4">
+            {followers && (
+              <div className="surface-light flex items-center gap-4 rounded-2xl p-4">
+                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-party-primary text-ink">
+                  <Heart size={22} />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-caption uppercase tracking-wide text-party-gray">{t('venue.followers.title')}</p>
+                  <p className="font-display text-headline-lg tabular">
+                    {followers.total}
+                    {followers.lastWeek > 0 && (
+                      <span className="ml-2 text-body-sm font-bold text-emerald-600">
+                        {t('venue.followers.thisWeek', { count: followers.lastWeek })}
+                      </span>
+                    )}
+                  </p>
+                  <p className="text-caption text-party-gray">{t('venue.followers.private')}</p>
+                </div>
+              </div>
+            )}
+            <VenueBusinessProfile venueId={currentVenue.id} />
+            <VenueProfileForm venueId={currentVenue.id} />
+          </div>
+        )}
 
         {section === 'team' && (
           <div className="mx-auto max-w-2xl">

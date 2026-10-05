@@ -1534,7 +1534,8 @@
             "notify": "Avisar els meus seguidors",
             "notified": "Avís enviat",
             "notifiedBody": "Els arriba als teus {{count}} seguidors.",
-            "alreadyNotified": "Ja s'ha avisat els teus seguidors d'aquest esdeveniment"
+            "alreadyNotified": "Ja s'ha avisat els teus seguidors d'aquest esdeveniment",
+            "private": "La teva fitxa mostra quants et segueixen, mai qui. Els avisem quan publiques una festa."
         },
         "profileForm": {
             "title": "Fitxa del negoci",
@@ -2018,6 +2019,11 @@
                 "PLAN_EVENT_LIMIT": "El local ha arribat al límit de festes del seu pla.",
                 "HOUSE_OWNER_MISSING": "Falta el compte de sistema del local de la casa."
             }
+        },
+        "eventForm": {
+            "platformSwipeHelp": "És una festa de Fiestea: allà no hi ha QR ni codi. Amb el swipe encès, la fitxa mostra «Soc aquí» i s’entra per ubicació; apagat, només «Hi aniré».",
+            "settingsTitle": "Ajustos de la festa",
+            "settingsAfterCreate": "El swipe, el recompte en directe, el % d’homes i dones i la Llista Fiestea s’ajusten editant la festa un cop creada."
         }
     },
     "pwa": {
@@ -2134,7 +2140,8 @@
         "intentNote": "En marcar «hi vaig», el negoci et veurà a la seva Llista Fiestea (nom, edat i foto).",
         "viewPoster": "Veure el cartell",
         "locationOff": "Sense ubicació",
-        "locationOffBody": "Activa la ubicació de l'app als ajustos del mòbil per veure a quina distància és."
+        "locationOffBody": "Activa la ubicació de l'app als ajustos del mòbil per veure a quina distància és.",
+        "imHere": "Soc aquí"
     },
     "venueTypes": {
         "discoteca": "Discoteca",

@@ -1534,7 +1534,8 @@
             "notify": "Notify my followers",
             "notified": "Notification sent",
             "notifiedBody": "It goes to your {{count}} followers.",
-            "alreadyNotified": "Your followers were already notified about this event"
+            "alreadyNotified": "Your followers were already notified about this event",
+            "private": "Your page shows how many people follow you, never who. We notify them when you publish a party."
         },
         "profileForm": {
             "title": "Venue page",
@@ -2018,6 +2019,11 @@
                 "PLAN_EVENT_LIMIT": "The venue has reached its plan's party limit.",
                 "HOUSE_OWNER_MISSING": "The house venue's system account is missing."
             }
+        },
+        "eventForm": {
+            "platformSwipeHelp": "This is a Fiestea party: there is no QR or code at the door. With swipe on, the page shows “I’m here” and people enter by location; with it off, only “I’m going”.",
+            "settingsTitle": "Party settings",
+            "settingsAfterCreate": "Swipe, live headcount, men/women split and Fiestea list are set by editing the party once it is created."
         }
     },
     "pwa": {
@@ -2134,7 +2140,8 @@
         "intentNote": "When you mark \"I'm going\", the venue will see you on its Fiestea List (name, age and photo).",
         "viewPoster": "View poster",
         "locationOff": "No location",
-        "locationOffBody": "Turn on the app's location in your phone settings to see how far it is."
+        "locationOffBody": "Turn on the app's location in your phone settings to see how far it is.",
+        "imHere": "I’m here"
     },
     "venueTypes": {
         "discoteca": "Club",

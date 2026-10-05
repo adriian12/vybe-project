@@ -1534,7 +1534,8 @@
             "notify": "Avisar a mis seguidores",
             "notified": "Aviso enviado",
             "notifiedBody": "Les llega a tus {{count}} seguidores.",
-            "alreadyNotified": "Ya se avisó de este evento a tus seguidores"
+            "alreadyNotified": "Ya se avisó de este evento a tus seguidores",
+            "private": "Tu ficha enseña cuántos te siguen, nunca quiénes. Les avisamos cuando publicas una fiesta."
         },
         "profileForm": {
             "title": "Ficha del negocio",
@@ -2018,6 +2019,11 @@
                 "PLAN_EVENT_LIMIT": "El local ha llegado al límite de fiestas de su plan.",
                 "HOUSE_OWNER_MISSING": "Falta la cuenta de sistema del local de la casa."
             }
+        },
+        "eventForm": {
+            "platformSwipeHelp": "Es una fiesta de Fiestea: allí no hay QR ni código. Con el swipe encendido, la ficha enseña «Estoy aquí» y se entra por ubicación; apagado, sólo «Voy a ir».",
+            "settingsTitle": "Ajustes de la fiesta",
+            "settingsAfterCreate": "Swipe, recuento en directo, % de hombres y mujeres y Lista Fiestea se ajustan al editar la fiesta, una vez creada."
         }
     },
     "pwa": {
@@ -2134,7 +2140,8 @@
         "intentNote": "Al marcar «voy a ir», el negocio te verá en su Lista Fiestea (nombre, edad y foto).",
         "viewPoster": "Ver el cartel",
         "locationOff": "Sin ubicación",
-        "locationOffBody": "Activa la ubicación de la app en los ajustes del móvil para ver a qué distancia está."
+        "locationOffBody": "Activa la ubicación de la app en los ajustes del móvil para ver a qué distancia está.",
+        "imHere": "Estoy aquí"
     },
     "venueTypes": {
         "discoteca": "Discoteca",

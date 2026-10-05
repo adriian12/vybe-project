@@ -362,7 +362,7 @@ const TicketsPage = () => {
 
                         <div className="mt-auto flex items-center justify-between gap-2 border-t border-black/[0.08] pt-2">
                           <span className="text-caption text-ink/60">{t('tickets.youreGoing')}</span>
-                          {directo ? (
+                          {directo && (!event.byPlatform || event.swipeEnabled) ? (
                             <button
                               type="button"
                               onClick={(e) => {

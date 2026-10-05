@@ -1534,7 +1534,8 @@
             "notify": "Meine Follower benachrichtigen",
             "notified": "Benachrichtigung gesendet",
             "notifiedBody": "Sie geht an deine {{count}} Follower.",
-            "alreadyNotified": "Deine Follower wurden über dieses Event schon benachrichtigt"
+            "alreadyNotified": "Deine Follower wurden über dieses Event schon benachrichtigt",
+            "private": "Deine Seite zeigt, wie viele dir folgen, nie wer. Wir benachrichtigen sie, wenn du eine Party veröffentlichst."
         },
         "profileForm": {
             "title": "Location-Profil",
@@ -2018,6 +2019,11 @@
                 "PLAN_EVENT_LIMIT": "Der Betrieb hat das Party-Limit seines Plans erreicht.",
                 "HOUSE_OWNER_MISSING": "Das Systemkonto des Hauses fehlt."
             }
+        },
+        "eventForm": {
+            "platformSwipeHelp": "Das ist eine Fiestea-Party: Vor Ort gibt es weder QR-Code noch Code. Mit Swipe zeigt die Seite „Ich bin da“ und man kommt per Standort rein; ohne nur „Ich gehe hin“.",
+            "settingsTitle": "Party-Einstellungen",
+            "settingsAfterCreate": "Swipe, Live-Zählung, Anteil Männer/Frauen und Fiestea-Liste stellst du nach dem Erstellen beim Bearbeiten ein."
         }
     },
     "pwa": {
@@ -2134,7 +2140,8 @@
         "intentNote": "Wenn du „Ich gehe hin“ markierst, sieht dich die Location auf ihrer Fiestea-Liste (Name, Alter und Foto).",
         "viewPoster": "Plakat ansehen",
         "locationOff": "Kein Standort",
-        "locationOffBody": "Aktiviere den Standort der App in den Handy-Einstellungen, um die Entfernung zu sehen."
+        "locationOffBody": "Aktiviere den Standort der App in den Handy-Einstellungen, um die Entfernung zu sehen.",
+        "imHere": "Ich bin da"
     },
     "venueTypes": {
         "discoteca": "Club",

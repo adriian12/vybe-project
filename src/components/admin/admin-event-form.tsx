@@ -11,6 +11,7 @@ import { PartyButton } from '@/components/ui-custom/party-button';
 import { useToast } from '@/components/ui/use-toast';
 import { adminService, AdminEventInput, AdminVenue } from '@/services/admin';
 import LocationPicker, { PickedLocation } from '@/components/venue/location-picker';
+import EventLiveSettings from '@/components/venue/event-live-settings';
 import { Event } from '@/types/venue';
 
 const HOUSE = 'house';
@@ -274,6 +275,17 @@ const AdminEventForm = ({
           }}
         />
       </div>
+
+      {/* Swipe, recuento, % de hombres y mujeres y Lista Fiestea: los mismos
+          interruptores que el panel del negocio; se guardan al tocarlos. */}
+      {editando && event ? (
+        <div className="space-y-2">
+          {deLaCasa && <p className="text-caption text-ink/60">{t('admin.eventForm.platformSwipeHelp')}</p>}
+          <EventLiveSettings eventId={event.id} className="border border-black/10" />
+        </div>
+      ) : (
+        <p className="text-caption text-ink/60">{t('admin.eventForm.settingsAfterCreate')}</p>
+      )}
 
       <PartyButton
         className={bare ? 'w-full gap-2' : 'w-full gap-2 sm:w-auto'}

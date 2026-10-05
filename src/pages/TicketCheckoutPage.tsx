@@ -104,7 +104,8 @@ const TicketCheckoutPage = () => {
       if (pideCorreo && a.email.trim().toLowerCase() !== a.emailConfirm.trim().toLowerCase()) {
         e.emailConfirm = 'tickets.checkout.errors.emailMatch';
       }
-      if (i === 0 && a.phone.replace(/\D/g, '').length < 9) e.phone = 'tickets.checkout.errors.phone';
+      // El teléfono es opcional; si se escribe, que sea un número de verdad.
+      if (a.phone.trim() && a.phone.replace(/\D/g, '').length < 9) e.phone = 'tickets.checkout.errors.phone';
       if (!/^\d{4}-\d{2}-\d{2}$/.test(a.birthdate)) e.birthdate = 'tickets.checkout.errors.birthdate';
       else if (info.minAge && edadEn(a.birthdate, info.startDate) < info.minAge) e.birthdate = 'tickets.checkout.errors.minAge';
       return e;
@@ -212,7 +213,7 @@ const TicketCheckoutPage = () => {
   const hoy = new Date().toISOString().slice(0, 10);
 
   return (
-    <div className="min-h-screen pb-[calc(var(--nav-h)+7rem)] pt-[var(--header-h)]">
+    <div className="min-h-screen pb-[calc(var(--safe-bottom)+8rem)] pt-[var(--header-h)]">
       <Header />
 
       <main className="mx-auto max-w-2xl space-y-5 px-margin pt-3">
@@ -347,7 +348,7 @@ const TicketCheckoutPage = () => {
                 </div>
                 <div className="grid gap-3 sm:grid-cols-2">
                   {campo(i, 'phone', {
-                    label: i === 0 ? t('tickets.checkout.phone') : t('tickets.checkout.phoneOptional'),
+                    label: t('tickets.checkout.phoneOptional'),
                     type: 'tel',
                     inputMode: 'tel',
                     autoComplete: i === 0 ? 'tel' : 'off',
@@ -439,8 +440,10 @@ const TicketCheckoutPage = () => {
       </main>
 
       {!agotada && info.purchasable && (
-        <div className="fixed inset-x-0 bottom-[var(--nav-h)] z-30 border-t border-white/10 bg-background/95 px-margin py-3 backdrop-blur">
-          <div className="mx-auto flex max-w-2xl items-center gap-3">
+        // Esta pantalla no lleva la barra de abajo: el botón va pegado al borde,
+        // por encima de la zona segura del móvil (antes flotaba a media altura).
+        <div className="pb-safe fixed inset-x-0 bottom-0 z-30 border-t border-white/10 bg-background/95 px-margin backdrop-blur">
+          <div className="mx-auto flex max-w-2xl items-center gap-3 py-3">
             <div className="min-w-0">
               <p className="text-caption text-party-gray">{t('tickets.checkout.total')}</p>
               <p className="font-display text-title-card tabular">{gratis ? t('tickets.buy.free') : euros(total)}</p>

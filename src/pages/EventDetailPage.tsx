@@ -479,16 +479,18 @@ const EventDetailPage = () => {
               <Undo2 size={20} />
               {t('home.goBack')}
             </button>
-          ) : live ? (
+          ) : live && (!event.byPlatform || event.swipeEnabled) ? (
             // En directo lo que toca es entrar; decir que vas sigue en el
-            // marcador de arriba.
+            // marcador de arriba. Las fiestas de Fiestea no tienen QR ni código
+            // en la puerta: sólo se entra (por ubicación) si administración ha
+            // encendido el swipe; si no, se queda «Voy a ir» (migración 100).
             <button
               type="button"
               onClick={() => navigate(`/event/${event.id}/access`)}
               className="press flex h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-party-primary font-display text-title-card font-extrabold uppercase tracking-wide text-ink shadow-lg"
             >
               {event.byPlatform ? <MapPinIcon size={20} /> : <QrCode size={20} />}
-              {t('eventDetail.enterNow')}
+              {event.byPlatform ? t('eventDetail.imHere') : t('eventDetail.enterNow')}
             </button>
           ) : (
             <button
