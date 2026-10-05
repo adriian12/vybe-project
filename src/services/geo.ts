@@ -75,7 +75,7 @@ export const getCurrentPosition = async (
   // propio diálogo de permisos y el GPS del teléfono. El navegador es el caso
   // de respaldo, no al revés.
   try {
-    const native = await getNativePosition();
+    const native = await getNativePosition(options);
     if (native) return native;
   } catch (error) {
     if (error instanceof Error && error.message === 'LOCATION_DENIED') {
@@ -119,6 +119,13 @@ export const getCurrentPosition = async (
 };
 
 /** Distancia en metros entre dos puntos (fórmula de Haversine). */
+/**
+ * Posición rápida: vale una de hace hasta 5 minutos y no exige el GPS fino.
+ * Para el tablón basta saber en qué sala estás; esperar al GPS preciso (hasta
+ * 15 s) dejaba la pantalla vacía al entrar.
+ */
+export const FAST_POSITION: PositionOptions = { enableHighAccuracy: false, timeout: 6000, maximumAge: 300_000 };
+
 export const calculateDistance = (
   lat1: number,
   lon1: number,

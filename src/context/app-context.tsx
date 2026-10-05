@@ -14,7 +14,7 @@ import { Venue, Event, EventAccess } from '@/types/venue';
 import { api, ApiError } from '@/services/api';
 import { socialService, DiscoveryFilters } from '@/services/social';
 import { identifyUser } from '@/lib/observability';
-import { getCurrentPosition, Coordinates } from '@/services/geo';
+import { getCurrentPosition, Coordinates, FAST_POSITION } from '@/services/geo';
 import { markMatchCelebrated, unregisterNativePush } from '@/services/native-push';
 import { onAppResume } from '@/services/native';
 import type { VenueRole } from '@/services/venue-service';
@@ -316,6 +316,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     async (code: string, coords?: Coordinates): Promise<EventAccess> => {
       const position = coords ?? lastKnownPosition.current ?? undefined;
       const access = await api.redeemEventCode(code, position?.latitude, position?.longitude);
+      // La ubicación del canje vale para el tablón: no hace falta pedirla otra vez.
+      if (position) lastKnownPosition.current = position;
       setActiveEvent(access);
       return access;
     },
@@ -325,6 +327,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const enterPlatformEvent = useCallback(async (eventId: string, coords?: Coordinates): Promise<EventAccess> => {
     const position = coords ?? lastKnownPosition.current ?? undefined;
     const access = await api.enterPlatformEvent(eventId, position?.latitude, position?.longitude);
+    if (position) lastKnownPosition.current = position;
     setActiveEvent(access);
     return access;
   }, []);
@@ -391,7 +394,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     const turno = ++cargaPerfiles.current;
 
     try {
-      const coords = lastKnownPosition.current ?? (await getCurrentPosition().catch(() => null));
+      const coords = lastKnownPosition.current ?? (await getCurrentPosition(FAST_POSITION).catch(() => null));
       if (coords) lastKnownPosition.current = coords;
 
       // Sin ubicación se pregunta igual: en un evento sin ubicación (la sala de
@@ -574,25 +577,33 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
   const registerSwipe = useCallback(
     async (userId: string, type: 'like' | 'dislike' | 'super_like'): Promise<boolean> => {
+      // Optimista: la siguiente persona sale al momento y el servidor guarda
+      // la decisión por detrás. Antes se esperaba a la red (y, con match, a
+      // recargar los crushes) y entre tarjeta y tarjeta quedaba un hueco.
+      const perfil = nearbyProfiles.find((p) => p.id === userId) ?? null;
+      advanceProfile(userId);
       try {
         const isMatch = await api.swipe(userId, type, activeEvent?.eventId);
 
         if (isMatch) {
           // Esta pantalla ya lo celebra: el aviso push del mismo match sobra.
           markMatchCelebrated(userId);
-          const matched = nearbyProfiles.find((p) => p.id === userId);
-          await loadConnections();
-          if (matched) {
+          void loadConnections();
+          if (perfil) {
             toast({
               title: t('match.newConnection'),
-              description: t('match.connectedWith', { name: matched.name }),
+              description: t('match.connectedWith', { name: perfil.name }),
             });
           }
         }
 
-        advanceProfile(userId);
         return isMatch;
       } catch (error) {
+        // No se guardó: la tarjeta vuelve la primera para decidir otra vez.
+        if (perfil) {
+          setNearbyProfiles((prev) => (prev.some((p) => p.id === userId) ? prev : [perfil, ...prev]));
+          setCurrentProfile(perfil);
+        }
         toast({
           title: t('common.error'),
           description: error instanceof ApiError ? error.message : t('errors.generic'),

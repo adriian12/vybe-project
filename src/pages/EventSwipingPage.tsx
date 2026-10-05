@@ -103,6 +103,26 @@ const EventSwipingPage = () => {
 
   const tarjeta = useRef<ProfileCardHandle | null>(null);
 
+  // Las fotos de las siguientes personas se descargan ya: al deslizar, la
+  // próxima tarjeta sale pintada en vez de cargarse delante de ti.
+  useEffect(() => {
+    for (const perfil of nearbyProfiles.slice(0, 4)) {
+      const url = perfil.photos[0] ?? perfil.avatar;
+      if (url) new Image().src = url;
+    }
+  }, [nearbyProfiles]);
+
+  // Con el tablón vacío se vuelve a mirar cada 8 s: llega gente nueva, o tu
+  // foto de la noche se acaba de aprobar (hasta entonces el servidor no
+  // enseña a nadie). Antes había que salir y volver a entrar.
+  const tablonVacio = nearbyProfiles.length === 0;
+  const puedeDeslizar = Boolean(activeEvent?.photoUrl);
+  useEffect(() => {
+    if (!tablonVacio || !puedeDeslizar) return;
+    const reloj = setInterval(() => void loadProfiles(), 8000);
+    return () => clearInterval(reloj);
+  }, [tablonVacio, puedeDeslizar, loadProfiles]);
+
   const extras = useNightExtras(activeEvent?.eventId ?? eventId ?? '', loadProfiles);
 
   // Cómo se entra a la fiesta lo dice el tipo de cuenta; un vyber puede pasar

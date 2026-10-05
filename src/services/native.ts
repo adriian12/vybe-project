@@ -148,7 +148,7 @@ export interface NativePosition {
  * tienda de aplicaciones, y funciona con el GPS del teléfono en vez de con la
  * aproximación del navegador.
  */
-export const getNativePosition = async (): Promise<NativePosition | null> => {
+export const getNativePosition = async (options?: PositionOptions): Promise<NativePosition | null> => {
   if (!isNative()) return null;
 
   const { Geolocation } = await import('@capacitor/geolocation');
@@ -161,9 +161,12 @@ export const getNativePosition = async (): Promise<NativePosition | null> => {
     }
   }
 
+  // Por defecto, GPS preciso. Quien sólo necesita saber más o menos dónde está
+  // (el tablón) pide una posición rápida y acepta una reciente (`maximumAge`).
   const position = await Geolocation.getCurrentPosition({
-    enableHighAccuracy: true,
-    timeout: 15000,
+    enableHighAccuracy: options?.enableHighAccuracy ?? true,
+    timeout: options?.timeout ?? 15000,
+    maximumAge: options?.maximumAge ?? 0,
   });
 
   return {

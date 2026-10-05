@@ -45,10 +45,41 @@ const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(({ user, onS
   const [salida, setSalida] = useState<SwipeDirection | null>(null);
   const [showReport, setShowReport] = useState(false);
 
-  // Arrastre con el dedo: la tarjeta sigue la mano y se decide al soltar.
-  const [drag, setDrag] = useState(0);
+  // Arrastre con el dedo: la tarjeta sigue la mano y se decide al soltar. El
+  // movimiento no pasa por el estado de React: con un render por cada evento
+  // del dedo (foto incluida) el WebView de Android iba a tirones. Se escribe
+  // el `transform` directamente, una vez por fotograma.
   const [dragging, setDragging] = useState(false);
   const startX = useRef<number | null>(null);
+  const drag = useRef(0);
+  const frame = useRef<number | null>(null);
+  const cardEl = useRef<HTMLDivElement | null>(null);
+  const likeEl = useRef<HTMLDivElement | null>(null);
+  const nopeEl = useRef<HTMLDivElement | null>(null);
+
+  const pintar = useCallback(() => {
+    frame.current = null;
+    const x = drag.current;
+    if (cardEl.current) cardEl.current.style.transform = x !== 0 ? `translate3d(${x}px,0,0) rotate(${x / 25}deg)` : '';
+    const opacidad = Math.min(Math.abs(x) / DECISION_THRESHOLD, 1);
+    if (likeEl.current) likeEl.current.style.opacity = x > 0 ? String(opacidad) : '0';
+    if (nopeEl.current) nopeEl.current.style.opacity = x < 0 ? String(opacidad) : '0';
+  }, []);
+
+  const moverA = useCallback(
+    (x: number) => {
+      drag.current = x;
+      if (frame.current === null) frame.current = requestAnimationFrame(pintar);
+    },
+    [pintar],
+  );
+
+  useEffect(
+    () => () => {
+      if (frame.current !== null) cancelAnimationFrame(frame.current);
+    },
+    [],
+  );
 
   const lanzar = useCallback(
     (direction: SwipeDirection) => {
@@ -60,22 +91,22 @@ const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(({ user, onS
         // vuelve en vez de quedarse invisible.
         setTimeout(() => {
           setSalida(null);
-          setDrag(0);
+          moverA(0);
         }, 600);
       }, EXIT_MS);
     },
-    [onSwipe, salida, user.id],
+    [onSwipe, salida, user.id, moverA],
   );
 
   useImperativeHandle(ref, () => ({ swipe: lanzar }), [lanzar]);
 
   // Cada perfil entra centrado, aunque el anterior saliera arrastrado.
   useEffect(() => {
-    setDrag(0);
+    moverA(0);
     setDragging(false);
     setSalida(null);
     startX.current = null;
-  }, [user.id]);
+  }, [user.id, moverA]);
 
   const onPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
     if ((event.target as HTMLElement).closest('button') || salida) return;
@@ -86,45 +117,42 @@ const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(({ user, onS
 
   const onPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
     if (startX.current === null) return;
-    setDrag(event.clientX - startX.current);
+    moverA(event.clientX - startX.current);
   };
 
   const onPointerUp = () => {
     if (startX.current === null) return;
 
-    const distance = drag;
+    const distance = drag.current;
     startX.current = null;
     setDragging(false);
 
     if (distance > DECISION_THRESHOLD) lanzar('right');
     else if (distance < -DECISION_THRESHOLD) lanzar('left');
-    else setDrag(0);
+    else moverA(0);
   };
 
-  /** Opacidad de los sellos según lo lejos que se haya arrastrado. */
-  const stampOpacity = Math.min(Math.abs(drag) / DECISION_THRESHOLD, 1);
-
-  const transform = salida
+  // La salida sí va por React (un solo cambio); el arrastre lo pinta `pintar`.
+  const salidaTransform = salida
     ? salida === 'left'
-      ? 'translateX(-130%) rotate(-14deg)'
+      ? 'translate3d(-130%,0,0) rotate(-14deg)'
       : salida === 'right'
-        ? 'translateX(130%) rotate(14deg)'
-        : 'translateY(-120%) scale(0.96)'
-    : drag !== 0
-      ? `translateX(${drag}px) rotate(${drag / 25}deg)`
-      : 'none';
+        ? 'translate3d(130%,0,0) rotate(14deg)'
+        : 'translate3d(0,-120%,0) scale(0.96)'
+    : undefined;
 
   const foto = user.photos[0] ?? user.avatar ?? FALLBACK_PHOTO;
 
   return (
     <div
-      className="absolute inset-0 touch-pan-y select-none"
+      ref={cardEl}
+      className="absolute inset-0 touch-pan-y select-none will-change-transform"
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
       onPointerCancel={onPointerUp}
       style={{
-        transform,
+        ...(salidaTransform ? { transform: salidaTransform } : {}),
         opacity: salida ? 0 : 1,
         transition: dragging
           ? 'none'
@@ -135,22 +163,20 @@ const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(({ user, onS
         <img src={foto} alt="" draggable={false} className="h-full w-full object-cover" />
 
         {/* Sellos de decisión: dicen qué va a pasar antes de soltar. */}
-        {drag > 0 && (
-          <div
-            className="absolute left-6 top-6 z-20 rotate-[-18deg] rounded-xl border-4 border-party-primary px-3 py-1 font-display text-2xl font-black uppercase text-party-primary"
-            style={{ opacity: stampOpacity }}
-          >
-            {t('swiping.stampLike')}
-          </div>
-        )}
-        {drag < 0 && (
-          <div
-            className="absolute right-6 top-6 z-20 rotate-[18deg] rounded-xl border-4 border-white px-3 py-1 font-display text-2xl font-black uppercase text-white"
-            style={{ opacity: stampOpacity }}
-          >
-            {t('swiping.stampNope')}
-          </div>
-        )}
+        <div
+          ref={likeEl}
+          className="pointer-events-none absolute left-6 top-6 z-20 rotate-[-18deg] rounded-xl border-4 border-party-primary px-3 py-1 font-display text-2xl font-black uppercase text-party-primary"
+          style={{ opacity: 0 }}
+        >
+          {t('swiping.stampLike')}
+        </div>
+        <div
+          ref={nopeEl}
+          className="pointer-events-none absolute right-6 top-6 z-20 rotate-[18deg] rounded-xl border-4 border-white px-3 py-1 font-display text-2xl font-black uppercase text-white"
+          style={{ opacity: 0 }}
+        >
+          {t('swiping.stampNope')}
+        </div>
 
         <button
           type="button"
