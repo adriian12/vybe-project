@@ -24,6 +24,9 @@ interface MapFiltersSheetProps {
   onLive: (value: boolean) => void;
   free: boolean;
   onFree: (value: boolean) => void;
+  /** «Con Flechazo» (en directo y con el tablón encendido). Sin `onFlechazo` no sale. */
+  flechazo?: boolean;
+  onFlechazo?: (value: boolean) => void;
   /** Cuántos eventos quedan con lo elegido. */
   results: number;
   onReset: () => void;
@@ -52,6 +55,8 @@ const MapFiltersSheet = ({
   onLive,
   free,
   onFree,
+  flechazo = false,
+  onFlechazo,
   results,
   onReset,
 }: MapFiltersSheetProps) => {
@@ -90,6 +95,12 @@ const MapFiltersSheet = ({
                 {free && <Check size={14} />}
                 {t('map.freeOnly')}
               </button>
+              {onFlechazo && (
+                <button type="button" onClick={() => onFlechazo(!flechazo)} aria-pressed={flechazo} className={pill(flechazo)}>
+                  {flechazo && <Check size={14} />}
+                  {t('filters.flechazo')}
+                </button>
+              )}
             </>,
           )}
 

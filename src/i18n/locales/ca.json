@@ -381,7 +381,8 @@
             "tardeo": "Comença entre les 17:00 i les 23:00",
             "nocheo": "Comença entre les 23:00 i les 5:00",
             "after": "Comença entre les 5:00 i les 14:00"
-        }
+        },
+        "flechazo": "Amb Flechazo"
     },
     "match": {
         "title": "{{name}}!",

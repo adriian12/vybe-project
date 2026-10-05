@@ -25,7 +25,7 @@ import { cn } from '@/lib/utils';
 import { VenueType } from '@/types/venue';
 import { featuredFirst, isFeatured } from '@/lib/featured';
 import MapFiltersSheet from '@/components/map-filters-sheet';
-import { aplicarFiltros, Franja } from '@/lib/party-filters';
+import { aplicarFiltros, conFlechazo, Franja } from '@/lib/party-filters';
 
 /** Centro por defecto: Palma, cuando no hay ubicación ni eventos con punto. */
 const PALMA: L.LatLngTuple = [39.5696, 2.6502];
@@ -73,7 +73,9 @@ const TIPOS: VenueType[] = ['discoteca', 'bar', 'festival', 'fiesta_privada', 'e
 const MapPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { activeEvent } = useAppContext();
+  const { activeEvent, currentUser } = useAppContext();
+  // Los invitados no usan el Flechazo: no se les ofrece ese filtro.
+  const esInvitado = currentUser?.accountType === 'guest';
   const { withDistance, position, activity } = useEventsFeed();
 
   const contenedor = useRef<HTMLDivElement | null>(null);
@@ -86,6 +88,7 @@ const MapPage = () => {
   const [busqueda, setBusqueda] = useState('');
   const [tipo, setTipo] = useState<VenueType | null>(null);
   const [soloDirecto, setSoloDirecto] = useState(false);
+  const [soloFlechazo, setSoloFlechazo] = useState(false);
   // La fecha es la misma que en inicio (por defecto, hoy).
   const fecha = useDateSelection();
   const [soloGratis, setSoloGratis] = useState(false);
@@ -122,6 +125,7 @@ const MapPage = () => {
     return featuredFirst(aplicarFiltros(conPunto, theme, franja).filter(({ event }) => {
       if (tipo && event.venueType !== tipo) return false;
       if (soloDirecto && !isEventLive(event)) return false;
+      if (soloFlechazo && !conFlechazo(event)) return false;
       if (!matchesDate(event, fecha)) return false;
       if (soloGratis && (event.price ?? 0) > 0) return false;
       if (
@@ -140,7 +144,7 @@ const MapPage = () => {
         .replace(/\p{Diacritic}/gu, '');
       return texto.includes(q);
     }));
-  }, [conPunto, busqueda, tipo, soloDirecto, fecha, soloGratis, desde, theme, franja]);
+  }, [conPunto, busqueda, tipo, soloDirecto, soloFlechazo, fecha, soloGratis, desde, theme, franja]);
 
   const temasMapa = useMemo(() => {
     const encontrados = new Set<string>();
@@ -260,7 +264,7 @@ const MapPage = () => {
   const abrir = (id: string) =>
     navigate(activeEvent?.eventId === id ? `/event/${id}/live` : `/event/${id}`);
 
-  const filtrosActivos = [soloDirecto, soloGratis, tipo !== null, theme !== null, franja !== null].filter(
+  const filtrosActivos = [soloDirecto, soloGratis, soloFlechazo, tipo !== null, theme !== null, franja !== null].filter(
     Boolean,
   ).length;
   const cercanos = visibles.filter((e) => e.distance !== null && e.distance <= 10_000).length;
@@ -346,6 +350,8 @@ const MapPage = () => {
           onLive={setSoloDirecto}
           free={soloGratis}
           onFree={setSoloGratis}
+          flechazo={soloFlechazo}
+          onFlechazo={esInvitado ? undefined : setSoloFlechazo}
           results={visibles.length}
           onReset={() => {
             setTipo(null);
@@ -353,6 +359,7 @@ const MapPage = () => {
             setFranja(null);
             setSoloDirecto(false);
             setSoloGratis(false);
+            setSoloFlechazo(false);
           }}
         />
 

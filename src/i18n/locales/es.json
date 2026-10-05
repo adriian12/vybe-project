@@ -381,7 +381,8 @@
             "tardeo": "Empieza entre las 17:00 y las 23:00",
             "nocheo": "Empieza entre las 23:00 y las 5:00",
             "after": "Empieza entre las 5:00 y las 14:00"
-        }
+        },
+        "flechazo": "Con Flechazo"
     },
     "match": {
         "title": "¡{{name}}!",

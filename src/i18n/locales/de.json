@@ -381,7 +381,8 @@
             "tardeo": "Beginnt zwischen 17 und 23 Uhr",
             "nocheo": "Beginnt zwischen 23 und 5 Uhr",
             "after": "Beginnt zwischen 5 und 14 Uhr"
-        }
+        },
+        "flechazo": "Mit Flechazo"
     },
     "match": {
         "title": "{{name}}!",

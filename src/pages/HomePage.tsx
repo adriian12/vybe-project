@@ -14,7 +14,7 @@ import { isFeatured } from '@/lib/featured';
 import PartyFilters, { useDateLabel } from '@/components/party-filters';
 import { isNearDate, matchesDate, nightOf, useDateSelection } from '@/lib/date-filter';
 import RatePartyPrompt from '@/components/rate-party';
-import { aplicarFiltros, Franja } from '@/lib/party-filters';
+import { aplicarFiltros, conFlechazo, Franja } from '@/lib/party-filters';
 
 /** Cuántas tarjetas caben en el carrusel de destacados. */
 const DESTACADOS = 5;
@@ -42,6 +42,7 @@ const HomePage = () => {
 
   const [theme, setTheme] = useState<string | null>(null);
   const [franja, setFranja] = useState<Franja | null>(null);
+  const [soloFlechazo, setSoloFlechazo] = useState(false);
   const [avisosAbiertos, setAvisosAbiertos] = useState(false);
   const avisos = useActivity(intents);
 
@@ -66,7 +67,10 @@ const HomePage = () => {
   }, [withDistance]);
 
   // Música y horario; después, la fecha (por defecto, hoy).
-  const filtrados = useMemo(() => aplicarFiltros(withDistance, theme, franja), [withDistance, theme, franja]);
+  const filtrados = useMemo(
+    () => aplicarFiltros(withDistance, theme, franja).filter(({ event }) => !soloFlechazo || conFlechazo(event)),
+    [withDistance, theme, franja, soloFlechazo],
+  );
   const fecha = useDateSelection();
   const etiquetaFecha = useDateLabel();
   const delDia = useMemo(() => filtrados.filter(({ event }) => matchesDate(event, fecha)), [filtrados, fecha]);
@@ -226,6 +230,8 @@ const HomePage = () => {
             franja={franja}
             onFranja={setFranja}
             nights={noches}
+            flechazo={soloFlechazo}
+            onFlechazo={currentUser?.accountType === 'guest' ? undefined : setSoloFlechazo}
           />
         )}
 

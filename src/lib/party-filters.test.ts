@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { aplicarFiltros, franjaDe } from './party-filters';
+import { aplicarFiltros, franjaDe, conFlechazo } from './party-filters';
 
 /** Un evento que empieza a esa hora local. */
 const a = (hora: number, minuto = 0) => {
@@ -37,5 +37,27 @@ describe('franjas de la fiesta', () => {
     expect(aplicarFiltros(lista, 'Techno', 'nocheo')).toHaveLength(1);
     expect(aplicarFiltros(lista, null, 'nocheo')).toHaveLength(2);
     expect(aplicarFiltros(lista, 'Techno', null)).toHaveLength(2);
+  });
+});
+
+describe('conFlechazo', () => {
+  const ahora = new Date('2026-10-05T23:30:00Z').getTime();
+  const base = {
+    startDate: '2026-10-05T22:00:00Z',
+    endDate: '2026-10-06T05:00:00Z',
+    swipeEnabled: true,
+    byPlatform: false,
+    location: undefined,
+  };
+  it('en directo y con Flechazo', () => {
+    expect(conFlechazo(base, ahora)).toBe(true);
+  });
+  it('sin Flechazo, o fuera de hora, no', () => {
+    expect(conFlechazo({ ...base, swipeEnabled: false }, ahora)).toBe(false);
+    expect(conFlechazo({ ...base, startDate: '2026-10-06T01:00:00Z' }, ahora)).toBe(false);
+  });
+  it('las de Fiestea, sólo con ubicación', () => {
+    expect(conFlechazo({ ...base, byPlatform: true }, ahora)).toBe(false);
+    expect(conFlechazo({ ...base, byPlatform: true, location: { latitude: 39.5, longitude: 2.6 } }, ahora)).toBe(true);
   });
 });

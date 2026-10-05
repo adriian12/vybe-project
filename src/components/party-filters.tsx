@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CalendarDays, Check, ChevronDown, Clock, Music, X } from 'lucide-react';
+import { CalendarDays, Check, ChevronDown, Clock, Heart, Music, X } from 'lucide-react';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Calendar } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
@@ -92,6 +92,9 @@ interface PartyFiltersProps {
   onFranja: (franja: Franja | null) => void;
   /** Noches con fiestas, para los puntos del calendario. */
   nights: string[];
+  /** «Con Flechazo»: sólo fiestas en directo con el tablón encendido. Sin `onFlechazo` no sale (invitados). */
+  flechazo?: boolean;
+  onFlechazo?: (value: boolean) => void;
   className?: string;
 }
 
@@ -99,7 +102,7 @@ interface PartyFiltersProps {
  * Filtros de fiestas, en este orden: fecha, «Música» (todos los géneros) y
  * «Horario» (tardeo, nocheo o after, en un solo selector).
  */
-const PartyFilters = ({ themes, theme, onTheme, franja, onFranja, nights, className }: PartyFiltersProps) => {
+const PartyFilters = ({ themes, theme, onTheme, franja, onFranja, nights, flechazo = false, onFlechazo, className }: PartyFiltersProps) => {
   const { t } = useTranslation();
   const [musicaAbierta, setMusicaAbierta] = useState(false);
   const [horarioAbierto, setHorarioAbierto] = useState(false);
@@ -112,6 +115,14 @@ const PartyFilters = ({ themes, theme, onTheme, franja, onFranja, nights, classN
   return (
     <div className={cn('no-scrollbar flex gap-2 overflow-x-auto', className)}>
       <DateFilter nights={nights} />
+
+      {onFlechazo && (
+        <button type="button" onClick={() => onFlechazo(!flechazo)} aria-pressed={flechazo} className={pill(flechazo)}>
+          <Heart size={15} className={flechazo ? 'fill-current' : undefined} />
+          {t('filters.flechazo')}
+          {flechazo && <X size={14} aria-hidden />}
+        </button>
+      )}
 
       <button type="button" onClick={() => setMusicaAbierta(true)} aria-pressed={theme !== null} className={pill(theme !== null)}>
         <Music size={15} />

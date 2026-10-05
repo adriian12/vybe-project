@@ -32,3 +32,16 @@ export const aplicarFiltros = <T extends { event: Pick<Event, 'startDate' | 'the
   lista.filter(
     ({ event }) => (!theme || event.theme === theme) && (!franja || franjaDe(event) === franja),
   );
+
+/**
+ * «Con Flechazo»: en directo ahora y con el Flechazo (tablón) encendido. En
+ * las fiestas de Fiestea, además, con ubicación: es como se entra en ellas.
+ */
+export const conFlechazo = (
+  event: Pick<Event, 'startDate' | 'endDate' | 'swipeEnabled' | 'byPlatform' | 'location'>,
+  ahora: number = Date.now(),
+): boolean =>
+  new Date(event.startDate).getTime() <= ahora &&
+  new Date(event.endDate).getTime() > ahora &&
+  event.swipeEnabled !== false &&
+  (!event.byPlatform || Boolean(event.location));
