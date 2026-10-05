@@ -3496,7 +3496,12 @@
         "bioPlaceholder": "Alguna cosa que vulguis que sàpiguen de tu",
         "optional": "opcional",
         "save": "Desa i entra",
-        "done": "Perfil a punt!"
+        "done": "Perfil a punt!",
+        "chooseTitle": "Com vols entrar?",
+        "chooseBody": "Hola, {{name}}. Tria el tipus de compte; el podràs canviar al perfil.",
+        "chooseVyber": "Festes i conèixer gent: Flechazo, crushes i xat a cada festa.",
+        "chooseGuest": "Només festes: veure esdeveniments, comprar entrades, ofertes i sortejos. Hi entres ja, sense més dades.",
+        "chooseLater": "Com a convidat pots passar a Fiester@ quan vulguis."
     },
     "share": {
         "title": "Compartir",

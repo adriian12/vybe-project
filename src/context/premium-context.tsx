@@ -73,7 +73,11 @@ export const usePremium = () => {
 };
 
 export const PremiumProvider = ({ children }: { children: ReactNode }) => {
-  const { isLoggedIn, userType, activeEvent } = useAppContext();
+  const { isLoggedIn, userType, activeEvent, currentUser } = useAppContext();
+  // Un invitado no ve nada de Premium. Si lo tenía como fiester@, la
+  // suscripción sigue corriendo (los días como invitado se consumen) y vuelve a
+  // verse al pasar otra vez a fiester@.
+  const esInvitado = currentUser?.accountType === 'guest';
   const { toast } = useToast();
   const { t } = useTranslation();
   const location = useLocation();
@@ -314,13 +318,13 @@ export const PremiumProvider = ({ children }: { children: ReactNode }) => {
   }, [loadSubscription, toast, t, fallo, store, storePurchases]);
 
   const value: PremiumContextType = {
-    isPremium,
+    isPremium: isPremium && !esInvitado,
     isLoading,
     subscriptionType,
     premiumEventId,
     expiresAt,
     cancelAtPeriodEnd,
-    showPremiumDialog,
+    showPremiumDialog: showPremiumDialog && !esInvitado,
     setShowPremiumDialog,
     upgradeToPremium,
     getPremiumForEvent,

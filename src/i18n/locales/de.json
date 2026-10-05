@@ -3496,7 +3496,12 @@
         "bioPlaceholder": "Etwas, das andere über dich wissen sollen",
         "optional": "optional",
         "save": "Speichern und weiter",
-        "done": "Profil fertig!"
+        "done": "Profil fertig!",
+        "chooseTitle": "Wie möchtest du starten?",
+        "chooseBody": "Hallo, {{name}}. Wähle deinen Kontotyp; du kannst ihn im Profil ändern.",
+        "chooseVyber": "Partys und Leute kennenlernen: Flechazo, Crushes und Chat auf jeder Party.",
+        "chooseGuest": "Nur Partys: Events ansehen, Tickets kaufen, Angebote und Verlosungen. Sofort drin, ohne weitere Angaben.",
+        "chooseLater": "Als Gast kannst du jederzeit zu Fiester@ wechseln."
     },
     "share": {
         "title": "Teilen",

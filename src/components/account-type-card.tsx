@@ -11,6 +11,7 @@ import {
 import { PartyButton } from '@/components/ui-custom/party-button';
 import { useToast } from '@/components/ui/use-toast';
 import AccountKindInfo, { AccountKind } from '@/components/account-kind-info';
+import { FiesterData, FiesterForm } from '@/components/complete-profile-dialog';
 import { api, AccountTypeStatus, ApiError } from '@/services/api';
 import { useAppContext } from '@/context/app-context';
 import { cn } from '@/lib/utils';
@@ -31,8 +32,6 @@ const AccountTypeCard = () => {
   const [estado, setEstado] = useState<AccountTypeStatus | null>(null);
   const [abierto, setAbierto] = useState(false);
   const [info, setInfo] = useState<AccountKind | null>(null);
-  const [gender, setGender] = useState<'man' | 'woman' | null>(null);
-  const [wants, setWants] = useState<'men' | 'women' | 'all'>('all');
   const [busy, setBusy] = useState(false);
 
   const cargar = useCallback(async () => setEstado(await api.getAccountTypeStatus()), []);
@@ -48,16 +47,22 @@ const AccountTypeCard = () => {
   const fecha = estado.nextAllowedAt ? new Date(estado.nextAllowedAt).toLocaleDateString() : null;
   const bloqueado = otro === 'vyber' && estado.changesUsed >= estado.maxChanges;
 
-  const cambiar = async () => {
+  /**
+   * Sin ficha de fiester@ (se registró como invitado, o con Google y eligió
+   * invitado), primero se rellena. Si ya fue fiester@, sus datos siguen ahí y
+   * se pasa directamente; se cambian en el perfil.
+   */
+  const cambiar = async (ficha?: FiesterData) => {
     setBusy(true);
     try {
-      if (otro === 'vyber' && estado.needsProfile) {
-        if (!gender) {
-          toast({ title: t('auth.errors.genderRequired'), variant: 'destructive' });
-          return;
-        }
-        await api.setMyGender(gender);
-        await api.updateProfile({ wants });
+      if (ficha) {
+        await api.completeProfile({
+          age: ficha.age,
+          gender: ficha.gender,
+          wants: ficha.wants,
+          planTonight: ficha.planTonight,
+          bio: ficha.bio,
+        });
       }
 
       await api.setAccountType(otro);
@@ -123,7 +128,7 @@ const AccountTypeCard = () => {
       )}
 
       <Dialog open={abierto} onOpenChange={(value) => !busy && setAbierto(value)}>
-        <DialogContent>
+        <DialogContent className="max-h-[90dvh] overflow-y-auto">
           <DialogHeader className="text-left">
             <DialogTitle className="font-display text-headline-md">
               {t('accountKind.switchTitle', { kind: t(`accountKind.${otro}.tab`) })}
@@ -145,60 +150,31 @@ const AccountTypeCard = () => {
             </div>
           )}
 
-          {/* Al registrarse como invitado no se pidieron: se piden ahora. */}
+          {/* Sin ficha de fiester@: el formulario completo, como en el primer acceso. */}
           {otro === 'vyber' && !bloqueado && estado.needsProfile && (
-            <div className="space-y-3">
-              <div>
-                <p className="mb-1 text-body-sm font-bold">{t('auth.gender')}</p>
-                <div className="grid grid-cols-2 gap-1 rounded-xl bg-surface-low p-1">
-                  {(['woman', 'man'] as const).map((option) => (
-                    <button
-                      key={option}
-                      type="button"
-                      onClick={() => setGender(option)}
-                      aria-pressed={gender === option}
-                      className={cn(
-                        'press h-10 rounded-lg text-body-sm font-bold',
-                        gender === option ? 'bg-party-primary text-ink' : 'text-party-gray',
-                      )}
-                    >
-                      {t(`auth.genders.${option}`)}
-                    </button>
-                  ))}
-                </div>
-                <p className="mt-1 text-caption text-party-gray">{t('auth.genderHelp')}</p>
-              </div>
-
-              <div>
-                <p className="mb-1 text-body-sm font-bold">{t('auth.wants')}</p>
-                <div className="grid grid-cols-3 gap-1 rounded-xl bg-surface-low p-1">
-                  {(['women', 'men', 'all'] as const).map((option) => (
-                    <button
-                      key={option}
-                      type="button"
-                      onClick={() => setWants(option)}
-                      aria-pressed={wants === option}
-                      className={cn(
-                        'press h-10 rounded-lg text-body-sm font-bold',
-                        wants === option ? 'bg-party-primary text-ink' : 'text-party-gray',
-                      )}
-                    >
-                      {t(`auth.wantsOptions.${option}`)}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
+            <FiesterForm
+              initial={{
+                age: currentUser?.age,
+                gender: currentUser?.gender,
+                wants: currentUser?.wants,
+                planTonight: currentUser?.planTonight,
+                bio: currentUser?.bio,
+              }}
+              submitLabel={t('accountKind.switchConfirm')}
+              onSubmit={(ficha) => cambiar(ficha)}
+            />
           )}
 
           <div className="grid gap-2">
-            <PartyButton
-              className="w-full"
-              disabled={busy || (otro === 'vyber' && bloqueado)}
-              onClick={() => void cambiar()}
-            >
-              {busy ? <Loader2 size={16} className="animate-spin" /> : t('accountKind.switchConfirm')}
-            </PartyButton>
+            {!(otro === 'vyber' && !bloqueado && estado.needsProfile) && (
+              <PartyButton
+                className="w-full"
+                disabled={busy || (otro === 'vyber' && bloqueado)}
+                onClick={() => void cambiar()}
+              >
+                {busy ? <Loader2 size={16} className="animate-spin" /> : t('accountKind.switchConfirm')}
+              </PartyButton>
+            )}
             <button type="button" onClick={() => setAbierto(false)} className="press h-10 text-body-sm text-party-gray">
               {t('common.cancel')}
             </button>

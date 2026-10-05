@@ -400,6 +400,9 @@ const ProfilePage = () => {
     );
   }
 
+  // Invitado: sólo ve fiestas y compra entradas; ni verificación ni Premium.
+  const esInvitado = currentUser.accountType === 'guest';
+
   if (captureTarget) {
     return (
       <div className="min-h-screen pb-[calc(var(--nav-h)+2rem)] pt-[var(--header-h)]">
@@ -549,6 +552,8 @@ const ProfilePage = () => {
                 {t('profile.connectionsMade', { count: reputation.connectionsMade })}
               </span>
             )}
+            {/* Un invitado no necesita verificarse: sólo ve fiestas y compra entradas. */}
+            {!esInvitado && (
             <span
               className={cn(
                 'flex items-center gap-1.5 rounded-full px-3 py-1 text-caption',
@@ -558,10 +563,14 @@ const ProfilePage = () => {
               <ShieldAlert size={14} className={currentUser.isVerified ? 'text-party-primary' : ''} />
               {currentUser.isVerified ? t('profile.verified') : t('profile.unverified')}
             </span>
+            )}
           </div>
         </section>
 
         <div className="flex flex-col gap-4 px-margin">
+          {/* Premium no se enseña a los invitados (lo conservan si vuelven a fiester@). */}
+          {!esInvitado && (
+            <>
           {/* ---------------------------------------------------- premium */}
           <section className="rounded-xl bg-party-primary p-4 text-ink shadow-xl">
             <div className="flex items-start gap-3">
@@ -616,9 +625,11 @@ const ProfilePage = () => {
               )}
             </div>
           </section>
+            </>
+          )}
 
           {/* ----------------------------------------------- verificación */}
-          {!currentUser.isVerified && (
+          {!currentUser.isVerified && !esInvitado && (
             <section className="space-y-3 rounded-2xl bg-white p-4 text-ink">
               <h2 className="flex items-center gap-2 font-display text-headline-md">
                 <ShieldAlert size={20} className="text-destructive" />

@@ -3496,7 +3496,12 @@
         "bioPlaceholder": "Something you want people to know",
         "optional": "optional",
         "save": "Save and continue",
-        "done": "Profile ready!"
+        "done": "Profile ready!",
+        "chooseTitle": "How do you want to join?",
+        "chooseBody": "Hi, {{name}}. Pick your account type; you can change it in your profile.",
+        "chooseVyber": "Parties and meeting people: Flechazo, crushes and chat at every party.",
+        "chooseGuest": "Just parties: see events, buy tickets, offers and raffles. You’re in right away, nothing else to fill.",
+        "chooseLater": "As a guest you can switch to Fiester@ whenever you like."
     },
     "share": {
         "title": "Share",
