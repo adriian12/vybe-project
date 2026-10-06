@@ -190,6 +190,8 @@ const CompleteProfileDialog = () => {
   const { currentUser, userType, refreshProfile } = useAppContext();
   const [paso, setPaso] = useState<'tipo' | 'datos' | null>(null);
   const [eligiendo, setEligiendo] = useState(false);
+  // Tocar una opción sólo la marca; el botón de abajo la confirma.
+  const [eleccion, setEleccion] = useState<'vyber' | 'guest' | null>(null);
 
   const abierto =
     userType === 'user' &&
@@ -264,10 +266,19 @@ const CompleteProfileDialog = () => {
               <button
                 type="button"
                 disabled={eligiendo}
-                onClick={() => setPaso('datos')}
-                className="press flex w-full items-start gap-3 rounded-2xl border-2 border-party-primary bg-card p-4 text-left disabled:opacity-50"
+                onClick={() => setEleccion('vyber')}
+                aria-pressed={eleccion === 'vyber'}
+                className={cn(
+                  'press flex w-full items-start gap-3 rounded-2xl border-2 bg-card p-4 text-left disabled:opacity-50',
+                  eleccion === 'vyber' ? 'border-party-primary' : 'border-white/10',
+                )}
               >
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-party-primary text-ink">
+                <span
+                  className={cn(
+                    'flex h-11 w-11 shrink-0 items-center justify-center rounded-xl',
+                    eleccion === 'vyber' ? 'bg-party-primary text-ink' : 'bg-surface-high text-foreground',
+                  )}
+                >
                   <Heart size={20} />
                 </span>
                 <span className="min-w-0">
@@ -278,17 +289,37 @@ const CompleteProfileDialog = () => {
               <button
                 type="button"
                 disabled={eligiendo}
-                onClick={() => void entrarComoInvitado()}
-                className="press flex w-full items-start gap-3 rounded-2xl border-2 border-white/10 bg-card p-4 text-left disabled:opacity-50"
+                onClick={() => setEleccion('guest')}
+                aria-pressed={eleccion === 'guest'}
+                className={cn(
+                  'press flex w-full items-start gap-3 rounded-2xl border-2 bg-card p-4 text-left disabled:opacity-50',
+                  eleccion === 'guest' ? 'border-party-primary' : 'border-white/10',
+                )}
               >
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-surface-high text-foreground">
-                  {eligiendo ? <Loader2 size={20} className="animate-spin" /> : <Ticket size={20} />}
+                <span
+                  className={cn(
+                    'flex h-11 w-11 shrink-0 items-center justify-center rounded-xl',
+                    eleccion === 'guest' ? 'bg-party-primary text-ink' : 'bg-surface-high text-foreground',
+                  )}
+                >
+                  <Ticket size={20} />
                 </span>
                 <span className="min-w-0">
                   <span className="block font-display text-title-card">{t('accountKind.guest.tab')}</span>
                   <span className="block text-body-sm text-party-gray">{t('completeProfile.chooseGuest')}</span>
                 </span>
               </button>
+              <PartyButton
+                size="lg"
+                className="w-full"
+                disabled={eleccion === null || eligiendo}
+                onClick={() => (eleccion === 'guest' ? void entrarComoInvitado() : setPaso('datos'))}
+              >
+                {eligiendo && <Loader2 size={16} className="animate-spin" />}
+                {eleccion
+                  ? t('completeProfile.chooseContinue', { kind: t(`accountKind.${eleccion}.tab`) })
+                  : t('completeProfile.chooseFirst')}
+              </PartyButton>
               <p className="text-center text-caption text-party-gray">{t('completeProfile.chooseLater')}</p>
             </div>
           </>

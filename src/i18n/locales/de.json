@@ -3501,7 +3501,9 @@
         "chooseBody": "Hallo, {{name}}. Wähle deinen Kontotyp; du kannst ihn im Profil ändern.",
         "chooseVyber": "Partys und Leute kennenlernen: Flechazo, Crushes und Chat auf jeder Party.",
         "chooseGuest": "Nur Partys: Events ansehen, Tickets kaufen, Angebote und Verlosungen. Sofort drin, ohne weitere Angaben.",
-        "chooseLater": "Als Gast kannst du jederzeit zu Fiester@ wechseln."
+        "chooseLater": "Als Gast kannst du jederzeit zu Fiester@ wechseln.",
+        "chooseContinue": "Weiter mit {{kind}}",
+        "chooseFirst": "Wähle eine Option"
     },
     "share": {
         "title": "Teilen",

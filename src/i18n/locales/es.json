@@ -3501,7 +3501,9 @@
         "chooseBody": "Hola, {{name}}. Elige tu tipo de cuenta; podrás cambiarlo en tu perfil.",
         "chooseVyber": "Fiestas y conocer gente: Flechazo, crushes y chat en cada fiesta.",
         "chooseGuest": "Sólo fiestas: ver eventos, comprar entradas, ofertas y sorteos. Entras ya, sin más datos.",
-        "chooseLater": "Como invitado puedes pasarte a Fiester@ cuando quieras."
+        "chooseLater": "Como invitado puedes pasarte a Fiester@ cuando quieras.",
+        "chooseContinue": "Continuar con {{kind}}",
+        "chooseFirst": "Elige una opción"
     },
     "share": {
         "title": "Compartir",

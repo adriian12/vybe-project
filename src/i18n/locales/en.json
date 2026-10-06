@@ -3501,7 +3501,9 @@
         "chooseBody": "Hi, {{name}}. Pick your account type; you can change it in your profile.",
         "chooseVyber": "Parties and meeting people: Flechazo, crushes and chat at every party.",
         "chooseGuest": "Just parties: see events, buy tickets, offers and raffles. You’re in right away, nothing else to fill.",
-        "chooseLater": "As a guest you can switch to Fiester@ whenever you like."
+        "chooseLater": "As a guest you can switch to Fiester@ whenever you like.",
+        "chooseContinue": "Continue with {{kind}}",
+        "chooseFirst": "Choose an option"
     },
     "share": {
         "title": "Share",

@@ -3501,7 +3501,9 @@
         "chooseBody": "Hola, {{name}}. Tria el tipus de compte; el podràs canviar al perfil.",
         "chooseVyber": "Festes i conèixer gent: Flechazo, crushes i xat a cada festa.",
         "chooseGuest": "Només festes: veure esdeveniments, comprar entrades, ofertes i sortejos. Hi entres ja, sense més dades.",
-        "chooseLater": "Com a convidat pots passar a Fiester@ quan vulguis."
+        "chooseLater": "Com a convidat pots passar a Fiester@ quan vulguis.",
+        "chooseContinue": "Continuar amb {{kind}}",
+        "chooseFirst": "Tria una opció"
     },
     "share": {
         "title": "Compartir",

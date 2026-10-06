@@ -75,6 +75,9 @@ def save(img, rel, opaque=False):
 # --- Web / PWA ---------------------------------------------------------------
 save(render(192), 'public/icons/icon-192.png')
 save(render(512), 'public/icons/icon-512.png')
+# Logo del pase de Google Wallet: 660 × 660 (lo que recomienda Google). Lo
+# muestra recortado en círculo, así que la F va algo más pequeña y con fondo.
+save(render(660, 'none', background=INK, scale=0.8, transparent=False), 'public/icons/wallet-logo-660.png', opaque=True)
 # Maskable: el sistema recorta hasta el 80 % central, así que va a sangre.
 save(render(512, 'square', scale=1.0), 'public/icons/icon-maskable-512.png', opaque=True)
 save(render(180, 'square'), 'public/icons/apple-touch-icon.png', opaque=True)

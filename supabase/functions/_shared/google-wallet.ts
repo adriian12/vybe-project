@@ -18,7 +18,8 @@ import type { TicketPdfData } from './ticket-pdf.ts';
 
 const API = 'https://walletobjects.googleapis.com/walletobjects/v1';
 const SCOPE = 'https://www.googleapis.com/auth/wallet_object.issuer';
-const LOGO = 'https://fiestea.es/icons/icon-512.png';
+// 660 × 660, lo que recomienda Google (`scripts/generate-icons.py`).
+const LOGO = 'https://fiestea.es/icons/wallet-logo-660.png';
 const FONDO = '#111114';
 
 const issuer = () => (Deno.env.get('GOOGLE_WALLET_ISSUER_ID') ?? '').trim();

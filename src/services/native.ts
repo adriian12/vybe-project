@@ -139,7 +139,7 @@ export interface NativePosition {
   latitude: number;
   longitude: number;
   accuracy?: number;
-  /** Sólo Android: la posición viene de una app de ubicación falsa. */
+  /** La posición viene de una app o un accesorio de ubicación falsa. */
   mocked?: boolean;
 }
 
@@ -150,7 +150,7 @@ export interface NativePosition {
  * tienda de aplicaciones, y funciona con el GPS del teléfono en vez de con la
  * aproximación del navegador.
  */
-/** Plugin propio de Android (`FiesteaLocationPlugin.java`). */
+/** Plugin propio: `FiesteaLocationPlugin.java` (Android) y `.swift` (iOS). */
 const FiesteaLocation = registerPlugin<{
   getPosition(options: { enableHighAccuracy: boolean; timeout: number; maximumAge: number }): Promise<{
     latitude: number;
@@ -173,9 +173,10 @@ export const getNativePosition = async (options?: PositionOptions): Promise<Nati
     }
   }
 
-  // En Android, el plugin propio dice además si la ubicación es simulada
-  // (migración 101). Si fallara, se sigue con el de Capacitor.
-  if (platform() === 'android') {
+  // El plugin propio (Android e iOS) dice además si la ubicación es simulada
+  // (migración 101). Si falta o falla (una versión vieja de la app), se sigue
+  // con el de Capacitor.
+  if (platform() === 'android' || platform() === 'ios') {
     try {
       const pos = await FiesteaLocation.getPosition({
         enableHighAccuracy: options?.enableHighAccuracy ?? true,

@@ -38,8 +38,14 @@ export const isResendConfigured = (): boolean =>
  * dirección suya. No se puede comprobar desde el código, así que si los correos
  * no llegan a nadie más que a ti, es esto.
  */
-const from = (): string =>
-  Deno.env.get('AUTH_FROM_EMAIL') ?? Deno.env.get('SOS_FROM_EMAIL') ?? '';
+const from = (): string => {
+  const valor = (Deno.env.get('AUTH_FROM_EMAIL') ?? Deno.env.get('SOS_FROM_EMAIL') ?? '').trim();
+  if (!valor) return '';
+  // Siempre «Fiestea <dirección>»: en la bandeja sale el nombre de la marca y
+  // no la dirección suelta (o un nombre antiguo que se quedara en el secreto).
+  const direccion = valor.match(/<([^>]+)>/)?.[1] ?? valor;
+  return `Fiestea <${direccion.trim()}>`;
+};
 
 export interface Email {
   to: string;
