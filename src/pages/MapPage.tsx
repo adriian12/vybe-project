@@ -73,7 +73,7 @@ const TIPOS: VenueType[] = ['discoteca', 'bar', 'festival', 'fiesta_privada', 'e
 const MapPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { activeEvent, currentUser } = useAppContext();
+  const { currentUser } = useAppContext();
   // Los invitados no usan el Flechazo: no se les ofrece ese filtro.
   const esInvitado = currentUser?.accountType === 'guest';
   const { withDistance, position, activity } = useEventsFeed();
@@ -261,8 +261,8 @@ const MapPage = () => {
     }
   };
 
-  const abrir = (id: string) =>
-    navigate(activeEvent?.eventId === id ? `/event/${id}/live` : `/event/${id}`);
+  // Siempre a la ficha, también la fiesta en la que estás (a la sala se vuelve desde ella).
+  const abrir = (id: string) => navigate(`/event/${id}`);
 
   const filtrosActivos = [soloDirecto, soloGratis, soloFlechazo, tipo !== null, theme !== null, franja !== null].filter(
     Boolean,

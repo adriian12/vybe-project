@@ -46,11 +46,9 @@ const HomePage = () => {
   const [avisosAbiertos, setAvisosAbiertos] = useState(false);
   const avisos = useActivity(intents);
 
+  // Siempre a la ficha, aunque estés dentro: a la sala se vuelve con la franja
+  // «Estás dentro de…» o con el botón de la propia ficha.
   const openEvent = (event: Event) => {
-    if (activeEvent?.eventId === event.id) {
-      navigate(`/event/${event.id}/live`);
-      return;
-    }
     track('event_viewed', { eventId: event.id });
     navigate(`/event/${event.id}`);
   };
