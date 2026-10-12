@@ -1,10 +1,12 @@
+import { VybeMark } from '@/components/brand/vybe-logo';
+
 const ComingSoonPage = () => (
   <div
     style={{ background: '#111114', minHeight: '100dvh' }}
     className="flex flex-col items-center justify-center px-6 text-center"
   >
-    <div className="mb-8 select-none text-7xl font-black tracking-tight text-[#F8D000]" style={{ fontFamily: 'Outfit, sans-serif' }}>
-      F
+    <div className="mb-8">
+      <VybeMark size={96} />
     </div>
 
     <h1
