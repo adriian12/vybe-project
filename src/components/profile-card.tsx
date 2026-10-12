@@ -26,6 +26,16 @@ const FALLBACK_PHOTO = '/placeholder.svg';
  */
 const DECISION_THRESHOLD = 90;
 
+/**
+ * Un golpe rápido también decide aunque no llegue al umbral: quien desliza con
+ * prisa lanza la tarjeta 40-60 px y la soltaba esperando que saliera, pero
+ * volvía al centro. Velocidad en px/ms medida en los últimos 100 ms del gesto,
+ * y un recorrido mínimo para no tomar por decisión un roce.
+ */
+const FLICK_VELOCITY = 0.5;
+const FLICK_MIN_DISTANCE = 30;
+const FLICK_WINDOW_MS = 100;
+
 /** Lo que dura la salida de la tarjeta; por debajo del tope de 300 ms. */
 const EXIT_MS = 260;
 
@@ -51,6 +61,8 @@ const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(({ user, onS
   // el `transform` directamente, una vez por fotograma.
   const [dragging, setDragging] = useState(false);
   const startX = useRef<number | null>(null);
+  /** Últimas posiciones del dedo, para medir la velocidad al soltar. */
+  const muestras = useRef<Array<{ x: number; t: number }>>([]);
   const drag = useRef(0);
   const frame = useRef<number | null>(null);
   const cardEl = useRef<HTMLDivElement | null>(null);
@@ -111,12 +123,16 @@ const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(({ user, onS
   const onPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
     if ((event.target as HTMLElement).closest('button') || salida) return;
     startX.current = event.clientX;
+    muestras.current = [{ x: event.clientX, t: event.timeStamp }];
     setDragging(true);
     event.currentTarget.setPointerCapture(event.pointerId);
   };
 
   const onPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
     if (startX.current === null) return;
+    const ahora = event.timeStamp;
+    muestras.current.push({ x: event.clientX, t: ahora });
+    while (muestras.current.length > 2 && ahora - muestras.current[0].t > FLICK_WINDOW_MS) muestras.current.shift();
     moverA(event.clientX - startX.current);
   };
 
@@ -127,8 +143,18 @@ const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(({ user, onS
     startX.current = null;
     setDragging(false);
 
-    if (distance > DECISION_THRESHOLD) lanzar('right');
-    else if (distance < -DECISION_THRESHOLD) lanzar('left');
+    const primera = muestras.current[0];
+    const ultima = muestras.current[muestras.current.length - 1];
+    const dt = primera && ultima ? ultima.t - primera.t : 0;
+    const velocidad = dt > 0 ? (ultima.x - primera.x) / dt : 0;
+    muestras.current = [];
+
+    // Golpe rápido: cuenta si va en el mismo sentido que el recorrido.
+    const golpe =
+      Math.abs(velocidad) > FLICK_VELOCITY && Math.abs(distance) > FLICK_MIN_DISTANCE && Math.sign(velocidad) === Math.sign(distance);
+
+    if (distance > DECISION_THRESHOLD || (golpe && distance > 0)) lanzar('right');
+    else if (distance < -DECISION_THRESHOLD || (golpe && distance < 0)) lanzar('left');
     else moverA(0);
   };
 

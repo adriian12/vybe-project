@@ -83,12 +83,12 @@ const MatchDialog: React.FC<MatchDialogProps> = ({
 
         {/* Las dos fotos, inclinadas hacia fuera, con el rayo encima. */}
         <div className="relative mx-auto flex h-48 w-72 items-center justify-center">
-          <div className="absolute left-3 h-40 w-32 -rotate-6 overflow-hidden rounded-xl bg-surface-high shadow-2xl">
+          <div className="celebrate-in-left absolute left-3 h-40 w-32 -rotate-6 overflow-hidden rounded-xl bg-surface-high shadow-2xl">
             <img src={currentUserPhoto || FALLBACK_PHOTO} alt="" className="h-full w-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-[#0E0E11]/90 via-transparent to-transparent" />
             <span className="absolute bottom-2 left-2 text-caption text-[#D0C6AB]">{t('matchDialog.you')}</span>
           </div>
-          <div className="absolute right-3 h-40 w-32 rotate-6 overflow-hidden rounded-xl bg-surface-high shadow-2xl">
+          <div className="celebrate-in-right absolute right-3 h-40 w-32 rotate-6 overflow-hidden rounded-xl bg-surface-high shadow-2xl">
             <img
               src={matchedUser.photos[0] || matchedUser.avatar || FALLBACK_PHOTO}
               alt={matchedUser.name}
@@ -103,11 +103,17 @@ const MatchDialog: React.FC<MatchDialogProps> = ({
             </span>
           </div>
           <div className="absolute z-10 -translate-y-1 flex flex-col items-center">
-            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-party-primary text-ink shadow-[0_0_24px_rgba(248,208,0,0.6)]">
+            <span
+              className="celebrate-pop flex h-14 w-14 items-center justify-center rounded-full bg-party-primary text-ink shadow-[0_0_24px_rgba(248,208,0,0.6)]"
+              style={{ '--d': '220ms' } as React.CSSProperties}
+            >
               <Zap size={30} className="fill-ink" />
             </span>
             {comunes.length > 0 && (
-              <span className="mt-2 whitespace-nowrap rounded-full bg-[#0E0E11] px-2.5 py-0.5 text-label-pill uppercase text-party-primary shadow-md">
+              <span
+                className="celebrate-pop mt-2 whitespace-nowrap rounded-full bg-[#0E0E11] px-2.5 py-0.5 text-label-pill uppercase text-party-primary shadow-md"
+                style={{ '--d': '360ms' } as React.CSSProperties}
+              >
                 {t('matchDialog.inCommon', { count: comunes.length })}
               </span>
             )}

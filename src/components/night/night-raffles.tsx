@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Gift, PartyPopper, Trophy } from 'lucide-react';
 import {
@@ -14,6 +14,16 @@ import TicketCode from './ticket-code';
 
 const hora = (iso: string) => new Date(iso).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
 
+/** Sorteos ganados que ya se celebraron en este móvil: el «pop» sale una vez, no cada vez que se abre. */
+const CLAVE_CELEBRADOS = 'fiestea:sorteos-celebrados';
+const leerCelebrados = (): string[] => {
+  try {
+    return JSON.parse(localStorage.getItem(CLAVE_CELEBRADOS) ?? '[]') as string[];
+  } catch {
+    return [];
+  }
+};
+
 /**
  * Sorteos de la noche. Participa todo el que sigue dentro a la hora del
  * sorteo, sin apuntarse: por eso lo que se enseña es la hora, que es lo que
@@ -23,6 +33,20 @@ const NightRaffles = ({ raffles }: { raffles: Raffle[] }) => {
   const { t } = useTranslation();
   const [enseñar, setEnseñar] = useState<Raffle | null>(null);
   const visibles = raffles.filter((r) => r.status === 'scheduled' || r.status === 'drawn');
+  // Se fija al montar: lo que se celebra ahora no se vuelve a celebrar al repintar.
+  const [yaCelebrados] = useState(() => new Set(leerCelebrados()));
+  const ganados = visibles.filter((r) => r.status === 'drawn' && r.isMe).map((r) => r.id);
+  const clavesGanados = ganados.join(',');
+
+  useEffect(() => {
+    if (!clavesGanados) return;
+    try {
+      const todos = new Set([...leerCelebrados(), ...clavesGanados.split(',')]);
+      localStorage.setItem(CLAVE_CELEBRADOS, JSON.stringify([...todos].slice(-50)));
+    } catch {
+      // sin almacenamiento sólo se repite la animación
+    }
+  }, [clavesGanados]);
 
   if (visibles.length === 0) {
     return <p className="py-6 text-center text-sm text-muted-foreground">{t('night.raffles.empty')}</p>;
@@ -38,7 +62,12 @@ const NightRaffles = ({ raffles }: { raffles: Raffle[] }) => {
             className={cn('rounded-lg border p-3', ganado ? 'border-party-primary bg-party-primary/10' : 'border-border')}
           >
             <div className="flex items-start gap-3">
-              <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-surface-high text-party-primary">
+              <span
+                className={cn(
+                  'mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-surface-high text-party-primary',
+                  ganado && !yaCelebrados.has(raffle.id) && 'celebrate-pop',
+                )}
+              >
                 {ganado ? <PartyPopper size={18} /> : <Gift size={17} />}
               </span>
               <div className="min-w-0 flex-1">
@@ -79,7 +108,7 @@ const NightRaffles = ({ raffles }: { raffles: Raffle[] }) => {
         <DialogContent className="border-0 bg-party-primary text-ink">
           {enseñar && (
             <div className="flex flex-col items-center py-4 text-center">
-              <span className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-ink text-party-primary">
+              <span className="celebrate-pop mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-ink text-party-primary">
                 <Trophy size={32} />
               </span>
               <DialogHeader className="items-center text-center">

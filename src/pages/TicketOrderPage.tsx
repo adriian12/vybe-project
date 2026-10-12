@@ -97,14 +97,14 @@ const TicketOrderPage = () => {
     return (
       <>
         <section className="flex flex-col items-center gap-2 rounded-3xl bg-surface-low p-6 text-center">
-          <CheckCircle2 className="h-12 w-12 text-party-primary" />
+          <CheckCircle2 className="celebrate-pop h-12 w-12 text-party-primary" />
           <h1 className="font-display text-headline-lg">{t('tickets.order.done')}</h1>
           <p className="text-body-sm text-party-gray">
             {t('tickets.order.doneBody', { count: pedido.tickets.length, event: pedido.eventName })}
           </p>
         </section>
 
-        <section className="rounded-2xl bg-white p-4 text-ink">
+        <section className="enter rounded-2xl bg-white p-4 text-ink" style={{ animationDelay: '160ms' }}>
           <p className="text-caption font-bold uppercase text-ink/50">{pedido.venueName}</p>
           <p className="font-display text-title-card">{pedido.eventName}</p>
           <p className="text-caption text-ink/60 first-letter:uppercase">
