@@ -9,7 +9,7 @@ export const COMPANY = {
   name: 'Adrián Rojas Martínez',
   taxId: 'NIF 43188784M',
   address: 'Calle Reina Laura, 8, 3.º, 07007 Palma de Mallorca, Illes Balears, España',
-  email: 'soporte@fiestea.es',
+  email: 'fiesttea@gmail.com',
 };
 
 /** Fecha de la versión vigente de los textos legales (se guarda al aceptarlos). */
