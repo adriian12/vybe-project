@@ -15,7 +15,7 @@ const ComingSoonPage = () => (
     </h1>
 
     <p className="max-w-xs text-base text-[#A1A1A6]" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
-      Fiestea abre pronto. Prepárate para vivir las noches de Mallorca de otra manera.
+      Fiestea abre pronto. Prepárate para vivir las fiestas de otra manera.
     </p>
 
     <div className="mt-10 h-1 w-16 rounded-full bg-[#F8D000]" />
