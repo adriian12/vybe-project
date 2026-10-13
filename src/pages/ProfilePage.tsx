@@ -67,6 +67,7 @@ import PhotoRequirementsDialog, { FailedPhoto } from '@/components/photo-require
 import AccountTypeCard from '@/components/account-type-card';
 import { Input } from '@/components/ui/input';
 import { privacyService } from '@/services/privacy';
+import { manageStoreSubscription } from '@/services/iap';
 import { track } from '@/lib/observability';
 
 const MAX_PHOTOS = 6;
@@ -146,6 +147,7 @@ const ProfilePage = () => {
     cancelPremium,
     supercrushBalance,
     setShowSupercrushDialog,
+    storePurchases,
   } = usePremium();
 
   const [captureTarget, setCaptureTarget] = useState<'avatar' | 'photo' | null>(null);
@@ -156,6 +158,8 @@ const ProfilePage = () => {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleteText, setDeleteText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
+  /** El borrado se paró porque hay Premium de Apple que sigue renovándose. */
+  const [appleSub, setAppleSub] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
@@ -987,45 +991,69 @@ const ProfilePage = () => {
 
       {/* Eliminar la cuenta: borra el perfil, las fotos, las conexiones, los
           mensajes y el usuario (Edge Function `delete-account`). */}
-      <AlertDialog open={confirmDelete} onOpenChange={(open) => !isDeleting && setConfirmDelete(open)}>
+      <AlertDialog
+        open={confirmDelete}
+        onOpenChange={(open) => {
+          if (isDeleting) return;
+          setConfirmDelete(open);
+          if (!open) setAppleSub(false);
+        }}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t('privacy.deleteConfirmTitle')}</AlertDialogTitle>
+            <AlertDialogTitle>{t(appleSub ? 'privacy.appleSubTitle' : 'privacy.deleteConfirmTitle')}</AlertDialogTitle>
             <AlertDialogDescription>
-              {t('privacy.deleteBody')} {t('privacy.deleteConfirmBody')}
+              {appleSub
+                ? `${t('privacy.appleSubBody')} ${storePurchases === 'apple' ? '' : t('privacy.appleSubHowTo')}`
+                : `${t('privacy.deleteBody')} ${t('privacy.deleteSubscriptions')} ${t('privacy.deleteConfirmBody')}`}
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <Input
+          {appleSub && storePurchases === 'apple' && (
+            <button
+              type="button"
+              onClick={() => void manageStoreSubscription().catch(() => undefined)}
+              className="press h-11 w-full rounded-xl bg-party-primary font-display text-title-card text-ink"
+            >
+              {t('privacy.appleSubManage')}
+            </button>
+          )}
+          {!appleSub && <Input
             value={deleteText}
             onChange={(e) => setDeleteText(e.target.value)}
             placeholder={t('privacy.deleteKeyword')}
             autoCapitalize="characters"
             aria-label={t('privacy.deleteKeyword')}
-          />
+          />}
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isDeleting}>{t('common.cancel')}</AlertDialogCancel>
             <AlertDialogAction
-              disabled={isDeleting || deleteText.trim().toUpperCase() !== t('privacy.deleteKeyword').toUpperCase()}
+              disabled={isDeleting || (!appleSub && deleteText.trim().toUpperCase() !== t('privacy.deleteKeyword').toUpperCase())}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               onClick={(e) => {
                 e.preventDefault();
                 void (async () => {
                   setIsDeleting(true);
                   try {
-                    await privacyService.deleteMyAccount();
+                    await privacyService.deleteMyAccount({ appleConfirmed: appleSub });
                     track('account_deleted');
                     toast({ title: t('privacy.deleted'), description: t('privacy.deletedBody') });
                     setConfirmDelete(false);
+                    setAppleSub(false);
                     await logout();
                     navigate('/', { replace: true });
-                  } catch {
-                    fail();
+                  } catch (error) {
                     setIsDeleting(false);
+                    const code = (error as { code?: string } | null)?.code;
+                    // Premium comprado con Apple y aún renovándose: se pide
+                    // cancelarlo antes, porque sólo la persona puede hacerlo.
+                    if (code === 'APPLE_SUBSCRIPTION_ACTIVE') setAppleSub(true);
+                    else if (code === 'CANCEL_FAILED') toast({ title: t('privacy.cancelFailed'), variant: 'destructive' });
+                    else fail();
                   }
                 })();
               }}
             >
-              {isDeleting ? <Loader2 size={16} className="animate-spin" /> : t('privacy.deleteConfirm')}
+              {isDeleting ? <Loader2 size={16} className="animate-spin" /> : t(appleSub ? 'privacy.appleSubDone' : 'privacy.deleteConfirm')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

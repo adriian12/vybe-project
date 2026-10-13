@@ -124,6 +124,24 @@ export const fetchGooglePurchase = async (productId: string, purchaseToken: stri
   };
 };
 
+/**
+ * Cancela la renovación de la suscripción mensual (al borrar la cuenta): sigue
+ * pagada hasta su fin, pero Google ya no vuelve a cobrar. Si ya estaba
+ * cancelada, caducada o el token ya no existe, no hay nada que cancelar.
+ */
+export const cancelGoogleSubscription = async (purchaseToken: string): Promise<void> => {
+  const productId = `${GOOGLE_PACKAGE}.premium.monthly`;
+  const token = await googleAccessToken(SCOPE);
+  const r = await fetch(
+    `${API}/subscriptions/${encodeURIComponent(productId)}/tokens/${encodeURIComponent(purchaseToken)}:cancel`,
+    { method: 'POST', headers: { Authorization: `Bearer ${token}` } },
+  );
+  if (r.ok || r.status === 404 || r.status === 410) return;
+  const texto = (await r.text()).slice(0, 300);
+  if (r.status === 400 && /expired|cancel|not.?found|no longer/i.test(texto)) return;
+  throw new GooglePlayError(`Google Play ${r.status}: ${texto}`);
+};
+
 /** Confirma la suscripción en Google (si no, Google la devuelve a los 3 días). */
 export const acknowledgeGoogleSubscription = async (productId: string, purchaseToken: string) => {
   try {

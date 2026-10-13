@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import { ApiError } from '@/services/api';
+import { ApiError, functionErrorCode } from '@/services/api';
 
 /**
  * Versiones vigentes de los documentos legales.
@@ -110,20 +110,24 @@ export const privacyService = {
   // ==========================================================================
 
   /**
-   * Marca la cuenta para borrado y lanza el borrado duro.
+   * Borra la cuenta.
    *
-   * La RPC oculta el perfil de inmediato; la Edge Function borra después los
-   * ficheros de Storage y el usuario de auth, que requieren service role.
+   * Primero la Edge Function, que cancela las suscripciones (Stripe y Google
+   * Play) y borra ficheros, datos y usuario. Si una suscripción no se puede
+   * cancelar, o la de Apple sigue renovándose, no se borra nada: lanza
+   * `CANCEL_FAILED` o `APPLE_SUBSCRIPTION_ACTIVE` para que la pantalla lo diga.
+   * Ante cualquier otro fallo, la cuenta queda marcada para borrado y oculta.
    */
-  deleteMyAccount: async (): Promise<void> => {
-    const { error } = await supabase.rpc('request_account_deletion');
-    if (error) throw new ApiError('DELETE_FAILED', 'errors.generic');
-
-    try {
-      await supabase.functions.invoke('delete-account');
-    } catch (hardDeleteError) {
-      // El borrado queda pendiente y lo completará el proceso programado.
-      console.error('Error running hard delete:', hardDeleteError);
+  deleteMyAccount: async (opts: { appleConfirmed?: boolean } = {}): Promise<void> => {
+    const { error: fnError } = await supabase.functions.invoke('delete-account', { body: opts });
+    if (fnError) {
+      const code = await functionErrorCode(fnError);
+      if (code === 'APPLE_SUBSCRIPTION_ACTIVE' || code === 'CANCEL_FAILED') {
+        throw new ApiError(code, code === 'CANCEL_FAILED' ? 'privacy.cancelFailed' : 'privacy.appleSubBody');
+      }
+      console.error('Error running hard delete:', code);
+      const { error } = await supabase.rpc('request_account_deletion');
+      if (error) throw new ApiError('DELETE_FAILED', 'errors.generic');
     }
 
     await supabase.auth.signOut();

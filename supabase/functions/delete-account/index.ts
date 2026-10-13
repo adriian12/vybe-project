@@ -3,6 +3,7 @@ import { overLimit, tooManyRequests } from '../_shared/rate-limit.ts';
 import { json, preflight } from '../_shared/cors.ts';
 import { adminClient, getUser, getProfileId } from '../_shared/supabase.ts';
 import { stripeSecretKey } from '../_shared/stripe-env.ts';
+import { cancelGoogleSubscription } from '../_shared/google-play.ts';
 
 /**
  * Borrado duro de la cuenta (art. 17 RGPD).
@@ -68,17 +69,47 @@ serve(async (req: Request): Promise<Response> => {
 
     const profileId = await getProfileId(supabase, user.id);
 
-    // Premium mensual: se cancela ya en Stripe. Si no, al desaparecer la
-    // cuenta Stripe seguiría cobrando cada mes a alguien que ya no existe.
+    // Premium mensual: ninguna suscripción puede seguir cobrando cuando la
+    // cuenta ya no existe. Stripe y Google Play se cancelan desde aquí; Apple no
+    // deja cancelar desde el servidor, así que se le pide a la persona antes.
     if (profileId) {
-      const secretKey = stripeSecretKey();
+      let body: { appleConfirmed?: boolean } = {};
+      try {
+        body = await req.json();
+      } catch {
+        // Sin cuerpo.
+      }
       const { data: subs } = await supabase
         .from('premium_subscriptions')
-        .select('stripe_subscription_id')
-        .eq('user_id', profileId)
-        .not('stripe_subscription_id', 'is', null);
+        .select('subscription_type, expires_at, cancel_at_period_end, stripe_subscription_id, google_purchase_token, apple_original_transaction_id')
+        .eq('user_id', profileId);
+      const renueva = (s: { subscription_type: string; expires_at: string | null; cancel_at_period_end: boolean | null }) =>
+        s.subscription_type === 'monthly' &&
+        !s.cancel_at_period_end &&
+        (!s.expires_at || new Date(s.expires_at).getTime() > Date.now());
+
+      // Apple: sólo la persona puede cancelarla (Ajustes del iPhone). Mientras
+      // siga renovándose no se borra nada, salvo que diga que ya la canceló
+      // (el aviso de Apple puede tardar unos minutos en llegar).
+      if (!body.appleConfirmed && (subs ?? []).some((s) => s.apple_original_transaction_id && renueva(s))) {
+        return json({ error: 'APPLE_SUBSCRIPTION_ACTIVE' }, 409);
+      }
+
+      // Google Play: se cancela la renovación con la Play Developer API.
       for (const sub of subs ?? []) {
-        if (!secretKey) break;
+        if (!sub.google_purchase_token || !renueva(sub)) continue;
+        try {
+          await cancelGoogleSubscription(sub.google_purchase_token);
+        } catch (error) {
+          console.error('Google Play cancel on delete:', error);
+          return json({ error: 'CANCEL_FAILED' }, 502);
+        }
+      }
+
+      // Stripe (web): se cancela al momento.
+      const secretKey = stripeSecretKey();
+      for (const sub of subs ?? []) {
+        if (!secretKey || !sub.stripe_subscription_id) continue;
         const r = await fetch(`https://api.stripe.com/v1/subscriptions/${sub.stripe_subscription_id}`, {
           method: 'DELETE',
           headers: { Authorization: `Bearer ${secretKey}` },

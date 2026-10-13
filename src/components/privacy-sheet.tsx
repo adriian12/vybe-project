@@ -25,6 +25,7 @@ import { PartyButton } from '@/components/ui-custom/party-button';
 import { useToast } from '@/components/ui/use-toast';
 import { privacyService, ConsentRecord } from '@/services/privacy';
 import { track } from '@/lib/observability';
+import { manageStoreSubscription, storePlatform } from '@/services/iap';
 
 interface PrivacySheetProps {
   open: boolean;
@@ -46,6 +47,8 @@ const PrivacySheet: React.FC<PrivacySheetProps> = ({ open, onOpenChange }) => {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [confirmText, setConfirmText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
+  /** El borrado se paró porque hay Premium de Apple que sigue renovándose. */
+  const [appleSub, setAppleSub] = useState(false);
 
   useEffect(() => {
     if (open) void privacyService.getMyConsents().then(setConsents);
@@ -68,13 +71,16 @@ const PrivacySheet: React.FC<PrivacySheetProps> = ({ open, onOpenChange }) => {
   const deleteAccount = async () => {
     setIsDeleting(true);
     try {
-      await privacyService.deleteMyAccount();
+      await privacyService.deleteMyAccount({ appleConfirmed: appleSub });
       track('account_deleted');
       toast({ title: t('privacy.deleted'), description: t('privacy.deletedBody') });
       navigate('/', { replace: true });
-    } catch {
-      toast({ title: t('common.error'), description: t('errors.generic'), variant: 'destructive' });
+    } catch (error) {
       setIsDeleting(false);
+      const code = (error as { code?: string } | null)?.code;
+      if (code === 'APPLE_SUBSCRIPTION_ACTIVE') setAppleSub(true);
+      else if (code === 'CANCEL_FAILED') toast({ title: t('privacy.cancelFailed'), variant: 'destructive' });
+      else toast({ title: t('common.error'), description: t('errors.generic'), variant: 'destructive' });
     }
   };
 
@@ -157,14 +163,30 @@ const PrivacySheet: React.FC<PrivacySheetProps> = ({ open, onOpenChange }) => {
         </SheetContent>
       </Sheet>
 
-      <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+      <AlertDialog
+        open={confirmOpen}
+        onOpenChange={(o) => {
+          setConfirmOpen(o);
+          if (!o) setAppleSub(false);
+        }}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t('privacy.deleteConfirmTitle')}</AlertDialogTitle>
-            <AlertDialogDescription>{t('privacy.deleteConfirmBody')}</AlertDialogDescription>
+            <AlertDialogTitle>{t(appleSub ? 'privacy.appleSubTitle' : 'privacy.deleteConfirmTitle')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {appleSub
+                ? `${t('privacy.appleSubBody')} ${storePlatform() === 'apple' ? '' : t('privacy.appleSubHowTo')}`
+                : `${t('privacy.deleteSubscriptions')} ${t('privacy.deleteConfirmBody')}`}
+            </AlertDialogDescription>
           </AlertDialogHeader>
 
-          <div className="space-y-2">
+          {appleSub && storePlatform() === 'apple' && (
+            <Button className="w-full" onClick={() => void manageStoreSubscription().catch(() => undefined)}>
+              {t('privacy.appleSubManage')}
+            </Button>
+          )}
+
+          {!appleSub && <div className="space-y-2">
             <Label htmlFor="delete-confirm">{keyword}</Label>
             <Input
               id="delete-confirm"
@@ -172,7 +194,7 @@ const PrivacySheet: React.FC<PrivacySheetProps> = ({ open, onOpenChange }) => {
               onChange={(e) => setConfirmText(e.target.value)}
               autoComplete="off"
             />
-          </div>
+          </div>}
 
           <AlertDialogFooter>
             <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
@@ -180,10 +202,10 @@ const PrivacySheet: React.FC<PrivacySheetProps> = ({ open, onOpenChange }) => {
                 el texto coincida sin que el diálogo se cierre solo. */}
             <Button
               variant="destructive"
-              disabled={confirmText.trim().toUpperCase() !== keyword.toUpperCase() || isDeleting}
+              disabled={(!appleSub && confirmText.trim().toUpperCase() !== keyword.toUpperCase()) || isDeleting}
               onClick={() => void deleteAccount()}
             >
-              {t('privacy.deleteConfirm')}
+              {t(appleSub ? 'privacy.appleSubDone' : 'privacy.deleteConfirm')}
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
