@@ -10,6 +10,14 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
+        <!--
+            El SDK de Facebook (dentro del plugin de inicio de sesión social) no
+            se usa: que no arranque solo ni envíe eventos ni el ID de publicidad.
+        -->
+        <meta-data android:name="com.facebook.sdk.AutoInitEnabled" android:value="false" />
+        <meta-data android:name="com.facebook.sdk.AutoLogAppEventsEnabled" android:value="false" />
+        <meta-data android:name="com.facebook.sdk.AdvertiserIDCollectionEnabled" android:value="false" />
+
         <activity
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode|navigation|density"
             android:name=".MainActivity"
@@ -114,6 +122,15 @@
 
     <!-- Avisos. Desde Android 13 hay que pedirlo explícitamente. -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!--
+        Sin ID de publicidad. El plugin de inicio de sesión social trae el SDK
+        de Facebook, que añade estos permisos al manifiesto final aunque la app
+        no ofrece «Continuar con Facebook». Fiestea no usa el ID de publicidad,
+        y así lo declara en Play Console.
+    -->
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" tools:node="remove" />
+    <uses-permission android:name="android.permission.ACCESS_ADSERVICES_AD_ID" tools:node="remove" />
 
     <!--
         Galería (fotos de perfil de Premium): desde Capacitor 8 la cámara usa el
