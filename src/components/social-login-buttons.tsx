@@ -52,7 +52,15 @@ const Botones = ({ kind, proveedores }: { kind?: 'vyber' | 'guest'; proveedores:
     } catch (error) {
       if (error instanceof SocialLoginCancelled) return;
       console.error('social login', error);
-      toast({ title: t('common.error'), description: t('auth.social.failed'), variant: 'destructive' });
+      const msg = error instanceof Error ? error.message : '';
+      const yaRegistrado = msg.includes('already registered') || msg.includes('already exists') || msg.includes('email_exists');
+      toast({
+        title: yaRegistrado ? t('auth.social.emailTakenTitle', 'Correo ya registrado') : t('common.error'),
+        description: yaRegistrado
+          ? t('auth.social.emailTaken', 'Este correo ya tiene cuenta con contraseña. Inicia sesión con tu correo y contraseña.')
+          : t('auth.social.failed'),
+        variant: 'destructive',
+      });
     } finally {
       setBusy(null);
     }
