@@ -32,17 +32,12 @@ export const setupNativeShell = async (): Promise<void> => {
   void removeServiceWorkers();
 
   try {
-    const { StatusBar, Style } = await import('@capacitor/status-bar');
-
-    await StatusBar.setStyle({ style: Style.Dark });
-
-    if (platform() === 'android') {
-      // El lienzo del sistema de diseño: la barra de estado se funde con la
-      // cabecera en vez de dibujar una franja de otro negro. Sólo hasta
-      // Android 14: desde el 15 la app va de borde a borde y la barra es
-      // transparente sobre el propio fondo (`capacitor.config.ts`, SystemBars).
-      await StatusBar.setBackgroundColor({ color: '#111114' });
-    }
+    // SystemBars viene en el núcleo de Capacitor 8. Sustituye al plugin
+    // `@capacitor/status-bar`, que usaba APIs de color de barra obsoletas desde
+    // Android 15 (Google Play lo marcaba). La app va de borde a borde en todas
+    // las versiones y lo que asoma bajo las barras es su propio fondo.
+    const { SystemBars, SystemBarsStyle } = await import('@capacitor/core');
+    await SystemBars.setStyle({ style: SystemBarsStyle.Dark });
   } catch (error) {
     // Que falle el aspecto no puede impedir que la aplicación arranque.
     console.error('No se pudo preparar la barra de estado:', error);

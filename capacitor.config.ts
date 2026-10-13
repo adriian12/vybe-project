@@ -55,11 +55,6 @@ const config: CapacitorConfig = {
       style: 'DARK',
     },
 
-    // Sólo tiene efecto hasta Android 14.
-    StatusBar: {
-      style: 'DARK',
-      backgroundColor: '#111114',
-    },
   },
 };
 

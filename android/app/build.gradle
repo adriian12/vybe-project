@@ -42,8 +42,11 @@ android {
             if (firmaProps['storeFile']) {
                 signingConfig signingConfigs.release
             }
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            // R8: reduce y ofusca el código. Google Play avisa si la ofuscación
+            // baja del 25 %. Las reglas para Capacitor van en proguard-rules.pro.
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 }
