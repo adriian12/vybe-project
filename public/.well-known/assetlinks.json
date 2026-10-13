@@ -1,10 +1,15 @@
 [
   {
-    "relation": ["delegate_permission/common.handle_all_urls"],
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
     "target": {
       "namespace": "android_app",
       "package_name": "es.fiestea.app",
-      "sha256_cert_fingerprints": ["7F:D1:8A:2F:3F:D9:9A:59:25:85:D7:AD:B5:E7:14:27:14:79:4D:4C:81:75:E1:69:85:CC:4A:66:AC:E6:18:84"]
+      "sha256_cert_fingerprints": [
+        "7F:D1:8A:2F:3F:D9:9A:59:25:85:D7:AD:B5:E7:14:27:14:79:4D:4C:81:75:E1:69:85:CC:4A:66:AC:E6:18:84",
+        "63:5B:7A:EC:A5:B4:49:C6:5D:16:2C:D2:2B:29:EE:00:12:0A:17:87:76:D2:70:C9:A0:AB:48:DE:9D:96:FB:B7"
+      ]
     }
   }
 ]
