@@ -65,6 +65,7 @@ import { pushService, PushStatus } from '@/services/push';
 import { cn } from '@/lib/utils';
 import PhotoRequirementsDialog, { FailedPhoto } from '@/components/photo-requirements-dialog';
 import AccountTypeCard from '@/components/account-type-card';
+import FollowedVenues from '@/components/followed-venues';
 import { Input } from '@/components/ui/input';
 import { privacyService } from '@/services/privacy';
 import { manageStoreSubscription } from '@/services/iap';
@@ -818,6 +819,9 @@ const ProfilePage = () => {
               del tablón tampoco están, así que aquí sólo eran ruido. El código
               (InterestPicker, saveInterests) se queda para volver a
               enseñarlos. */}
+
+          {/* ----------------------------------------- negocios que sigues */}
+          <FollowedVenues />
 
           {/* ------------------------------------------------------ ajustes */}
           <AccountTypeCard />

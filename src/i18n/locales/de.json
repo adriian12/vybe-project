@@ -2271,7 +2271,11 @@
         "partyType": "Art der Party",
         "venueType": "Art der Location",
         "showResults_one": "{{count}} Party ansehen",
-        "showResults_other": "{{count}} Partys ansehen"
+        "showResults_other": "{{count}} Partys ansehen",
+        "venues": "Locations",
+        "venueParties_one": "{{count}} kommende Party",
+        "venueParties_other": "{{count}} kommende Partys",
+        "venueParties_zero": "Keine Partys angekündigt"
     },
     "tickets": {
         "external": {
@@ -3652,5 +3656,17 @@
         "expelledBody": "Das Lokal hat dir nach einer Meldung den Zugang zu {{name}} entzogen.",
         "leftFarTitle": "Du hast die Party verlassen",
         "leftFarBody": "Du bist weit weg von {{name}} und erscheinst nicht mehr im Flechazo. Wenn du zurückkommst, tritt erneut ein."
+    },
+    "organizer": {
+        "title": "Veranstalter",
+        "seePage": "Seite ansehen",
+        "follow": "Folgen",
+        "following": "Folgst du",
+        "followed": "Du folgst {{name}}. Wir sagen dir Bescheid, wenn es neue Partys gibt."
+    },
+    "followedVenues": {
+        "title": "Locations, denen du folgst",
+        "empty": "Du folgst noch keiner Location. Öffne eine Party und tippe unter «Veranstalter» auf «Folgen», um von ihren nächsten Partys zu erfahren.",
+        "noParties": "Keine Partys"
     }
 }

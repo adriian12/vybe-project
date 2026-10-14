@@ -2271,7 +2271,11 @@
         "partyType": "Tipo de fiesta",
         "venueType": "Tipo de negocio",
         "showResults_one": "Ver {{count}} fiesta",
-        "showResults_other": "Ver {{count}} fiestas"
+        "showResults_other": "Ver {{count}} fiestas",
+        "venues": "Negocios",
+        "venueParties_one": "{{count}} fiesta próxima",
+        "venueParties_other": "{{count}} fiestas próximas",
+        "venueParties_zero": "Sin fiestas anunciadas"
     },
     "tickets": {
         "external": {
@@ -3652,5 +3656,17 @@
         "expelledBody": "El negocio te ha retirado el acceso a {{name}} tras una denuncia.",
         "leftFarTitle": "Has salido de la fiesta",
         "leftFarBody": "Estás lejos de {{name}}, así que ya no sales en su Flechazo. Si vuelves, entra otra vez."
+    },
+    "organizer": {
+        "title": "Organiza",
+        "seePage": "Ver ficha",
+        "follow": "Seguir",
+        "following": "Siguiendo",
+        "followed": "Sigues a {{name}}. Te avisaremos de sus próximas fiestas."
+    },
+    "followedVenues": {
+        "title": "Negocios que sigues",
+        "empty": "Aún no sigues ningún negocio. Entra en la ficha de una fiesta y pulsa «Seguir» en «Organiza» para enterarte de sus próximas fiestas.",
+        "noParties": "Sin fiestas"
     }
 }

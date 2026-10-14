@@ -49,6 +49,7 @@ import { track } from '@/lib/observability';
 import { cn } from '@/lib/utils';
 import { Event } from '@/types/venue';
 import { artistInitials, instagramUrl } from '@/lib/lineup';
+import VenueOrganizerCard from '@/components/venue-organizer-card';
 
 /**
  * Desplegable amarillo de la ficha (Entradas, Listas, Reservados VIP), como en
@@ -293,18 +294,16 @@ const EventDetailPage = () => {
             {formatHourRange(event.startDate, event.endDate)}
           </p>
           <h1 className="font-display text-headline-xl text-white">{event.name}</h1>
-          {/* El local lleva a su ficha: horario, más fiestas y seguirlo. */}
-          <button
-            type="button"
-            onClick={() => navigate(`/local/${event.venueId}`)}
-            className="press flex w-fit max-w-full items-center gap-1.5 text-left text-body-md text-party-gray hover:text-foreground"
-          >
+          {/* Dónde es. La ficha del negocio que organiza va más abajo
+              («Organiza»): en las fiestas de Fiestea y de Funout la sala no
+              es el organizador. */}
+          <p className="flex max-w-full items-center gap-1.5 text-body-md text-party-gray">
             <Martini size={16} className="shrink-0" />
-            <span className="truncate underline decoration-white/20 underline-offset-4">
+            <span className="truncate">
               {event.placeName ?? event.venueName}
               {event.city ? ` · ${event.city}` : ''}
             </span>
-          </button>
+          </p>
           <EventRatingBadge eventId={event.id} />
         </div>
 
@@ -503,6 +502,9 @@ const EventDetailPage = () => {
           {!terminado && !live && (
             <p className="text-caption text-party-gray">{t('eventDetail.intentNote')}</p>
           )}
+
+          {/* ----------------------------------------------------- organiza */}
+          {event.venueId && <VenueOrganizerCard venueId={event.venueId} />}
 
           {/* -------------------------------------------------- cómo llegar */}
           {event.location && (

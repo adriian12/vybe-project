@@ -215,6 +215,19 @@ export interface VenueProfile {
   socialTiktok: string | null;
 }
 
+/** Un negocio en el buscador del mapa o en «Negocios que sigues». */
+export interface VenueSummary {
+  id: string;
+  name: string;
+  city: string | null;
+  logoUrl: string | null;
+  /** Fiestas que aún no han terminado. */
+  upcoming: number;
+  /** Cuándo empieza la siguiente (sólo en «Negocios que sigues»). */
+  nextEventAt: string | null;
+  isPlatform: boolean;
+}
+
 export interface VenueEventSummary {
   id: string;
   name: string;
@@ -288,6 +301,37 @@ export const nightService = {
     const { data, error } = await supabase.rpc('toggle_venue_follow', { p_venue_id: venueId });
     if (error) throw fail(error.message);
     return Boolean(data);
+  },
+
+  /** Negocios cuyo nombre contiene el texto (migración 110). */
+  searchVenues: async (query: string): Promise<VenueSummary[]> => {
+    if (query.trim().length < 2) return [];
+    const { data, error } = await supabase.rpc('search_venues', { p_query: query });
+    if (error) throw fail(error.message);
+    return (data ?? []).map((row) => ({
+      id: row.id,
+      name: row.name,
+      city: row.city,
+      logoUrl: row.logo_url,
+      upcoming: Number(row.upcoming ?? 0),
+      nextEventAt: null,
+      isPlatform: Boolean(row.is_platform),
+    }));
+  },
+
+  /** «Negocios que sigues», con la siguiente fiesta de cada uno. */
+  getFollowedVenues: async (): Promise<VenueSummary[]> => {
+    const { data, error } = await supabase.rpc('get_my_followed_venues');
+    if (error) throw fail(error.message);
+    return (data ?? []).map((row) => ({
+      id: row.id,
+      name: row.name,
+      city: row.city,
+      logoUrl: row.logo_url,
+      upcoming: Number(row.upcoming ?? 0),
+      nextEventAt: row.next_event_at,
+      isPlatform: false,
+    }));
   },
 
   // ------------------------------------------------------- panel del local

@@ -2271,7 +2271,11 @@
         "partyType": "Type of party",
         "venueType": "Type of venue",
         "showResults_one": "See {{count}} party",
-        "showResults_other": "See {{count}} parties"
+        "showResults_other": "See {{count}} parties",
+        "venues": "Venues",
+        "venueParties_one": "{{count}} upcoming party",
+        "venueParties_other": "{{count}} upcoming parties",
+        "venueParties_zero": "No parties announced"
     },
     "tickets": {
         "external": {
@@ -3652,5 +3656,17 @@
         "expelledBody": "The venue has removed your access to {{name}} after a report.",
         "leftFarTitle": "You have left the party",
         "leftFarBody": "You are far from {{name}}, so you no longer appear in its Flechazo. If you go back, enter again."
+    },
+    "organizer": {
+        "title": "Organised by",
+        "seePage": "View page",
+        "follow": "Follow",
+        "following": "Following",
+        "followed": "You follow {{name}}. We will let you know about their next parties."
+    },
+    "followedVenues": {
+        "title": "Venues you follow",
+        "empty": "You do not follow any venue yet. Open a party and tap «Follow» under «Organised by» to hear about their next parties.",
+        "noParties": "No parties"
     }
 }

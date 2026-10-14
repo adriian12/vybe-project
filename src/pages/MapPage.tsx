@@ -26,6 +26,7 @@ import { VenueType } from '@/types/venue';
 import { featuredFirst, isFeatured } from '@/lib/featured';
 import MapFiltersSheet from '@/components/map-filters-sheet';
 import { aplicarFiltros, conFlechazo, Franja } from '@/lib/party-filters';
+import VenueSearchResults from '@/components/venue-search-results';
 
 /** Centro por defecto: Palma, cuando no hay ubicación ni eventos con punto. */
 const PALMA: L.LatLngTuple = [39.5696, 2.6502];
@@ -315,6 +316,9 @@ const MapPage = () => {
               )}
             </button>
           </div>
+
+          {/* Negocios que coinciden con la búsqueda, para ir a su ficha. */}
+          <VenueSearchResults query={busqueda} />
 
           <div className="pointer-events-auto flex">
             <DateFilter nights={noches} className="shadow-lg shadow-black/30" />

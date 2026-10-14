@@ -2271,7 +2271,11 @@
         "partyType": "Tipus de festa",
         "venueType": "Tipus de negoci",
         "showResults_one": "Veure {{count}} festa",
-        "showResults_other": "Veure {{count}} festes"
+        "showResults_other": "Veure {{count}} festes",
+        "venues": "Negocis",
+        "venueParties_one": "{{count}} festa propera",
+        "venueParties_other": "{{count}} festes properes",
+        "venueParties_zero": "Sense festes anunciades"
     },
     "tickets": {
         "external": {
@@ -3652,5 +3656,17 @@
         "expelledBody": "El negoci t'ha retirat l'accés a {{name}} després d'una denúncia.",
         "leftFarTitle": "Has sortit de la festa",
         "leftFarBody": "Ets lluny de {{name}}, així que ja no surts al seu Flechazo. Si hi tornes, torna a entrar."
+    },
+    "organizer": {
+        "title": "Organitza",
+        "seePage": "Veure fitxa",
+        "follow": "Segueix",
+        "following": "Seguint",
+        "followed": "Segueixes {{name}}. T’avisarem de les seves properes festes."
+    },
+    "followedVenues": {
+        "title": "Negocis que segueixes",
+        "empty": "Encara no segueixes cap negoci. Entra a la fitxa d’una festa i prem «Segueix» a «Organitza» per saber les seves properes festes.",
+        "noParties": "Sense festes"
     }
 }

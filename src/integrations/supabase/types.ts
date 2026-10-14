@@ -4582,6 +4582,17 @@ export type Database = {
           venue_count: number
         }[]
       }
+      get_event_share: {
+        Args: { p_event_id: string }
+        Returns: {
+          city: string
+          end_date: string
+          name: string
+          place: string
+          poster_url: string
+          start_date: string
+        }[]
+      }
       get_event_stats: {
         Args: { p_event_id: string }
         Returns: {
@@ -4730,6 +4741,17 @@ export type Database = {
           event_name: string
           start_date: string
           venue_name: string
+        }[]
+      }
+      get_my_followed_venues: {
+        Args: never
+        Returns: {
+          city: string
+          id: string
+          logo_url: string
+          name: string
+          next_event_at: string
+          upcoming: number
         }[]
       }
       get_my_profile: {
@@ -5652,6 +5674,17 @@ export type Database = {
         }
         Returns: string
       }
+      search_venues: {
+        Args: { p_query: string }
+        Returns: {
+          city: string
+          id: string
+          is_platform: boolean
+          logo_url: string
+          name: string
+          upcoming: number
+        }[]
+      }
       set_account_type: { Args: { p_type: string }; Returns: undefined }
       set_code_commission: {
         Args: { p_code_id: string; p_type: string; p_value: number }
@@ -5813,6 +5846,7 @@ export type Database = {
         Args: { p_venue_id: string }
         Returns: number
       }
+      venue_search_key: { Args: { p_text: string }; Returns: string }
       verify_from_event_photo: {
         Args: { p_profile_id: string; p_url: string }
         Returns: undefined
