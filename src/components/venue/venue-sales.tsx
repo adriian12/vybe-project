@@ -13,6 +13,7 @@ import TicketOverview from '@/components/venue/tickets/ticket-overview';
 import TicketOrders from '@/components/venue/tickets/ticket-orders';
 import TicketAttendees from '@/components/venue/tickets/ticket-attendees';
 import TicketComps from '@/components/venue/tickets/ticket-comps';
+import PromoterTeamMoney from '@/components/venue/promoter-team-money';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -741,6 +742,7 @@ const VenueSales = ({ events, plan }: VenueSalesProps) => {
       {/* -------------------------------------------------- comisiones RRPP */}
       {pestana === 'promoters' && !cargando && (
         <div className="space-y-4">
+          <PromoterTeamMoney />
           <div className="grid grid-cols-2 gap-3">
             <div className="surface-light rounded-2xl p-4">
               <p className="font-display text-headline-md tabular">{euros(aPagar)}</p>

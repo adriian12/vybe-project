@@ -3476,6 +3476,68 @@ export type Database = {
           },
         ]
       }
+      venue_promoter_team_members: {
+        Row: {
+          link_id: string
+          team_id: string
+        }
+        Insert: {
+          link_id: string
+          team_id: string
+        }
+        Update: {
+          link_id?: string
+          team_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "venue_promoter_team_members_link_id_fkey"
+            columns: ["link_id"]
+            isOneToOne: false
+            referencedRelation: "venue_team_links"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "venue_promoter_team_members_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "venue_promoter_teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      venue_promoter_teams: {
+        Row: {
+          color: string
+          created_at: string
+          id: string
+          name: string
+          venue_id: string
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          id?: string
+          name: string
+          venue_id: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          id?: string
+          name?: string
+          venue_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "venue_promoter_teams_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       venue_stamp_cards: {
         Row: {
           enabled: boolean
@@ -4238,6 +4300,7 @@ export type Database = {
       current_venue_role: { Args: never; Returns: string }
       delete_guest_entry: { Args: { p_entry_id: string }; Returns: undefined }
       delete_guest_list: { Args: { p_list_id: string }; Returns: undefined }
+      delete_promoter_team: { Args: { p_id: string }; Returns: undefined }
       delete_ticket_type: { Args: { p_type_id: string }; Returns: string }
       demographics_min_bucket: { Args: never; Returns: number }
       draw_raffle: { Args: { p_raffle_id: string }; Returns: string }
@@ -4869,6 +4932,25 @@ export type Database = {
           reports_received: number
         }[]
       }
+      get_promoter_ranking: {
+        Args: {
+          p_event_ids?: string[]
+          p_from?: string
+          p_team_id?: string
+          p_to?: string
+        }
+        Returns: {
+          commission_cents: number
+          entered: number
+          events: number
+          link_id: string
+          listed: number
+          name: string
+          paid_cents: number
+          revenue_cents: number
+          team_ids: string[]
+        }[]
+      }
       get_promoter_settlement: {
         Args: { p_event_id: string }
         Returns: {
@@ -4884,6 +4966,15 @@ export type Database = {
           paid_cents: number
           promoter_name: string
           ticket_revenue_cents: number
+        }[]
+      }
+      get_promoter_teams: {
+        Args: never
+        Returns: {
+          color: string
+          id: string
+          link_ids: string[]
+          name: string
         }[]
       }
       get_promotion_stats: {
@@ -5348,6 +5439,7 @@ export type Database = {
         Args: { p_event_id: string; p_feature: string }
         Returns: string
       }
+      owner_venue_or_raise: { Args: never; Returns: string }
       pending_event_pushes: {
         Args: never
         Returns: {
@@ -5518,6 +5610,10 @@ export type Database = {
         Args: { p_device_model?: string; p_platform: string; p_token: string }
         Returns: undefined
       }
+      save_promoter_team: {
+        Args: { p_color?: string; p_id: string; p_name: string }
+        Returns: string
+      }
       save_ticket_type: {
         Args: {
           p_active?: boolean
@@ -5590,6 +5686,10 @@ export type Database = {
         Returns: undefined
       }
       set_my_gender: { Args: { p_gender: string }; Returns: undefined }
+      set_promoter_teams: {
+        Args: { p_link_id: string; p_team_ids: string[] }
+        Returns: undefined
+      }
       set_raffle_entries: {
         Args: { p_closed: boolean; p_raffle_id: string }
         Returns: string

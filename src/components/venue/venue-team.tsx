@@ -1,3 +1,6 @@
+import PromoterTeams from '@/components/venue/promoter-teams';
+import PromoterRanking from '@/components/venue/promoter-ranking';
+import { PromoterTeam, promotersService } from '@/services/promoters';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Eye, Link2, Loader2, Plus, Trash2, UserPlus } from 'lucide-react';
@@ -56,6 +59,9 @@ const VenueTeam: React.FC<VenueTeamProps> = ({ venueId, role, events, canCommiss
   const [commissionType, setCommissionType] = useState<CommissionType | 'none'>('none');
   const [commissionValue, setCommissionValue] = useState('');
   const [viendo, setViendo] = useState<{ label: string; role: TeamLinkRole; token: string } | null>(null);
+  // Equipos de RRPP (migración 106).
+  const [teams, setTeams] = useState<PromoterTeam[]>([]);
+  const [teamsVersion, setTeamsVersion] = useState(0);
 
   const isOwner = role === 'owner';
 
@@ -84,6 +90,16 @@ const VenueTeam: React.FC<VenueTeamProps> = ({ venueId, role, events, canCommiss
   useEffect(() => {
     void load();
   }, [load]);
+
+  const loadTeams = useCallback(async () => {
+    if (!isOwner) return;
+    setTeams(await promotersService.getTeams());
+    setTeamsVersion((v) => v + 1);
+  }, [isOwner]);
+
+  useEffect(() => {
+    void loadTeams();
+  }, [loadTeams]);
 
   /** Fiestas a las que se puede atar un enlace de una noche: las que no han terminado. */
   const proximas = useMemo(
@@ -448,6 +464,18 @@ const VenueTeam: React.FC<VenueTeamProps> = ({ venueId, role, events, canCommiss
             })}
           </ul>
         </section>
+      )}
+
+      {/* ------------------------------------------ equipos y ranking de RRPP */}
+      {isOwner && (
+        <>
+          <PromoterTeams
+            teams={teams}
+            promoters={links.filter((l) => l.role === 'promoter' && !l.revokedAt)}
+            onChanged={loadTeams}
+          />
+          <PromoterRanking events={events} teams={teams} showMoney={canCommission} version={teamsVersion} />
+        </>
       )}
 
       <Dialog open={Boolean(viendo)} onOpenChange={(open) => !open && setViendo(null)}>
