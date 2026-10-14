@@ -1,6 +1,8 @@
 import { supabase } from '@/integrations/supabase/client';
 import { ApiError } from '@/services/api';
 import { safeHttpUrl } from '@/lib/safe-url';
+import { cleanLineup, LineupArtist } from '@/lib/lineup';
+import type { Json } from '@/integrations/supabase/types';
 
 /**
  * Lo que puede hacer administración sobre las cuentas.
@@ -100,6 +102,7 @@ export interface AdminEventInput {
   dressCode?: string | null;
   bookingUrl?: string | null;
   posterUrl?: string | null;
+  lineup?: LineupArtist[];
 }
 
 /** Un evento de Funout, tal y como se guardó (sólo los datos que usamos). */
@@ -185,6 +188,7 @@ export const adminService = {
     theme?: string | null;
     latitude?: number | null;
     longitude?: number | null;
+    lineup?: LineupArtist[];
   }): Promise<string> => {
     const { data, error } = await supabase.rpc('admin_create_event', {
       p_name: event.name,
@@ -200,6 +204,7 @@ export const adminService = {
       p_longitude: event.longitude ?? null,
       // Con punto en el mapa, se comprueba que la gente está allí al entrar.
       p_requires_location: event.latitude != null && event.longitude != null,
+      p_lineup: cleanLineup(event.lineup ?? []) as unknown as Json,
     });
     if (error) fallo(error.message);
     return String(data ?? '');
@@ -227,6 +232,7 @@ export const adminService = {
       p_dress_code: event.dressCode ?? null,
       p_booking_url: safeHttpUrl(event.bookingUrl) ?? null,
       p_poster_url: event.posterUrl ?? null,
+      p_lineup: event.lineup ? (cleanLineup(event.lineup) as unknown as Json) : null,
     } as never);
     if (error) fallo(error.message);
   },

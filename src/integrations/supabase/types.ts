@@ -1110,6 +1110,7 @@ export type Database = {
           guest_list_message: string | null
           id: string
           latitude: number | null
+          lineup: Json
           longitude: number | null
           max_age: number | null
           max_capacity: number | null
@@ -1161,6 +1162,7 @@ export type Database = {
           guest_list_message?: string | null
           id?: string
           latitude?: number | null
+          lineup?: Json
           longitude?: number | null
           max_age?: number | null
           max_capacity?: number | null
@@ -1212,6 +1214,7 @@ export type Database = {
           guest_list_message?: string | null
           id?: string
           latitude?: number | null
+          lineup?: Json
           longitude?: number | null
           max_age?: number | null
           max_capacity?: number | null
@@ -3828,6 +3831,7 @@ export type Database = {
           p_description?: string
           p_end: string
           p_latitude?: number
+          p_lineup?: Json
           p_longitude?: number
           p_name: string
           p_price?: number
@@ -4010,6 +4014,7 @@ export type Database = {
           p_end: string
           p_event_id: string
           p_latitude: number
+          p_lineup?: Json
           p_longitude: number
           p_name: string
           p_place_name: string
@@ -5649,6 +5654,7 @@ export type Database = {
         Args: { p_latitude: number; p_longitude: number; p_profile_id: string }
         Returns: undefined
       }
+      valid_lineup: { Args: { p: Json }; Returns: boolean }
       validate_event_ticket: {
         Args: { p_code: string }
         Returns: {

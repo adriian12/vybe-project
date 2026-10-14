@@ -42,6 +42,8 @@ export const VENUE_RADIUS: Record<VenueType, number> = {
   festival: 500,
 };
 
+import type { LineupArtist } from '@/lib/lineup';
+
 export interface Event {
   id: string;
   name: string;
@@ -82,6 +84,8 @@ export interface Event {
    * imagen. Es lo primero que mira quien decide a qué fiesta va.
    */
   posterUrl?: string;
+  /** Quién actúa: nombre, hora e Instagram (migración 105). */
+  lineup?: LineupArtist[];
   qrCode?: string;
   description?: string;
   maxCapacity?: number;

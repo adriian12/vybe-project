@@ -4,15 +4,19 @@ import { useTranslation } from 'react-i18next';
 import {
   AlertTriangle,
   ArrowLeft,
+  AtSign,
   Bookmark,
   BookmarkCheck,
-  CalendarDays,
   CheckCircle2,
-  Clock,
+  ChevronDown,
+  ClipboardList,
+  Crown,
   Loader2,
   Martini,
+  Music,
   Navigation,
   QrCode,
+  Shirt,
   MapPin as MapPinIcon,
   Share2,
   Ticket,
@@ -44,39 +48,46 @@ import { useShareSheet } from '@/components/share-sheet';
 import { track } from '@/lib/observability';
 import { cn } from '@/lib/utils';
 import { Event } from '@/types/venue';
+import { artistInitials, instagramUrl } from '@/lib/lineup';
 
 /**
- * Una de las tres losetas blancas: icono en círculo oscuro, dato y etiqueta.
- * Con `onClick` (la distancia) toda la loseta es el botón.
+ * Desplegable amarillo de la ficha (Entradas, Listas, Reservados VIP), como en
+ * el diseño de referencia. El contenido se queda montado aunque esté cerrado:
+ * así carga y dice si tiene algo que enseñar.
  */
-const Loseta: React.FC<{ icon: typeof Clock; value: string; label: string; onClick?: () => void }> = ({
-  icon: Icon,
-  value,
-  label,
-  onClick,
-}) => {
-  const contenido = (
-    <>
-      <span className="mb-1 flex h-8 w-8 items-center justify-center rounded-full bg-surface-low text-white">
-        <Icon size={17} />
+const Desplegable: React.FC<{
+  title: string;
+  icon: typeof Ticket;
+  open: boolean;
+  onToggle: () => void;
+  hidden?: boolean;
+  children: React.ReactNode;
+}> = ({ title, icon: Icon, open, onToggle, hidden, children }) => (
+  <section className={cn(hidden && 'hidden')}>
+    <button
+      type="button"
+      aria-expanded={open}
+      onClick={onToggle}
+      className="press flex h-12 w-full items-center justify-between gap-2 rounded-xl bg-party-primary px-4 font-display text-title-card text-ink"
+    >
+      <span className="flex items-center gap-2">
+        <Icon size={18} />
+        {title}
       </span>
-      <span className="font-display text-title-card leading-tight text-ink">{value}</span>
-      <span className="text-caption uppercase text-ink/60">{label}</span>
-    </>
-  );
-  const clase = 'flex flex-col items-center justify-center rounded-xl bg-white p-3 text-center';
-  return onClick ? (
-    <button type="button" onClick={onClick} className={`press ${clase}`}>
-      {contenido}
+      <ChevronDown size={18} className={cn('transition-transform', open && 'rotate-180')} />
     </button>
-  ) : (
-    <div className={clase}>{contenido}</div>
-  );
-};
+    <div className={cn('flex flex-col gap-2 pt-2', !open && 'hidden')}>{children}</div>
+  </section>
+);
+
+/** Géneros escritos en un solo campo: «Techno, Tech House / Hard Techno». */
+const generos = (theme?: string) =>
+  [...new Set((theme ?? '').split(/[,/·|]+/).map((g) => g.trim()).filter(Boolean))];
 
 /** Píldora oscura del detalle: edad, género, vestimenta. */
-const Etiqueta: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <span className="shrink-0 rounded-full bg-surface-container px-3 py-2 text-label-pill text-[#C8C6C5]">
+const Etiqueta: React.FC<{ children: React.ReactNode; icon?: typeof Music }> = ({ children, icon: Icon }) => (
+  <span className="flex shrink-0 items-center gap-1 rounded-full bg-surface-container px-3 py-1.5 text-label-pill text-[#C8C6C5]">
+    {Icon && <Icon size={13} className="text-party-primary" />}
     {children}
   </span>
 );
@@ -110,6 +121,14 @@ const EventDetailPage = () => {
   }, [position]);
   const [estado, setEstado] = useState<'loading' | 'ready' | 'not-found'>('loading');
   const [preguntaLista, setPreguntaLista] = useState(0);
+  // Desplegables: cuál está abierto y cuáles tienen algo que enseñar.
+  const [abierto, setAbierto] = useState<'tickets' | 'lists' | 'vip' | null>(null);
+  const [hayEntradas, setHayEntradas] = useState(0);
+  const [hayMesas, setHayMesas] = useState(0);
+  const [hayLista, setHayLista] = useState(false);
+  const [descAbierta, setDescAbierta] = useState(false);
+  const [todosGeneros, setTodosGeneros] = useState(false);
+  const alternar = (k: 'tickets' | 'lists' | 'vip') => setAbierto((a) => (a === k ? null : k));
 
   // El evento se pide directamente: puede venir de un enlace compartido y no
   // estar en la lista cargada (por ejemplo, si ya ha terminado).
@@ -156,7 +175,11 @@ const EventDetailPage = () => {
   const marcarVoy = async () => {
     const iba = going;
     await toggleIntent(event.id);
-    if (!iba) setPreguntaLista((n) => n + 1);
+    if (!iba) {
+      // Si hay lista, se abre su desplegable para que se vea la pregunta.
+      if (hayLista) setAbierto('lists');
+      setPreguntaLista((n) => n + 1);
+    }
   };
   const dentro = activeEvent?.eventId === event.id;
   const distancia =
@@ -168,6 +191,14 @@ const EventDetailPage = () => {
   const fecha = new Date(event.startDate)
     .toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' })
     .replace(/\./g, '');
+  // «SÁB 13 JUL 2026 | 23:30 – 06:00», la franja de arriba del diseño.
+  const lineaFecha = new Date(event.startDate)
+    .toLocaleDateString(i18n.language, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })
+    .replace(/[.,]/g, '')
+    .toUpperCase();
+  const listaGeneros = generos(event.theme);
+  const lineup = event.lineup ?? [];
+  const descLarga = (event.description?.length ?? 0) > 220 || (event.description?.split('\n').length ?? 0) > 4;
 
   const compartir = () =>
     share({
@@ -254,8 +285,13 @@ const EventDetailPage = () => {
           {live && <LivePill className="absolute bottom-4 left-margin z-10" />}
         </div>
 
-        {/* ---------------------------------------------------------- título */}
-        <div className="flex flex-col gap-1 px-margin pb-3 pt-1">
+        {/* ------------------------------------------------ fecha y título */}
+        <div className="flex flex-col gap-1.5 px-margin pb-3 pt-1">
+          <p className="text-caption font-bold uppercase tracking-wide text-party-gray">
+            {lineaFecha}
+            <span className="mx-2 text-party-primary">|</span>
+            {formatHourRange(event.startDate, event.endDate)}
+          </p>
           <h1 className="font-display text-headline-xl text-white">{event.name}</h1>
           {/* El local lleva a su ficha: horario, más fiestas y seguirlo. */}
           <button
@@ -272,34 +308,101 @@ const EventDetailPage = () => {
           <EventRatingBadge eventId={event.id} />
         </div>
 
-        <div className="space-y-4 px-margin">
-          {/* ---------------------------------------------------- losetas */}
-          <div className="grid grid-cols-3 gap-2">
-            <Loseta icon={CalendarDays} value={fecha} label={t('eventDetail.date')} />
-            <Loseta
-              icon={Clock}
-              value={formatHourRange(event.startDate, event.endDate)}
-              label={t('eventAccess.schedule')}
-            />
-            {/* Con la ubicación, la distancia real y al tocarla la ruta; sin
-                ella, al tocarla se pide. */}
-            <Loseta
-              icon={Navigation}
-              value={
-                distancia !== null ? formatDistance(distancia, i18n.language) : pidiendoUbicacion ? '…' : '—'
-              }
-              label={t('eventDetail.distance')}
-              onClick={
-                !event.location
-                  ? undefined
-                  : distancia !== null
-                    ? verRuta
-                    : pidiendoUbicacion
-                      ? undefined
-                      : () => void pedirUbicacion()
-              }
-            />
+        <div className="space-y-5 px-margin">
+          {/* ------------------------------------------- géneros y etiquetas */}
+          <div className="flex flex-wrap items-center gap-1.5">
+            {/* Las importadas sin precio no son gratis: su precio no se sabe. */}
+            {!(event.price === undefined && event.externalSource) && (
+              <span className="shrink-0 rounded-full bg-party-primary px-3 py-1 font-display text-title-card text-ink">
+                {event.price !== undefined && event.price > 0
+                  ? t('home.fromPrice', { price: `${event.price} €` })
+                  : t('eventAccess.free')}
+              </span>
+            )}
+            {(todosGeneros ? listaGeneros : listaGeneros.slice(0, 3)).map((g) => (
+              <Etiqueta key={g} icon={Music}>
+                {g}
+              </Etiqueta>
+            ))}
+            {!todosGeneros && listaGeneros.length > 3 && (
+              <button
+                type="button"
+                onClick={() => setTodosGeneros(true)}
+                className="press rounded-full bg-surface-container px-3 py-1.5 text-label-pill text-party-primary"
+              >
+                +{listaGeneros.length - 3}
+              </button>
+            )}
+            {franja && <Etiqueta>{t(`filters.franjas.${franja}`)}</Etiqueta>}
+            {event.minAge !== undefined && <Etiqueta>{event.minAge}+</Etiqueta>}
+            {event.dressCode && <Etiqueta icon={Shirt}>{event.dressCode}</Etiqueta>}
           </div>
+
+          {/* ------------------------------------------------- descripción */}
+          {event.description && (
+            <section className="border-l-2 border-party-primary/50 pl-3">
+              <p
+                className={cn(
+                  'whitespace-pre-line text-body-md leading-relaxed text-[#C8C6C5]',
+                  descLarga && !descAbierta && 'line-clamp-4',
+                )}
+              >
+                {event.description}
+              </p>
+              {descLarga && (
+                <button
+                  type="button"
+                  onClick={() => setDescAbierta((v) => !v)}
+                  className="press mt-1 text-body-sm font-bold text-party-primary"
+                >
+                  {descAbierta ? t('eventDetail.seeLess') : t('eventDetail.seeMore')}
+                </button>
+              )}
+            </section>
+          )}
+
+          {/* ----------------------------------------------------- line-up */}
+          {lineup.length > 0 && (
+            <section>
+              <h2 className="mb-2 font-display text-headline-md text-white">{t('eventDetail.lineup')}</h2>
+              <ul className="no-scrollbar -mx-margin flex gap-3 overflow-x-auto px-margin pb-1">
+                {lineup.map((artista, i) => {
+                  const contenido = (
+                    <>
+                      <span className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-party-primary to-[#A87F00] font-display text-title-card text-ink ring-2 ring-white/10">
+                        {artistInitials(artista.name)}
+                      </span>
+                      <span className="mt-1.5 line-clamp-2 text-center text-caption font-bold leading-tight text-white">
+                        {artista.name}
+                      </span>
+                      {artista.time && <span className="text-[11px] text-party-gray">{artista.time}</span>}
+                      {artista.instagram && (
+                        <span className="flex items-center gap-0.5 text-[11px] text-party-primary">
+                          <AtSign size={11} />
+                          {artista.instagram}
+                        </span>
+                      )}
+                    </>
+                  );
+                  return (
+                    <li key={`${artista.name}-${i}`} className="w-[5.5rem] shrink-0">
+                      {artista.instagram ? (
+                        <button
+                          type="button"
+                          onClick={() => void openExternal(instagramUrl(artista.instagram as string))}
+                          className="press flex w-full flex-col items-center"
+                        >
+                          {contenido}
+                        </button>
+                      ) : (
+                        <div className="flex flex-col items-center">{contenido}</div>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+          )}
 
           {/* ------------------------------------------------ ahora mismo */}
           {/* El ambiente lo da el local desde la puerta; la cifra no se enseña
@@ -320,6 +423,67 @@ const EventDetailPage = () => {
             </p>
           )}
           <WhoIsGoing eventId={event.id} going={cifras.going} />
+
+          {/* ---------------------------- Entradas · Listas · Reservados VIP */}
+          {!terminado && (
+            <div className="space-y-2">
+              {/* Las que vende el local en la app y, si no, su enlace externo. */}
+              <Desplegable
+                title={t('eventDetail.ticketsSection')}
+                icon={Ticket}
+                open={abierto === 'tickets'}
+                onToggle={() => alternar('tickets')}
+                hidden={hayEntradas === 0 && !event.bookingUrl}
+              >
+                <EventTickets eventId={event.id} kinds={['entry', 'vip']} onCount={setHayEntradas} bare />
+                {event.bookingUrl && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      void socialService.trackBookingClick(event.id).catch(() => undefined);
+                      void openExternal(event.bookingUrl as string);
+                    }}
+                    className="press flex w-full items-center gap-3 rounded-xl bg-white p-3 text-left"
+                  >
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-party-primary text-ink">
+                      <Ticket size={18} />
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block font-display text-title-card text-ink">{t('eventAccess.tickets')}</span>
+                      <span className="block truncate text-caption text-ink/60">{t('eventDetail.ticketsBody')}</span>
+                    </span>
+                  </button>
+                )}
+              </Desplegable>
+
+              <Desplegable
+                title={t('eventDetail.listsSection')}
+                icon={ClipboardList}
+                open={abierto === 'lists'}
+                onToggle={() => alternar('lists')}
+                hidden={!hayLista}
+              >
+                <GuestListJoin
+                  key={currentUser?.id ?? 'anon'}
+                  eventId={event.id}
+                  ask={preguntaLista}
+                  defaultName={currentUser?.name ?? ''}
+                  onAvailable={setHayLista}
+                />
+              </Desplegable>
+
+              <Desplegable
+                title={t('eventDetail.vipSection')}
+                icon={Crown}
+                open={abierto === 'vip'}
+                onToggle={() => alternar('vip')}
+                hidden={hayMesas === 0}
+              >
+                <EventTickets eventId={event.id} kinds={['table']} onCount={setHayMesas} bare />
+              </Desplegable>
+            </div>
+          )}
+
           {/* «Voy a ir», también a la vista: en la tarjeta del inicio no está
               cuando la fiesta vende entradas. */}
           {!terminado && !live && (
@@ -343,65 +507,6 @@ const EventDetailPage = () => {
             <p className="text-caption text-party-gray">{t('eventDetail.intentNote')}</p>
           )}
 
-          {/* ---------------------------------------------------- píldoras */}
-          <div className="no-scrollbar -mx-margin flex items-center gap-1 overflow-x-auto px-margin py-0.5">
-            {/* Las importadas sin precio no son gratis: su precio no se sabe. */}
-            {!(event.price === undefined && event.externalSource) && (
-              <span className="shrink-0 rounded-full bg-party-primary px-3 py-1.5 font-display text-title-card text-ink">
-                {event.price !== undefined && event.price > 0
-                  ? t('home.fromPrice', { price: `${event.price} €` })
-                  : t('eventAccess.free')}
-              </span>
-            )}
-            {franja && <Etiqueta>{t(`filters.franjas.${franja}`)}</Etiqueta>}
-            {event.minAge !== undefined && <Etiqueta>{event.minAge}+</Etiqueta>}
-            {event.theme && <Etiqueta>{event.theme}</Etiqueta>}
-            {event.dressCode && <Etiqueta>{event.dressCode}</Etiqueta>}
-          </div>
-
-          {/* ------------------------------------------------- descripción */}
-          {event.description && (
-            <section className="flex flex-col gap-2">
-              <h2 className="font-display text-headline-md text-white">{t('eventDetail.description')}</h2>
-              <p className="whitespace-pre-line text-body-md leading-relaxed text-[#C8C6C5]">
-                {event.description}
-              </p>
-            </section>
-          )}
-
-          {/* ------------------------------------------------ Lista Fiestea */}
-          {/* Encima de las entradas, si el negocio la tiene activada. */}
-          {!terminado && (
-            <GuestListJoin
-              key={currentUser?.id ?? 'anon'}
-              eventId={event.id}
-              ask={preguntaLista}
-              defaultName={currentUser?.name ?? ''}
-            />
-          )}
-
-          {/* ------------------------------------------------------ entradas */}
-          {/* Las que vende el local dentro de la app (Business). */}
-          {!terminado && <EventTickets eventId={event.id} />}
-          {event.bookingUrl && !terminado && (
-            <button
-              type="button"
-              onClick={() => {
-                void socialService.trackBookingClick(event.id).catch(() => undefined);
-                void openExternal(event.bookingUrl as string);
-              }}
-              className="press flex w-full items-center gap-3 rounded-xl bg-white p-3 text-left"
-            >
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-party-primary text-ink">
-                <Ticket size={18} />
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block font-display text-title-card text-ink">{t('eventAccess.tickets')}</span>
-                <span className="block truncate text-caption text-ink/60">{t('eventDetail.ticketsBody')}</span>
-              </span>
-            </button>
-          )}
-
           {/* -------------------------------------------------- cómo llegar */}
           {event.location && (
             <section className="pb-2">
@@ -419,6 +524,7 @@ const EventDetailPage = () => {
                   </span>
                   <span className="truncate text-caption font-medium text-ink/60">
                     {[event.city, event.region].filter(Boolean).join(', ')}
+                    {distancia !== null ? ` · ${t('eventDetail.away', { distance: formatDistance(distancia, i18n.language) })}` : ''}
                   </span>
                   <span className="mt-2 inline-flex items-center gap-1 self-start text-label-pill uppercase text-ink">
                     <Navigation size={15} className="text-party-primary" />
@@ -426,7 +532,22 @@ const EventDetailPage = () => {
                   </span>
                 </span>
               </button>
-              <p className="mt-1 text-right text-[10px] text-party-gray/70">© OpenStreetMap · CARTO</p>
+              <div className="mt-1 flex items-center justify-between gap-2">
+                {/* Sin la ubicación del móvil, la distancia se pide aquí. */}
+                {distancia === null ? (
+                  <button
+                    type="button"
+                    disabled={pidiendoUbicacion}
+                    onClick={() => void pedirUbicacion()}
+                    className="press text-caption font-bold text-party-primary disabled:opacity-50"
+                  >
+                    {pidiendoUbicacion ? '…' : t('eventDetail.howFar')}
+                  </button>
+                ) : (
+                  <span />
+                )}
+                <p className="text-right text-[10px] text-party-gray/70">© OpenStreetMap · CARTO</p>
+              </div>
             </section>
           )}
         </div>

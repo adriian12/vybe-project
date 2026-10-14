@@ -12,7 +12,17 @@ import { cn } from '@/lib/utils';
  * enlace de reservas externo, si lo tiene. Al elegir una se abre la pantalla
  * de compra (`/tickets/buy/:typeId`), con los datos de cada asistente.
  */
-const EventTickets = ({ eventId }: { eventId: string }) => {
+interface EventTicketsProps {
+  eventId: string;
+  /** Sólo estos tipos (la ficha separa entradas de reservados VIP). */
+  kinds?: TicketType['kind'][];
+  /** Cuántos tipos hay que enseñar, en cuanto se sabe. */
+  onCount?: (n: number) => void;
+  /** Sin título: va dentro de un desplegable que ya lo lleva. */
+  bare?: boolean;
+}
+
+const EventTickets = ({ eventId, kinds, onCount, bare = false }: EventTicketsProps) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [types, setTypes] = useState<TicketType[]>([]);
@@ -21,11 +31,16 @@ const EventTickets = ({ eventId }: { eventId: string }) => {
   useEffect(() => {
     let vivo = true;
     void ticketsService.getEventTypes(eventId).then((lista) => {
-      if (vivo) setTypes(lista);
+      if (!vivo) return;
+      const propios = kinds ? lista.filter((x) => kinds.includes(x.kind)) : lista;
+      setTypes(propios);
+      onCount?.(propios.length);
     });
     return () => {
       vivo = false;
     };
+    // `kinds` y `onCount` son fijos para cada uso.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [eventId]);
 
   if (types.length === 0) return null;
@@ -35,7 +50,7 @@ const EventTickets = ({ eventId }: { eventId: string }) => {
 
   return (
     <section className="flex flex-col gap-2">
-      <h2 className="font-display text-headline-md text-white">{t('tickets.buy.title')}</h2>
+      {!bare && <h2 className="font-display text-headline-md text-white">{t('tickets.buy.title')}</h2>}
       <ul className="flex flex-col gap-2">
         {types.map((tipo) => {
           const agotada = tipo.remaining !== null && tipo.remaining <= 0;

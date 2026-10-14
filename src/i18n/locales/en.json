@@ -839,6 +839,15 @@
             "exportBusiness": "Exporting is part of the Business plan"
         },
         "events": {
+            "lineup": "Line-up",
+            "lineupHelp": "Who is playing. Time and Instagram are optional.",
+            "lineupName": "Artist name",
+            "lineupTime": "Time (01:30 – 03:00)",
+            "lineupInstagram": "Instagram (@user)",
+            "lineupAdd": "Add artist",
+            "lineupRemove": "Remove artist",
+            "lineupUp": "Move up",
+            "lineupDown": "Move down",
             "title": "Event management",
             "subtitle": "Create and manage your venue's events.",
             "upcoming": "Upcoming events",
@@ -2137,6 +2146,14 @@
         "dismiss": "Dismiss"
     },
     "eventDetail": {
+        "lineup": "Line-up",
+        "seeMore": "See more",
+        "seeLess": "See less",
+        "ticketsSection": "Tickets",
+        "listsSection": "Guest lists",
+        "vipSection": "VIP tables",
+        "away": "{{distance}} away",
+        "howFar": "How far is it?",
         "shareText": "Coming to {{name}}? {{date}} at {{venue}}.",
         "copied": "Link copied",
         "date": "Date",

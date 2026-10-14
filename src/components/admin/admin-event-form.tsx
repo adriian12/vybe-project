@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import LineupEditor from '@/components/lineup-editor';
+import { LineupArtist } from '@/lib/lineup';
 import { useTranslation } from 'react-i18next';
 import { CalendarPlus, Check, ChevronsUpDown, Loader2, Save } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -66,6 +68,7 @@ const AdminEventForm = ({
   const [bookingUrl, setBookingUrl] = useState(event?.bookingUrl ?? '');
   const [posterUrl, setPosterUrl] = useState(event?.posterUrl ?? '');
   const [description, setDescription] = useState(event?.description ?? '');
+  const [lineup, setLineup] = useState<LineupArtist[]>(event?.lineup ?? []);
   const [lugar, setLugar] = useState<PickedLocation | null>(
     event?.location ? { latitude: event.location.latitude, longitude: event.location.longitude } : null,
   );
@@ -102,6 +105,7 @@ const AdminEventForm = ({
       bookingUrl: bookingUrl.trim() || null,
       posterUrl: posterUrl.trim() || null,
       description: description.trim() || null,
+      lineup,
     };
 
     setEnviando(true);
@@ -124,6 +128,7 @@ const AdminEventForm = ({
         setBookingUrl('');
         setPosterUrl('');
         setDescription('');
+        setLineup([]);
         setLugar(null);
       }
       onCreated?.();
@@ -257,6 +262,13 @@ const AdminEventForm = ({
       {campo('ae-desc', t('admin.newEvent.description'), (
         <Textarea id="ae-desc" rows={3} maxLength={2000} value={description} onChange={(e) => setDescription(e.target.value)} />
       ))}
+
+      <LineupEditor
+        value={lineup}
+        onChange={setLineup}
+        inputClassName="h-10 w-full rounded-md border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        labelClassName="mb-1 block text-caption font-medium"
+      />
 
       {/* Las fiestas de Fiestea se entran con la ubicación: sin punto en el
           mapa no se podría comprobar que la gente está allí. */}

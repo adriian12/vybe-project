@@ -839,6 +839,15 @@
             "exportBusiness": "Exportar és del pla Business"
         },
         "events": {
+            "lineup": "Line-up",
+            "lineupHelp": "Qui actua. L’hora i l’Instagram són opcionals.",
+            "lineupName": "Nom de l’artista",
+            "lineupTime": "Hora (01:30 – 03:00)",
+            "lineupInstagram": "Instagram (@usuari)",
+            "lineupAdd": "Afegir artista",
+            "lineupRemove": "Treure artista",
+            "lineupUp": "Pujar",
+            "lineupDown": "Baixar",
             "title": "Gestió d'esdeveniments",
             "subtitle": "Crea i gestiona els esdeveniments del teu establiment.",
             "upcoming": "Propers esdeveniments",
@@ -2137,6 +2146,14 @@
         "dismiss": "Descartar"
     },
     "eventDetail": {
+        "lineup": "Line-up",
+        "seeMore": "Veure’n més",
+        "seeLess": "Veure’n menys",
+        "ticketsSection": "Entrades",
+        "listsSection": "Llistes",
+        "vipSection": "Reservats VIP",
+        "away": "a {{distance}}",
+        "howFar": "A quina distància és?",
         "shareText": "Véns a {{name}}? {{date}} a {{venue}}.",
         "copied": "Enllaç copiat",
         "date": "Data",

@@ -18,6 +18,8 @@ interface GuestListJoinProps {
   eventId: string;
   /** Cambia cada vez que la persona marca «voy a ir»: entonces se le lleva a la lista. */
   ask: number;
+  /** Si hay lista a la que apuntarse (o ya se está apuntado), en cuanto se sabe. */
+  onAvailable?: (available: boolean) => void;
   defaultName?: string;
 }
 
@@ -29,7 +31,7 @@ interface GuestListJoinProps {
  * y «Apuntarme». Al marcar «voy a ir», la ficha baja hasta ella. Una vez
  * apuntada, la ficha lo dice y deja cambiarlo o borrarse.
  */
-const GuestListJoin = ({ eventId, ask, defaultName = '' }: GuestListJoinProps) => {
+const GuestListJoin = ({ eventId, ask, defaultName = '', onAvailable }: GuestListJoinProps) => {
   const { t } = useTranslation();
   const { toast } = useToast();
   const [info, setInfo] = useState<GuestListInfo | null>(null);
@@ -43,7 +45,10 @@ const GuestListJoin = ({ eventId, ask, defaultName = '' }: GuestListJoinProps) =
   const cargar = useCallback(async () => {
     const datos = await guestListService.getInfo(eventId);
     setInfo(datos);
+    onAvailable?.(Boolean(datos?.enabled || datos?.mine));
     return datos;
+    // `onAvailable` es fijo para cada uso.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [eventId]);
 
   useEffect(() => {

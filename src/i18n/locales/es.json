@@ -839,6 +839,15 @@
             "exportBusiness": "Exportar es del plan Business"
         },
         "events": {
+            "lineup": "Line-up",
+            "lineupHelp": "Quién actúa. La hora y el Instagram son opcionales.",
+            "lineupName": "Nombre del artista",
+            "lineupTime": "Hora (01:30 – 03:00)",
+            "lineupInstagram": "Instagram (@usuario)",
+            "lineupAdd": "Añadir artista",
+            "lineupRemove": "Quitar artista",
+            "lineupUp": "Subir",
+            "lineupDown": "Bajar",
             "title": "Gestión de eventos",
             "subtitle": "Crea y gestiona los eventos de tu establecimiento.",
             "upcoming": "Próximos eventos",
@@ -2137,6 +2146,14 @@
         "dismiss": "Descartar"
     },
     "eventDetail": {
+        "lineup": "Line-up",
+        "seeMore": "Ver más",
+        "seeLess": "Ver menos",
+        "ticketsSection": "Entradas",
+        "listsSection": "Listas",
+        "vipSection": "Reservados VIP",
+        "away": "a {{distance}}",
+        "howFar": "¿A qué distancia está?",
         "shareText": "¿Te vienes a {{name}}? {{date}} en {{venue}}.",
         "copied": "Enlace copiado",
         "date": "Fecha",

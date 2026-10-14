@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import LineupEditor from '@/components/lineup-editor';
+import { LineupArtist } from '@/lib/lineup';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { CopyPlus, ImagePlus, X } from 'lucide-react';
@@ -148,6 +150,9 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onCreated, onClose, e
   const [posterPreview, setPosterPreview] = useState<string | null>(base?.posterUrl ?? null);
 
   // Dónde es: la del evento al editar; al crear, la del local si la tiene.
+  // El line-up va aparte del formulario: es una lista de filas.
+  const [lineup, setLineup] = useState<LineupArtist[]>(base?.lineup ?? []);
+
   const [ubicacion, setUbicacion] = useState<PickedLocation | null>(
     base?.location ?? currentVenue?.location ?? null,
   );
@@ -248,6 +253,7 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onCreated, onClose, e
         maxCapacity: capacity && capacity > 0 ? capacity : undefined,
         recurrence,
         posterUrl,
+        lineup,
         location: { latitude: ubicacion.latitude, longitude: ubicacion.longitude },
       };
 
@@ -446,6 +452,8 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onCreated, onClose, e
             placeholder={t('venue.events.dressCodePlaceholder')}
           />
         </div>
+
+        <LineupEditor value={lineup} onChange={setLineup} inputClassName={campo} labelClassName={etiqueta} />
 
         {/* El cartel. La columna `poster_url` existía desde el principio y no
             había forma de rellenarla. */}

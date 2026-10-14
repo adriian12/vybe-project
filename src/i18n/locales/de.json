@@ -839,6 +839,15 @@
             "exportBusiness": "Exportieren ist im Business-Plan enthalten"
         },
         "events": {
+            "lineup": "Line-up",
+            "lineupHelp": "Wer auftritt. Uhrzeit und Instagram sind optional.",
+            "lineupName": "Name des Artists",
+            "lineupTime": "Uhrzeit (01:30 – 03:00)",
+            "lineupInstagram": "Instagram (@nutzer)",
+            "lineupAdd": "Artist hinzufügen",
+            "lineupRemove": "Artist entfernen",
+            "lineupUp": "Nach oben",
+            "lineupDown": "Nach unten",
             "title": "Event-Verwaltung",
             "subtitle": "Erstelle und verwalte die Events deines Lokals.",
             "upcoming": "Kommende Events",
@@ -2137,6 +2146,14 @@
         "dismiss": "Ausblenden"
     },
     "eventDetail": {
+        "lineup": "Line-up",
+        "seeMore": "Mehr anzeigen",
+        "seeLess": "Weniger anzeigen",
+        "ticketsSection": "Tickets",
+        "listsSection": "Gästelisten",
+        "vipSection": "VIP-Tische",
+        "away": "{{distance}} entfernt",
+        "howFar": "Wie weit ist es?",
         "shareText": "Kommst du mit zu {{name}}? {{date}} im {{venue}}.",
         "copied": "Link kopiert",
         "date": "Datum",

@@ -1,11 +1,12 @@
 import { User, Message, Report, ReportType, MatchConnection } from '@/types/user';
 import { Venue, VenueType, Event, EventAccess, VenueStats } from '@/types/venue';
 import { supabase } from '@/integrations/supabase/client';
-import { Tables, TablesUpdate } from '@/integrations/supabase/types';
+import { Json, Tables, TablesUpdate } from '@/integrations/supabase/types';
 import { calculateDistance } from '@/services/geo';
 import { isNative } from '@/services/native';
 import { APP_URL } from '@/lib/hosts';
 import { safeHttpUrl } from '@/lib/safe-url';
+import { cleanLineup, parseLineup } from '@/lib/lineup';
 import {
   canonicalPhotoUrl,
   signedPhotoUrl,
@@ -148,6 +149,7 @@ const dbEventToEvent = (dbEvent: EventRow, venue?: Partial<VenueRow>): Event => 
   price: dbEvent.price !== null ? Number(dbEvent.price) : undefined,
   bookingUrl: safeHttpUrl(dbEvent.booking_url as string | null | undefined),
   posterUrl: dbEvent.poster_url ?? undefined,
+  lineup: parseLineup(dbEvent.lineup),
   qrCode: dbEvent.qr_code ?? undefined,
   description: dbEvent.description ?? undefined,
   maxCapacity: dbEvent.max_capacity ?? undefined,
@@ -1256,6 +1258,7 @@ export const api = {
         poster_url: eventData.posterUrl ?? null,
         max_capacity: eventData.maxCapacity ?? null,
         recurrence: eventData.recurrence ?? 'none',
+        lineup: cleanLineup(eventData.lineup ?? []) as unknown as Json,
       })
       .select()
       .single();
@@ -1387,6 +1390,7 @@ export const api = {
         booking_url: safeHttpUrl(eventData.bookingUrl) ?? null,
         poster_url: eventData.posterUrl ?? null,
         max_capacity: eventData.maxCapacity ?? null,
+        lineup: cleanLineup(eventData.lineup ?? []) as unknown as Json,
       })
       .eq('id', eventId);
 
