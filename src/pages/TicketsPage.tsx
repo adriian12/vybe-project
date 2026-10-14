@@ -20,6 +20,7 @@ import {
 import Header from '@/components/header';
 import Footer from '@/components/footer';
 import PurchasedTickets from '@/components/purchased-tickets';
+import ExternalTickets from '@/components/external-tickets';
 import { VybeMark } from '@/components/brand/vybe-logo';
 import { dayAndMonth, formatHour, formatHourRange } from '@/components/event-bits';
 import { PartyButton } from '@/components/ui-custom/party-button';
@@ -121,6 +122,7 @@ const TicketsPage = () => {
   );
 
   const activas = proximas.length + (activeEvent ? 1 : 0);
+  const eventosFeed = useMemo(() => withDistance.map(({ event }) => event), [withDistance]);
 
   const compartir = (event: Event) =>
     share({
@@ -173,6 +175,9 @@ const TicketsPage = () => {
           <>
             {/* ---------------------------------------- entradas compradas */}
             <PurchasedTickets />
+
+            {/* ---------------------------- entradas de otras webs (Fourvenues…) */}
+            <ExternalTickets events={eventosFeed} />
 
             {/* ------------------------------------------------- pase activo */}
             {activeEvent && (

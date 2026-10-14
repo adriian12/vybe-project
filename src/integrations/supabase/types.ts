@@ -1262,6 +1262,87 @@ export type Database = {
           },
         ]
       }
+      external_tickets: {
+        Row: {
+          address: string | null
+          archived_at: string | null
+          code: string | null
+          created_at: string
+          details: string | null
+          ends_label: string | null
+          event_id: string | null
+          event_name: string | null
+          holder_name: string | null
+          id: string
+          kind: string | null
+          organizer: string | null
+          people: number | null
+          price_cents: number | null
+          profile_id: string
+          qr_text: string
+          source: string
+          starts_at: string | null
+          ticket_type: string | null
+        }
+        Insert: {
+          address?: string | null
+          archived_at?: string | null
+          code?: string | null
+          created_at?: string
+          details?: string | null
+          ends_label?: string | null
+          event_id?: string | null
+          event_name?: string | null
+          holder_name?: string | null
+          id?: string
+          kind?: string | null
+          organizer?: string | null
+          people?: number | null
+          price_cents?: number | null
+          profile_id?: string
+          qr_text: string
+          source?: string
+          starts_at?: string | null
+          ticket_type?: string | null
+        }
+        Update: {
+          address?: string | null
+          archived_at?: string | null
+          code?: string | null
+          created_at?: string
+          details?: string | null
+          ends_label?: string | null
+          event_id?: string | null
+          event_name?: string | null
+          holder_name?: string | null
+          id?: string
+          kind?: string | null
+          organizer?: string | null
+          people?: number | null
+          price_cents?: number | null
+          profile_id?: string
+          qr_text?: string
+          source?: string
+          starts_at?: string | null
+          ticket_type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "external_tickets_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "external_tickets_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       funout_events: {
         Row: {
           address: string | null
@@ -2000,6 +2081,7 @@ export type Database = {
           updated_at: string | null
           user_id: string
           wants: string
+          welcome_email_sent_at: string | null
         }
         Insert: {
           account_type?: string
@@ -2035,6 +2117,7 @@ export type Database = {
           updated_at?: string | null
           user_id: string
           wants?: string
+          welcome_email_sent_at?: string | null
         }
         Update: {
           account_type?: string
@@ -2070,6 +2153,7 @@ export type Database = {
           updated_at?: string | null
           user_id?: string
           wants?: string
+          welcome_email_sent_at?: string | null
         }
         Relationships: []
       }
@@ -4604,6 +4688,7 @@ export type Database = {
           updated_at: string | null
           user_id: string
           wants: string
+          welcome_email_sent_at: string | null
         }[]
         SetofOptions: {
           from: "*"
