@@ -389,7 +389,7 @@ const EventDetailPage = () => {
                       {artista.instagram ? (
                         <button
                           type="button"
-                          onClick={() => void openExternal(instagramUrl(artista.instagram as string))}
+                          onClick={() => void openExternal(instagramUrl(artista.instagram as string), { system: true })}
                           className="press flex w-full flex-col items-center"
                         >
                           {contenido}

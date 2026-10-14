@@ -330,7 +330,9 @@ const VenuePage = () => {
                 <button
                   key={red}
                   type="button"
-                  onClick={() => void openExternal(socialUrl(red, valor))}
+                  // Fuera de la app: así Android e iOS lo abren en la app de
+                  // la red social si está instalada, no en un navegador.
+                  onClick={() => void openExternal(socialUrl(red, valor), { system: true })}
                   aria-label={t('venuePage.openSocial', { network: SOCIAL_NAME[red] })}
                   className="press flex h-16 flex-col items-center justify-center gap-1 rounded-xl bg-surface-low px-1 text-[11px] font-bold"
                 >
