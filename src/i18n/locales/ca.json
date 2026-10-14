@@ -1683,7 +1683,6 @@
             "contactEmail": "Correu de contacte (opcional)",
             "contactEmailHelp": "Surt a la teva fitxa. Pot ser diferent del d'accés.",
             "website": "Web (opcional)",
-            "instagram": "Instagram (opcional)",
             "terms": "Condicions de venda",
             "termsHelp": "Qui compra una entrada les ha d'acceptar: dret d'admissió, devolucions, edat mínima, etc.",
             "termsPlaceholder": "Ex.: Reservat el dret d'admissió. No s'admeten devolucions excepte si s'anul·la l'esdeveniment…",
@@ -1694,9 +1693,17 @@
                 "logoUpload": "No s'ha pogut pujar el logo.",
                 "name": "Escriu el nom del negoci.",
                 "website": "La web no és vàlida.",
-                "instagram": "L'usuari d'Instagram no és vàlid.",
                 "email": "El correu de contacte no és vàlid.",
-                "phone": "El telèfon no és vàlid."
+                "phone": "El telèfon no és vàlid.",
+                "social": "Revisa el teu usuari de {{network}}: no sembla vàlid."
+            },
+            "socials": "Xarxes socials",
+            "socialsHelp": "Escriu el teu usuari o enganxa l’enllaç del teu perfil. A la teva fitxa sortirà un botó per cada xarxa que omplis.",
+            "socialPlaceholder": {
+                "instagram": "@latevasala",
+                "x": "@latevasala",
+                "youtube": "@eltecanal",
+                "tiktok": "@latevasala"
             }
         },
         "liveSettings": {
@@ -2957,13 +2964,27 @@
         "today": "Avui: {{hours}}",
         "directions": "Com arribar-hi",
         "upcoming": "Properes festes",
-        "past": "Festes passades",
         "noUpcoming": "No hi ha festes anunciades. Segueix-lo i t'avisarem de la propera.",
         "noUpcomingFollowing": "No hi ha festes anunciades. T'avisarem de la propera.",
         "promptTitle": "Vols que {{name}} t'avisi de les seves festes?",
         "promptBody": "Segueix-lo i et arribarà un avís quan publiqui una festa nova. Pots deixar de seguir-lo quan vulguis des de la seva fitxa.",
         "email": "Correu",
-        "website": "Web"
+        "website": "Web",
+        "socials": "Segueix-nos a les xarxes",
+        "openSocial": "Obre el seu perfil de {{network}}",
+        "view": "Com veure les festes",
+        "viewList": "Llista",
+        "viewCalendar": "Calendari",
+        "prevMonth": "Mes anterior",
+        "nextMonth": "Mes següent",
+        "eventsCount_one": "{{count}} esdeveniment",
+        "eventsCount_other": "{{count}} esdeveniments",
+        "noEvents": "Sense esdeveniments",
+        "dayTitle": "Festes del dia",
+        "dayPick_one": "Toca la festa per veure’n els detalls.",
+        "dayPick_other": "Hi ha {{count}} festes aquest dia. Toca la que t’interessi per veure’n els detalls.",
+        "dayEmpty": "Aquest dia no hi ha festes anunciades.",
+        "backToVenue": "Torna al negoci"
     },
     "photoCheck": {
         "titleSingle": "La foto no compleix els requisits",

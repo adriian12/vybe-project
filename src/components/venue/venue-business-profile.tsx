@@ -7,8 +7,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { PartyButton } from '@/components/ui-custom/party-button';
 import { useToast } from '@/components/ui/use-toast';
 import LocationPicker, { PickedLocation } from '@/components/venue/location-picker';
+import SocialIcon from '@/components/social-icon';
 import { ApiError } from '@/services/api';
 import { BusinessProfile, businessProfileService } from '@/services/business-profile';
+import { normalizeSocial, SOCIAL_NAME, SOCIAL_NETWORKS, socialLabel, SocialNetwork } from '@/lib/socials';
 
 /**
  * «Negocio»: el perfil que ve el público (ficha, compra de entradas y PDF de
@@ -31,17 +33,6 @@ const normalizarWeb = (texto: string): string | null | undefined => {
   }
 };
 
-/** «@sala», «instagram.com/sala/» o «sala» → «sala». */
-const normalizarInstagram = (texto: string): string | null | undefined => {
-  const limpio = texto
-    .trim()
-    .replace(/^https?:\/\/(www\.)?instagram\.com\//i, '')
-    .replace(/^@/, '')
-    .replace(/[/?#].*$/, '');
-  if (!limpio) return null;
-  return /^[A-Za-z0-9._]{1,30}$/.test(limpio) ? limpio : undefined;
-};
-
 type Campos = {
   name: string;
   address: string;
@@ -49,9 +40,10 @@ type Campos = {
   phone: string;
   contactEmail: string;
   website: string;
-  instagram: string;
   businessTerms: string;
 };
+
+type Redes = Record<SocialNetwork, string>;
 
 const VenueBusinessProfile = ({ venueId }: { venueId: string }) => {
   const { t } = useTranslation();
@@ -59,6 +51,7 @@ const VenueBusinessProfile = ({ venueId }: { venueId: string }) => {
   const archivo = useRef<HTMLInputElement | null>(null);
   const [perfil, setPerfil] = useState<BusinessProfile | null>(null);
   const [campos, setCampos] = useState<Campos | null>(null);
+  const [redes, setRedes] = useState<Redes>({ instagram: '', x: '', youtube: '', tiktok: '' });
   const [ubicacion, setUbicacion] = useState<PickedLocation | null>(null);
   const [guardando, setGuardando] = useState(false);
   const [subiendo, setSubiendo] = useState(false);
@@ -75,8 +68,13 @@ const VenueBusinessProfile = ({ venueId }: { venueId: string }) => {
         phone: p.phone ?? '',
         contactEmail: p.contactEmail ?? '',
         website: p.website ?? '',
-        instagram: p.instagram ? `@${p.instagram}` : '',
         businessTerms: p.businessTerms ?? '',
+      });
+      setRedes({
+        instagram: socialLabel('instagram', p.instagram),
+        x: socialLabel('x', p.socialX),
+        youtube: socialLabel('youtube', p.socialYoutube),
+        tiktok: socialLabel('tiktok', p.socialTiktok),
       });
       if (p.latitude !== null && p.longitude !== null) setUbicacion({ latitude: p.latitude, longitude: p.longitude });
     });
@@ -125,12 +123,22 @@ const VenueBusinessProfile = ({ venueId }: { venueId: string }) => {
 
   const guardar = async () => {
     const web = normalizarWeb(campos.website);
-    const instagram = normalizarInstagram(campos.instagram);
+    const red = Object.fromEntries(SOCIAL_NETWORKS.map((n) => [n, normalizeSocial(n, redes[n])])) as Record<
+      SocialNetwork,
+      string | null | undefined
+    >;
+    const malo = SOCIAL_NETWORKS.find((n) => red[n] === undefined);
     const correo = campos.contactEmail.trim().toLowerCase();
     const telefono = campos.phone.trim();
     if (campos.name.trim().length < 2) return error('venue.business.errors.name');
     if (web === undefined) return error('venue.business.errors.website');
-    if (instagram === undefined) return error('venue.business.errors.instagram');
+    if (malo) {
+      return toast({
+        title: t('common.error'),
+        description: t('venue.business.errors.social', { network: SOCIAL_NAME[malo] }),
+        variant: 'destructive',
+      });
+    }
     if (correo && !CORREO.test(correo)) return error('venue.business.errors.email');
     if (telefono && telefono.replace(/\D/g, '').length < 9) return error('venue.business.errors.phone');
 
@@ -145,10 +153,16 @@ const VenueBusinessProfile = ({ venueId }: { venueId: string }) => {
         phone: telefono || null,
         contactEmail: correo || null,
         website: web,
-        instagram,
+        instagram: red.instagram ?? null,
+        socialX: red.x ?? null,
+        socialYoutube: red.youtube ?? null,
+        socialTiktok: red.tiktok ?? null,
         businessTerms: campos.businessTerms.trim() || null,
       });
-      setCampos({ ...campos, website: web ?? '', instagram: instagram ? `@${instagram}` : '' });
+      setCampos({ ...campos, website: web ?? '' });
+      setRedes(
+        Object.fromEntries(SOCIAL_NETWORKS.map((n) => [n, socialLabel(n, red[n] ?? null)])) as Redes,
+      );
       toast({ title: t('venue.business.saved') });
     } catch (e) {
       error(e instanceof ApiError ? e.message : 'errors.generic');
@@ -275,7 +289,34 @@ const VenueBusinessProfile = ({ venueId }: { venueId: string }) => {
             help: t('venue.business.contactEmailHelp'),
           })}
           {campo('website', { label: t('venue.business.website'), inputMode: 'url', autoCapitalize: 'none', placeholder: 'https://', maxLength: 200 })}
-          {campo('instagram', { label: t('venue.business.instagram'), autoCapitalize: 'none', placeholder: '@', maxLength: 60 })}
+        </div>
+      </section>
+
+      {/* ------------------------------------------------------------ redes */}
+      <section className="surface-light space-y-3 rounded-2xl p-4">
+        <div>
+          <h3 className="font-display text-title-card uppercase">{t('venue.business.socials')}</h3>
+          <p className="text-caption text-party-gray">{t('venue.business.socialsHelp')}</p>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2">
+          {SOCIAL_NETWORKS.map((n) => (
+            <div key={n} className="space-y-1">
+              <Label htmlFor={`bp-${n}`} className="flex items-center gap-1.5 text-caption">
+                <SocialIcon network={n} size={14} />
+                {SOCIAL_NAME[n]}
+              </Label>
+              <Input
+                id={`bp-${n}`}
+                value={redes[n]}
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck={false}
+                maxLength={120}
+                placeholder={t(`venue.business.socialPlaceholder.${n}`)}
+                onChange={(e) => setRedes({ ...redes, [n]: e.target.value })}
+              />
+            </div>
+          ))}
         </div>
       </section>
 

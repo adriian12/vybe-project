@@ -1683,7 +1683,6 @@
             "contactEmail": "Contact email (optional)",
             "contactEmailHelp": "Shown on your page. It can differ from your login email.",
             "website": "Website (optional)",
-            "instagram": "Instagram (optional)",
             "terms": "Sales conditions",
             "termsHelp": "Buyers must accept them: right of admission, refunds, minimum age, etc.",
             "termsPlaceholder": "E.g.: Right of admission reserved. No refunds unless the event is cancelled…",
@@ -1694,9 +1693,17 @@
                 "logoUpload": "The logo could not be uploaded.",
                 "name": "Enter the business name.",
                 "website": "The website is not valid.",
-                "instagram": "The Instagram username is not valid.",
                 "email": "The contact email is not valid.",
-                "phone": "The phone number is not valid."
+                "phone": "The phone number is not valid.",
+                "social": "Check your {{network}} username: it does not look valid."
+            },
+            "socials": "Social media",
+            "socialsHelp": "Type your username or paste your profile link. Your page will show a button for each one you fill in.",
+            "socialPlaceholder": {
+                "instagram": "@yourvenue",
+                "x": "@yourvenue",
+                "youtube": "@yourchannel",
+                "tiktok": "@yourvenue"
             }
         },
         "liveSettings": {
@@ -2957,13 +2964,27 @@
         "today": "Today: {{hours}}",
         "directions": "Directions",
         "upcoming": "Upcoming parties",
-        "past": "Past parties",
         "noUpcoming": "No parties announced yet. Follow them and we'll tell you about the next one.",
         "noUpcomingFollowing": "No parties announced yet. We'll tell you about the next one.",
         "promptTitle": "Want {{name}} to tell you about their parties?",
         "promptBody": "Follow them and you'll get a notification when they post a new party. You can unfollow any time from their page.",
         "email": "Email",
-        "website": "Website"
+        "website": "Website",
+        "socials": "Follow us",
+        "openSocial": "Open their {{network}} profile",
+        "view": "How to view the parties",
+        "viewList": "List",
+        "viewCalendar": "Calendar",
+        "prevMonth": "Previous month",
+        "nextMonth": "Next month",
+        "eventsCount_one": "{{count}} event",
+        "eventsCount_other": "{{count}} events",
+        "noEvents": "No events",
+        "dayTitle": "Parties that day",
+        "dayPick_one": "Tap the party to see the details.",
+        "dayPick_other": "There are {{count}} parties this day. Tap the one you like to see the details.",
+        "dayEmpty": "No parties announced for this day.",
+        "backToVenue": "Back to the venue"
     },
     "photoCheck": {
         "titleSingle": "The photo doesn't meet the requirements",

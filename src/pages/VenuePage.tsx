@@ -3,43 +3,55 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   ArrowLeft,
-  AtSign,
   BadgeCheck,
   Bell,
   BellRing,
+  CalendarDays,
   Clock,
   Globe,
+  List,
   Loader2,
   Mail,
   MapPin,
   Martini,
   Navigation,
   Phone,
-  Sparkles,
 } from 'lucide-react';
 import Header from '@/components/header';
 import Footer from '@/components/footer';
 import MapThumb from '@/components/map-thumb';
-import { LivePill, formatHourRange } from '@/components/event-bits';
+import { LivePill } from '@/components/event-bits';
+import SocialIcon from '@/components/social-icon';
+import VenueCalendar from '@/components/venue-calendar';
+import VenueEventCard from '@/components/venue-event-card';
 import { useToast } from '@/components/ui/use-toast';
 import { ApiError } from '@/services/api';
 import { openExternal } from '@/services/native';
 import { nightService, OpeningDay, VenueEventSummary, VenueProfile } from '@/services/night';
+import { SOCIAL_NAME, socialUrl, SocialNetwork } from '@/lib/socials';
 import { cn } from '@/lib/utils';
 
 /** Lunes = 0 … domingo = 6, como se guarda el horario. */
 const diaHoy = () => (new Date().getDay() + 6) % 7;
 
-const fechaCorta = (iso: string) =>
-  new Date(iso).toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' }).replace(/\./g, '');
-
 /** Nombre del día en el idioma del teléfono (2026-09-14 fue lunes). */
 const nombreDia = (day: number) =>
   new Date(Date.UTC(2026, 8, 14 + day, 12)).toLocaleDateString(undefined, { weekday: 'long' });
 
+/** Vista de las próximas fiestas, que se recuerda entre visitas. */
+type Vista = 'list' | 'calendar';
+const VISTA_KEY = 'fiestea_venue_events_view';
+const leerVista = (): Vista => {
+  try {
+    return localStorage.getItem(VISTA_KEY) === 'calendar' ? 'calendar' : 'list';
+  } catch {
+    return 'list';
+  }
+};
+
 /**
- * La ficha de un local: quién es, cuándo abre, dónde está y sus fiestas (la que
- * está en marcha, las próximas y las pasadas). Aquí se sigue al local para que
+ * La ficha de un local: quién es, cuándo abre, dónde está, sus redes y sus
+ * próximas fiestas, en lista o en calendario. Aquí se sigue al local para que
  * avise de sus fiestas nuevas.
  */
 const VenuePage = () => {
@@ -52,6 +64,16 @@ const VenuePage = () => {
   const [events, setEvents] = useState<VenueEventSummary[]>([]);
   const [estado, setEstado] = useState<'loading' | 'ready' | 'not-found'>('loading');
   const [busy, setBusy] = useState(false);
+  const [vista, setVista] = useState<Vista>(leerVista);
+
+  const cambiarVista = (v: Vista) => {
+    setVista(v);
+    try {
+      localStorage.setItem(VISTA_KEY, v);
+    } catch {
+      // Sin almacenamiento sólo se pierde la preferencia.
+    }
+  };
 
   const load = useCallback(async () => {
     if (!venueId) return;
@@ -111,40 +133,15 @@ const VenuePage = () => {
     (e) => new Date(e.startDate).getTime() <= ahora && new Date(e.endDate).getTime() > ahora,
   );
   const proximos = events.filter((e) => new Date(e.startDate).getTime() > ahora);
-  const pasados = events.filter((e) => new Date(e.endDate).getTime() <= ahora);
+  const redes: [SocialNetwork, string | null][] = [
+    ['instagram', venue.instagram],
+    ['x', venue.socialX],
+    ['youtube', venue.socialYoutube],
+    ['tiktok', venue.socialTiktok],
+  ];
+  const conRedes = redes.filter((r): r is [SocialNetwork, string] => Boolean(r[1]));
   const hoy = diaHoy();
   const horarioHoy = venue.openingHours.find((d) => d.day === hoy);
-
-  const tarjeta = (event: VenueEventSummary, pasado = false) => (
-    <li key={event.id}>
-      <button
-        type="button"
-        onClick={() => navigate(`/event/${event.id}`)}
-        className={cn(
-          'press flex w-full items-center gap-3 rounded-2xl p-3 text-left',
-          pasado ? 'bg-surface-low text-party-gray' : 'bg-white text-ink',
-        )}
-      >
-        <span className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-black/10">
-          {event.posterUrl ? (
-            <img src={event.posterUrl} alt="" className="h-full w-full object-cover" />
-          ) : (
-            <Martini size={20} className="opacity-40" />
-          )}
-        </span>
-        <span className="min-w-0 flex-1">
-          <span className="flex items-center gap-1.5">
-            <span className="truncate font-display text-title-card">{event.name}</span>
-            {event.featured && <Sparkles size={14} className="shrink-0 text-party-accent" />}
-          </span>
-          <span className={cn('block truncate text-body-sm', pasado ? '' : 'text-ink/60')}>
-            {fechaCorta(event.startDate)} · {formatHourRange(event.startDate, event.endDate)}
-          </span>
-          {event.theme && <span className={cn('block truncate text-caption', pasado ? '' : 'text-ink/50')}>{event.theme}</span>}
-        </span>
-      </button>
-    </li>
-  );
 
   const fila = (d: OpeningDay) => (
     <li
@@ -289,7 +286,7 @@ const VenuePage = () => {
         )}
 
         {/* -------------------------------------------------------- contacto */}
-        {(venue.phone || venue.contactEmail || venue.website || venue.instagram) && (
+        {(venue.phone || venue.contactEmail || venue.website) && (
           <section className="flex flex-wrap gap-2">
             {venue.phone && (
               <button
@@ -321,37 +318,82 @@ const VenuePage = () => {
                 {t('venuePage.website')}
               </button>
             )}
-            {venue.instagram && (
-              <button
-                type="button"
-                onClick={() => void openExternal(`https://instagram.com/${venue.instagram}`)}
-                className="press flex h-10 items-center gap-1.5 rounded-xl bg-surface-low px-3 text-caption font-bold"
-              >
-                <AtSign size={14} />
-                {venue.instagram}
-              </button>
-            )}
+          </section>
+        )}
+
+        {/* ----------------------------------------------------------- redes */}
+        {conRedes.length > 0 && (
+          <section>
+            <h2 className="mb-2 font-display text-title-card uppercase tracking-wide">{t('venuePage.socials')}</h2>
+            <div className="grid grid-cols-4 gap-2">
+              {conRedes.map(([red, valor]) => (
+                <button
+                  key={red}
+                  type="button"
+                  onClick={() => void openExternal(socialUrl(red, valor))}
+                  aria-label={t('venuePage.openSocial', { network: SOCIAL_NAME[red] })}
+                  className="press flex h-16 flex-col items-center justify-center gap-1 rounded-xl bg-surface-low px-1 text-[11px] font-bold"
+                >
+                  <SocialIcon network={red} size={22} />
+                  {SOCIAL_NAME[red]}
+                </button>
+              ))}
+            </div>
           </section>
         )}
 
         {/* --------------------------------------------------------- eventos */}
         <section>
-          <h2 className="mb-2 font-display text-headline-md">{t('venuePage.upcoming')}</h2>
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <h2 className="font-display text-headline-md">{t('venuePage.upcoming')}</h2>
+            {proximos.length > 0 && (
+              <div className="flex shrink-0 rounded-xl bg-surface-low p-1" role="tablist" aria-label={t('venuePage.view')}>
+                {(
+                  [
+                    ['list', List, t('venuePage.viewList')],
+                    ['calendar', CalendarDays, t('venuePage.viewCalendar')],
+                  ] as const
+                ).map(([v, Icono, etiqueta]) => (
+                  <button
+                    key={v}
+                    type="button"
+                    role="tab"
+                    aria-selected={vista === v}
+                    aria-label={etiqueta}
+                    onClick={() => cambiarVista(v)}
+                    className={cn(
+                      'press flex h-9 items-center gap-1.5 rounded-lg px-2.5 text-caption font-bold',
+                      vista === v ? 'bg-party-primary text-ink' : 'text-party-gray',
+                    )}
+                  >
+                    <Icono size={16} />
+                    <span className="hidden sm:inline">{etiqueta}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
           {proximos.length === 0 ? (
             <p className="text-body-sm text-party-gray">
               {venue.iFollow ? t('venuePage.noUpcomingFollowing') : t('venuePage.noUpcoming')}
             </p>
+          ) : vista === 'calendar' ? (
+            <VenueCalendar
+              events={proximos}
+              onDay={(key, delDia) =>
+                delDia.length === 1 ? navigate(`/event/${delDia[0].id}`) : navigate(`/local/${venue.id}/dia/${key}`)
+              }
+            />
           ) : (
-            <ul className="space-y-2">{proximos.map((e) => tarjeta(e))}</ul>
+            <ul className="space-y-2">
+              {proximos.map((e) => (
+                <li key={e.id}>
+                  <VenueEventCard event={e} />
+                </li>
+              ))}
+            </ul>
           )}
         </section>
-
-        {pasados.length > 0 && (
-          <section>
-            <h2 className="mb-2 font-display text-headline-md">{t('venuePage.past')}</h2>
-            <ul className="space-y-2">{pasados.map((e) => tarjeta(e, true))}</ul>
-          </section>
-        )}
       </main>
 
       <Footer />

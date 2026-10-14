@@ -1683,7 +1683,6 @@
             "contactEmail": "Kontakt-E-Mail (optional)",
             "contactEmailHelp": "Erscheint auf deiner Seite. Kann von der Login-E-Mail abweichen.",
             "website": "Website (optional)",
-            "instagram": "Instagram (optional)",
             "terms": "Verkaufsbedingungen",
             "termsHelp": "Käufer müssen sie akzeptieren: Hausrecht, Erstattungen, Mindestalter usw.",
             "termsPlaceholder": "z. B.: Hausrecht vorbehalten. Keine Erstattung außer bei Absage der Veranstaltung…",
@@ -1694,9 +1693,17 @@
                 "logoUpload": "Das Logo konnte nicht hochgeladen werden.",
                 "name": "Gib den Namen des Betriebs ein.",
                 "website": "Die Website ist ungültig.",
-                "instagram": "Der Instagram-Name ist ungültig.",
                 "email": "Die Kontakt-E-Mail ist ungültig.",
-                "phone": "Die Telefonnummer ist ungültig."
+                "phone": "Die Telefonnummer ist ungültig.",
+                "social": "Prüfe deinen {{network}}-Benutzernamen: Er scheint ungültig zu sein."
+            },
+            "socials": "Soziale Netzwerke",
+            "socialsHelp": "Gib deinen Benutzernamen ein oder füge den Link zu deinem Profil ein. Auf deiner Seite erscheint für jedes ausgefüllte Netzwerk ein Button.",
+            "socialPlaceholder": {
+                "instagram": "@deinlokal",
+                "x": "@deinlokal",
+                "youtube": "@deinkanal",
+                "tiktok": "@deinlokal"
             }
         },
         "liveSettings": {
@@ -2957,13 +2964,27 @@
         "today": "Heute: {{hours}}",
         "directions": "Route",
         "upcoming": "Kommende Partys",
-        "past": "Vergangene Partys",
         "noUpcoming": "Noch keine Partys angekündigt. Folge ihr und wir sagen dir bei der nächsten Bescheid.",
         "noUpcomingFollowing": "Noch keine Partys angekündigt. Wir sagen dir bei der nächsten Bescheid.",
         "promptTitle": "Soll dich {{name}} über ihre Partys informieren?",
         "promptBody": "Folge ihr und du bekommst eine Benachrichtigung, wenn sie eine neue Party veröffentlicht. Entfolgen geht jederzeit auf ihrer Seite.",
         "email": "E-Mail",
-        "website": "Website"
+        "website": "Website",
+        "socials": "Folge uns",
+        "openSocial": "{{network}}-Profil öffnen",
+        "view": "Ansicht der Partys",
+        "viewList": "Liste",
+        "viewCalendar": "Kalender",
+        "prevMonth": "Vorheriger Monat",
+        "nextMonth": "Nächster Monat",
+        "eventsCount_one": "{{count}} Event",
+        "eventsCount_other": "{{count}} Events",
+        "noEvents": "Keine Events",
+        "dayTitle": "Partys an diesem Tag",
+        "dayPick_one": "Tippe auf die Party, um die Details zu sehen.",
+        "dayPick_other": "An diesem Tag gibt es {{count}} Partys. Tippe auf die, die dich interessiert.",
+        "dayEmpty": "An diesem Tag sind keine Partys angekündigt.",
+        "backToVenue": "Zurück zum Lokal"
     },
     "photoCheck": {
         "titleSingle": "Das Foto erfüllt die Anforderungen nicht",

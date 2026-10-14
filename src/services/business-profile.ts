@@ -22,6 +22,9 @@ export interface BusinessProfile {
   contactEmail: string | null;
   website: string | null;
   instagram: string | null;
+  socialX: string | null;
+  socialYoutube: string | null;
+  socialTiktok: string | null;
   businessTerms: string | null;
 }
 
@@ -34,7 +37,7 @@ export const businessProfileService = {
     const { data } = await supabase
       .from('venues')
       .select(
-        'name, is_verified, logo_url, address, city, latitude, longitude, phone, contact_email, website, instagram, business_terms',
+        'name, is_verified, logo_url, address, city, latitude, longitude, phone, contact_email, website, instagram, social_x, social_youtube, social_tiktok, business_terms',
       )
       .eq('id', venueId)
       .maybeSingle();
@@ -51,6 +54,9 @@ export const businessProfileService = {
       contactEmail: data.contact_email,
       website: data.website,
       instagram: data.instagram,
+      socialX: data.social_x,
+      socialYoutube: data.social_youtube,
+      socialTiktok: data.social_tiktok,
       businessTerms: data.business_terms,
     };
   },
@@ -68,6 +74,9 @@ export const businessProfileService = {
         contact_email: input.contactEmail,
         website: input.website,
         instagram: input.instagram,
+        social_x: input.socialX,
+        social_youtube: input.socialYoutube,
+        social_tiktok: input.socialTiktok,
         business_terms: input.businessTerms,
       })
       .eq('id', venueId);

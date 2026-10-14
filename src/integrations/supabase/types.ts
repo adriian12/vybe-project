@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.5"
+    PostgrestVersion: "13.0.5"
   }
   public: {
     Tables: {
@@ -3751,6 +3751,9 @@ export type Database = {
           phone: string | null
           platform_fee_percent: number
           region: string | null
+          social_tiktok: string | null
+          social_x: string | null
+          social_youtube: string | null
           stripe_account_id: string | null
           stripe_charges_enabled: boolean
           stripe_details_submitted: boolean
@@ -3787,6 +3790,9 @@ export type Database = {
           phone?: string | null
           platform_fee_percent?: number
           region?: string | null
+          social_tiktok?: string | null
+          social_x?: string | null
+          social_youtube?: string | null
           stripe_account_id?: string | null
           stripe_charges_enabled?: boolean
           stripe_details_submitted?: boolean
@@ -3823,6 +3829,9 @@ export type Database = {
           phone?: string | null
           platform_fee_percent?: number
           region?: string | null
+          social_tiktok?: string | null
+          social_x?: string | null
+          social_youtube?: string | null
           stripe_account_id?: string | null
           stripe_charges_enabled?: boolean
           stripe_details_submitted?: boolean
@@ -4019,6 +4028,9 @@ export type Database = {
           phone: string | null
           platform_fee_percent: number
           region: string | null
+          social_tiktok: string | null
+          social_x: string | null
+          social_youtube: string | null
           stripe_account_id: string | null
           stripe_charges_enabled: boolean
           stripe_details_submitted: boolean
@@ -4821,6 +4833,9 @@ export type Database = {
           phone: string | null
           platform_fee_percent: number
           region: string | null
+          social_tiktok: string | null
+          social_x: string | null
+          social_youtube: string | null
           stripe_account_id: string | null
           stripe_charges_enabled: boolean
           stripe_details_submitted: boolean
@@ -5172,6 +5187,9 @@ export type Database = {
           opening_hours: Json
           phone: string
           region: string
+          social_tiktok: string
+          social_x: string
+          social_youtube: string
           subscribed: boolean
           type: string
           website: string

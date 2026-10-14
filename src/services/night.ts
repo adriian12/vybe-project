@@ -210,6 +210,9 @@ export interface VenueProfile {
   contactEmail: string | null;
   website: string | null;
   instagram: string | null;
+  socialX: string | null;
+  socialYoutube: string | null;
+  socialTiktok: string | null;
 }
 
 export interface VenueEventSummary {
@@ -259,6 +262,9 @@ export const nightService = {
       contactEmail: row.contact_email,
       website: row.website,
       instagram: row.instagram,
+      socialX: row.social_x,
+      socialYoutube: row.social_youtube,
+      socialTiktok: row.social_tiktok,
     };
   },
 

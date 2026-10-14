@@ -1683,7 +1683,6 @@
             "contactEmail": "Correo de contacto (opcional)",
             "contactEmailHelp": "Sale en tu ficha. Puede ser distinto del de acceso.",
             "website": "Web (opcional)",
-            "instagram": "Instagram (opcional)",
             "terms": "Condiciones de venta",
             "termsHelp": "Quien compra una entrada tiene que aceptarlas: derecho de admisión, devoluciones, edad mínima, etc.",
             "termsPlaceholder": "Ej.: Reservado el derecho de admisión. No se admiten devoluciones salvo cancelación del evento…",
@@ -1694,9 +1693,17 @@
                 "logoUpload": "No se ha podido subir el logo.",
                 "name": "Escribe el nombre del negocio.",
                 "website": "La web no es válida.",
-                "instagram": "El usuario de Instagram no es válido.",
                 "email": "El correo de contacto no es válido.",
-                "phone": "El teléfono no es válido."
+                "phone": "El teléfono no es válido.",
+                "social": "Revisa tu usuario de {{network}}: no parece válido."
+            },
+            "socials": "Redes sociales",
+            "socialsHelp": "Escribe tu usuario o pega el enlace de tu perfil. En tu ficha saldrá un botón por cada red que rellenes.",
+            "socialPlaceholder": {
+                "instagram": "@tusala",
+                "x": "@tusala",
+                "youtube": "@tucanal",
+                "tiktok": "@tusala"
             }
         },
         "liveSettings": {
@@ -2957,13 +2964,27 @@
         "today": "Hoy: {{hours}}",
         "directions": "Cómo llegar",
         "upcoming": "Próximas fiestas",
-        "past": "Fiestas pasadas",
         "noUpcoming": "No hay fiestas anunciadas. Síguelo y te avisamos de la próxima.",
         "noUpcomingFollowing": "No hay fiestas anunciadas. Te avisaremos de la próxima.",
         "promptTitle": "¿Quieres que {{name}} te avise de sus fiestas?",
         "promptBody": "Síguelo y te llegará un aviso cuando publique una fiesta nueva. Puedes dejar de seguirlo cuando quieras desde su ficha.",
         "email": "Correo",
-        "website": "Web"
+        "website": "Web",
+        "socials": "Síguenos en redes",
+        "openSocial": "Abrir su perfil de {{network}}",
+        "view": "Cómo ver las fiestas",
+        "viewList": "Lista",
+        "viewCalendar": "Calendario",
+        "prevMonth": "Mes anterior",
+        "nextMonth": "Mes siguiente",
+        "eventsCount_one": "{{count}} evento",
+        "eventsCount_other": "{{count}} eventos",
+        "noEvents": "Sin eventos",
+        "dayTitle": "Fiestas del día",
+        "dayPick_one": "Toca la fiesta para ver los detalles.",
+        "dayPick_other": "Hay {{count}} fiestas este día. Toca la que te interese para ver los detalles.",
+        "dayEmpty": "Este día no hay fiestas anunciadas.",
+        "backToVenue": "Volver al negocio"
     },
     "photoCheck": {
         "titleSingle": "La foto no cumple los requisitos",
