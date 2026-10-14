@@ -3142,7 +3142,8 @@
         "buyCta": "Buy supercrushes",
         "none": "You have no supercrushes left",
         "giftTitle": "You have a free supercrush",
-        "giftBody": "It is for this party and is used before yours. If you do not use it, it expires when the party ends."
+        "giftBody": "It is for this party and is used before yours. If you do not use it, it expires when the party ends.",
+        "chooseInPlay": "{{unit}} each. Choose how many you want in the Google Play payment window."
     },
     "notFound": {
         "body": "This page doesn't exist. The link may be mistyped or no longer available."

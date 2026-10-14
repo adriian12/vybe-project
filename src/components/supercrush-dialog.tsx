@@ -4,7 +4,7 @@ import { Minus, Plus, Star } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
 import { PartyButton } from '@/components/ui-custom/party-button';
 import { PREMIUM_PRICES, usePremium } from '@/context/premium-context';
-import { storeMaxQuantity } from '@/services/iap';
+import { storeChoosesQuantity, storeMaxQuantity } from '@/services/iap';
 
 const MAX = 100;
 
@@ -24,6 +24,8 @@ const SupercrushDialog = () => {
   // En la app se compra en la tienda: su precio y, como mucho, 10 de una vez
   // en Apple y 1 en Google Play.
   const tope = storePurchases ? storeMaxQuantity() : MAX;
+  // En Android la cantidad se elige en la hoja de Google Play.
+  const enGoogle = storePurchases && storeChoosesQuantity();
   const tienda = storePurchases ? storePrices.supercrush : undefined;
   const unidad = tienda?.amount ?? PREMIUM_PRICES.supercrush;
   const moneda = tienda?.currency ?? 'EUR';
@@ -52,42 +54,50 @@ const SupercrushDialog = () => {
         </div>
 
         <div className="space-y-5 p-5">
-          <p className="text-center text-body-md font-bold">{t('supercrush.howMany')}</p>
+          {enGoogle ? (
+            <p className="text-center text-body-sm text-party-gray">
+              {t('supercrush.chooseInPlay', { unit: tienda?.label ?? dinero(unidad, moneda) })}
+            </p>
+          ) : (
+            <>
+              <p className="text-center text-body-md font-bold">{t('supercrush.howMany')}</p>
 
-          <div className="flex items-center justify-center gap-5">
-            <button
-              type="button"
-              onClick={() => setCantidad((c) => Math.max(1, c - 1))}
-              disabled={cantidad <= 1 || enviando}
-              aria-label={t('supercrush.less')}
-              className="press flex h-12 w-12 items-center justify-center rounded-full bg-surface-high text-foreground disabled:opacity-40"
-            >
-              <Minus size={22} />
-            </button>
-            <span
-              className="min-w-[3ch] text-center font-display text-headline-xl tabular-nums"
-              aria-live="polite"
-            >
-              {cantidad}
-            </span>
-            <button
-              type="button"
-              onClick={() => setCantidad((c) => Math.min(tope, c + 1))}
-              disabled={cantidad >= tope || enviando}
-              aria-label={t('supercrush.more')}
-              className="press flex h-12 w-12 items-center justify-center rounded-full bg-party-primary text-ink disabled:opacity-40"
-            >
-              <Plus size={22} />
-            </button>
-          </div>
+              <div className="flex items-center justify-center gap-5">
+                <button
+                  type="button"
+                  onClick={() => setCantidad((c) => Math.max(1, c - 1))}
+                  disabled={cantidad <= 1 || enviando}
+                  aria-label={t('supercrush.less')}
+                  className="press flex h-12 w-12 items-center justify-center rounded-full bg-surface-high text-foreground disabled:opacity-40"
+                >
+                  <Minus size={22} />
+                </button>
+                <span
+                  className="min-w-[3ch] text-center font-display text-headline-xl tabular-nums"
+                  aria-live="polite"
+                >
+                  {cantidad}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setCantidad((c) => Math.min(tope, c + 1))}
+                  disabled={cantidad >= tope || enviando}
+                  aria-label={t('supercrush.more')}
+                  className="press flex h-12 w-12 items-center justify-center rounded-full bg-party-primary text-ink disabled:opacity-40"
+                >
+                  <Plus size={22} />
+                </button>
+              </div>
 
-          <p className="text-center text-body-sm text-party-gray">
-            {t('supercrush.priceLine', {
-              count: cantidad,
-              unit: tienda?.label ?? dinero(unidad, moneda),
-              total: dinero(total, moneda),
-            })}
-          </p>
+              <p className="text-center text-body-sm text-party-gray">
+                {t('supercrush.priceLine', {
+                  count: cantidad,
+                  unit: tienda?.label ?? dinero(unidad, moneda),
+                  total: dinero(total, moneda),
+                })}
+              </p>
+            </>
+          )}
 
           <PartyButton
             size="lg"
@@ -100,7 +110,11 @@ const SupercrushDialog = () => {
               });
             }}
           >
-            {enviando ? t('premium.redirecting') : t('supercrush.pay', { total: dinero(total, moneda) })}
+            {enviando
+              ? t('premium.redirecting')
+              : enGoogle
+                ? t('supercrush.buyCta')
+                : t('supercrush.pay', { total: dinero(total, moneda) })}
           </PartyButton>
 
           <p className="text-center text-caption text-party-gray">

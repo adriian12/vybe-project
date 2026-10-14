@@ -3142,7 +3142,8 @@
         "buyCta": "Supercrushes kaufen",
         "none": "Du hast keine Supercrushes mehr",
         "giftTitle": "Du hast einen Supercrush geschenkt",
-        "giftBody": "Er gilt für diese Party und wird vor deinen eigenen verbraucht. Nutzt du ihn nicht, verfällt er am Ende."
+        "giftBody": "Er gilt für diese Party und wird vor deinen eigenen verbraucht. Nutzt du ihn nicht, verfällt er am Ende.",
+        "chooseInPlay": "{{unit}} pro Stück. Wähle im Zahlungsfenster von Google Play, wie viele du möchtest."
     },
     "notFound": {
         "body": "Diese Seite gibt es nicht. Vielleicht ist der Link falsch geschrieben oder nicht mehr verfügbar."

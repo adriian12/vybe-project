@@ -61,6 +61,13 @@ export const usesStorePurchases = (): boolean => storePlatform() !== null;
 /** Cuántos supercrush se pueden comprar de una vez: StoreKit deja 10, Google Play 1. */
 export const storeMaxQuantity = (): number => (storePlatform() === 'apple' ? 10 : 1);
 
+/**
+ * En Google Play la cantidad no la manda la app: si el producto admite varias
+ * unidades, se elige en la propia hoja de pago de Google, y `google-play`
+ * abona las que diga la compra (`quantity`).
+ */
+export const storeChoosesQuantity = (): boolean => storePlatform() === 'google';
+
 const funcion = () => (storePlatform() === 'google' ? 'google-play' : 'apple-iap');
 
 const invoke = async <T>(body: Record<string, unknown>): Promise<T> => {

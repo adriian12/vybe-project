@@ -3142,7 +3142,8 @@
         "buyCta": "Comprar supercrush",
         "none": "No te quedan supercrush",
         "giftTitle": "Tienes un supercrush de regalo",
-        "giftBody": "Es para esta fiesta y se usa antes que los tuyos. Si no lo usas, se pierde al terminar."
+        "giftBody": "Es para esta fiesta y se usa antes que los tuyos. Si no lo usas, se pierde al terminar.",
+        "chooseInPlay": "{{unit}} cada uno. Elige cuántos quieres en la ventana de pago de Google Play."
     },
     "notFound": {
         "body": "Esta página no existe. Puede que el enlace esté mal escrito o que ya no esté disponible."
