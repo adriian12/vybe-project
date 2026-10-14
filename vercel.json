@@ -4,9 +4,25 @@
   "installCommand": "npm ci",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
+  "functions": {
+    "api/share-image.ts": {
+      "includeFiles": "node_modules/@jsquash/avif/codec/dec/avif_dec.wasm"
+    }
+  },
   "rewrites": [
     {
-      "source": "/((?!.well-known/).*)",
+      "source": "/event/:id",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*(WhatsApp|facebookexternalhit|Facebot|meta-externalagent|Twitterbot|TelegramBot|Slackbot|Discordbot|LinkedInBot|SkypeUriPreview|Pinterestbot|redditbot|vkShare|Viber|Embedly|Iframely).*"
+        }
+      ],
+      "destination": "/api/share-event?id=:id"
+    },
+    {
+      "source": "/((?!.well-known/|api/).*)",
       "destination": "/index.html"
     }
   ],
