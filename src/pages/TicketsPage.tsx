@@ -11,11 +11,11 @@ import {
   Loader2,
   MapPin,
   Music,
+  Plus,
   QrCode,
   Share2,
   ShieldCheck,
   Undo2,
-  Users,
 } from 'lucide-react';
 import Header from '@/components/header';
 import Footer from '@/components/footer';
@@ -68,6 +68,8 @@ const TicketsPage = () => {
   const [vales, setVales] = useState<ClaimedOffer[]>([]);
   const [ofertas, setOfertas] = useState<EventOffer[]>([]);
   const [historial, setHistorial] = useState<EventHistoryItem[] | null>(null);
+  const [anadir, setAnadir] = useState(false);
+  const [entradasPasadas, setEntradasPasadas] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -166,18 +168,25 @@ const TicketsPage = () => {
             >
               {clave === 'upcoming'
                 ? t('tickets.upcoming', { count: activas })
-                : t('tickets.past', { count: pasadas.length })}
+                : t('tickets.past', { count: pasadas.length + entradasPasadas })}
             </button>
           ))}
         </div>
 
         {pestana === 'upcoming' ? (
           <>
-            {/* ---------------------------------------- entradas compradas */}
-            <PurchasedTickets />
-
-            {/* ---------------------------- entradas de otras webs (Fourvenues…) */}
-            <ExternalTickets events={eventosFeed} />
+            {/* ------------------- entradas compradas y de otras webs (Fourvenues…) */}
+            <section className="space-y-3">
+              <div className="flex items-center justify-between gap-3">
+                <h2 className="font-display text-headline-md uppercase">{t('tickets.mine.title')}</h2>
+                <PartyButton size="sm" onClick={() => setAnadir(true)}>
+                  <Plus size={14} className="mr-1" />
+                  {t('tickets.external.add')}
+                </PartyButton>
+              </div>
+              <PurchasedTickets view="upcoming" onPastCount={setEntradasPasadas} />
+              <ExternalTickets events={eventosFeed} addOpen={anadir} onAddOpenChange={setAnadir} />
+            </section>
 
             {/* ------------------------------------------------- pase activo */}
             {activeEvent && (
@@ -402,28 +411,6 @@ const TicketsPage = () => {
               )
             )}
 
-            {/* ------------------------------------------------------ grupos */}
-            <section className="rounded-2xl bg-card p-4">
-              <div className="flex gap-3">
-                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-party-primary/15 text-party-primary">
-                  <Users size={22} />
-                </span>
-                <div>
-                  <h2 className="font-display text-title-card">{t('tickets.groupTitle')}</h2>
-                  <p className="text-body-sm text-party-gray">{t('tickets.groupBody')}</p>
-                </div>
-              </div>
-              <button
-                type="button"
-                disabled={!activeEvent}
-                onClick={() => activeEvent && navigate(`/event/${activeEvent.eventId}/live`)}
-                className="press mt-4 flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-surface-high text-body-md font-semibold disabled:opacity-50"
-              >
-                <Users size={18} />
-                {activeEvent ? t('tickets.groupCta') : t('tickets.groupLocked')}
-              </button>
-            </section>
-
             <Link
               to="/location"
               className="press flex items-center justify-between gap-3 py-1 text-body-md text-party-gray"
@@ -435,41 +422,49 @@ const TicketsPage = () => {
               <ChevronRight size={18} />
             </Link>
           </>
-        ) : historial === null ? (
-          <div className="flex justify-center py-10">
-            <Loader2 className="h-7 w-7 animate-spin text-party-primary" />
-          </div>
-        ) : pasadas.length === 0 ? (
-          <div className="flex flex-col items-center rounded-2xl bg-card px-6 py-10 text-center">
-            <CalendarX2 size={40} className="mb-3 text-party-gray" />
-            <h2 className="font-display text-headline-md">{t('tickets.pastEmptyTitle')}</h2>
-            <p className="mt-1 max-w-xs text-body-sm text-party-gray">{t('tickets.pastEmptyBody')}</p>
-          </div>
         ) : (
-          <ul className="stagger space-y-3">
-            {pasadas.map((item, index) => {
-              const { day, month } = dayAndMonth(item.startDate);
-              return (
-                <li
-                  key={item.eventId}
-                  style={{ '--i': Math.min(index, 8) } as React.CSSProperties}
-                  className="flex items-center gap-3 rounded-2xl bg-card p-3"
-                >
-                  <span className="flex h-14 w-14 shrink-0 flex-col items-center justify-center rounded-xl bg-surface-high leading-none">
-                    <span className="font-display text-headline-md font-black">{day}</span>
-                    <span className="text-[10px] font-bold uppercase text-party-gray">{month}</span>
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate font-display text-title-card">{item.eventName}</p>
-                    <p className="truncate text-body-sm text-party-gray">{item.venueName}</p>
-                  </div>
-                  <span className="shrink-0 rounded-full bg-surface-high px-2.5 py-1 text-caption">
-                    {t('tickets.connections', { count: item.connectionsMade })}
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
+          <>
+            {/* Entradas usadas o de fiestas que ya terminaron. */}
+            <PurchasedTickets view="past" onPastCount={setEntradasPasadas} />
+            {historial === null ? (
+              <div className="flex justify-center py-10">
+                <Loader2 className="h-7 w-7 animate-spin text-party-primary" />
+              </div>
+            ) : pasadas.length === 0 ? (
+              entradasPasadas === 0 && (
+              <div className="flex flex-col items-center rounded-2xl bg-card px-6 py-10 text-center">
+                <CalendarX2 size={40} className="mb-3 text-party-gray" />
+                <h2 className="font-display text-headline-md">{t('tickets.pastEmptyTitle')}</h2>
+                <p className="mt-1 max-w-xs text-body-sm text-party-gray">{t('tickets.pastEmptyBody')}</p>
+              </div>
+              )
+            ) : (
+              <ul className="stagger space-y-3">
+                {pasadas.map((item, index) => {
+                  const { day, month } = dayAndMonth(item.startDate);
+                  return (
+                    <li
+                      key={item.eventId}
+                      style={{ '--i': Math.min(index, 8) } as React.CSSProperties}
+                      className="flex items-center gap-3 rounded-2xl bg-card p-3"
+                    >
+                      <span className="flex h-14 w-14 shrink-0 flex-col items-center justify-center rounded-xl bg-surface-high leading-none">
+                        <span className="font-display text-headline-md font-black">{day}</span>
+                        <span className="text-[10px] font-bold uppercase text-party-gray">{month}</span>
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate font-display text-title-card">{item.eventName}</p>
+                        <p className="truncate text-body-sm text-party-gray">{item.venueName}</p>
+                      </div>
+                      <span className="shrink-0 rounded-full bg-surface-high px-2.5 py-1 text-caption">
+                        {t('tickets.connections', { count: item.connectionsMade })}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </>
         )}
       </main>
 

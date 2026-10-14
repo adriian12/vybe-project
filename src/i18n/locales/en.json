@@ -199,7 +199,7 @@
     },
     "home": {
         "title": "Events in your city",
-        "subtitle": "Browse the parties happening in Mallorca.",
+        "subtitle": "Browse the parties near you.",
         "empty": "No events yet",
         "emptyBody": "No verified venue has published a party yet. Check back later.",
         "live": "Live",
@@ -688,8 +688,6 @@
         "activatedEvent": "You have Premium for this event.",
         "redirecting": "Taking you to checkout…",
         "features": {
-            "superLikes": "One supercrush per party",
-            "superLikesBody": "Stand out. Want more? Buy them individually and use them at any party.",
             "seeWhoLiked": "See who liked you",
             "seeWhoLikedBody": "Find out who likes you before you swipe.",
             "keepAlone": "Rescue the connection",
@@ -1704,6 +1702,11 @@
                 "x": "@yourvenue",
                 "youtube": "@yourchannel",
                 "tiktok": "@yourvenue"
+            },
+            "tabs": {
+                "profile": "Business profile",
+                "socials": "Social media",
+                "page": "Public page"
             }
         },
         "liveSettings": {
@@ -2272,7 +2275,6 @@
     },
     "tickets": {
         "external": {
-            "title": "From other websites",
             "add": "Add ticket",
             "addHint": "Bought your ticket on Fourvenues or another website? Add it and keep it here with the rest.",
             "addTitle": "Add a ticket",
@@ -2295,7 +2297,6 @@
             "otherSource": "another website",
             "validFor_one": "Valid for {{count}} person",
             "validFor_other": "Valid for {{count}} people",
-            "doorNote": "{{source}} checks it at the door: it is the same QR as in the PDF.",
             "details": "Details",
             "seeEvent": "See the party",
             "remove": "Remove",
@@ -2325,10 +2326,6 @@
         "emptyTitle": "No plans yet",
         "emptyBody": "Tap “I'm going” on a party and it will be here, ready to get in.",
         "explore": "Explore events",
-        "groupTitle": "Going with friends?",
-        "groupBody": "Once inside you can create a group with its own chat and find each other on the floor.",
-        "groupCta": "Go to the party's groups",
-        "groupLocked": "Available once you're in",
         "haveCode": "Have an entry code?",
         "pastEmptyTitle": "You haven't been out yet",
         "pastEmptyBody": "Parties you get into will show up here with the people you met.",
@@ -2375,7 +2372,9 @@
             "restored": "Ticket restored",
             "archivedList_one": "Archived ({{count}})",
             "archivedList_other": "Archived ({{count}})",
-            "allArchived": "You have archived all your tickets. They still work: they are below."
+            "allArchived": "You have archived all your tickets. They still work: they are below.",
+            "usedShort": "Used · {{time}}",
+            "ended": "Finished"
         },
         "checkout": {
             "notFound": "This ticket is no longer on sale",
@@ -2507,7 +2506,7 @@
             "close": "Close menu"
         },
         "hero": {
-            "pill": "The nightlife app in Mallorca",
+            "pill": "Live the party 100%",
             "titleStart": "Nights are lived on the dance floor.",
             "titleBrand": "Fiestea",
             "titleEnd": "connects fiesters and venues in real time.",
@@ -2515,7 +2514,7 @@
             "ctaUser": "Get the app",
             "ctaVenue": "Fiestea for venues",
             "imageAlt": "People dancing in a club under yellow lights",
-            "imageTag": "Mallorca",
+            "imageTag": "Spain",
             "imageCaption": "Verified parties, real people inside",
             "facts": {
                 "adults": "Verified profiles, adults only",
@@ -2789,7 +2788,7 @@
             "soon": "Coming soon"
         },
         "meta": {
-            "description": "Discover the parties in Mallorca, buy your ticket and get in with the QR. For businesses: ticket sales, guest lists, live capacity and alerts."
+            "description": "Discover the parties near you, buy your ticket and get in with the QR. For businesses: ticket sales, guest lists, live capacity and alerts."
         },
         "whatsapp": {
             "label": "Message us on WhatsApp",
@@ -3141,7 +3140,9 @@
         "bought": "Supercrushes bought",
         "boughtBody": "They're in your account. Use them at any party.",
         "buyCta": "Buy supercrushes",
-        "none": "You have no supercrushes left"
+        "none": "You have no supercrushes left",
+        "giftTitle": "You have a free supercrush",
+        "giftBody": "It is for this party and is used before yours. If you do not use it, it expires when the party ends."
     },
     "notFound": {
         "body": "This page doesn't exist. The link may be mistyped or no longer available."

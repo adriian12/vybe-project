@@ -45,7 +45,12 @@ type Campos = {
 
 type Redes = Record<SocialNetwork, string>;
 
-const VenueBusinessProfile = ({ venueId }: { venueId: string }) => {
+/**
+ * `part` elige qué enseñar, porque en el panel van en pestañas distintas:
+ * «Perfil negocio» (logo, datos, contacto y condiciones) y «Redes sociales».
+ * Cada pestaña guarda la ficha entera con lo que ha cargado.
+ */
+const VenueBusinessProfile = ({ venueId, part }: { venueId: string; part: 'profile' | 'socials' }) => {
   const { t } = useTranslation();
   const { toast } = useToast();
   const archivo = useRef<HTMLInputElement | null>(null);
@@ -186,156 +191,168 @@ const VenueBusinessProfile = ({ venueId }: { venueId: string }) => {
 
   return (
     <div className="mx-auto max-w-2xl space-y-4">
-      {/* ------------------------------------------------------------ logo */}
-      <section className="surface-light rounded-2xl p-4">
-        <h3 className="mb-1 flex items-center gap-2 font-display text-title-card uppercase">
-          <Building2 size={17} />
-          {t('venue.business.title')}
-        </h3>
-        <p className="mb-4 text-caption text-party-gray">{t('venue.business.hint')}</p>
+      {part === 'profile' && (
+        <>
+          {/* ------------------------------------------------------------ logo */}
+          <section className="surface-light rounded-2xl p-4">
+            <h3 className="mb-1 flex items-center gap-2 font-display text-title-card uppercase">
+              <Building2 size={17} />
+              {t('venue.business.title')}
+            </h3>
+            <p className="mb-4 text-caption text-party-gray">{t('venue.business.hint')}</p>
 
-        <div className="flex items-center gap-4">
-          <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-black/10 bg-white">
-            {perfil.logoUrl ? (
-              <img src={perfil.logoUrl} alt={t('venue.business.logo')} className="h-full w-full object-contain" />
-            ) : (
-              <span className="font-display text-headline-md font-black text-ink/30">
-                {campos.name.charAt(0).toUpperCase()}
-              </span>
-            )}
-          </div>
-          <div className="min-w-0 flex-1 space-y-2">
-            <p className="text-caption text-party-gray">{t('venue.business.logoHelp')}</p>
-            <div className="flex flex-wrap gap-2">
-              <button
-                type="button"
-                disabled={subiendo}
-                onClick={() => archivo.current?.click()}
-                className="press flex h-10 items-center gap-1.5 rounded-lg bg-party-primary px-3 text-caption font-bold text-ink disabled:opacity-50"
-              >
-                {subiendo ? <Loader2 size={14} className="animate-spin" /> : <ImagePlus size={14} />}
-                {perfil.logoUrl ? t('venue.business.changeLogo') : t('venue.business.uploadLogo')}
-              </button>
-              {perfil.logoUrl && (
-                <button
-                  type="button"
-                  disabled={subiendo}
-                  onClick={() => void quitarLogo()}
-                  className="press flex h-10 items-center gap-1.5 rounded-lg border border-black/15 px-3 text-caption font-bold disabled:opacity-50"
-                >
-                  <Trash2 size={14} />
-                  {t('venue.business.removeLogo')}
-                </button>
-              )}
+            <div className="flex items-center gap-4">
+              <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-black/10 bg-white">
+                {perfil.logoUrl ? (
+                  <img src={perfil.logoUrl} alt={t('venue.business.logo')} className="h-full w-full object-contain" />
+                ) : (
+                  <span className="font-display text-headline-md font-black text-ink/30">
+                    {campos.name.charAt(0).toUpperCase()}
+                  </span>
+                )}
+              </div>
+              <div className="min-w-0 flex-1 space-y-2">
+                <p className="text-caption text-party-gray">{t('venue.business.logoHelp')}</p>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    disabled={subiendo}
+                    onClick={() => archivo.current?.click()}
+                    className="press flex h-10 items-center gap-1.5 rounded-lg bg-party-primary px-3 text-caption font-bold text-ink disabled:opacity-50"
+                  >
+                    {subiendo ? <Loader2 size={14} className="animate-spin" /> : <ImagePlus size={14} />}
+                    {perfil.logoUrl ? t('venue.business.changeLogo') : t('venue.business.uploadLogo')}
+                  </button>
+                  {perfil.logoUrl && (
+                    <button
+                      type="button"
+                      disabled={subiendo}
+                      onClick={() => void quitarLogo()}
+                      className="press flex h-10 items-center gap-1.5 rounded-lg border border-black/15 px-3 text-caption font-bold disabled:opacity-50"
+                    >
+                      <Trash2 size={14} />
+                      {t('venue.business.removeLogo')}
+                    </button>
+                  )}
+                </div>
+                <input
+                  ref={archivo}
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp"
+                  className="hidden"
+                  onChange={(e) => void subirLogo(e.target.files?.[0])}
+                />
+              </div>
             </div>
-            <input
-              ref={archivo}
-              type="file"
-              accept="image/png,image/jpeg,image/webp"
-              className="hidden"
-              onChange={(e) => void subirLogo(e.target.files?.[0])}
-            />
-          </div>
-        </div>
-      </section>
+          </section>
 
-      {/* ------------------------------------------------------------- datos */}
-      <section className="surface-light space-y-3 rounded-2xl p-4">
-        <div className="space-y-1">
-          <Label htmlFor="bp-name" className="text-caption">
-            {t('venue.business.name')}
-          </Label>
-          <div className="relative">
-            <Input
-              id="bp-name"
-              value={campos.name}
-              maxLength={80}
-              disabled={perfil.isVerified}
-              onChange={(e) => poner('name', e.target.value)}
-            />
-            {perfil.isVerified && (
-              <Lock size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-party-gray" />
-            )}
-          </div>
-          {perfil.isVerified && <p className="text-caption text-party-gray">{t('venue.business.nameLocked')}</p>}
-        </div>
-
-        <div className="grid gap-3 sm:grid-cols-3">
-          <div className="sm:col-span-2">
-            {campo('address', { label: t('venue.business.address'), maxLength: 200, autoComplete: 'street-address' })}
-          </div>
-          {campo('city', { label: t('venue.business.city'), maxLength: 80 })}
-        </div>
-        <div className="space-y-1">
-          <p className="text-caption font-medium">{t('venue.business.map')}</p>
-          <LocationPicker
-            value={ubicacion}
-            onChange={(lugar) => {
-              setUbicacion(lugar);
-              if (lugar.label && !campos.address.trim()) poner('address', lugar.label);
-            }}
-          />
-          <p className="text-caption text-party-gray">{t('venue.business.mapHelp')}</p>
-        </div>
-
-        <div className="grid gap-3 sm:grid-cols-2">
-          {campo('phone', { label: t('venue.business.phone'), type: 'tel', inputMode: 'tel', maxLength: 24 })}
-          {campo('contactEmail', {
-            label: t('venue.business.contactEmail'),
-            type: 'email',
-            inputMode: 'email',
-            autoCapitalize: 'none',
-            maxLength: 120,
-            help: t('venue.business.contactEmailHelp'),
-          })}
-          {campo('website', { label: t('venue.business.website'), inputMode: 'url', autoCapitalize: 'none', placeholder: 'https://', maxLength: 200 })}
-        </div>
-      </section>
-
-      {/* ------------------------------------------------------------ redes */}
-      <section className="surface-light space-y-3 rounded-2xl p-4">
-        <div>
-          <h3 className="font-display text-title-card uppercase">{t('venue.business.socials')}</h3>
-          <p className="text-caption text-party-gray">{t('venue.business.socialsHelp')}</p>
-        </div>
-        <div className="grid gap-3 sm:grid-cols-2">
-          {SOCIAL_NETWORKS.map((n) => (
-            <div key={n} className="space-y-1">
-              <Label htmlFor={`bp-${n}`} className="flex items-center gap-1.5 text-caption">
-                <SocialIcon network={n} size={14} />
-                {SOCIAL_NAME[n]}
+          {/* ------------------------------------------------------------- datos */}
+          <section className="surface-light space-y-3 rounded-2xl p-4">
+            <div className="space-y-1">
+              <Label htmlFor="bp-name" className="text-caption">
+                {t('venue.business.name')}
               </Label>
-              <Input
-                id={`bp-${n}`}
-                value={redes[n]}
-                autoCapitalize="none"
-                autoCorrect="off"
-                spellCheck={false}
-                maxLength={120}
-                placeholder={t(`venue.business.socialPlaceholder.${n}`)}
-                onChange={(e) => setRedes({ ...redes, [n]: e.target.value })}
-              />
+              <div className="relative">
+                <Input
+                  id="bp-name"
+                  value={campos.name}
+                  maxLength={80}
+                  disabled={perfil.isVerified}
+                  onChange={(e) => poner('name', e.target.value)}
+                />
+                {perfil.isVerified && (
+                  <Lock size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-party-gray" />
+                )}
+              </div>
+              {perfil.isVerified && <p className="text-caption text-party-gray">{t('venue.business.nameLocked')}</p>}
             </div>
-          ))}
-        </div>
-      </section>
 
-      {/* ------------------------------------------------------- condiciones */}
-      <section className="surface-light space-y-2 rounded-2xl p-4">
-        <Label htmlFor="bp-terms" className="font-display text-title-card uppercase">
-          {t('venue.business.terms')}
-        </Label>
-        <p className="text-caption text-party-gray">{t('venue.business.termsHelp')}</p>
-        <Textarea
-          id="bp-terms"
-          rows={8}
-          maxLength={6000}
-          value={campos.businessTerms}
-          placeholder={t('venue.business.termsPlaceholder')}
-          onChange={(e) => poner('businessTerms', e.target.value)}
-        />
-        <p className="text-right text-caption text-party-gray tabular">{campos.businessTerms.length}/6000</p>
-      </section>
+            <div className="grid gap-3 sm:grid-cols-3">
+              <div className="sm:col-span-2">
+                {campo('address', { label: t('venue.business.address'), maxLength: 200, autoComplete: 'street-address' })}
+              </div>
+              {campo('city', { label: t('venue.business.city'), maxLength: 80 })}
+            </div>
+            <div className="space-y-1">
+              <p className="text-caption font-medium">{t('venue.business.map')}</p>
+              <LocationPicker
+                value={ubicacion}
+                onChange={(lugar) => {
+                  setUbicacion(lugar);
+                  if (lugar.label && !campos.address.trim()) poner('address', lugar.label);
+                }}
+              />
+              <p className="text-caption text-party-gray">{t('venue.business.mapHelp')}</p>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              {campo('phone', { label: t('venue.business.phone'), type: 'tel', inputMode: 'tel', maxLength: 24 })}
+              {campo('contactEmail', {
+                label: t('venue.business.contactEmail'),
+                type: 'email',
+                inputMode: 'email',
+                autoCapitalize: 'none',
+                maxLength: 120,
+                help: t('venue.business.contactEmailHelp'),
+              })}
+              {campo('website', { label: t('venue.business.website'), inputMode: 'url', autoCapitalize: 'none', placeholder: 'https://', maxLength: 200 })}
+            </div>
+          </section>
+        </>
+      )}
+
+      {part === 'socials' && (
+        <>
+          {/* ------------------------------------------------------------ redes */}
+          <section className="surface-light space-y-3 rounded-2xl p-4">
+            <div>
+              <h3 className="font-display text-title-card uppercase">{t('venue.business.socials')}</h3>
+              <p className="text-caption text-party-gray">{t('venue.business.socialsHelp')}</p>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {SOCIAL_NETWORKS.map((n) => (
+                <div key={n} className="space-y-1">
+                  <Label htmlFor={`bp-${n}`} className="flex items-center gap-1.5 text-caption">
+                    <SocialIcon network={n} size={14} />
+                    {SOCIAL_NAME[n]}
+                  </Label>
+                  <Input
+                    id={`bp-${n}`}
+                    value={redes[n]}
+                    autoCapitalize="none"
+                    autoCorrect="off"
+                    spellCheck={false}
+                    maxLength={120}
+                    placeholder={t(`venue.business.socialPlaceholder.${n}`)}
+                    onChange={(e) => setRedes({ ...redes, [n]: e.target.value })}
+                  />
+                </div>
+              ))}
+            </div>
+          </section>
+        </>
+      )}
+
+      {part === 'profile' && (
+        <>
+          {/* ------------------------------------------------------- condiciones */}
+          <section className="surface-light space-y-2 rounded-2xl p-4">
+            <Label htmlFor="bp-terms" className="font-display text-title-card uppercase">
+              {t('venue.business.terms')}
+            </Label>
+            <p className="text-caption text-party-gray">{t('venue.business.termsHelp')}</p>
+            <Textarea
+              id="bp-terms"
+              rows={8}
+              maxLength={6000}
+              value={campos.businessTerms}
+              placeholder={t('venue.business.termsPlaceholder')}
+              onChange={(e) => poner('businessTerms', e.target.value)}
+            />
+            <p className="text-right text-caption text-party-gray tabular">{campos.businessTerms.length}/6000</p>
+          </section>
+        </>
+      )}
 
       <PartyButton className="w-full" disabled={guardando} onClick={() => void guardar()}>
         {guardando ? <Loader2 size={16} className="animate-spin" /> : t('common.save')}

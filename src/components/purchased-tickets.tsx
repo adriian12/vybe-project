@@ -19,8 +19,17 @@ import { cn } from '@/lib/utils';
  * Quien compra para sus amigos puede archivar las entradas que no son suyas
  * (migración 088): dejan de salir aquí, siguen valiendo en la puerta y se
  * recuperan en «Archivadas».
+ *
+ * `view` separa las que aún sirven (próximas) de las usadas o de fiestas ya
+ * terminadas (pasadas). El título y «Añadir entrada» los pinta la página.
  */
-const PurchasedTickets = () => {
+const PurchasedTickets = ({
+  view,
+  onPastCount,
+}: {
+  view: 'upcoming' | 'past';
+  onPastCount?: (count: number) => void;
+}) => {
   const { t } = useTranslation();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -77,13 +86,25 @@ const PurchasedTickets = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
-  // Sólo las de fiestas que no han terminado.
-  const vivas = useMemo(
-    () => tickets.filter((ticket) => new Date(ticket.endDate).getTime() > Date.now() && ticket.status !== 'refunded'),
-    [tickets],
-  );
+  // Próximas: de fiestas que no han terminado y sin usar. Una entrada usada
+  // ya no abre la puerta: pasa a «Pasadas».
+  const { vivas, pasadas } = useMemo(() => {
+    const ahora = Date.now();
+    const validas = tickets.filter((ticket) => ticket.status !== 'refunded');
+    const esPasada = (ticket: MyTicket) => ticket.status === 'used' || new Date(ticket.endDate).getTime() <= ahora;
+    return {
+      vivas: validas.filter((ticket) => !esPasada(ticket)),
+      pasadas: validas
+        .filter(esPasada)
+        .sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime()),
+    };
+  }, [tickets]);
   const vigentes = vivas.filter((ticket) => !ticket.archived);
   const archivadas = vivas.filter((ticket) => ticket.archived);
+
+  useEffect(() => {
+    onPastCount?.(pasadas.length);
+  }, [pasadas.length, onPastCount]);
 
   const archivar = async (ticket: MyTicket, archived: boolean) => {
     setTickets((lista) => lista.map((x) => (x.id === ticket.id ? { ...x, archived } : x)));
@@ -99,24 +120,64 @@ const PurchasedTickets = () => {
     }
   };
 
+  const fecha = (ticket: MyTicket) =>
+    `${ticket.venueName} · ${new Date(ticket.startDate).toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' })} · ${formatHourRange(ticket.startDate, ticket.endDate)}`;
+
+  if (view === 'past') {
+    if (pasadas.length === 0) return null;
+    return (
+      <ul className="space-y-3">
+        {pasadas.map((ticket) => {
+          const Icono = ticket.kind === 'table' ? Armchair : ticket.kind === 'vip' ? Crown : Ticket;
+          return (
+            <li key={ticket.id}>
+              <button
+                type="button"
+                onClick={() => navigate(`/event/${ticket.eventId}`)}
+                className="press flex w-full items-center gap-3 rounded-2xl bg-card p-3 text-left"
+              >
+                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-surface-high text-party-primary">
+                  <Icono size={20} />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate font-display text-title-card">{ticket.eventName}</span>
+                  <span className="block truncate text-caption text-party-gray">{fecha(ticket)}</span>
+                  <span className="block truncate text-caption font-bold">
+                    {ticket.typeName}
+                    {ticket.holderName ? ` · ${ticket.holderName}` : ''}
+                  </span>
+                </span>
+                <span className="flex shrink-0 items-center gap-1 rounded-full bg-surface-high px-2.5 py-1 text-caption">
+                  {ticket.status === 'used' && <CheckCircle2 size={12} className="text-party-primary" />}
+                  {ticket.status === 'used'
+                    ? t('tickets.mine.usedShort', {
+                        time: ticket.usedAt
+                          ? new Date(ticket.usedAt).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })
+                          : '',
+                      })
+                    : t('tickets.mine.ended')}
+                </span>
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+    );
+  }
+
   if (vivas.length === 0 && !esperando) return null;
 
   const tarjeta = (ticket: MyTicket) => {
-    const usada = ticket.status === 'used';
     const Icono = ticket.kind === 'table' ? Armchair : ticket.kind === 'vip' ? Crown : Ticket;
     return (
-      <li key={ticket.id} className={cn('overflow-hidden rounded-2xl bg-white text-ink', usada && 'opacity-60')}>
+      <li key={ticket.id} className="overflow-hidden rounded-2xl bg-white text-ink">
         <div className="flex items-start gap-3 p-4">
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-party-primary">
             <Icono size={18} />
           </span>
           <div className="min-w-0 flex-1">
             <p className="truncate font-display text-title-card">{ticket.eventName}</p>
-            <p className="truncate text-caption text-ink/60">
-              {ticket.venueName} ·{' '}
-              {new Date(ticket.startDate).toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' })} ·{' '}
-              {formatHourRange(ticket.startDate, ticket.endDate)}
-            </p>
+            <p className="truncate text-caption text-ink/60">{fecha(ticket)}</p>
             {ticket.holderName && <p className="mt-1 truncate text-caption font-bold text-ink/80">{ticket.holderName}</p>}
             <p className="mt-1 text-body-sm font-bold">
               {ticket.typeName}
@@ -140,16 +201,7 @@ const PurchasedTickets = () => {
             {ticket.archived ? t('tickets.mine.restore') : t('tickets.mine.archive')}
           </button>
         </div>
-        {ticket.archived ? null : usada ? (
-          <p className="flex items-center justify-center gap-1.5 border-t border-dashed border-black/15 py-3 text-caption font-bold uppercase">
-            <CheckCircle2 size={14} />
-            {t('tickets.mine.used', {
-              time: ticket.usedAt
-                ? new Date(ticket.usedAt).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })
-                : '',
-            })}
-          </p>
-        ) : (
+        {ticket.archived ? null : (
           <div className="flex flex-col items-center gap-2 border-t border-dashed border-black/15 p-4">
             <QRCodeSVG value={ticket.code} size={168} level="M" />
             <p className="font-mono text-body-md font-bold tracking-[0.2em]">{ticket.code}</p>
@@ -170,13 +222,12 @@ const PurchasedTickets = () => {
   };
 
   return (
-    <section className="space-y-3">
-      <h2 className="flex items-center gap-2 font-display text-headline-md uppercase">
-        {t('tickets.mine.title')}
-        {esperando && <Loader2 size={16} className="animate-spin text-party-primary" />}
-      </h2>
-      {esperando && vigentes.length === 0 && (
-        <p className="rounded-2xl bg-card p-4 text-body-sm text-party-gray">{t('tickets.mine.waiting')}</p>
+    <div className="space-y-3">
+      {esperando && (
+        <p className="flex items-center gap-2 rounded-2xl bg-card p-4 text-body-sm text-party-gray">
+          <Loader2 size={16} className="shrink-0 animate-spin text-party-primary" />
+          {t('tickets.mine.waiting')}
+        </p>
       )}
       {vigentes.length > 0 && <ul className="space-y-3">{vigentes.map(tarjeta)}</ul>}
       {vigentes.length === 0 && archivadas.length > 0 && (
@@ -197,7 +248,7 @@ const PurchasedTickets = () => {
           {verArchivadas && <ul className="space-y-3">{archivadas.map(tarjeta)}</ul>}
         </div>
       )}
-    </section>
+    </div>
   );
 };
 

@@ -410,12 +410,9 @@ const EventDetailPage = () => {
           {live && <LiveThermometer activity={cifras} />}
 
           {/* ---------------------------------------------------- quién va */}
-          {cifras.inside > 0 && (
-            <p className="flex items-center gap-2 text-body-md font-bold text-party-primary">
-              <span className="h-2 w-2 animate-pulse rounded-full bg-party-primary" />
-              {t('home.inside', { count: cifras.inside })}
-            </p>
-          )}
+          {/* Cuánta gente hay dentro lo dice el termómetro, con el recuento
+              de la puerta y sólo si el negocio lo enseña: «N fiesteros
+              dentro» (sólo los de la app) contaba lo mismo dos veces. */}
           {cifras.friendsGoing > 0 && !terminado && (
             <p className="flex items-center gap-2 text-body-md font-bold">
               <Zap size={16} className="text-party-primary" />

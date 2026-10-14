@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { QRCodeSVG } from 'qrcode.react';
-import { Archive, ArchiveRestore, ChevronDown, FileUp, Loader2, MapPin, Plus, Ticket, Trash2, Users } from 'lucide-react';
+import { Archive, ArchiveRestore, ChevronDown, FileUp, Loader2, MapPin, Ticket, Trash2, Users } from 'lucide-react';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
@@ -32,11 +32,22 @@ const fechaLarga = (iso: string) =>
   new Date(iso).toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' });
 const horaCorta = (iso: string) => new Date(iso).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
 
-const ExternalTickets = ({ events }: { events: Event[] }) => {
+/**
+ * La hoja «Añadir entrada» la abre el botón que hay junto a «Tus entradas»
+ * (`TicketsPage`), así que se controla desde fuera.
+ */
+const ExternalTickets = ({
+  events,
+  addOpen,
+  onAddOpenChange,
+}: {
+  events: Event[];
+  addOpen: boolean;
+  onAddOpenChange: (open: boolean) => void;
+}) => {
   const { t } = useTranslation();
   const { toast } = useToast();
   const [tickets, setTickets] = useState<ExternalTicket[]>([]);
-  const [abierta, setAbierta] = useState(false);
   const [verArchivadas, setVerArchivadas] = useState(false);
   const [abiertos, setAbiertos] = useState<Record<string, boolean>>({});
 
@@ -132,7 +143,6 @@ const ExternalTickets = ({ events }: { events: Event[] }) => {
                 {t('tickets.external.validFor', { count: ticket.people })}
               </p>
             )}
-            <p className="text-center text-caption text-ink/60">{t('tickets.external.doorNote', { source: plataforma })}</p>
           </div>
         )}
 
@@ -185,26 +195,7 @@ const ExternalTickets = ({ events }: { events: Event[] }) => {
   };
 
   return (
-    <section className="space-y-3">
-      <div className="flex items-center justify-between gap-3">
-        <h2 className="font-display text-headline-md uppercase">{t('tickets.external.title')}</h2>
-        <PartyButton size="sm" onClick={() => setAbierta(true)}>
-          <Plus size={14} className="mr-1" />
-          {t('tickets.external.add')}
-        </PartyButton>
-      </div>
-
-      {vigentes.length === 0 && archivadas.length === 0 && (
-        <button
-          type="button"
-          onClick={() => setAbierta(true)}
-          className="press flex w-full items-center gap-3 rounded-2xl border border-dashed border-white/20 p-4 text-left text-body-sm text-party-gray"
-        >
-          <FileUp size={20} className="shrink-0 text-party-primary" />
-          {t('tickets.external.addHint')}
-        </button>
-      )}
-
+    <div className="space-y-3">
       {vigentes.length > 0 && <ul className="space-y-3">{vigentes.map(tarjeta)}</ul>}
 
       {archivadas.length > 0 && (
@@ -224,12 +215,12 @@ const ExternalTickets = ({ events }: { events: Event[] }) => {
       )}
 
       <AddTicketSheet
-        open={abierta}
-        onOpenChange={setAbierta}
+        open={addOpen}
+        onOpenChange={onAddOpenChange}
         events={events}
         onSaved={(nueva) => setTickets((l) => [...l.filter((x) => x.id !== nueva.id), nueva])}
       />
-    </section>
+    </div>
   );
 };
 
@@ -331,6 +322,12 @@ const AddTicketSheet = ({
         />
 
         <div className="space-y-4 py-4">
+          {!leida && (
+            <p className="flex items-center gap-3 rounded-2xl border border-dashed border-white/20 p-4 text-body-sm text-party-gray">
+              <FileUp size={20} className="shrink-0 text-party-primary" />
+              {t('tickets.external.addHint')}
+            </p>
+          )}
           {!leida && (
             <PartyButton className="w-full" size="lg" disabled={leyendo} onClick={() => input.current?.click()}>
               {leyendo ? <Loader2 size={16} className="mr-2 animate-spin" /> : <FileUp size={16} className="mr-2" />}

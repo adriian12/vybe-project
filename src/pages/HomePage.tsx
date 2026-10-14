@@ -88,19 +88,25 @@ const HomePage = () => {
    * Destacados: primero los que el local ha pagado por destacar, y después los
    * que tienen más movimiento. Pesa más la gente que ya está dentro que la que
    * dice que irá, porque es la señal que no miente.
+   *
+   * No dependen del día elegido: salen de todas las próximas (con los filtros
+   * de música y horario), con las de ese día delante. Antes salían sólo del
+   * día, y al cambiar de «hoy» el carrusel se quedaba vacío.
    */
   const destacados = useMemo(() => {
     const puntos = (id: string) => (activity[id]?.inside ?? 0) * 3 + (activity[id]?.going ?? 0);
     const ahora = Date.now();
-    return [...visible]
+    const deEseDia = new Set(delDia.map(({ event }) => event.id));
+    return [...filtrados]
       .filter(({ event }) => isFeatured(event, ahora) || puntos(event.id) > 0 || isEventLive(event))
       .sort(
         (a, b) =>
           Number(isFeatured(b.event, ahora)) - Number(isFeatured(a.event, ahora)) ||
+          Number(deEseDia.has(b.event.id)) - Number(deEseDia.has(a.event.id)) ||
           puntos(b.event.id) - puntos(a.event.id),
       )
       .slice(0, DESTACADOS);
-  }, [visible, activity]);
+  }, [filtrados, delDia, activity]);
 
   const foto = currentUser?.avatar || currentUser?.photos?.[0];
   const hora = new Date().getHours();

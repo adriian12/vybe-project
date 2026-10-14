@@ -79,7 +79,7 @@ export const PremiumProvider = ({ children }: { children: ReactNode }) => {
   // verse al pasar otra vez a fiester@.
   const esInvitado = currentUser?.accountType === 'guest';
   const { toast } = useToast();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -212,11 +212,18 @@ export const PremiumProvider = ({ children }: { children: ReactNode }) => {
       };
       toast({
         title: t('common.error'),
-        description: known[code] ? t(known[code]) : error instanceof ApiError ? error.message : t('errors.generic'),
+        // Algunos `ApiError` (los de la tienda) ya traen la clave del texto.
+        description: known[code]
+          ? t(known[code])
+          : error instanceof ApiError
+            ? i18n.exists(error.message)
+              ? t(error.message)
+              : error.message
+            : t('errors.generic'),
         variant: 'destructive',
       });
     },
-    [toast, t],
+    [toast, t, i18n],
   );
 
   /**

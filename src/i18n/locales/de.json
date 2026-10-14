@@ -199,7 +199,7 @@
     },
     "home": {
         "title": "Events in deiner Stadt",
-        "subtitle": "Entdecke die Partys auf Mallorca.",
+        "subtitle": "Entdecke die Partys in deiner Nähe.",
         "empty": "Noch keine Events",
         "emptyBody": "Noch hat kein verifiziertes Lokal eine Party veröffentlicht. Schau später wieder vorbei.",
         "live": "Live",
@@ -688,8 +688,6 @@
         "activatedEvent": "Du hast Premium für dieses Event.",
         "redirecting": "Wir bringen dich zur Zahlung…",
         "features": {
-            "superLikes": "Ein Supercrush pro Party",
-            "superLikesBody": "Fall auf. Mehr gefällig? Einzeln kaufen und auf jeder Party nutzen.",
             "seeWhoLiked": "Sieh, wer dich geliked hat",
             "seeWhoLikedBody": "Finde heraus, wem du gefällst, bevor du swipest.",
             "keepAlone": "Verbindung retten",
@@ -1704,6 +1702,11 @@
                 "x": "@deinlokal",
                 "youtube": "@deinkanal",
                 "tiktok": "@deinlokal"
+            },
+            "tabs": {
+                "profile": "Betriebsprofil",
+                "socials": "Soziale Netzwerke",
+                "page": "Öffentliche Seite"
             }
         },
         "liveSettings": {
@@ -2272,7 +2275,6 @@
     },
     "tickets": {
         "external": {
-            "title": "Von anderen Websites",
             "add": "Ticket hinzufügen",
             "addHint": "Ticket bei Fourvenues oder einer anderen Website gekauft? Füge es hinzu und hab es hier bei den anderen.",
             "addTitle": "Ticket hinzufügen",
@@ -2295,7 +2297,6 @@
             "otherSource": "einer anderen Website",
             "validFor_one": "Gültig für {{count}} Person",
             "validFor_other": "Gültig für {{count}} Personen",
-            "doorNote": "{{source}} prüft es am Einlass: Es ist derselbe QR-Code wie im PDF.",
             "details": "Details",
             "seeEvent": "Zur Party",
             "remove": "Entfernen",
@@ -2325,10 +2326,6 @@
         "emptyTitle": "Noch keine Pläne",
         "emptyBody": "Tippe bei einer Party auf „Ich gehe hin“ und sie ist hier, bereit für den Einlass.",
         "explore": "Events entdecken",
-        "groupTitle": "Mit Freunden unterwegs?",
-        "groupBody": "Drinnen könnt ihr eine Gruppe mit eigenem Chat gründen und euch auf der Tanzfläche finden.",
-        "groupCta": "Zu den Gruppen der Party",
-        "groupLocked": "Verfügbar, sobald du drin bist",
         "haveCode": "Hast du einen Einlasscode?",
         "pastEmptyTitle": "Noch nicht ausgegangen",
         "pastEmptyBody": "Partys, bei denen du drin warst, erscheinen hier mit den Leuten, die du kennengelernt hast.",
@@ -2375,7 +2372,9 @@
             "restored": "Ticket wiederhergestellt",
             "archivedList_one": "Archiviert ({{count}})",
             "archivedList_other": "Archiviert ({{count}})",
-            "allArchived": "Du hast alle deine Tickets archiviert. Sie gelten weiterhin: Du findest sie unten."
+            "allArchived": "Du hast alle deine Tickets archiviert. Sie gelten weiterhin: Du findest sie unten.",
+            "usedShort": "Genutzt · {{time}}",
+            "ended": "Vorbei"
         },
         "checkout": {
             "notFound": "Dieses Ticket ist nicht mehr erhältlich",
@@ -2507,7 +2506,7 @@
             "close": "Menü schließen"
         },
         "hero": {
-            "pill": "Die Nightlife-App auf Mallorca",
+            "pill": "Erlebe die Party zu 100 %",
             "titleStart": "Die Nacht erlebt man auf der Tanzfläche.",
             "titleBrand": "Fiestea",
             "titleEnd": "verbindet Fiester und Locations in Echtzeit.",
@@ -2515,7 +2514,7 @@
             "ctaUser": "App herunterladen",
             "ctaVenue": "Fiestea für Locations",
             "imageAlt": "Menschen tanzen in einem Club unter gelbem Licht",
-            "imageTag": "Mallorca",
+            "imageTag": "Spanien",
             "imageCaption": "Verifizierte Partys, echte Leute vor Ort",
             "facts": {
                 "adults": "Verifizierte Profile, nur Volljährige",
@@ -2789,7 +2788,7 @@
             "soon": "Demnächst"
         },
         "meta": {
-            "description": "Entdecke die Partys auf Mallorca, kauf dein Ticket und komm mit dem QR-Code rein. Für Betriebe: Ticketverkauf, Gästelisten, Live-Auslastung und Hinweise."
+            "description": "Entdecke die Partys in deiner Nähe, kauf dein Ticket und komm mit dem QR-Code rein. Für Betriebe: Ticketverkauf, Gästelisten, Live-Auslastung und Hinweise."
         },
         "whatsapp": {
             "label": "Schreib uns auf WhatsApp",
@@ -3141,7 +3140,9 @@
         "bought": "Supercrushes gekauft",
         "boughtBody": "Sie sind in deinem Konto. Nutze sie auf jeder Party.",
         "buyCta": "Supercrushes kaufen",
-        "none": "Du hast keine Supercrushes mehr"
+        "none": "Du hast keine Supercrushes mehr",
+        "giftTitle": "Du hast einen Supercrush geschenkt",
+        "giftBody": "Er gilt für diese Party und wird vor deinen eigenen verbraucht. Nutzt du ihn nicht, verfällt er am Ende."
     },
     "notFound": {
         "body": "Diese Seite gibt es nicht. Vielleicht ist der Link falsch geschrieben oder nicht mehr verfügbar."

@@ -199,7 +199,7 @@
     },
     "home": {
         "title": "Esdeveniments a la teva ciutat",
-        "subtitle": "Explora les festes disponibles a Mallorca.",
+        "subtitle": "Explora les festes a prop teu.",
         "empty": "Encara no hi ha esdeveniments",
         "emptyBody": "Encara no hi ha festes publicades per negocis verificats. Torna-hi més tard.",
         "live": "En directe",
@@ -688,8 +688,6 @@
         "activatedEvent": "Tens Premium durant aquest esdeveniment.",
         "redirecting": "Et portem al pagament…",
         "features": {
-            "superLikes": "Un supercrush per festa",
-            "superLikesBody": "Destaca sobre la resta. En vols més? Es compren solts i valen a qualsevol festa.",
             "seeWhoLiked": "Veure qui t'ha donat like",
             "seeWhoLikedBody": "Descobreix a qui li has agradat abans de lliscar.",
             "keepAlone": "Rescatar la connexió",
@@ -1704,6 +1702,11 @@
                 "x": "@latevasala",
                 "youtube": "@eltecanal",
                 "tiktok": "@latevasala"
+            },
+            "tabs": {
+                "profile": "Perfil del negoci",
+                "socials": "Xarxes socials",
+                "page": "Fitxa del negoci"
             }
         },
         "liveSettings": {
@@ -2272,7 +2275,6 @@
     },
     "tickets": {
         "external": {
-            "title": "D’altres webs",
             "add": "Afegir entrada",
             "addHint": "Vas comprar l’entrada a Fourvenues o a una altra web? Afegeix-la i tingues-la aquí amb la resta.",
             "addTitle": "Afegir una entrada",
@@ -2295,7 +2297,6 @@
             "otherSource": "una altra web",
             "validFor_one": "Vàlid per a {{count}} persona",
             "validFor_other": "Vàlid per a {{count}} persones",
-            "doorNote": "La valida {{source}} a la porta: és el mateix QR del PDF.",
             "details": "Detalls",
             "seeEvent": "Veure la festa",
             "remove": "Treure",
@@ -2325,10 +2326,6 @@
         "emptyTitle": "Encara no tens plans",
         "emptyBody": "Marca «Hi aniré» en una festa i la tindràs aquí, llesta per entrar.",
         "explore": "Explorar esdeveniments",
-        "groupTitle": "Vas en grup amb amics?",
-        "groupBody": "Dins la festa podeu crear un grup amb xat propi i trobar-vos a la pista.",
-        "groupCta": "Anar als grups de la festa",
-        "groupLocked": "Disponible quan entris",
         "haveCode": "Tens un codi d'accés?",
         "pastEmptyTitle": "Encara no has sortit",
         "pastEmptyBody": "Les festes on entris apareixeran aquí amb la gent que hi vas conèixer.",
@@ -2375,7 +2372,9 @@
             "restored": "Entrada recuperada",
             "archivedList_one": "Arxivades ({{count}})",
             "archivedList_other": "Arxivades ({{count}})",
-            "allArchived": "Has arxivat totes les teves entrades. Continuen sent vàlides: les tens a baix."
+            "allArchived": "Has arxivat totes les teves entrades. Continuen sent vàlides: les tens a baix.",
+            "usedShort": "Usada · {{time}}",
+            "ended": "Acabada"
         },
         "checkout": {
             "notFound": "Aquesta entrada ja no està a la venda",
@@ -2507,7 +2506,7 @@
             "close": "Tancar el menú"
         },
         "hero": {
-            "pill": "L'app de la nit a Mallorca",
+            "pill": "Viu la festa al 100%",
             "titleStart": "La nit es viu a la pista.",
             "titleBrand": "Fiestea",
             "titleEnd": "connecta fiester@s i sales en temps real.",
@@ -2515,7 +2514,7 @@
             "ctaUser": "Descarregar l'app",
             "ctaVenue": "Fiestea per a negocis",
             "imageAlt": "Gent ballant en una discoteca amb llums grogues",
-            "imageTag": "Mallorca",
+            "imageTag": "Espanya",
             "imageCaption": "Festes verificades, gent real a dins",
             "facts": {
                 "adults": "Perfils verificats, només majors d'edat",
@@ -2789,7 +2788,7 @@
             "soon": "Aviat"
         },
         "meta": {
-            "description": "Descobreix les festes de Mallorca, compra la teva entrada i entra amb el QR. Per a negocis: venda d’entrades, llistes, aforament en directe i avisos."
+            "description": "Descobreix les festes a prop teu, compra la teva entrada i entra amb el QR. Per a negocis: venda d’entrades, llistes, aforament en directe i avisos."
         },
         "whatsapp": {
             "label": "Escriu-nos per WhatsApp",
@@ -3141,7 +3140,9 @@
         "bought": "Supercrush comprats",
         "boughtBody": "Ja els tens al compte. Fes-los servir a qualsevol festa.",
         "buyCta": "Comprar supercrush",
-        "none": "No et queden supercrush"
+        "none": "No et queden supercrush",
+        "giftTitle": "Tens un supercrush de regal",
+        "giftBody": "És per a aquesta festa i es fa servir abans que els teus. Si no el fas servir, es perd quan acaba."
     },
     "notFound": {
         "body": "Aquesta pàgina no existeix. Potser l'enllaç està mal escrit o ja no està disponible."

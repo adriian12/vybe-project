@@ -46,6 +46,7 @@ import EventPicker from '@/components/venue/event-picker';
 import VenueWeeklyReport from '@/components/venue/venue-weekly-report';
 import VenueProfileForm from '@/components/venue/venue-profile-form';
 import VenueBusinessProfile from '@/components/venue/venue-business-profile';
+import PanelTabs from '@/components/venue/panel-tabs';
 import EventLiveSettings from '@/components/venue/event-live-settings';
 import { nightService } from '@/services/night';
 import { BOOST_PRICE, planHas } from '@/lib/venue-plans';
@@ -108,6 +109,7 @@ import { Event as VybeEvent, VenueStats } from '@/types/venue';
  * escritorio de Stitch.
  */
 type Section = 'qr' | 'door' | 'events' | 'stats' | 'promos' | 'sales' | 'business' | 'team' | 'settings' | 'plan';
+type PestanaNegocio = 'profile' | 'socials' | 'page';
 type Period = 'total' | 'year' | 'month' | 'week';
 type EventFilter = 'live' | 'scheduled' | 'past';
 type Drawer = null | 'menu' | 'venue' | 'documents' | 'broadcast';
@@ -155,6 +157,7 @@ const VenueDashboardPage = () => {
   // La sección se recuerda en la sesión del navegador: al recargar o volver de
   // otra pestaña se sigue donde estabas. Un aviso push puede pedir una
   // (`?seccion=door` cuando alguien pide ayuda).
+  const [pestanaNegocio, setPestanaNegocio] = useState<PestanaNegocio>('profile');
   const [section, setSection] = useState<Section>(() => {
     const pedida = new URLSearchParams(window.location.search).get('seccion') as Section | null;
     if (pedida && SECCIONES_POR_ROL.owner.includes(pedida)) return pedida;
@@ -1081,7 +1084,16 @@ const VenueDashboardPage = () => {
             descripción y horario) y cuánta gente le sigue, sin nombres. */}
         {section === 'business' && (
           <div className="mx-auto max-w-3xl space-y-4">
-            {followers && (
+            <PanelTabs
+              tabs={[
+                { id: 'profile', label: t('venue.business.tabs.profile') },
+                { id: 'socials', label: t('venue.business.tabs.socials') },
+                { id: 'page', label: t('venue.business.tabs.page') },
+              ]}
+              value={pestanaNegocio}
+              onChange={(v) => setPestanaNegocio(v as PestanaNegocio)}
+            />
+            {pestanaNegocio === 'profile' && followers && (
               <div className="surface-light flex items-center gap-4 rounded-2xl p-4">
                 <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-party-primary text-ink">
                   <Heart size={22} />
@@ -1100,8 +1112,9 @@ const VenueDashboardPage = () => {
                 </div>
               </div>
             )}
-            <VenueBusinessProfile venueId={currentVenue.id} />
-            <VenueProfileForm venueId={currentVenue.id} />
+            {pestanaNegocio === 'profile' && <VenueBusinessProfile venueId={currentVenue.id} part="profile" />}
+            {pestanaNegocio === 'socials' && <VenueBusinessProfile venueId={currentVenue.id} part="socials" />}
+            {pestanaNegocio === 'page' && <VenueProfileForm venueId={currentVenue.id} />}
           </div>
         )}
 

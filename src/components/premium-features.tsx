@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Crown, Star, Bookmark, Users, RotateCcw, Rocket, Eye, Check } from 'lucide-react';
+import { Crown, Bookmark, Users, RotateCcw, Rocket, Eye, Check } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { PartyButton } from './ui-custom/party-button';
 import { PREMIUM_PRICES, usePremium } from '@/context/premium-context';
@@ -25,7 +25,6 @@ const FEATURES = [
   { icon: <RotateCcw size={20} />, key: 'secondChance' },
   { icon: <Rocket size={20} />, key: 'boost' },
   { icon: <Eye size={20} />, key: 'seeWhoLiked' },
-  { icon: <Star size={20} />, key: 'superLikes' },
 ] as const;
 
 /**

@@ -70,7 +70,7 @@ export async function GET(request: Request): Promise<Response> {
         jpeg: Boolean(ev.poster_url),
       })
     : pagina({
-        title: 'Fiestea · Las fiestas de Mallorca en tu móvil',
+        title: 'Fiestea · Vive la fiesta al 100%',
         description: 'Descubre qué hay esta noche, compra tu entrada y entra con el QR.',
         url: APP_URL,
         image: DEFAULT_IMAGE,

@@ -82,9 +82,28 @@ const EventSwipingPage = () => {
   } = useAppContext();
   const { supercrushBalance, supercrushIncluded, setShowSupercrushDialog, refreshSupercrush } =
     usePremium();
-  // Supercrush que puede mandar ahora: el incluido de Premium en esta fiesta
-  // más los comprados o regalados.
+  // Supercrush que puede mandar ahora: el de regalo de esta fiesta (uno por
+  // persona y fiesta, migración 109) más los comprados o regalados.
   const supercrushDisponibles = supercrushBalance + (supercrushIncluded ? 1 : 0);
+  // El aviso «tienes uno de regalo» sale encima del botón hasta que lo usa o
+  // lo cierra; cerrado, no vuelve en esa fiesta.
+  const avisoRegaloClave = `fiestea_supercrush_gift_${eventId}`;
+  const [avisoRegaloCerrado, setAvisoRegaloCerrado] = useState(() => {
+    try {
+      return localStorage.getItem(avisoRegaloClave) === '1';
+    } catch {
+      return false;
+    }
+  });
+  const cerrarAvisoRegalo = () => {
+    setAvisoRegaloCerrado(true);
+    try {
+      localStorage.setItem(avisoRegaloClave, '1');
+    } catch {
+      // Sin almacenamiento: vuelve a salir la próxima vez.
+    }
+  };
+  const verAvisoRegalo = supercrushIncluded && !avisoRegaloCerrado && Boolean(currentProfile);
 
   const [fallidas, setFallidas] = useState<{ items: FailedPhoto[]; total: number; kind: 'profile' | 'event' }>({
     items: [],
@@ -460,20 +479,42 @@ const EventSwipingPage = () => {
           >
             <RotateCcw size={21} />
           </button>
-          <button
-            type="button"
-            disabled={!currentProfile}
-            onClick={() =>
-              supercrushDisponibles > 0 ? tarjeta.current?.swipe('super') : setShowSupercrushDialog(true)
-            }
-            aria-label={t('supercrush.send', { count: supercrushDisponibles })}
-            className="press relative flex h-12 w-12 items-center justify-center rounded-full bg-card text-party-primary shadow-lg disabled:opacity-40"
-          >
-            <Star size={21} className="fill-party-primary" />
-            <span className="absolute -right-1 -top-1 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-party-primary px-1 text-[11px] font-bold text-ink">
-              {supercrushDisponibles > 0 ? supercrushDisponibles : '+'}
-            </span>
-          </button>
+          <div className="relative">
+            {verAvisoRegalo && (
+              <div
+                role="status"
+                className="absolute bottom-full left-1/2 z-10 mb-3 w-52 -translate-x-1/2 rounded-xl bg-party-primary px-3 py-2 text-ink shadow-lg animate-in fade-in slide-in-from-bottom-1"
+              >
+                <button
+                  type="button"
+                  onClick={cerrarAvisoRegalo}
+                  aria-label={t('common.close')}
+                  className="absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full"
+                >
+                  <X size={14} />
+                </button>
+                <p className="pr-5 text-caption font-bold leading-snug">{t('supercrush.giftTitle')}</p>
+                <p className="text-[11px] leading-snug text-ink/75">{t('supercrush.giftBody')}</p>
+                <span className="absolute left-1/2 top-full h-0 w-0 -translate-x-1/2 border-x-[7px] border-t-[7px] border-x-transparent border-t-party-primary" />
+              </div>
+            )}
+            <button
+              type="button"
+              disabled={!currentProfile}
+              onClick={() => {
+                if (verAvisoRegalo) cerrarAvisoRegalo();
+                if (supercrushDisponibles > 0) tarjeta.current?.swipe('super');
+                else setShowSupercrushDialog(true);
+              }}
+              aria-label={t('supercrush.send', { count: supercrushDisponibles })}
+              className="press relative flex h-12 w-12 items-center justify-center rounded-full bg-card text-party-primary shadow-lg disabled:opacity-40"
+            >
+              <Star size={21} className="fill-party-primary" />
+              <span className="absolute -right-1 -top-1 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-party-primary px-1 text-[11px] font-bold text-ink">
+                {supercrushDisponibles > 0 ? supercrushDisponibles : '+'}
+              </span>
+            </button>
+          </div>
           <button
             type="button"
             disabled={!currentProfile}
