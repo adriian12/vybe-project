@@ -1712,9 +1712,14 @@
         "liveSettings": {
             "title": "Party-Einstellungen",
             "hint": "Was du erlaubst und was das Publikum auf dieser Party sieht. Wird beim Tippen gespeichert.",
+            "entry": {
+                "title": "Zur Party",
+                "body": "Man kommt mit QR-Code, Code oder vor Ort rein. Aus: Die Seite zeigt nur „Ich gehe hin“ (und Tickets, falls es welche gibt), und Swipe ist aus."
+            },
             "swipe": {
                 "title": "Leute kennenlernen (Swipe)",
-                "body": "Wer drinnen ist, sieht das Board, swipt und hat Crushes. Aus: niemand sieht es."
+                "body": "Wer drinnen ist, sieht das Board, swipt und hat Crushes. Aus: niemand sieht es.",
+                "needsEntry": "Ohne „Zur Party“ erscheint niemand auf dem Board: Schalte es zuerst ein."
             },
             "headcount": {
                 "title": "Live-Zählung",
@@ -1728,7 +1733,8 @@
                 "title": "Fiestea-Liste",
                 "body": "Die Seite zeigt über den Tickets ein Formular zum Eintragen mit Name und Begleitung.",
                 "messagePlaceholder": "Nachricht (z. B. Gratis vor 00:30)"
-            }
+            },
+            "afterCreateFailed": "Die Party wurde erstellt, aber ihre Einstellungen wurden nicht gespeichert. Prüfe sie beim Bearbeiten."
         },
         "promoters": {
             "teamsTitle": "Promoter-Teams",
@@ -2107,9 +2113,8 @@
             }
         },
         "eventForm": {
-            "platformSwipeHelp": "Das ist eine Fiestea-Party: Vor Ort gibt es weder QR-Code noch Code. Mit Standort und Flechazo zeigt die Seite „Zur Party“ und man kommt rein, wenn man vor Ort ist (GPS wird geprüft); ohne nur „Ich gehe hin“.",
-            "settingsTitle": "Party-Einstellungen",
-            "settingsAfterCreate": "Swipe, Live-Zählung, Anteil Männer/Frauen und Fiestea-Liste stellst du nach dem Erstellen beim Bearbeiten ein."
+            "platformSwipeHelp": "Das ist eine Fiestea-Party: Vor Ort gibt es weder QR-Code noch Code. Mit Standort und „Zur Party“ zeigt die Seite „Zur Party“ und man kommt rein, wenn man vor Ort ist (GPS wird geprüft); ohne nur „Ich gehe hin“.",
+            "settingsTitle": "Party-Einstellungen"
         }
     },
     "pwa": {

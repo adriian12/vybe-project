@@ -40,7 +40,7 @@ import { useAppContext } from '@/context/app-context';
 import { isEventLive, useEventsFeed } from '@/hooks/use-events-feed';
 import { api } from '@/services/api';
 import { calculateDistance, Coordinates, formatDistance, getCurrentPosition } from '@/services/geo';
-import { franjaDe } from '@/lib/party-filters';
+import { franjaDe, sePuedeEntrar } from '@/lib/party-filters';
 import { openExternal } from '@/services/native';
 import { EMPTY_ACTIVITY, socialService } from '@/services/social';
 import { publicLink } from '@/lib/share';
@@ -599,11 +599,10 @@ const EventDetailPage = () => {
               <Undo2 size={20} />
               {t('home.goBack')}
             </button>
-          ) : live && (!event.byPlatform || (event.swipeEnabled && event.location)) ? (
+          ) : live && sePuedeEntrar(event) ? (
             // En directo lo que toca es entrar; decir que vas sigue en el
-            // marcador de arriba. Las fiestas de Fiestea no tienen QR ni código
-            // en la puerta: sólo se entra (por ubicación) si administración ha
-            // encendido el swipe; si no, se queda «Voy a ir» (migración 100).
+            // marcador de arriba. Si el negocio o administración han apagado
+            // «Entrar al evento», se queda «Voy a ir» (migración 111).
             <button
               type="button"
               onClick={() => navigate(`/event/${event.id}/access`)}

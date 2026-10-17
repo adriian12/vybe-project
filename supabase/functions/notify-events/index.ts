@@ -32,14 +32,19 @@ interface PendingPush {
   locale: string | null;
   /** Ambiente según el total de la puerta; null si el local no cuenta. */
   vibe_level: VibeLevel | null;
+  /** Si se entra con la app; sin entrada el aviso abre la ficha (111). */
+  entry_enabled: boolean;
 }
 
 /** Texto y destino de cada aviso, en el idioma de quien lo recibe. */
 const compose = (push: PendingPush): { title: string; body: string; url: string } => {
   const texts = pushTexts(push.locale);
 
+  // Sin «Entrar al evento» no hay pantalla de entrar: a la ficha.
+  const entrar = push.entry_enabled !== false ? `/event/${push.event_id}/access` : `/event/${push.event_id}`;
+
   if (push.kind === 'doors_open') {
-    return { ...texts.doorsOpen(push.event_name, push.venue_name), url: `/event/${push.event_id}/access` };
+    return { ...texts.doorsOpen(push.event_name, push.venue_name), url: entrar };
   }
 
   if (push.kind === 'likes_expiring') {
@@ -57,7 +62,9 @@ const compose = (push: PendingPush): { title: string; body: string; url: string 
   const texto = push.vibe_level
     ? texts.fillingUpVibe(push.event_name, push.vibe_level)
     : texts.fillingUp(push.event_name, Number(push.inside) || 0);
-  return { ...texto, url: `/event/${push.event_id}/access` };
+  // Sin entrada no hay código que escanear (lleno o casi lleno ya no lo dice).
+  const sinCodigo = push.entry_enabled === false && push.vibe_level !== 'full' && push.vibe_level !== 'almost_full';
+  return { ...texto, ...(sinCodigo ? { body: texts.goNow } : {}), url: entrar };
 };
 
 serve(async (req: Request): Promise<Response> => {
@@ -123,29 +130,33 @@ serve(async (req: Request): Promise<Response> => {
 
     // ------------------------------------------------------------- generales
     // Los programados esperan a su hora; los inmediatos salen en esta pasada.
-    const { data: broadcasts } = await supabase
-      .from('broadcasts')
-      .select('id, title, body, url')
-      .eq('status', 'pending')
-      .or(`scheduled_at.is.null,scheduled_at.lte.${new Date().toISOString()}`)
-      .order('created_at')
-      .limit(10);
+    // Se los queda esta pasada antes de enviar (`pending` → `sending`, 111): si
+    // la función muere a medias, la siguiente no los vuelve a mandar.
+    const { data: broadcasts, error: claimError } = await supabase.rpc('claim_broadcasts', { p_limit: 10 });
+    if (claimError) console.error('claim_broadcasts:', claimError);
 
-    for (const broadcast of broadcasts ?? []) {
+    for (const broadcast of (broadcasts ?? []) as { id: string; title: string; body: string; url: string | null }[]) {
       const { data: recipients } = await supabase.rpc('broadcast_recipients', {
         p_broadcast_id: broadcast.id,
       });
 
+      // De 20 en 20: una novedad de administración va a todo el mundo.
+      const lista = (recipients ?? []) as { profile_id: string }[];
       let sent = 0;
-      for (const recipient of (recipients ?? []) as { profile_id: string }[]) {
-        sent += await push({
-          profileId: recipient.profile_id,
-          kind: 'event',
-          title: broadcast.title,
-          body: broadcast.body,
-          url: broadcast.url ?? '/home',
-          tag: `broadcast-${broadcast.id}`,
-        });
+      for (let i = 0; i < lista.length; i += 20) {
+        const enviados = await Promise.all(
+          lista.slice(i, i + 20).map((recipient) =>
+            push({
+              profileId: recipient.profile_id,
+              kind: 'event',
+              title: broadcast.title,
+              body: broadcast.body,
+              url: broadcast.url ?? '/home',
+              tag: `broadcast-${broadcast.id}`,
+            }).catch(() => 0),
+          ),
+        );
+        sent += enviados.reduce((a, b) => a + b, 0);
       }
 
       broadcastPushes += sent;

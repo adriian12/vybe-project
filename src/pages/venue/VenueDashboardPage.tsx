@@ -949,7 +949,7 @@ const VenueDashboardPage = () => {
                 se abre desde el botón flotante. */}
             <aside className="hidden lg:col-span-5 lg:block">
               <div className="sticky top-40">
-                <CreateEventForm onCreated={() => void loadAllSummary()} />
+                <CreateEventForm withSettings={esPropietario} onCreated={() => void loadAllSummary()} />
               </div>
             </aside>
 
@@ -1298,6 +1298,7 @@ const VenueDashboardPage = () => {
             <DialogTitle>{t('venue.events.newEvent')}</DialogTitle>
           </DialogHeader>
           <CreateEventForm
+            withSettings={esPropietario}
             onClose={() => setCreating(false)}
             onCreated={() => {
               setCreating(false);

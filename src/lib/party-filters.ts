@@ -34,6 +34,14 @@ export const aplicarFiltros = <T extends { event: Pick<Event, 'startDate' | 'the
   );
 
 /**
+ * Si la fiesta deja entrar con la app (QR, código o ubicación). Apagado por el
+ * negocio o administración (111), sólo «Voy a ir». Las de Fiestea, además,
+ * con ubicación: no tienen QR ni código, se entra estando en el sitio.
+ */
+export const sePuedeEntrar = (event: Pick<Event, 'entryEnabled' | 'byPlatform' | 'location'>): boolean =>
+  event.entryEnabled !== false && (!event.byPlatform || Boolean(event.location));
+
+/**
  * «Con Flechazo»: en directo ahora y con el Flechazo (tablón) encendido. En
  * las fiestas de Fiestea, además, con ubicación: es como se entra en ellas.
  */

@@ -8,7 +8,13 @@ import { useAppContext } from '@/context/app-context';
 import { useToast } from '@/components/ui/use-toast';
 import { api } from '@/services/api';
 import { venueService } from '@/services/venue-service';
-import { eventSettingsService } from '@/services/event-settings';
+import {
+  DEFAULT_LIVE_SETTINGS,
+  differsFromDefault,
+  EventLiveSettings as Ajustes,
+  eventSettingsService,
+} from '@/services/event-settings';
+import EventLiveSettings from '@/components/venue/event-live-settings';
 import { ticketsService } from '@/services/tickets';
 import LocationPicker, { PickedLocation } from '@/components/venue/location-picker';
 import { track } from '@/lib/observability';
@@ -47,6 +53,11 @@ interface CreateEventFormProps {
    * todos los sábados.
    */
   template?: Event;
+  /**
+   * Al crear, los ajustes de la fiesta (entrar al evento, swipe, recuento…).
+   * Sólo el propietario: la base de datos rechaza a los demás.
+   */
+  withSettings?: boolean;
 }
 
 /** La misma fecha de la semana que viene, en formato de campo. */
@@ -129,7 +140,7 @@ const copiarConfiguracion = async (origen: Event, destinoId: string, nuevoInicio
   return ok;
 };
 
-const CreateEventForm: React.FC<CreateEventFormProps> = ({ onCreated, onClose, event, template }) => {
+const CreateEventForm: React.FC<CreateEventFormProps> = ({ onCreated, onClose, event, template, withSettings }) => {
   const { t } = useTranslation();
   const { currentVenue, createEvent, refreshEvents } = useAppContext();
   const { toast } = useToast();
@@ -137,6 +148,9 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onCreated, onClose, e
   // Al editar y al repetir se parte de los mismos datos; sólo cambia si se
   // guarda sobre el evento o se crea otro.
   const base = event ?? template;
+  // Al editar están debajo del formulario; al repetir se copian del original.
+  const conAjustes = Boolean(withSettings) && !event && !template;
+  const [ajustes, setAjustes] = useState<Ajustes>(DEFAULT_LIVE_SETTINGS);
 
   const [isLoading, setIsLoading] = useState(false);
   const repitiendo = Boolean(template && !event);
@@ -288,7 +302,12 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onCreated, onClose, e
         if (template) {
           const copiado = await copiarConfiguracion(template, newEvent.id, inicio);
           if (!copiado) toast({ title: t('venue.events.repeatPartial'), variant: 'destructive' });
+        } else if (conAjustes && differsFromDefault(ajustes)) {
+          await eventSettingsService
+            .save(newEvent.id, ajustes)
+            .catch(() => toast({ title: t('venue.liveSettings.afterCreateFailed'), variant: 'destructive' }));
         }
+        setAjustes(DEFAULT_LIVE_SETTINGS);
         track('venue_event_created', { eventId: newEvent.id, recurrence });
         reset();
         setRecurrence('none');
@@ -558,6 +577,8 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onCreated, onClose, e
           </label>
           <input id="ev-booking" type="url" {...register('bookingUrl')} className={campo} placeholder="https://…" />
         </div>
+
+        {conAjustes && <EventLiveSettings value={ajustes} onChange={setAjustes} className="border border-black/[0.08]" />}
 
         {/* Invertido: sobre el amarillo, un botón amarillo no se vería. */}
         <button

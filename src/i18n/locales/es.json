@@ -1712,9 +1712,14 @@
         "liveSettings": {
             "title": "Ajustes de la fiesta",
             "hint": "Lo que permites y lo que ve el público en esta fiesta. Se guarda al tocarlo.",
+            "entry": {
+                "title": "Entrar al evento",
+                "body": "La gente entra con el QR, el código o estando en el sitio. Apagado, la ficha sólo enseña «Voy a ir» (y las entradas, si hay) y el swipe se apaga."
+            },
             "swipe": {
                 "title": "Conocer gente (swipe)",
-                "body": "Quien entra puede ver el tablón, deslizar y hacer crush. Apagado, nadie lo ve."
+                "body": "Quien entra puede ver el tablón, deslizar y hacer crush. Apagado, nadie lo ve.",
+                "needsEntry": "Sin «Entrar al evento» nadie aparece en el tablón: enciéndelo primero."
             },
             "headcount": {
                 "title": "Recuento en directo",
@@ -1728,7 +1733,8 @@
                 "title": "Lista Fiestea",
                 "body": "La ficha enseña, encima de las entradas, un formulario para apuntarse con nombre y acompañantes.",
                 "messagePlaceholder": "Mensaje (ej.: Gratis antes de las 00:30)"
-            }
+            },
+            "afterCreateFailed": "La fiesta se ha creado, pero sus ajustes no se han guardado. Revísalos al editarla."
         },
         "promoters": {
             "teamsTitle": "Equipos de RRPP",
@@ -2107,9 +2113,8 @@
             }
         },
         "eventForm": {
-            "platformSwipeHelp": "Es una fiesta de Fiestea: allí no hay QR ni código. Con ubicación y el Flechazo encendido, la ficha enseña «Entrar al evento» y se entra estando en el sitio (se comprueba el GPS); apagado, sólo «Voy a ir».",
-            "settingsTitle": "Ajustes de la fiesta",
-            "settingsAfterCreate": "Swipe, recuento en directo, % de hombres y mujeres y Lista Fiestea se ajustan al editar la fiesta, una vez creada."
+            "platformSwipeHelp": "Es una fiesta de Fiestea: allí no hay QR ni código. Con ubicación y «Entrar al evento» encendido, la ficha enseña «Entrar al evento» y se entra estando en el sitio (se comprueba el GPS); apagado, sólo «Voy a ir».",
+            "settingsTitle": "Ajustes de la fiesta"
         }
     },
     "pwa": {

@@ -93,6 +93,8 @@ export interface Event {
   featuredUntil?: string;
   /** `false`: se entra sin comprobar la ubicación (la sala de pruebas). */
   requiresLocation?: boolean;
+  /** Si se puede entrar (QR, código o ubicación); apagado, sólo «Voy a ir» (111). */
+  entryEnabled?: boolean;
   /** El negocio deja conocer gente dentro (tablón y swipe). Por defecto, sí. */
   swipeEnabled?: boolean;
   /** El público ve cuánta gente hay dentro, en directo. */

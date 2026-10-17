@@ -23,6 +23,8 @@ interface Texts {
   fillingUp: (event: string, inside: number) => { title: string; body: string };
   /** Por el ambiente que da el local: nunca su cifra. */
   fillingUpVibe: (event: string, level: VibeLevel) => { title: string; body: string };
+  /** «Se está llenando» de una fiesta en la que no se entra con la app (111). */
+  goNow: string;
   endingSoon: (event: string, vybes: number) => { title: string; body: string };
   /** Una hora antes del final: los me gusta sin responder caducan con la fiesta (098). */
   likesExpiring: (event: string, likes: number) => { title: string; body: string };
@@ -69,6 +71,7 @@ const TEXTS: Record<Locale, Texts> = {
           ? 'Si vas a ir, date prisa: queda poco sitio.'
           : '¿Te lo vas a perder? Acércate y escanea el código para entrar.',
     }),
+    goNow: '¿Te lo vas a perder? Todavía estás a tiempo de ir.',
     endingSoon: (event, vybes) => ({
       title: `${event} termina en 30 minutos`,
       body:
@@ -144,6 +147,7 @@ const TEXTS: Record<Locale, Texts> = {
           ? "If you're going, hurry: there's not much room left."
           : 'Going to miss it? Head over and scan the code to get in.',
     }),
+    goNow: "Going to miss it? There's still time to go.",
     endingSoon: (event, vybes) => ({
       title: `${event} ends in 30 minutes`,
       body:
@@ -217,6 +221,7 @@ const TEXTS: Record<Locale, Texts> = {
           ? 'Wenn du hinwillst, beeil dich: Es ist kaum noch Platz.'
           : 'Willst du das verpassen? Komm vorbei und scanne den Code.',
     }),
+    goNow: 'Willst du das verpassen? Du kannst noch hingehen.',
     endingSoon: (event, vybes) => ({
       title: `${event} endet in 30 Minuten`,
       body:
@@ -292,6 +297,7 @@ const TEXTS: Record<Locale, Texts> = {
           ? "Si hi vas, afanya-t'hi: queda poc lloc."
           : "T'ho perdràs? Acosta't i escaneja el codi per entrar.",
     }),
+    goNow: "T'ho perdràs? Encara hi ets a temps.",
     endingSoon: (event, vybes) => ({
       title: `${event} acaba d'aquí a 30 minuts`,
       body:

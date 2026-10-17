@@ -1712,9 +1712,14 @@
         "liveSettings": {
             "title": "Party settings",
             "hint": "What you allow and what the public sees at this party. Saved as you tap.",
+            "entry": {
+                "title": "Enter the party",
+                "body": "People get in with the QR, the code or by being there. Off, the page only shows “I’m going” (and tickets, if any) and swipe turns off."
+            },
             "swipe": {
                 "title": "Meet people (swipe)",
-                "body": "People inside can see the board, swipe and crush. Off, nobody sees it."
+                "body": "People inside can see the board, swipe and crush. Off, nobody sees it.",
+                "needsEntry": "Without “Enter the party” nobody shows up on the board: turn it on first."
             },
             "headcount": {
                 "title": "Live headcount",
@@ -1728,7 +1733,8 @@
                 "title": "Fiestea list",
                 "body": "The page shows, above the tickets, a form to sign up with a name and guests.",
                 "messagePlaceholder": "Message (e.g. Free before 00:30)"
-            }
+            },
+            "afterCreateFailed": "The party was created, but its settings weren’t saved. Check them when you edit it."
         },
         "promoters": {
             "teamsTitle": "Promoter teams",
@@ -2107,9 +2113,8 @@
             }
         },
         "eventForm": {
-            "platformSwipeHelp": "This is a Fiestea party: there is no QR or code at the door. With a location and Flechazo on, the page shows “Enter the party” and people get in by being there (GPS is checked); with it off, only “I’m going”.",
-            "settingsTitle": "Party settings",
-            "settingsAfterCreate": "Swipe, live headcount, men/women split and Fiestea list are set by editing the party once it is created."
+            "platformSwipeHelp": "This is a Fiestea party: there is no QR or code at the door. With a location and “Enter the party” on, the page shows “Enter the party” and people get in by being there (GPS is checked); with it off, only “I’m going”.",
+            "settingsTitle": "Party settings"
         }
     },
     "pwa": {

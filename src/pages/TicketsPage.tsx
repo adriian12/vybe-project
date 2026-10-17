@@ -29,6 +29,7 @@ import { useAppContext } from '@/context/app-context';
 import { isEventLive, useEventsFeed } from '@/hooks/use-events-feed';
 import { api } from '@/services/api';
 import { ClaimedOffer, EventHistoryItem, EventOffer, socialService } from '@/services/social';
+import { sePuedeEntrar } from '@/lib/party-filters';
 import { publicLink } from '@/lib/share';
 import { useShareSheet } from '@/components/share-sheet';
 import { cn } from '@/lib/utils';
@@ -376,7 +377,7 @@ const TicketsPage = () => {
 
                         <div className="mt-auto flex items-center justify-between gap-2 border-t border-black/[0.08] pt-2">
                           <span className="text-caption text-ink/60">{t('tickets.youreGoing')}</span>
-                          {directo && (!event.byPlatform || (event.swipeEnabled && event.location)) ? (
+                          {directo && sePuedeEntrar(event) ? (
                             <button
                               type="button"
                               onClick={(e) => {

@@ -1136,6 +1136,7 @@ export type Database = {
           sponsor_url: string | null
           stamps_enabled: boolean
           start_date: string
+          entry_enabled: boolean
           swipe_enabled: boolean
           test_lab: boolean
           theme: string | null
@@ -1188,6 +1189,7 @@ export type Database = {
           sponsor_url?: string | null
           stamps_enabled?: boolean
           start_date: string
+          entry_enabled?: boolean
           swipe_enabled?: boolean
           test_lab?: boolean
           theme?: string | null
@@ -1240,6 +1242,7 @@ export type Database = {
           sponsor_url?: string | null
           stamps_enabled?: boolean
           start_date?: string
+          entry_enabled?: boolean
           swipe_enabled?: boolean
           test_lab?: boolean
           theme?: string | null
@@ -5709,6 +5712,7 @@ export type Database = {
       set_event_live_settings: {
         Args: {
           p_event_id: string
+          p_entry?: boolean
           p_gender: boolean
           p_headcount: boolean
           p_swipe: boolean

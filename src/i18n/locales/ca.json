@@ -1712,9 +1712,14 @@
         "liveSettings": {
             "title": "Ajustos de la festa",
             "hint": "El que permets i el que veu el públic en aquesta festa. Es desa en tocar-ho.",
+            "entry": {
+                "title": "Entrar a l'esdeveniment",
+                "body": "La gent entra amb el QR, el codi o sent-hi. Apagat, la fitxa només mostra «Hi aniré» (i les entrades, si n'hi ha) i el swipe s'apaga."
+            },
             "swipe": {
                 "title": "Conèixer gent (swipe)",
-                "body": "Qui entra pot veure el tauler, lliscar i fer crush. Apagat, ningú no el veu."
+                "body": "Qui entra pot veure el tauler, lliscar i fer crush. Apagat, ningú no el veu.",
+                "needsEntry": "Sense «Entrar a l'esdeveniment» ningú no surt al tauler: encén-lo primer."
             },
             "headcount": {
                 "title": "Recompte en directe",
@@ -1728,7 +1733,8 @@
                 "title": "Llista Fiestea",
                 "body": "La fitxa mostra, damunt de les entrades, un formulari per apuntar-se amb nom i acompanyants.",
                 "messagePlaceholder": "Missatge (ex.: Gratis abans de les 00:30)"
-            }
+            },
+            "afterCreateFailed": "La festa s'ha creat, però els seus ajustos no s'han desat. Revisa'ls quan l'editis."
         },
         "promoters": {
             "teamsTitle": "Equips de RRPP",
@@ -2107,9 +2113,8 @@
             }
         },
         "eventForm": {
-            "platformSwipeHelp": "És una festa de Fiestea: allà no hi ha QR ni codi. Amb ubicació i el Flechazo encès, la fitxa mostra «Entrar a l'esdeveniment» i s'entra sent-hi (es comprova el GPS); apagat, només «Hi aniré».",
-            "settingsTitle": "Ajustos de la festa",
-            "settingsAfterCreate": "El swipe, el recompte en directe, el % d’homes i dones i la Llista Fiestea s’ajusten editant la festa un cop creada."
+            "platformSwipeHelp": "És una festa de Fiestea: allà no hi ha QR ni codi. Amb ubicació i «Entrar a l'esdeveniment» encès, la fitxa mostra «Entrar a l'esdeveniment» i s'entra sent-hi (es comprova el GPS); apagat, només «Hi aniré».",
+            "settingsTitle": "Ajustos de la festa"
         }
     },
     "pwa": {

@@ -14,6 +14,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { adminService, AdminEventInput, AdminVenue } from '@/services/admin';
 import LocationPicker, { PickedLocation } from '@/components/venue/location-picker';
 import EventLiveSettings from '@/components/venue/event-live-settings';
+import { DEFAULT_LIVE_SETTINGS, EventLiveSettings as Ajustes, eventSettingsService } from '@/services/event-settings';
 import { Event } from '@/types/venue';
 
 const HOUSE = 'house';
@@ -74,6 +75,8 @@ const AdminEventForm = ({
   );
   const deLaCasa = editando ? Boolean(event?.byPlatform) : venueId === HOUSE;
   const [enviando, setEnviando] = useState(false);
+  // Al crear: entrada, swipe, recuento… se guardan en cuanto existe la fiesta.
+  const [ajustes, setAjustes] = useState<Ajustes>(DEFAULT_LIVE_SETTINGS);
 
   useEffect(() => {
     if (!editando) void adminService.listVenues().then(setVenues).catch(() => undefined);
@@ -116,7 +119,14 @@ const AdminEventForm = ({
         // Se crea y se completa con lo que la creación no admite (sala,
         // dirección, cartel, entradas…).
         const id = await adminService.createEvent(datos);
-        if (id) await adminService.updateEvent(id, datos);
+        if (id) {
+          await adminService.updateEvent(id, datos);
+          // Siempre: las de Fiestea nacen con entrada y swipe según la ubicación.
+          await eventSettingsService.save(id, ajustes).catch(() =>
+            toast({ title: t('venue.liveSettings.afterCreateFailed'), variant: 'destructive' }),
+          );
+        }
+        setAjustes(DEFAULT_LIVE_SETTINGS);
         setName('');
         setCity('');
         setPrice('');
@@ -288,16 +298,17 @@ const AdminEventForm = ({
         />
       </div>
 
-      {/* Swipe, recuento, % de hombres y mujeres y Lista Fiestea: los mismos
-          interruptores que el panel del negocio; se guardan al tocarlos. */}
-      {editando && event ? (
-        <div className="space-y-2">
-          {deLaCasa && <p className="text-caption text-ink/60">{t('admin.eventForm.platformSwipeHelp')}</p>}
+      {/* Entrar al evento, swipe, recuento, % de hombres y mujeres y Lista
+          Fiestea: los mismos interruptores que el panel del negocio. Al editar
+          se guardan al tocarlos; al crear, con la fiesta. */}
+      <div className="space-y-2">
+        {deLaCasa && <p className="text-caption text-ink/60">{t('admin.eventForm.platformSwipeHelp')}</p>}
+        {editando && event ? (
           <EventLiveSettings eventId={event.id} className="border border-black/10" />
-        </div>
-      ) : (
-        <p className="text-caption text-ink/60">{t('admin.eventForm.settingsAfterCreate')}</p>
-      )}
+        ) : (
+          <EventLiveSettings value={ajustes} onChange={setAjustes} className="border border-black/10" />
+        )}
+      </div>
 
       <PartyButton
         className={bare ? 'w-full gap-2' : 'w-full gap-2 sm:w-auto'}

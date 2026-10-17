@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ClipboardList, Heart, Loader2, Percent, Settings2, Users } from 'lucide-react';
+import { ClipboardList, DoorOpen, Heart, Loader2, Percent, Settings2, Users } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/components/ui/use-toast';
@@ -12,15 +12,26 @@ import { cn } from '@/lib/utils';
  * «Ajustes de la fiesta»: lo que el negocio permite y enseña en esta fiesta.
  * Cada interruptor se guarda al tocarlo. Sólo lo ve el propietario (la base de
  * datos rechaza a los demás).
+ *
+ * Sin `eventId` (al crear la fiesta) es un borrador: `value` y `onChange`, y
+ * quien crea la fiesta lo guarda después.
+ *
+ * Sin entrada no hay swipe: al apagarla se apaga y no se puede encender.
  */
-const EventLiveSettings = ({ eventId, className }: { eventId: string; className?: string }) => {
+type Props =
+  | { eventId: string; value?: never; onChange?: never; className?: string }
+  | { eventId?: never; value: Ajustes; onChange: (value: Ajustes) => void; className?: string };
+
+const EventLiveSettings = ({ eventId, value, onChange, className }: Props) => {
   const { t } = useTranslation();
   const { toast } = useToast();
-  const [ajustes, setAjustes] = useState<Ajustes | null>(null);
+  const [guardados, setAjustes] = useState<Ajustes | null>(null);
+  const ajustes = eventId ? guardados : value;
   const [guardando, setGuardando] = useState<keyof Ajustes | null>(null);
   const [mensaje, setMensaje] = useState('');
 
   useEffect(() => {
+    if (!eventId) return;
     let vivo = true;
     void eventSettingsService.get(eventId).then((a) => {
       if (!vivo || !a) return;
@@ -40,7 +51,12 @@ const EventLiveSettings = ({ eventId, className }: { eventId: string; className?
     );
   }
 
-  const guardar = async (campo: keyof Ajustes, nuevo: Ajustes) => {
+  const guardar = async (campo: keyof Ajustes, cambio: Ajustes) => {
+    const nuevo = { ...cambio, swipe: cambio.entry && cambio.swipe };
+    if (!eventId) {
+      onChange?.(nuevo);
+      return;
+    }
     const antes = ajustes;
     setAjustes(nuevo);
     setGuardando(campo);
@@ -58,7 +74,8 @@ const EventLiveSettings = ({ eventId, className }: { eventId: string; className?
     }
   };
 
-  const filas: { campo: 'swipe' | 'headcount' | 'genderSplit' | 'guestList'; icon: typeof Heart }[] = [
+  const filas: { campo: 'entry' | 'swipe' | 'headcount' | 'genderSplit' | 'guestList'; icon: typeof Heart }[] = [
+    { campo: 'entry', icon: DoorOpen },
     { campo: 'swipe', icon: Heart },
     { campo: 'headcount', icon: Users },
     { campo: 'genderSplit', icon: Percent },
@@ -81,14 +98,18 @@ const EventLiveSettings = ({ eventId, className }: { eventId: string; className?
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block text-body-sm font-bold">{t(`venue.liveSettings.${campo}.title`)}</span>
-                <span className="block text-caption text-party-gray">{t(`venue.liveSettings.${campo}.body`)}</span>
+                <span className="block text-caption text-party-gray">
+                  {campo === 'swipe' && !ajustes.entry
+                    ? t('venue.liveSettings.swipe.needsEntry')
+                    : t(`venue.liveSettings.${campo}.body`)}
+                </span>
               </span>
               {guardando === campo ? (
                 <Loader2 size={18} className="mt-1 animate-spin text-party-gray" />
               ) : (
                 <Switch
                   checked={ajustes[campo]}
-                  disabled={guardando !== null}
+                  disabled={guardando !== null || (campo === 'swipe' && !ajustes.entry)}
                   onCheckedChange={(v) => void guardar(campo, { ...ajustes, [campo]: v, guestListMessage: mensaje || null })}
                 />
               )}

@@ -105,6 +105,20 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
   - **Dónde:** en la sección «Ajustes» del panel (entre Equipo y Plan, con
     las pestañas por evento de Puerta) y al editar un evento; sólo el
     propietario (`set_event_live_settings`). Antes estaban en Puerta.
+    También al crear la fiesta (panel y administración): el bloque va en
+    modo borrador (`value`/`onChange`) y se guarda en cuanto existe.
+  - **Entrar al evento** (`events.entry_enabled`, migración 111, encendido
+    por defecto). Apagado, la ficha sólo enseña «Voy a ir» (y las entradas)
+    aunque esté en directo (`sePuedeEntrar` en `party-filters.ts`); el
+    disparador `event_attendance_needs_entry` rechaza entrar con código, QR
+    o ubicación (`ENTRY_DISABLED`). Los avisos «ha empezado» y «se está
+    llenando» siguen llegando a quien dijo «voy a ir», pero abren la ficha y
+    no hablan de escanear (`pending_event_pushes.entry_enabled`, `goNow`).
+    **Sin entrada no hay swipe:** `events_swipe_needs_entry` lo apaga y en la
+    pantalla queda bloqueado. En las de Fiestea, entrada y swipe nacen según
+    tengan ubicación (`platform_events_swipe_off`) y administración puede
+    encender o apagar cualquier ajuste; allí se entra por ubicación, así que
+    sin ella la ficha no enseña «Entrar».
   - **Swipe** (`events.swipe_enabled`, encendido por defecto). Apagado:
     - `get_nearby_profiles` devuelve vacío;
     - el disparador `a_check_event_swipe_enabled` rechaza los swipes

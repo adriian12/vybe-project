@@ -189,7 +189,7 @@ export interface Broadcast {
   id: string;
   title: string;
   body: string;
-  status: 'pending' | 'sent' | 'failed' | 'cancelled';
+  status: 'pending' | 'sending' | 'sent' | 'failed' | 'cancelled';
   /** Cuántos avisos salieron de verdad. Nulo mientras está en cola. */
   recipients: number | null;
   createdAt: string;

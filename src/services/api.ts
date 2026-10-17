@@ -155,6 +155,7 @@ const dbEventToEvent = (dbEvent: EventRow, venue?: Partial<VenueRow>): Event => 
   maxCapacity: dbEvent.max_capacity ?? undefined,
   featuredUntil: dbEvent.featured_until ?? undefined,
   requiresLocation: dbEvent.requires_location ?? true,
+  entryEnabled: dbEvent.entry_enabled ?? true,
   swipeEnabled: dbEvent.swipe_enabled ?? true,
   showHeadcount: dbEvent.show_headcount ?? false,
   showGenderSplit: dbEvent.show_gender_split ?? false,
@@ -257,6 +258,7 @@ const REDEEM_ERRORS: Record<string, string> = {
   LOCATION_MOCKED: 'Tu móvil está usando una ubicación simulada. Desactívala para entrar.',
   TOO_MANY_ATTEMPTS: 'Demasiados intentos seguidos. Espera unos minutos y vuelve a probar.',
   EXPELLED: 'El negocio te ha retirado el acceso a esta fiesta.',
+  ENTRY_DISABLED: 'En esta fiesta no se entra con la app: sólo puedes marcar «Voy a ir».',
 };
 
 /** Precisión y si es simulada: el servidor las comprueba al entrar (migración 101). */

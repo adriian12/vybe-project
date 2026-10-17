@@ -77,6 +77,11 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
     Se usa desde la papelera del chat y deslizando a la izquierda en Crushes.
   - **Avisos del local:** los que no llevan hora salen al momento (disparador
     `broadcasts_send_now`) y el programador pasa cada minuto.
+  - **Sin repetir (111):** cada pasada se queda los avisos antes de enviarlos
+    (`claim_broadcasts`, `pending` → `sending`) y manda de 20 en 20, sólo a
+    quien tiene dispositivo. Antes una novedad de administración a todo el
+    mundo no acababa en los 5 s de `pg_net`, no se marcaba y se repetía en
+    cada pasada. Ahora el programador espera hasta 2 min.
 - **Modo de acceso a una fiesta** (migraciones 055 y 056). Al entrar se elige:
   **Vyber** (foto del momento, sale en el tablón y desliza) o **Invitado**
   (sin foto; ve ofertas, sorteos y avisos del local, pero ni ve el tablón ni
