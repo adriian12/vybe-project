@@ -13,8 +13,13 @@
 # En Codemagic, la variable segura APP_STORE_CONNECT_PRIVATE_KEY (grupo
 # «appstore») lleva el contenido del .p8. Los identificadores van aquí.
 #
-# La ficha «Fiestea» de App Store Connect (id 6815824600) usa el
-# identificador es.fiestea.app, con push y dominios asociados activados.
+# En iOS el identificador es es.fiestea.ios (en Android sigue es.fiestea.app):
+# es.fiestea.app quedó anclado para siempre en otra cuenta al borrar allí la
+# app. Necesita push, dominios asociados, Sign in with Apple y compras.
+#
+# PENDIENTE al activar la cuenta de Apple nueva: APP_STORE_APPLE_ID (el id de la
+# ficha nueva) y la clave de App Store Connect (issuer, key id y .p8), que
+# todavía son de la cuenta anterior.
 #
 # Las variables VITE_ de abajo son públicas (viajan en el propio bundle que
 # sirve app.fiestea.es), así que van aquí y no hace falta grupo de variables.
@@ -41,7 +46,7 @@ workflows:
         - appstore
       vars:
         <<: *env_vite
-        BUNDLE_ID: 'es.fiestea.app'
+        BUNDLE_ID: 'es.fiestea.ios'
         APP_STORE_APPLE_ID: '6815824600'
         XCODE_SCHEME: 'App'
         # Firma con la clave de App Store Connect por variables de entorno. El

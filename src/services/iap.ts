@@ -30,12 +30,16 @@ import { ApiError, functionErrorCode } from '@/services/api';
 export type StorePlan = 'monthly' | 'event' | 'supercrush';
 export type Store = 'apple' | 'google';
 
-const BUNDLE = 'es.fiestea.app';
-/** Los mismos identificadores en App Store Connect y en Play Console. */
+/**
+ * Los mismos identificadores en App Store Connect y en Play Console. El prefijo
+ * es el de Android; la app de iOS es `es.fiestea.ios`, pero sus productos se
+ * llaman igual (`PRODUCT_PREFIX` en `_shared/apple-jws.ts`).
+ */
+const PREFIJO = 'es.fiestea.app';
 export const STORE_PRODUCTS: Record<StorePlan, string> = {
-  monthly: `${BUNDLE}.premium.monthly`,
-  event: `${BUNDLE}.premium.event`,
-  supercrush: `${BUNDLE}.supercrush`,
+  monthly: `${PREFIJO}.premium.monthly`,
+  event: `${PREFIJO}.premium.event`,
+  supercrush: `${PREFIJO}.supercrush`,
 };
 /** Plan base de la suscripción en Play Console. */
 const GOOGLE_BASE_PLAN = 'monthly';

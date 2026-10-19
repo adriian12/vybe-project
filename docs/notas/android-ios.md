@@ -44,3 +44,12 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
   `SceneDelegate`) y ya enlaza `App.entitlements` (Associated Domains y push):
   el App ID de Apple necesita esas dos capacidades. En Windows `cap sync` no
   ejecuta `pod install`: hazlo en el Mac antes de abrir Xcode.
+- **Identificador de iOS: `es.fiestea.ios`** (Android sigue `es.fiestea.app`).
+  `es.fiestea.app` quedó anclado para siempre en la cuenta de Apple anterior
+  al borrar allí la app sin publicar. Los productos de compra siguen llamándose
+  `es.fiestea.app.*`. **Pendiente al activar la cuenta nueva:** el Team ID en
+  `public/.well-known/apple-app-site-association` (aún `XQ5WB5Y646`, el de la
+  cuenta antigua), `APP_STORE_APPLE_ID` y la clave de App Store Connect en
+  `codemagic.yaml`, el Client ID `es.fiestea.ios` en el proveedor Apple de
+  Supabase, el bundle ID del cliente OAuth de iOS en Google Cloud y la app de
+  iOS en Firebase (clave APNs y `GoogleService-Info.plist`).

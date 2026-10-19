@@ -37,7 +37,7 @@ export const grantAppleTransaction = async (
   if (!ALLOW_SANDBOX && tx.environment && tx.environment !== 'Production') {
     return { ok: false, error: 'SANDBOX_TRANSACTION' };
   }
-  const kind = productKind(tx.bundleId, tx.productId);
+  const kind = productKind(tx.productId);
   if (!kind) return { ok: false, error: 'UNKNOWN_PRODUCT' };
 
   // La compra va atada a la cuenta con `appAccountToken` (el id del perfil).

@@ -59,7 +59,7 @@ serve(async (req: Request): Promise<Response> => {
       ? await verifyAppleJws<AppleRenewalInfo>(datos.signedRenewalInfo)
       : null;
     const original = tx?.originalTransactionId ?? renovacion?.originalTransactionId;
-    const kind = tx ? productKind(tx.bundleId, tx.productId) : null;
+    const kind = tx ? productKind(tx.productId) : null;
     console.log('apple-notifications', tipo, aviso.subtype ?? '', kind ?? '', tx?.environment ?? '');
 
     switch (tipo) {

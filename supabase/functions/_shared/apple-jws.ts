@@ -84,17 +84,24 @@ export interface AppleRenewalInfo {
 }
 
 /** Identificadores de la app en las tiendas (las dos marcas usan el mismo backend). */
-export const APPLE_BUNDLE_IDS = (Deno.env.get('APPLE_BUNDLE_IDS') ?? 'es.fiestea.app')
+export const APPLE_BUNDLE_IDS = (Deno.env.get('APPLE_BUNDLE_IDS') ?? 'es.fiestea.ios')
   .split(',')
   .map((s) => s.trim())
   .filter(Boolean);
 
 export type AppleProduct = 'monthly' | 'event' | 'supercrush';
 
+/**
+ * Prefijo de los productos: el mismo en App Store Connect y en Play Console
+ * (`src/services/iap.ts`). No es el identificador de la app de iOS
+ * (`es.fiestea.ios`): en Apple un producto puede llamarse como quiera.
+ */
+export const PRODUCT_PREFIX = 'es.fiestea.app';
+
 /** `es.fiestea.app.premium.monthly` → `monthly`. */
-export const productKind = (bundleId: string, productId: string): AppleProduct | null => {
-  if (!productId.startsWith(`${bundleId}.`)) return null;
-  const sufijo = productId.slice(bundleId.length + 1);
+export const productKind = (productId: string): AppleProduct | null => {
+  if (!productId.startsWith(`${PRODUCT_PREFIX}.`)) return null;
+  const sufijo = productId.slice(PRODUCT_PREFIX.length + 1);
   if (sufijo === 'premium.monthly') return 'monthly';
   if (sufijo === 'premium.event') return 'event';
   if (sufijo === 'supercrush') return 'supercrush';

@@ -20,7 +20,7 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
   `--party-gray`…) y los controles de dentro se adaptan solos. `party.gray` es
   una variable por eso.
 - **La marca es «Fiestea»** (`fiestea.es`, `app.fiestea.es`): app, nombre en
-  Android/iOS, paquete de las tiendas (`es.fiestea.app`), manifiesto, landing,
+  Android/iOS, paquete de las tiendas (`es.fiestea.app` en Android, `es.fiestea.ios` en iOS), manifiesto, landing,
   correos, avisos push y APK (`Fiestea.apk`). La interfaz dice «fiester@»,
   «crush» y «negocio». **«Vybe», «Vybes» y «vyber» no salen en nada que vea
   alguien fuera del código**: textos, correos, tiendas, consolas (Google,

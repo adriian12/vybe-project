@@ -36,7 +36,8 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
   con `onboarding@resend.dev` sólo llega al dueño de la cuenta de Resend.
 - **«Continuar con Google»** (sólo en la app instalada, `social-auth.ts`).
   - **Clientes OAuth:** están en el proyecto de Google Cloud `563350138901`:
-    uno web, uno de iOS (`es.fiestea.app`) y uno de Android (`es.fiestea.app`,
+    uno web, uno de iOS (`es.fiestea.ios`: hay que cambiarle el bundle ID en
+    Google Cloud, que tenía `es.fiestea.app`) y uno de Android (`es.fiestea.app`,
     SHA-1 de la clave de depuración).
   - **Supabase:** el proveedor Google tiene como `client_id` «web,iOS»,
     porque los tokens de Android llevan como audiencia el ID web. El secreto

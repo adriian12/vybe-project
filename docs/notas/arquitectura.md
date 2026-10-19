@@ -4,8 +4,8 @@
 
 - React 18, **Vite** (PWA con service worker), shadcn/Radix, Tailwind
 - **Capacitor 8**: la misma web empaquetada para Android e iOS (`android/`, `ios/`).
-  La app es `es.fiestea.app` en las dos tiendas (`appId` interno de Capacitor:
-  `com.vybe.app`). Android 16 (API 36, mínimo API 24), iOS 15.
+  La app es `es.fiestea.app` en Android y `es.fiestea.ios` en iOS (`appId`
+  interno de Capacitor: `com.vybe.app`; cuenta el de cada proyecto nativo). Android 16 (API 36, mínimo API 24), iOS 15.
 - i18next: ES / EN / DE / CA
 - **Supabase** (Auth + PostgreSQL con RLS + Realtime + Storage + Edge Functions)
 - React Query, RHF+Zod, qrcode.react, html5-qrcode, Sentry, Vitest

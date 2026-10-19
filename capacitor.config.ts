@@ -8,7 +8,9 @@ import type { CapacitorConfig } from '@capacitor/cli';
  * arregla en las tres.
  *
  * `appId` es el identificador con el que la aplicación vive en las tiendas y no
- * se puede cambiar una vez publicada.
+ * se puede cambiar una vez publicada. Cada plataforma lleva el suyo en su
+ * proyecto, que es el que cuenta: Android `es.fiestea.app` (build.gradle) e
+ * iOS `es.fiestea.ios` (Xcode y codemagic.yaml).
  */
 const config: CapacitorConfig = {
   appId: 'com.vybe.app',

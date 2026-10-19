@@ -6,7 +6,9 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
   Premium (mensual y de una fiesta) y los supercrush se venden con In-App
   Purchase, porque Apple lo exige para el contenido digital. Android y la web
   siguen con Stripe, igual que las entradas y «destacar» en todas partes.
-  - **Productos** (App Store Connect, ficha 6815824600):
+  - **Productos** (App Store Connect; la ficha antigua 6815824600 se borró y hay
+    que darlos de alta en la nueva, `es.fiestea.ios`, con estos mismos nombres:
+    `PRODUCT_PREFIX` en `_shared/apple-jws.ts` no depende del bundle ID):
     - `es.fiestea.app.premium.monthly`: suscripción, grupo «Fiestea Premium», 9,99 €;
     - `es.fiestea.app.premium.event`: consumible, 4,99 €;
     - `es.fiestea.app.supercrush`: consumible, 0,99 €, porque Apple no tiene

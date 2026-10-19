@@ -232,7 +232,7 @@ Edge Functions (`RESEND_*`, `INBOUND_*`, `AUTH_FROM_EMAIL`, `APP_URL`, `FCM_*`,
    - 🤖 Configurar `bundleRelease` para generar el AAB firmado.
    - Activar *Play App Signing*.
 4. 🧑 **Firebase con el paquete de la app.** La app de Android es
-   `es.fiestea.app`, igual que en iOS, y no se podrá cambiar tras la primera
+   `es.fiestea.app` (la de iOS es `es.fiestea.ios`) y no se podrá cambiar tras la primera
    subida. El `google-services.json` actual sólo conoce los paquetes antiguos, y
    con otro paquete el plugin de Google Services para la compilación: **hasta
    poner el nuevo no se puede generar el APK**.
