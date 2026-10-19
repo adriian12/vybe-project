@@ -27,6 +27,9 @@ end
 target 'App' do
   capacitor_pods
   # Add your Pods here
+  # Avisos: el servidor manda por Firebase (FCM), así que en iOS el token que
+  # se guarda tiene que ser el de Firebase y no el de APNs (AppDelegate.swift).
+  pod 'FirebaseMessaging'
 end
 
 post_install do |installer|

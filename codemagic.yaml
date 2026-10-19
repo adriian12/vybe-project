@@ -75,6 +75,14 @@ workflows:
       - name: Preparar el proyecto de iOS
         script: |
           set -e
+          # Firebase de iOS (avisos). No está en git: va en la variable segura
+          # GOOGLE_SERVICE_INFO_PLIST (grupo «appstore»), el .plist en base64.
+          if [ -z "$GOOGLE_SERVICE_INFO_PLIST" ]; then
+            echo "Falta GOOGLE_SERVICE_INFO_PLIST en Codemagic (grupo appstore)." >&2
+            exit 1
+          fi
+          echo "$GOOGLE_SERVICE_INFO_PLIST" | base64 --decode > ios/App/App/GoogleService-Info.plist
+          grep -q "es.fiestea.ios" ios/App/App/GoogleService-Info.plist
           npx cap sync ios
           test -f ios/App/App/capacitor.config.json
           cd ios/App

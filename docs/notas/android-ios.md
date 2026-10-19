@@ -50,7 +50,10 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
   `es.fiestea.app.*`. Cuenta de Apple de Adrián: Team ID `Q5S3R29R93`, ficha
   `6824473615`, clave de API `6N49TMD2KP` (App Manager; el `.p8` va en
   Codemagic, grupo `appstore`). Wallet: `pass.es.fiestea.ios.tickets` (el
-  `pass.es.fiestea.tickets` sigue en la cuenta antigua). **Pendiente:** el
-  Client ID `es.fiestea.ios` en el proveedor Apple de Supabase, el bundle ID
-  del cliente OAuth de iOS en Google Cloud, la app de iOS en Firebase (clave
-  APNs y `GoogleService-Info.plist`) y el certificado del Pass Type ID.
+  `pass.es.fiestea.tickets` sigue en la cuenta antigua). Hechos: Client ID
+  `es.fiestea.ios` en el proveedor Apple de Supabase, bundle ID del cliente
+  OAuth de iOS en Google, app de iOS en Firebase con APNs. **Pendiente:** el
+  certificado del Pass Type ID.
+- **Sólo iPhone** (`TARGETED_DEVICE_FAMILY = 1`): así el App Store no pide
+  capturas de iPad, y una vez publicada en iPad ya no se podría quitar. En un
+  iPad se instala igual, en modo iPhone.

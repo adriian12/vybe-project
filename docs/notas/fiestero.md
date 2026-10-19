@@ -130,8 +130,13 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
   (por eso `presentationOptions` es sólo `badge`). Al cerrar sesión se borra el
   token antes de `signOut()`. `FCM_PRIVATE_KEY` está guardada con los saltos de
   línea escapados dos veces: `fcm.ts` lo tolera; no quites esa normalización.
-  En iOS el plugin da un token de APNs, no de FCM: hará falta Firebase en el
-  proyecto de Xcode antes de publicar allí.
+  En iOS el plugin da un token de APNs: `AppDelegate.swift` lo cambia por el
+  de Firebase (pod `FirebaseMessaging`), así que `send-push` manda igual que
+  a Android. La app de iOS está en el mismo proyecto de Firebase
+  (`party-vybe-app`) con la clave de APNs subida. El `GoogleService-Info.plist`
+  no está en git: Codemagic lo escribe desde `GOOGLE_SERVICE_INFO_PLIST`
+  (base64, grupo `appstore`); sin él la build falla adrede y, si faltara en la
+  app, arrancaría sin avisos.
 - **La noche en directo** (migración 042, `src/services/night.ts`). Todo va por
   funciones que comprueban quién pregunta; el vyber sólo ve lo del evento en el
   que está (check-in de las últimas 4 h).
