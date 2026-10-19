@@ -7,7 +7,7 @@ import type { TicketPdfData } from './ticket-pdf.ts';
  *
  * Un .pkpass es un zip con `pass.json`, las imágenes, `manifest.json` (el
  * SHA-1 de cada fichero) y `signature` (firma PKCS#7 del manifiesto con el
- * certificado del Pass Type ID `pass.es.fiestea.tickets` y el intermedio WWDR
+ * certificado del Pass Type ID `pass.es.fiestea.ios.tickets` y el intermedio WWDR
  * G4 de Apple). Secretos: PASS_TYPE_ID, PASS_TEAM_ID, PASS_CERT_PEM,
  * PASS_KEY_PEM y PASS_WWDR_PEM.
  */

@@ -2,7 +2,7 @@
   "applinks": {
     "details": [
       {
-        "appIDs": ["XQ5WB5Y646.es.fiestea.ios"],
+        "appIDs": ["Q5S3R29R93.es.fiestea.ios"],
         "components": [
           { "/": "/event/*" },
           { "/": "/local/*" },
@@ -12,5 +12,5 @@
       }
     ]
   },
-  "webcredentials": { "apps": ["XQ5WB5Y646.es.fiestea.ios"] }
+  "webcredentials": { "apps": ["Q5S3R29R93.es.fiestea.ios"] }
 }

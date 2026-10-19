@@ -17,9 +17,7 @@
 # es.fiestea.app quedó anclado para siempre en otra cuenta al borrar allí la
 # app. Necesita push, dominios asociados, Sign in with Apple y compras.
 #
-# PENDIENTE al activar la cuenta de Apple nueva: APP_STORE_APPLE_ID (el id de la
-# ficha nueva) y la clave de App Store Connect (issuer, key id y .p8), que
-# todavía son de la cuenta anterior.
+# Cuenta de Apple de Adrián (Team ID Q5S3R29R93); ficha «Fiestea» 6824473615.
 #
 # Las variables VITE_ de abajo son públicas (viajan en el propio bundle que
 # sirve app.fiestea.es), así que van aquí y no hace falta grupo de variables.
@@ -47,7 +45,7 @@ workflows:
       vars:
         <<: *env_vite
         BUNDLE_ID: 'es.fiestea.ios'
-        APP_STORE_APPLE_ID: '6815824600'
+        APP_STORE_APPLE_ID: '6824473615'
         XCODE_SCHEME: 'App'
         # Firma con la clave de App Store Connect por variables de entorno. El
         # `app-store-connect` de Codemagic lee estas tres solo. Issuer y Key ID
@@ -55,8 +53,8 @@ workflows:
         # Codemagic (Environment variables) como APP_STORE_CONNECT_PRIVATE_KEY,
         # marcada como «Secure», pegando el contenido del .p8 con sus líneas
         # BEGIN/END. No se guarda en el repositorio.
-        APP_STORE_CONNECT_ISSUER_ID: '0f0d99a0-ebd4-4838-bb04-a98211ea3c7c'
-        APP_STORE_CONNECT_KEY_IDENTIFIER: '3793K45HAY'
+        APP_STORE_CONNECT_ISSUER_ID: '77771417-d749-4744-8e5e-dcc1fc1232d5'
+        APP_STORE_CONNECT_KEY_IDENTIFIER: '6N49TMD2KP'
       # Capacitor 8 exige Node 22: con 20, `cap sync` se niega y el .ipa sale
       # sin la web ni su configuración.
       node: 22
