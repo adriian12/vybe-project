@@ -75,10 +75,6 @@ const LegalPage = () => {
             </ul>
           </>
         )}
-
-        <p className="mt-10 border-t border-border pt-6 text-xs text-party-gray">
-          Documento pendiente de revisión legal antes de abrir el servicio al público.
-        </p>
       </div>
     </div>
   );

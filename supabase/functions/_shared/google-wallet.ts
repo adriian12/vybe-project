@@ -76,6 +76,14 @@ export const googleWalletSaveUrl = async (data: TicketPdfData, code: string): Pr
     ...(data.posterUrl?.startsWith('https://') ? { heroImage: imagen(data.posterUrl, data.eventName) } : {}),
     hexBackgroundColor: FONDO,
     finePrint: es(`Entrada vendida por ${data.venueName} a través de Fiestea. ${nota}`),
+    // La web de Fiestea en el pase: Google la revisa al dar acceso de publicación.
+    homepageUri: { uri: 'https://fiestea.es', description: 'Fiestea' },
+    linksModuleData: {
+      uris: [
+        { id: 'fiesta', uri: `https://app.fiestea.es/event/${encodeURIComponent(data.eventId)}`, description: 'Ver la fiesta en Fiestea' },
+        { id: 'soporte', uri: 'https://fiestea.es/legal/soporte', description: 'Ayuda' },
+      ],
+    },
   });
 
   const extras = [

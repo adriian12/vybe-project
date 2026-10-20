@@ -57,8 +57,9 @@ const TicketOrderPage = lazy(() => import('./pages/TicketOrderPage'));
 const UserProfilePage = lazy(() => import('./pages/UserProfilePage'));
 const EventSwipingPage = lazy(() => import('./pages/EventSwipingPage'));
 const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage'));
-// LandingPage pausada hasta el lanzamiento en tiendas
-import ComingSoonPage from './pages/ComingSoonPage';
+// La landing: los botones de las tiendas salen como «Próximamente» mientras no
+// haya enlaces (`store-buttons.tsx`). Google Wallet revisa esta web.
+const LandingPage = lazy(() => import('./pages/LandingPage'));
 const MobileOnlyPage = lazy(() => import('./pages/MobileOnlyPage'));
 // El contador del portero: se abre sin cuenta, desde el enlace que crea el local.
 const CounterPage = lazy(() => import('./pages/CounterPage'));
@@ -80,7 +81,7 @@ const RootPage = () => {
       <Index />
     </RedirectIfLoggedIn>
   ) : (
-    <ComingSoonPage />
+    <LandingPage />
   );
 };
 
@@ -174,7 +175,7 @@ const App = () => (
               <ConsentGate>
                 {MODE === 'landing' ? (
                   <Routes>
-                    <Route path="/" element={<ComingSoonPage />} />
+                    <Route path="/" element={<LandingPage />} />
                     <Route path="/legal" element={<LegalPage />} />
                     <Route path="/legal/:document" element={<LegalPage />} />
                     <Route path="*" element={<GoToApp />} />
