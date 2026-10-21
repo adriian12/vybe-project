@@ -5,29 +5,36 @@ import type { VenueEventSummary } from '@/services/night';
 import { dayKey, groupByDay, monthCells, weekdayInitials } from '@/lib/month-calendar';
 import { cn } from '@/lib/utils';
 
-interface VenueCalendarProps {
-  /** Las próximas fiestas del negocio. */
-  events: VenueEventSummary[];
+/** Lo que necesita cada fiesta del calendario. */
+export type CalendarEvent = Pick<VenueEventSummary, 'id' | 'name' | 'startDate' | 'posterUrl'>;
+
+interface VenueCalendarProps<T extends CalendarEvent> {
+  /** Las próximas fiestas (del negocio o, en inicio, todas). */
+  events: T[];
   /** Día tocado («2026-10-17») con sus fiestas. */
-  onDay: (key: string, events: VenueEventSummary[]) => void;
+  onDay: (key: string, events: T[]) => void;
+  /** A qué día va cada fiesta; por defecto, el día en que empieza. */
+  dayOf?: (event: T) => string;
 }
 
 const mesDe = (d: Date) => d.getFullYear() * 12 + d.getMonth();
 
 /**
- * Calendario de fiestas de la ficha del negocio: un mes cada vez, con el
- * cartel en cada día que tiene fiesta. Con dos o más, la casilla se parte y
- * dice cuántas hay.
+ * Calendario de fiestas de la ficha del negocio (y del filtro de fecha de
+ * inicio y del mapa): un mes cada vez, con el cartel en cada día que tiene
+ * fiesta. Con dos o más, la casilla se parte y dice cuántas hay.
  */
-const VenueCalendar = ({ events, onDay }: VenueCalendarProps) => {
+const VenueCalendar = <T extends CalendarEvent>({ events, onDay, dayOf }: VenueCalendarProps<T>) => {
   const { t, i18n } = useTranslation();
-  const porDia = useMemo(() => groupByDay(events), [events]);
+  const porDia = useMemo(() => groupByDay(events, dayOf), [events, dayOf]);
   const hoy = dayKey(new Date());
   const primero = mesDe(new Date());
   // Hasta el mes de la última fiesta anunciada (como poco, el actual).
   const ultimo = Math.max(primero, ...events.map((e) => mesDe(new Date(e.startDate))));
   // Abre en el mes de la próxima fiesta.
-  const [mes, setMes] = useState(() => (events.length ? mesDe(new Date(events[0].startDate)) : primero));
+  const [mes, setMes] = useState(() =>
+    events.length ? Math.max(primero, Math.min(...events.map((e) => mesDe(new Date(e.startDate))))) : primero,
+  );
 
   const year = Math.floor(mes / 12);
   const month = mes % 12;

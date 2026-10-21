@@ -77,6 +77,17 @@ const HomePage = () => {
   const sinFiestas = !isLoading && delDia.length === 0 && cercaDeLaFecha.length === 0;
   const visible = sinFiestas ? filtrados : delDia;
   const noches = useMemo(() => [...new Set(withDistance.map(({ event }) => nightOf(event.startDate)))], [withDistance]);
+  // El calendario del filtro de fecha, con el cartel de cada noche (todas las fiestas).
+  const paraCalendario = useMemo(
+    () =>
+      withDistance.map(({ event }) => ({
+        id: event.id,
+        name: event.name,
+        startDate: event.startDate,
+        posterUrl: event.posterUrl ?? null,
+      })),
+    [withDistance],
+  );
 
   useEffect(() => {
     if (theme && !themes.includes(theme)) setTheme(null);
@@ -234,6 +245,7 @@ const HomePage = () => {
             franja={franja}
             onFranja={setFranja}
             nights={noches}
+            calendarEvents={paraCalendario}
             flechazo={soloFlechazo}
             onFlechazo={currentUser?.accountType === 'guest' ? undefined : setSoloFlechazo}
           />

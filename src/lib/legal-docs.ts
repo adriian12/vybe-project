@@ -276,7 +276,7 @@ export const legalDocs = (app: string, web: string, panel: string, miembro: stri
         },
         {
           title: 'Pago',
-          body: `En la app del iPhone, Premium y los supercrush se compran con la compra integrada de Apple y se cobran en tu Apple ID. En Android y en la web, y las entradas en cualquier dispositivo, se pagan con Stripe, en su página segura. No guardamos los datos de tu tarjeta. Al terminar recibes por correo la confirmación, que sirve de justificante (con las entradas en PDF si compras entradas); estas condiciones están siempre en ${dominio}/legal/compras.`,
+          body: `En la app del iPhone, Premium y los supercrush se compran con la compra integrada de Apple y se cobran en tu Apple ID; en la app de Android, con Google Play, y se cobran en tu cuenta de Google. En la web, y las entradas en cualquier dispositivo, se pagan con Stripe, en su página segura. No guardamos los datos de tu tarjeta. Al terminar recibes por correo la confirmación, que sirve de justificante (con las entradas en PDF si compras entradas); estas condiciones están siempre en ${dominio}/legal/compras.`,
         },
         {
           title: 'Premium mensual',

@@ -421,24 +421,21 @@ const EventSwipingPage = () => {
         <main className="relative mx-margin flex-1">
           {currentProfile ? (
             <>
-              {/* Las dos siguientes asoman detrás, giradas, para que se lea que
-                  hay más gente sin tener que deslizar. */}
-              {siguientes.map((perfil, i) => (
-                <div
-                  key={perfil.id}
-                  aria-hidden
-                  className={cn(
-                    'absolute inset-0 overflow-hidden rounded-[20px] bg-surface-high',
-                    i === 0 ? 'translate-y-2 rotate-[2.5deg] scale-[0.96] opacity-70' : '-translate-y-1 -rotate-[3deg] scale-[0.92] opacity-40',
-                  )}
-                >
-                  <img
-                    src={perfil.photos[0] ?? perfil.avatar ?? '/placeholder.svg'}
-                    alt=""
-                    className="h-full w-full object-cover"
+              {/* Las dos siguientes asoman por abajo como tarjetas lisas, para
+                  que se lea que hay más gente. Sin su foto: girada y
+                  transparente se veía difuminada detrás de la principal. */}
+              {siguientes
+                .map((perfil, i) => (
+                  <div
+                    key={perfil.id}
+                    aria-hidden
+                    className={cn(
+                      'absolute inset-0 rounded-[20px] border border-white/[0.06]',
+                      i === 0 ? 'translate-y-2.5 scale-[0.96] bg-surface-high' : 'translate-y-5 scale-[0.92] bg-surface-container',
+                    )}
                   />
-                </div>
-              ))}
+                ))
+                .reverse()}
               <ProfileCard
                 ref={tarjeta}
                 user={currentProfile}

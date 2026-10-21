@@ -2115,6 +2115,24 @@
         "eventForm": {
             "platformSwipeHelp": "Es una fiesta de Fiestea: allí no hay QR ni código. Con ubicación y «Entrar al evento» encendido, la ficha enseña «Entrar al evento» y se entra estando en el sitio (se comprueba el GPS); apagado, sólo «Voy a ir».",
             "settingsTitle": "Ajustes de la fiesta"
+        },
+        "scanner": {
+            "tab": "Escáner",
+            "allCities": "Todas",
+            "search": "Buscar fiesta, sala o artista",
+            "scan": "Escanear",
+            "scanning": "Escaneando Xceed y Resident Advisor…",
+            "scanned_one": "{{count}} fiesta escaneada",
+            "scanned_other": "{{count}} fiestas escaneadas",
+            "scanError": "No se ha podido escanear. Prueba otra vez en un rato.",
+            "empty": "No hay fiestas escaneadas por empezar.",
+            "lineup": "Line-up",
+            "repeated": "Repetida",
+            "chooseTicket": "Está en varias webs. Elige el enlace de entradas:",
+            "imported_one": "{{count}} fiesta añadida a {{app}}",
+            "imported_other": "{{count}} fiestas añadidas a {{app}}",
+            "more": "Ver más ({{count}})",
+            "note": "Fiestas de Barcelona, Madrid y Alicante en Xceed y Resident Advisor. «Repetida»: ya hay una fiesta con ese nombre esa noche. Fourvenues no se escanea: bloquea a los robots."
         }
     },
     "pwa": {

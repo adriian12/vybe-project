@@ -110,6 +110,16 @@ const MapPage = () => {
 
   const conPunto = useMemo(() => withDistance.filter(({ event }) => event.location), [withDistance]);
   const noches = useMemo(() => [...new Set(conPunto.map(({ event }) => nightOf(event.startDate)))], [conPunto]);
+  const paraCalendario = useMemo(
+    () =>
+      conPunto.map(({ event }) => ({
+        id: event.id,
+        name: event.name,
+        startDate: event.startDate,
+        posterUrl: event.posterUrl ?? null,
+      })),
+    [conPunto],
+  );
 
   const tiposPresentes = useMemo(
     () => TIPOS.filter((tp) => conPunto.some(({ event }) => event.venueType === tp)),
@@ -321,7 +331,7 @@ const MapPage = () => {
           <VenueSearchResults query={busqueda} />
 
           <div className="pointer-events-auto flex">
-            <DateFilter nights={noches} className="shadow-lg shadow-black/30" />
+            <DateFilter nights={noches} events={paraCalendario} className="shadow-lg shadow-black/30" />
           </div>
 
           {desde && (

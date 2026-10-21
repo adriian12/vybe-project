@@ -31,11 +31,17 @@ export const monthCells = (year: number, month: number): (Date | null)[] => {
   return cells;
 };
 
-/** Agrupa por día lo que tenga fecha de inicio, en el orden en que llega. */
-export const groupByDay = <T extends { startDate: string }>(items: T[]): Map<string, T[]> => {
+/**
+ * Agrupa por día lo que tenga fecha de inicio, en el orden en que llega. Con
+ * `keyOf` se agrupa de otra forma (en inicio, por noche: `nightOf`).
+ */
+export const groupByDay = <T extends { startDate: string }>(
+  items: T[],
+  keyOf: (item: T) => string = (item) => dayKey(item.startDate),
+): Map<string, T[]> => {
   const out = new Map<string, T[]>();
   for (const item of items) {
-    const key = dayKey(item.startDate);
+    const key = keyOf(item);
     out.set(key, [...(out.get(key) ?? []), item]);
   }
   return out;

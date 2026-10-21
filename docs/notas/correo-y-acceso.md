@@ -37,8 +37,12 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
 - **«Continuar con Google»** (sólo en la app instalada, `social-auth.ts`).
   - **Clientes OAuth:** están en el proyecto de Google Cloud `563350138901`:
     uno web, uno de iOS (`es.fiestea.ios`: hay que cambiarle el bundle ID en
-    Google Cloud, que tenía `es.fiestea.app`) y uno de Android (`es.fiestea.app`,
-    SHA-1 de la clave de depuración).
+    Google Cloud, que tenía `es.fiestea.app`) y **tres de Android** con el
+    paquete `es.fiestea.app`, uno por huella SHA-1: depuración (`40:5D:6A:…`,
+    el APK local), firma de Google Play (`6C:5D:26:…`, lo que se instala desde
+    la tienda) y subida (`D7:D2:E5:…`). Sin la de Google Play, en la versión de
+    la tienda eliges la cuenta y vuelve a pedirla en bucle (pasó el 21-10-2026).
+    Si Play cambia la clave de firma, hay que añadir la nueva huella.
   - **Supabase:** el proveedor Google tiene como `client_id` «web,iOS»,
     porque los tokens de Android llevan como audiencia el ID web. El secreto
     del cliente web está sólo en Supabase, y `skip_nonce_check` está activo.

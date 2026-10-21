@@ -23,7 +23,10 @@ export type SubscriptionType = 'monthly' | 'event' | 'lifetime';
 
 /** Precios que se enseñan; los que cobra Stripe son los de sus productos. */
 // eslint-disable-next-line react-refresh/only-export-components
+/** Lo que cobra Stripe en la web. */
 export const PREMIUM_PRICES = { monthly: 9.99, event: 4.99, supercrush: 1 } as const;
+/** Lo que cuestan en Apple y Google Play, por si la tienda no responde (el cobro lo hace la tienda). */
+export const STORE_FALLBACK_PRICES = { monthly: 9.99, event: 4.99, supercrush: 0.99 } as const;
 
 /**
  * Premium y supercrush.

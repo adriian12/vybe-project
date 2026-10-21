@@ -52,6 +52,7 @@ import AdminUsers from '@/components/admin/admin-users';
 import AdminCreate from '@/components/admin/admin-create';
 import AdminEventForm from '@/components/admin/admin-event-form';
 import AdminFunout from '@/components/admin/admin-funout';
+import AdminScanner from '@/components/admin/admin-scanner';
 import AdminVenues from '@/components/admin/admin-venues';
 import TestLabCard from '@/components/admin/test-lab-card';
 import { VybeMark } from '@/components/brand/vybe-logo';
@@ -162,7 +163,7 @@ const AdminDashboardPage = () => {
   const [photoFilter, setPhotoFilter] = useState<'all' | 'event_photo' | 'face_verification'>('all');
   const [eventQuery, setEventQuery] = useState('');
   // Eventos: la lista de fiestas o los de Funout para añadir (migración 082).
-  const [pestanaEventos, setPestanaEventos] = useState<'list' | 'past' | 'funout'>('list');
+  const [pestanaEventos, setPestanaEventos] = useState<'list' | 'past' | 'funout' | 'scanner'>('list');
   // Orden de la lista: por defecto, lo más cercano a hoy primero.
   const [ordenEventos, setOrdenEventos] = useState<'nearest' | 'newest' | 'oldest'>('nearest');
   const [editandoEvento, setEditandoEvento] = useState<Event | null>(null);
@@ -1073,7 +1074,7 @@ const AdminDashboardPage = () => {
                 }
               />
               <div className="mb-3 inline-flex rounded-xl bg-white/10 p-1">
-                {(['list', 'past', 'funout'] as const).map((id) => (
+                {(['list', 'past', 'funout', 'scanner'] as const).map((id) => (
                   <button
                     key={id}
                     type="button"
@@ -1087,11 +1088,13 @@ const AdminDashboardPage = () => {
                       ? t('admin.events.tabList')
                       : id === 'past'
                         ? t('admin.events.tabPast', { count: numPasados })
-                        : 'FUNOUT'}
+                        : id === 'funout'
+                          ? 'FUNOUT'
+                          : t('admin.scanner.tab')}
                   </button>
                 ))}
               </div>
-              {pestanaEventos !== 'funout' && (
+              {pestanaEventos !== 'funout' && pestanaEventos !== 'scanner' && (
                 <label className="mb-3 ml-3 inline-flex items-center gap-2 text-caption font-bold text-white/70">
                   {t('admin.events.sortBy')}
                   <select
@@ -1109,6 +1112,8 @@ const AdminDashboardPage = () => {
               )}
               {pestanaEventos === 'funout' ? (
                 <AdminFunout onImported={() => void loadAll(true)} />
+              ) : pestanaEventos === 'scanner' ? (
+                <AdminScanner onImported={() => void loadAll(true)} />
               ) : eventosVisibles.length === 0 ? (
                 <Vacio text={t(pestanaEventos === 'past' ? 'admin.events.emptyPast' : 'admin.events.empty')} icon={CalendarDays} />
               ) : (

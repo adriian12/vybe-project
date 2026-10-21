@@ -2115,6 +2115,24 @@
         "eventForm": {
             "platformSwipeHelp": "This is a Fiestea party: there is no QR or code at the door. With a location and “Enter the party” on, the page shows “Enter the party” and people get in by being there (GPS is checked); with it off, only “I’m going”.",
             "settingsTitle": "Party settings"
+        },
+        "scanner": {
+            "tab": "Scanner",
+            "allCities": "All",
+            "search": "Search party, venue or artist",
+            "scan": "Scan",
+            "scanning": "Scanning Xceed and Resident Advisor…",
+            "scanned_one": "{{count}} party scanned",
+            "scanned_other": "{{count}} parties scanned",
+            "scanError": "Could not scan. Try again in a while.",
+            "empty": "No upcoming scanned parties.",
+            "lineup": "Line-up",
+            "repeated": "Duplicate",
+            "chooseTicket": "Listed on several sites. Choose the ticket link:",
+            "imported_one": "{{count}} party added to {{app}}",
+            "imported_other": "{{count}} parties added to {{app}}",
+            "more": "Show more ({{count}})",
+            "note": "Parties in Barcelona, Madrid and Alicante on Xceed and Resident Advisor. “Duplicate”: there is already a party with that name that night. Fourvenues is not scanned: it blocks bots."
         }
     },
     "pwa": {

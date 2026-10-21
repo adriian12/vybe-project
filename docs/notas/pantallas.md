@@ -42,6 +42,12 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
   destacados llevan una llama sobre el alfiler (`.vybe-pin-fire`).
 - **La cabecera superior está oculta** (`MOSTRAR_CABECERA` en `header.tsx`, y
   `--header-h` reducida a la zona segura).
+- **Calendario del filtro de fecha** (inicio y mapa): es el de la ficha del
+  negocio (`venue-calendar.tsx`) con todas las fiestas: el cartel en cada
+  noche y «×N» si hay varias. Agrupa por noche (`nightOf`, lo de madrugada a
+  la anterior), no por día, para cuadrar con el filtro.
+- **Tablón:** detrás de la tarjeta asoman dos tarjetas lisas, sin la foto de
+  las siguientes (girada y transparente se veía difuminada detrás).
 - **Filtros de fiestas** (`party-filters.tsx`, lógica en `lib/party-filters.ts`):
   «Música» agrupa los géneros; Tardeo (empieza 17:00-22:59), Nocheo
   (23:00-04:59) y After (05:00-13:59). Están en inicio y en el mapa.

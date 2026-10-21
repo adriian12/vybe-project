@@ -39,6 +39,31 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
   - Los eventos tienen su propia sala y dirección (`place_name`, `address`).
   - Administración edita cualquier fiesta con el lápiz (`admin_update_event`).
   - Eventos va debajo de Usuarios en el menú.
+- **Enlaces de Fourvenues a nombre de un RRPP** (migración 113): Funout trae
+  los de Fourvenues como `/es/alejandro-aguilo-pareja/events/…`. El bueno es
+  el del micrositio de la discoteca (`fitz-mallorca`, `discoteca-amok-mallorca@amok`,
+  `over-club`, `selva`, `palma-events`, `bcm-mallorca`, `enredo-club`,
+  `sala-wave-club`, `boomerang`), con el mismo final. **Fourvenues enseña la
+  fiesta con cualquier micrositio**, así que «no da 404» no basta: la página
+  del RRPP trae `"organization":{"id":…,"slug":…}` y cada micrositio el id de
+  su organización (`transfer-state-microsite-<slug>` → `channel.id`); se
+  empareja por ese id. Fourvenues está detrás de Cloudflare: sólo se puede
+  leer desde un Chrome de verdad (el del usuario), despacio (más de 3 o 4
+  peticiones seguidas → «Too much hype» un buen rato). `funout_upsert_event`
+  ya no pisa un enlace de Fourvenues corregido si apunta al mismo evento.
+- **Escáner** (migración 114, `scan-sync`, `admin-scanner.tsx`): Eventos →
+  ESCÁNER, al lado de FUNOUT. Lee Xceed (la página pública de eventos de cada
+  ciudad, estado de Next en `self.__next_f`; su API pide clave) y Resident
+  Advisor (GraphQL; zonas Barcelona 20, Madrid 41, Alicante 613) y guarda en
+  `scanned_events`. Las salas de Xceed sin coordenadas se buscan en Photon;
+  RA pone 0,0 a las salas «TBA» y se tratan como sin ubicación. El panel junta
+  la misma fiesta de varias webs (`src/lib/scan-groups.ts`) y deja elegir el
+  enlace de entradas; «Repetida» si ya hay una fiesta con ese nombre esa
+  noche. `admin_import_scanned` crea una fiesta por grupo en el local de la
+  casa (`external_source = 'scan'`). Al abrir la sección se reescanea si los
+  datos tienen más de 6 h. **Fourvenues no se escanea** (bloquea robots; sólo
+  con su API oficial). El script local `scraper_fiestas_v2.py` hace lo mismo
+  y escribe `eventos_scrap/eventos_<ciudad>.csv` con todos los campos.
 - **Administración → Eventos** se ordena en «Más cercanos» (por defecto: las
   que siguen en marcha o están por venir, de la más próxima a la más lejana, y
   después las pasadas), «Más recientes» o «Más antiguos». Carga hasta 500.

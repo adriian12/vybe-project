@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { CalendarDays, Check, ChevronDown, Clock, Heart, Music, X } from 'lucide-react';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Calendar } from '@/components/ui/calendar';
+import VenueCalendar, { CalendarEvent } from '@/components/venue-calendar';
 import { cn } from '@/lib/utils';
 import { FRANJAS, Franja } from '@/lib/party-filters';
 import { DateMode, DateSelection, nightOf, setDateSelection, tonight, useDateSelection } from '@/lib/date-filter';
@@ -26,16 +27,34 @@ export const useDateLabel = () => {
 };
 
 /**
- * La fecha: atajos y un calendario en el que los días con fiestas llevan un
- * punto y los pasados no se pueden elegir. Se comparte entre inicio y mapa.
+ * La fecha: atajos y un calendario. Con `events`, el calendario de la ficha
+ * del negocio con el cartel de cada noche (y cuántas fiestas hay si son
+ * varias); sin ellas, el de siempre, con un punto en las noches con fiestas.
+ * Se comparte entre inicio y mapa.
  */
-export const DateFilter = ({ nights, className }: { nights: string[]; className?: string }) => {
+export const DateFilter = ({
+  nights,
+  events,
+  className,
+}: {
+  nights: string[];
+  events?: CalendarEvent[];
+  className?: string;
+}) => {
   const { t } = useTranslation();
   const sel = useDateSelection();
   const etiqueta = useDateLabel();
   const [abierto, setAbierto] = useState(false);
   const conFiestas = useMemo(() => nights.map((n) => new Date(`${n}T12:00:00`)), [nights]);
   const hoy = new Date(`${tonight()}T00:00:00`);
+  // Sólo las de esta noche en adelante, por orden: el calendario abre en la primera.
+  const proximas = useMemo(
+    () =>
+      (events ?? [])
+        .filter((e) => nightOf(e.startDate) >= tonight())
+        .sort((a, b) => a.startDate.localeCompare(b.startDate)),
+    [events],
+  );
 
   const elegir = (s: DateSelection) => {
     setDateSelection(s);
@@ -64,6 +83,9 @@ export const DateFilter = ({ nights, className }: { nights: string[]; className?
               </button>
             ))}
           </div>
+          {events ? (
+            <VenueCalendar events={proximas} dayOf={(e) => nightOf(e.startDate)} onDay={(key) => elegir({ mode: 'date', date: key })} />
+          ) : (
           <Calendar
             mode="single"
             weekStartsOn={1}
@@ -77,6 +99,7 @@ export const DateFilter = ({ nights, className }: { nights: string[]; className?
             }}
             className="mx-auto rounded-2xl bg-surface-low"
           />
+          )}
         </SheetContent>
       </Sheet>
     </>
@@ -92,6 +115,8 @@ interface PartyFiltersProps {
   onFranja: (franja: Franja | null) => void;
   /** Noches con fiestas, para los puntos del calendario. */
   nights: string[];
+  /** Fiestas para el calendario con carteles (si no, el de puntos). */
+  calendarEvents?: CalendarEvent[];
   /** «Con Flechazo»: sólo fiestas en directo con el tablón encendido. Sin `onFlechazo` no sale (invitados). */
   flechazo?: boolean;
   onFlechazo?: (value: boolean) => void;
@@ -102,7 +127,18 @@ interface PartyFiltersProps {
  * Filtros de fiestas, en este orden: fecha, «Música» (todos los géneros) y
  * «Horario» (tardeo, nocheo o after, en un solo selector).
  */
-const PartyFilters = ({ themes, theme, onTheme, franja, onFranja, nights, flechazo = false, onFlechazo, className }: PartyFiltersProps) => {
+const PartyFilters = ({
+  themes,
+  theme,
+  onTheme,
+  franja,
+  onFranja,
+  nights,
+  calendarEvents,
+  flechazo = false,
+  onFlechazo,
+  className,
+}: PartyFiltersProps) => {
   const { t } = useTranslation();
   const [musicaAbierta, setMusicaAbierta] = useState(false);
   const [horarioAbierto, setHorarioAbierto] = useState(false);
@@ -114,7 +150,7 @@ const PartyFilters = ({ themes, theme, onTheme, franja, onFranja, nights, flecha
 
   return (
     <div className={cn('no-scrollbar flex gap-2 overflow-x-auto', className)}>
-      <DateFilter nights={nights} />
+      <DateFilter nights={nights} events={calendarEvents} />
 
       {onFlechazo && (
         <button type="button" onClick={() => onFlechazo(!flechazo)} aria-pressed={flechazo} className={pill(flechazo)}>

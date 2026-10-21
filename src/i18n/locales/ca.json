@@ -2115,6 +2115,24 @@
         "eventForm": {
             "platformSwipeHelp": "És una festa de Fiestea: allà no hi ha QR ni codi. Amb ubicació i «Entrar a l'esdeveniment» encès, la fitxa mostra «Entrar a l'esdeveniment» i s'entra sent-hi (es comprova el GPS); apagat, només «Hi aniré».",
             "settingsTitle": "Ajustos de la festa"
+        },
+        "scanner": {
+            "tab": "Escàner",
+            "allCities": "Totes",
+            "search": "Cerca festa, sala o artista",
+            "scan": "Escanejar",
+            "scanning": "Escanejant Xceed i Resident Advisor…",
+            "scanned_one": "{{count}} festa escanejada",
+            "scanned_other": "{{count}} festes escanejades",
+            "scanError": "No s'ha pogut escanejar. Torna-ho a provar d'aquí a una estona.",
+            "empty": "No hi ha festes escanejades per començar.",
+            "lineup": "Line-up",
+            "repeated": "Repetida",
+            "chooseTicket": "És a diverses webs. Tria l'enllaç d'entrades:",
+            "imported_one": "{{count}} festa afegida a {{app}}",
+            "imported_other": "{{count}} festes afegides a {{app}}",
+            "more": "Veure més ({{count}})",
+            "note": "Festes de Barcelona, Madrid i Alacant a Xceed i Resident Advisor. «Repetida»: ja hi ha una festa amb aquest nom aquella nit. Fourvenues no s'escaneja: bloqueja els robots."
         }
     },
     "pwa": {

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Minus, Plus, Star } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
 import { PartyButton } from '@/components/ui-custom/party-button';
-import { PREMIUM_PRICES, usePremium } from '@/context/premium-context';
+import { PREMIUM_PRICES, STORE_FALLBACK_PRICES, usePremium } from '@/context/premium-context';
 import { storeChoosesQuantity, storeMaxQuantity } from '@/services/iap';
 
 const MAX = 100;
@@ -27,7 +27,7 @@ const SupercrushDialog = () => {
   // En Android la cantidad se elige en la hoja de Google Play.
   const enGoogle = storePurchases && storeChoosesQuantity();
   const tienda = storePurchases ? storePrices.supercrush : undefined;
-  const unidad = tienda?.amount ?? PREMIUM_PRICES.supercrush;
+  const unidad = tienda?.amount ?? (storePurchases ? STORE_FALLBACK_PRICES.supercrush : PREMIUM_PRICES.supercrush);
   const moneda = tienda?.currency ?? 'EUR';
   const [cantidad, setCantidad] = useState(1);
   const [enviando, setEnviando] = useState(false);

@@ -105,6 +105,35 @@ export interface AdminEventInput {
   lineup?: LineupArtist[];
 }
 
+/** Una fiesta del escáner (Xceed o Resident Advisor), migración 114. */
+export interface ScannedEvent {
+  id: string;
+  source: 'xceed' | 'ra' | 'fourvenues';
+  city: string;
+  title: string;
+  startAt: string;
+  endAt: string | null;
+  placeName: string | null;
+  address: string | null;
+  hasLocation: boolean;
+  imageUrl: string | null;
+  ticketUrl: string;
+  genres: string[];
+  lineup: string[];
+  price: number | null;
+  minAge: number | null;
+  syncedAt: string;
+  importedEventId: string | null;
+  /** Fiesta de Fiestea con el mismo nombre la misma noche (o la creada al añadirla). */
+  existingEventId: string | null;
+}
+
+/** Un grupo para añadir: las fiestas que son la misma y la que pone el enlace de entradas. */
+export interface ScannedGroup {
+  ids: string[];
+  ticket: string;
+}
+
 /** Un evento de Funout, tal y como se guardó (sólo los datos que usamos). */
 export interface FunoutEvent {
   funoutId: number;
@@ -280,6 +309,48 @@ export const adminService = {
   /** Crea (o pone al día) las fiestas de Fiestea de esos eventos de Funout. */
   importFunout: async (ids: number[]): Promise<number> => {
     const { data, error } = await supabase.rpc('admin_import_funout', { p_ids: ids });
+    if (error) fallo(error.message);
+    return Number(data ?? 0);
+  },
+
+  // ----------------------------------------------------------------- Escáner
+  /** Las fiestas escaneadas que aún no han terminado (migración 114). */
+  listScanned: async (): Promise<ScannedEvent[]> => {
+    const { data, error } = await supabase.rpc('admin_list_scanned' as never);
+    if (error) fallo(error.message);
+    return ((data ?? []) as Record<string, unknown>[]).map((row) => ({
+      id: String(row.id),
+      source: row.source as ScannedEvent['source'],
+      city: String(row.city),
+      title: String(row.title),
+      startAt: String(row.start_at),
+      endAt: (row.end_at as string | null) ?? null,
+      placeName: (row.place_name as string | null) ?? null,
+      address: (row.address as string | null) ?? null,
+      hasLocation: row.latitude !== null && row.longitude !== null,
+      imageUrl: (row.image_url as string | null) ?? null,
+      ticketUrl: String(row.ticket_url),
+      genres: (row.genres as string[] | null) ?? [],
+      lineup: (row.lineup as string[] | null) ?? [],
+      price: row.price === null || row.price === undefined ? null : Number(row.price),
+      minAge: (row.min_age as number | null) ?? null,
+      syncedAt: String(row.synced_at),
+      importedEventId: (row.imported_event_id as string | null) ?? null,
+      existingEventId: (row.existing_event_id as string | null) ?? null,
+    }));
+  },
+
+  /** Vuelve a escanear Xceed y Resident Advisor (`scan-sync`). */
+  scan: async (cities?: string[]): Promise<{ saved: number; cities: Record<string, Record<string, number | string>> }> => {
+    const { data, error } = await supabase.functions.invoke('scan-sync', { body: cities ? { cities } : {} });
+    if (error) throw new Error('SCAN_FAILED');
+    const d = (data ?? {}) as { saved?: number; cities?: Record<string, Record<string, number | string>> };
+    return { saved: Number(d.saved ?? 0), cities: d.cities ?? {} };
+  },
+
+  /** Crea una fiesta por grupo, con el enlace de entradas elegido. */
+  importScanned: async (groups: ScannedGroup[]): Promise<number> => {
+    const { data, error } = await supabase.rpc('admin_import_scanned' as never, { p_groups: groups } as never);
     if (error) fallo(error.message);
     return Number(data ?? 0);
   },

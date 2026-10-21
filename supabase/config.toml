@@ -148,6 +148,9 @@ verify_jwt = false
 [functions.funout-sync]
 verify_jwt = false
 
+[functions.scan-sync]
+verify_jwt = false
+
 [functions.google-play]
 verify_jwt = true
 

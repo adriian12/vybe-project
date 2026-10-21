@@ -66,7 +66,7 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
   persona (migración 073, `ON DELETE SET NULL`).
 - **Cobros y supercrush** (migración 062). Cinco productos en Stripe
   (`STRIPE_PRICE_MONTHLY_USER` 9,99 €/mes, `STRIPE_PRICE_EVENT` 4,99 €,
-  `STRIPE_PRICE_SUPERLIKE` 1 €, `STRIPE_PRICE_VENUE_PRO` 49 €,
+  `STRIPE_PRICE_SUPERLIKE` 1 € (en Apple y Google Play, 0,99 €), `STRIPE_PRICE_VENUE_PRO` 49 €,
   `STRIPE_PRICE_VENUE_BUSINESS` 99 €).
   - **El móvil no puede escribir en `premium_subscriptions`**: antes las
     policies de INSERT/UPDATE dejaban activarse Premium gratis. Sólo escribe

@@ -173,6 +173,11 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
     términos y privacidad. Se guarda en los metadatos
     (`venue_terms_accepted_at`, `venue_terms_version`). La versión de los
     textos es `LEGAL_UPDATED` en `src/lib/company.ts`.
+  - **Apple Wallet** (`_shared/wallet-pass.ts`): desde el 21-10-2026 firma con
+    `pass.es.fiestea.ios.tickets` de la cuenta de Adrián (Team `Q5S3R29R93`;
+    certificado «Fiestea entradas Wallet», caduca el 20-11-2027). Clave,
+    solicitud y certificado en `D:\Webs\Vybe App\firma-apple-wallet\`, fuera de
+    git. Antes usaba `pass.es.fiestea.tickets` de la cuenta de Iván.
   - **Google Wallet** (`_shared/google-wallet.ts`, integrado el 1 de octubre
     de 2026). Emisor `3388000000023210201`, proyecto de Google Cloud
     **«Fiestea»** (`fiestea-509713`), no `party-vybe-app` (decisión del
@@ -187,8 +192,10 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
       pedir el enlace, y el JWT sólo lleva el id del pase.
     - `ticket-download?format=gwallet` redirige a `pay.google.com/gp/v/save/…`.
       El botón sale en Android (`ticket-download-buttons.tsx`) y en el correo.
-    - **Falta pedir a Google el acceso de publicación**: hasta entonces sólo
-      guardan pases las cuentas de prueba de la consola.
+    - **Acceso de publicación aprobado** (21-10-2026): cualquier cuenta puede
+      guardar pases. No hizo falta cambiar código: las clases nuevas se crean
+      con `reviewStatus: 'UNDER_REVIEW'` y Google las aprueba solas (la de
+      Aurora Sessions ya figura `approved`).
 - **Entradas de otras webs** (migración 104, `external-tickets.tsx`).
   - En «Entradas» → «Añadir entrada» se sube el PDF (o una captura) de una
     entrada de Fourvenues u otra web.
