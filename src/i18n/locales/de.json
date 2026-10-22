@@ -955,11 +955,11 @@
             "role": "Rolle",
             "roles": {
                 "owner": "Inhaber",
-                "security": "Security",
+                "security": "Einlasskontrolle",
                 "waiter": "Barpersonal",
                 "promoter": "Promoter"
             },
-            "roleHelp": "Inhaber: das ganze Dashboard. Security: Einlass (Kapazität, Listen, Tickets und Alarme) und QR-Code.",
+            "roleHelp": "Inhaber: das ganze Dashboard. Einlasskontrolle: Einlass (Kapazität, Listen, Tickets und Alarme) und QR-Code.",
             "add": "Hinzufügen",
             "added": "Mitglied hinzugefügt",
             "removed": "Mitglied entfernt",
@@ -970,7 +970,7 @@
             "count_other": "{{count}} Personen",
             "links": {
                 "title": "Team-Links",
-                "body": "Ohne Konto: Sie öffnen sich auf jedem Handy. Links für Security und Barpersonal gelten eine Nacht; der Link jedes Promoters gilt, bis du ihn widerrufst.",
+                "body": "Ohne Konto: Sie öffnen sich auf jedem Handy. Links für Einlasskontrolle und Barpersonal gelten eine Nacht; der Link jedes Promoters gilt, bis du ihn widerrufst.",
                 "new": "Neuer Link",
                 "name": "Name",
                 "namePlaceholder": "Tür 1, Bar Laura, Adrián…",
@@ -3644,7 +3644,9 @@
             "tooMany": "Zu viele aktive Links: Widerrufe einige.",
             "commission": "Ungültige Provision.",
             "entryLocked": "Jemand aus diesem Eintrag ist schon drin: Er kann nicht entfernt werden."
-        }
+        },
+        "scanTicket": "Ticket scannen",
+        "scanTicketBody": "Richte die Kamera auf den QR-Code des Tickets oder gib den Code ein. Jedes Ticket gilt nur einmal."
     },
     "completeProfile": {
         "title": "Vervollständige dein Profil",

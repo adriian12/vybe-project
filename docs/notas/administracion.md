@@ -50,6 +50,10 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
   corrigieron 21, todas pasadas. Fourvenues está detrás de Cloudflare y el
   usuario no quiere que se use su Chrome para esto. `funout_upsert_event`
   ya no pisa un enlace de Fourvenues corregido si apunta al mismo evento.
+- **Plan de un usuario con Premium de una fiesta** (migración 117): el
+  selector de Usuarios ya no se bloquea. «Sin Premium» cancela también el de la
+  fiesta; mensual o vitalicio se añaden y dejan el de la fiesta. (En Aurora,
+  que acaba en 2030, ese Premium caducaba en 2031 y no había forma de quitarlo.)
 - **Ahora se cambia por la sala** (migración 116): la tabla
   `fourvenues_microsites` (`venue_search_key(place_name)` → slug) y el
   disparador `events_fourvenues_venue_link` reescriben el canal de cualquier

@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ClipboardList, DoorClosed, DoorOpen, Flag, Loader2, ScanLine, ShieldCheck, UserMinus } from 'lucide-react';
+import { ClipboardList, DoorClosed, DoorOpen, Flag, Loader2, ShieldCheck, UserMinus } from 'lucide-react';
 import DoorCounter from '@/components/venue/door-counter';
-import TicketValidator from '@/components/venue/ticket-validator';
 import VenueGuestLists, { GuestListDoor } from '@/components/venue/venue-guest-lists';
 import VenueSosAlerts from '@/components/venue/venue-sos-alerts';
 import VenueSosAlarm from '@/components/venue/venue-sos-alarm';
 import { useToast } from '@/components/ui/use-toast';
 import { TeamTab, TeamTabs, useTeamSos } from '@/components/team/team-bits';
+import ScanTicketButton from '@/components/team/scan-ticket-button';
 import { CounterError, CounterState, CounterTransport } from '@/services/door-counter';
 import { ApiError } from '@/services/api';
 import { TeamLinkClient, TeamLinkError, TeamLinkState } from '@/services/team';
@@ -57,7 +57,7 @@ interface ReportRow {
   expelled?: boolean;
 }
 
-type Tab = 'door' | 'lists' | 'tickets' | 'reports';
+type Tab = 'door' | 'lists' | 'reports';
 
 /**
  * Seguridad con su enlace de la noche: alertas de ayuda con sirena, aforo,
@@ -236,7 +236,6 @@ const TeamSecurity = ({
   const tabs: TeamTab<Tab>[] = [
     { id: 'door', label: t('team.tabs.door'), icon: ShieldCheck, badge: abiertas },
     { id: 'lists', label: t('team.tabs.lists'), icon: ClipboardList },
-    ...(state.features.tickets ? [{ id: 'tickets' as const, label: t('team.tabs.tickets'), icon: ScanLine }] : []),
     { id: 'reports', label: t('team.tabs.reports'), icon: Flag, badge: reports?.filter((r) => !r.expelled).length ?? 0 },
   ];
 
@@ -272,8 +271,6 @@ const TeamSecurity = ({
       )}
 
       {tab === 'lists' && <VenueGuestLists eventId={eventId} door={door} />}
-
-      {tab === 'tickets' && <TicketValidator validate={validarEntrada} />}
 
       {tab === 'reports' && (
         <div className="surface-light rounded-2xl p-4">
@@ -321,6 +318,15 @@ const TeamSecurity = ({
             </ul>
           )}
         </div>
+      )}
+
+      {/* Las entradas ya no son una pestaña: un botón fijo abajo, a mano desde
+          cualquier parte, como en el enlace del contador. */}
+      {state.features.tickets && (
+        <>
+          <div aria-hidden className="h-24" />
+          <ScanTicketButton validate={validarEntrada} />
+        </>
       )}
     </>
   );

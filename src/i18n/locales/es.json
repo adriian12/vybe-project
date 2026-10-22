@@ -955,11 +955,11 @@
             "role": "Rol",
             "roles": {
                 "owner": "Propietario",
-                "security": "Seguridad",
+                "security": "Control puerta",
                 "waiter": "Camarero",
                 "promoter": "RRPP"
             },
-            "roleHelp": "Propietario: todo el panel. Seguridad: Puerta (aforo, listas, entradas y alertas) y Código QR.",
+            "roleHelp": "Propietario: todo el panel. Control puerta: Puerta (aforo, listas, entradas y alertas) y Código QR.",
             "add": "Añadir",
             "added": "Miembro añadido",
             "removed": "Miembro eliminado",
@@ -970,7 +970,7 @@
             "count_other": "{{count}} personas",
             "links": {
                 "title": "Enlaces del equipo",
-                "body": "Sin cuenta: se abren en cualquier móvil. Los de Seguridad y Camareros valen para una noche; el de cada RRPP dura hasta que lo revoques.",
+                "body": "Sin cuenta: se abren en cualquier móvil. Los de Control puerta y Camareros valen para una noche; el de cada RRPP dura hasta que lo revoques.",
                 "new": "Nuevo enlace",
                 "name": "Nombre",
                 "namePlaceholder": "Puerta 1, Barra Laura, Adrián…",
@@ -3644,7 +3644,9 @@
             "tooMany": "Demasiados enlaces activos: revoca alguno.",
             "commission": "Comisión no válida.",
             "entryLocked": "Ya ha entrado alguien de esa línea: no se puede quitar."
-        }
+        },
+        "scanTicket": "Escanear entrada",
+        "scanTicketBody": "Apunta la cámara al QR de la entrada o escribe el código. Cada entrada vale una sola vez."
     },
     "completeProfile": {
         "title": "Completa tu perfil",

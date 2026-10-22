@@ -16,10 +16,15 @@ import { adminClient } from '../_shared/supabase.ts';
  *     doble del aforo) y sólo deja contar con el evento en marcha.
  *   - Aquí, además, un tope de peticiones por enlace.
  *
- * Acciones: `state` (lee), `adjust` (`delta`) y `set` (`total`).
+ * Acciones: `state` (lee), `adjust` (`delta`) y `set` (`total`). Y, para el
+ * botón «Escanear entrada» (migración 118): `tickets` (si el enlace puede
+ * validar entradas) y `ticket` (`code`, valida una).
  */
 
-type Action = 'state' | 'adjust' | 'set';
+type Action = 'state' | 'adjust' | 'set' | 'tickets' | 'ticket';
+
+/** Errores de `counter_link_ticket` que se le cuentan al portero tal cual. */
+const TICKET_ERRORS = ['INVALID_LINK', 'PLAN_REQUIRED', 'TICKET_NOT_FOUND', 'TICKET_REFUNDED', 'NOT_AUTHORIZED'];
 
 /** Errores de `counter_link_apply` que se le cuentan al contador tal cual. */
 const KNOWN = ['INVALID_LINK', 'INVALID_DELTA', 'INVALID_TOTAL', 'CAPACITY_REQUIRED', 'EVENT_NOT_LIVE'];
@@ -79,12 +84,31 @@ serve(async (req: Request): Promise<Response> => {
   if (token.length < 16 || token.length > 64 || !/^[A-Za-z0-9_-]+$/.test(token)) {
     return json({ error: 'INVALID_LINK' }, 401);
   }
-  if (!['state', 'adjust', 'set'].includes(action)) {
+  if (!['state', 'adjust', 'set', 'tickets', 'ticket'].includes(action)) {
     return json({ error: 'INVALID_ACTION' }, 400);
   }
 
   const tokenHash = await sha256(token);
   if (tooMany(tokenHash)) return json({ error: 'TOO_MANY_REQUESTS' }, 429);
+
+  if (action === 'tickets' || action === 'ticket') {
+    const code = typeof body.code === 'string' ? body.code.trim() : '';
+    if (action === 'ticket' && (code.length < 4 || code.length > 20)) {
+      return json({ error: 'TICKET_NOT_FOUND' }, 400);
+    }
+    const { data, error } = await adminClient().rpc('counter_link_ticket', {
+      p_token_hash: tokenHash,
+      p_code: action === 'ticket' ? code : null,
+    });
+    if (error) {
+      const known = TICKET_ERRORS.find((k) => error.message?.includes(k));
+      if (known === 'INVALID_LINK') return json({ error: known }, 401);
+      if (known) return json({ error: known }, 400);
+      console.error('door-counter ticket:', error);
+      return json({ error: 'INTERNAL' }, 500);
+    }
+    return json(data ?? {});
+  }
 
   const delta = action === 'adjust' ? asInt(body.delta) : null;
   const total = action === 'set' ? asInt(body.total) : null;

@@ -166,8 +166,15 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
   la del móvil de quien los crea.
 - **Equipo del local** (migración 072). Hay cuatro roles:
   - **Propietarios:** tienen cuenta (`venue_members.role = 'owner'`) y ven todo el panel.
-  - **Seguridad:** con cuenta (`'security'`: Puerta y Código QR) o con un enlace
-    de una noche.
+  - **Control puerta** (antes «Seguridad»; en el código sigue siendo
+    `'security'`): con cuenta (Puerta y Código QR) o con un enlace de una noche.
+    En su enlace, las entradas no son una pestaña: un botón fijo abajo,
+    «Escanear entrada» (`scan-ticket-button.tsx`), abre el validador en una hoja.
+  - **El enlace del contador** (`/contador/<token>`) lleva el mismo botón
+    (migración 118): `door-counter` con `action: 'tickets'` (si el plan vende
+    entradas) y `'ticket'` (`code`), que llaman a `counter_link_ticket()`.
+    La entrada tiene que ser de la fiesta del enlace y se valida con el papel
+    de Control puerta fijado en la transacción, como en `team_link_action`.
   - **Camareros:** sólo con enlace de una noche.
   - **RRPP:** con un enlace fijo, que dura hasta que se revoca.
 

@@ -1,5 +1,7 @@
 import { FunctionsHttpError } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { ApiError } from '@/services/api';
+import type { TicketKind, ValidatedTicket } from '@/services/tickets';
 
 /**
  * Lo que enseña un contador de puerta, venga del panel o del enlace del portero.
@@ -86,4 +88,60 @@ export const linkTransport = (token: string): CounterTransport => ({
   load: () => callLink({ token, action: 'state' }),
   adjust: (delta) => callLink({ token, action: 'adjust', delta }),
   set: (total) => callLink({ token, action: 'set', total }),
+});
+
+const ERRORES_ENTRADA: Record<string, string> = {
+  TICKET_NOT_FOUND: 'sales.errors.ticketNotFound',
+  TICKET_REFUNDED: 'sales.errors.ticketRefunded',
+  PLAN_REQUIRED: 'sales.errors.planRequired',
+  INVALID_LINK: 'counter.errors.INVALID_LINK',
+};
+
+const llamarEntradas = async <T,>(body: Record<string, unknown>): Promise<T> => {
+  const { data, error } = await supabase.functions.invoke<T>('door-counter', { body });
+  if (error) {
+    let code = 'UNKNOWN';
+    if (error instanceof FunctionsHttpError) {
+      const detail = (await error.context.json().catch(() => null)) as { error?: string } | null;
+      code = detail?.error ?? code;
+    }
+    throw new ApiError(code, ERRORES_ENTRADA[code] ?? 'errors.generic');
+  }
+  return data as T;
+};
+
+/**
+ * Validar entradas con el enlace del contador (migración 118): el botón fijo
+ * «Escanear entrada» de `/contador/:token`.
+ */
+export const linkTickets = (token: string) => ({
+  /** Si el plan del local vende entradas; sin él, el botón no sale. */
+  enabled: async (): Promise<boolean> => {
+    try {
+      const r = await llamarEntradas<{ tickets?: boolean }>({ token, action: 'tickets' });
+      return Boolean(r?.tickets);
+    } catch {
+      return false;
+    }
+  },
+  validate: async (code: string): Promise<ValidatedTicket> => {
+    const r = await llamarEntradas<{
+      kind: TicketKind;
+      type_name: string;
+      holder_name: string;
+      event_name: string;
+      guests: number | null;
+      already_used: boolean;
+      used_at: string | null;
+    }>({ token, action: 'ticket', code });
+    return {
+      kind: r.kind,
+      typeName: r.type_name,
+      holderName: r.holder_name,
+      eventName: r.event_name,
+      guests: r.guests,
+      alreadyUsed: r.already_used,
+      usedAt: r.used_at,
+    };
+  },
 });

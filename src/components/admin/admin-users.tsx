@@ -58,7 +58,18 @@ const AdminUsers = () => {
       await adminService.setSubscription(user.profileId, valor as 'none' | 'monthly' | 'lifetime');
       setUsuarios((prev) =>
         prev.map((u) =>
-          u.profileId === user.profileId ? { ...u, subscription: valor as AdminUser['subscription'] } : u,
+          u.profileId === user.profileId
+            ? {
+                ...u,
+                subscription: valor as AdminUser['subscription'],
+                // Lo que pone admin_set_subscription: 30 días el mensual, sin
+                // fecha el vitalicio. Antes se quedaba la del plan anterior.
+                subscriptionExpiresAt:
+                  valor === 'monthly' ? new Date(Date.now() + 30 * 86_400_000).toISOString() : null,
+                subscriptionRenews: false,
+                subscriptionCancelAtPeriodEnd: false,
+              }
+            : u,
         ),
       );
       toast({ title: t('admin.users.planSaved') });
@@ -157,7 +168,9 @@ const AdminUsers = () => {
                     <div className="flex flex-wrap items-center gap-2">
                       <Select
                         value={user.subscription === 'event' ? 'event' : user.subscription}
-                        disabled={ocupado === user.profileId || user.subscription === 'event'}
+                        // Con Premium de una fiesta también se puede cambiar:
+                        // «Sin Premium» lo quita (migración 117).
+                        disabled={ocupado === user.profileId}
                         onValueChange={(v) => void cambiarPlan(user, v)}
                       >
                         <SelectTrigger className="h-9 w-auto min-w-[9rem] gap-2 rounded-full border-black/10 bg-[#F5F5F7] text-ink">

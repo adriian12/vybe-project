@@ -1,11 +1,13 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { DoorOpen, LinkIcon } from 'lucide-react';
 import DoorCounter from '@/components/venue/door-counter';
 import LanguageSwitcher from '@/components/language-switcher';
 import { VybeMark } from '@/components/brand/vybe-logo';
-import { CounterState, linkTransport } from '@/services/door-counter';
+import { cn } from '@/lib/utils';
+import ScanTicketButton from '@/components/team/scan-ticket-button';
+import { CounterState, linkTickets, linkTransport } from '@/services/door-counter';
 
 /**
  * Contador del portero: `/contador/<token>`.
@@ -18,6 +20,16 @@ const CounterPage = () => {
   const { t } = useTranslation();
   const { token = '' } = useParams();
   const transport = useMemo(() => linkTransport(token), [token]);
+  // El mismo enlace valida las entradas (migración 118), si el plan las vende.
+  const entradas = useMemo(() => linkTickets(token), [token]);
+  const [conEntradas, setConEntradas] = useState(false);
+  useEffect(() => {
+    let vivo = true;
+    void entradas.enabled().then((si) => vivo && setConEntradas(si));
+    return () => {
+      vivo = false;
+    };
+  }, [entradas]);
 
   const [info, setInfo] = useState<CounterState | null>(null);
   const [fatal, setFatal] = useState<string | null>(null);
@@ -40,7 +52,7 @@ const CounterPage = () => {
         <LanguageSwitcher />
       </header>
 
-      <main className="mx-auto flex w-full max-w-md flex-1 flex-col py-4">
+      <main className={cn('mx-auto flex w-full max-w-md flex-1 flex-col py-4', conEntradas && !cerrado && 'pb-28')}>
         {cerrado ? (
           <div className="enter flex flex-1 flex-col items-center justify-center text-center">
             <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-surface-high text-party-primary">
@@ -56,6 +68,8 @@ const CounterPage = () => {
           </>
         )}
       </main>
+
+      {conEntradas && !cerrado && <ScanTicketButton validate={entradas.validate} />}
     </div>
   );
 };

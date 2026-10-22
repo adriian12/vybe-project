@@ -955,11 +955,11 @@
             "role": "Role",
             "roles": {
                 "owner": "Owner",
-                "security": "Security",
+                "security": "Door control",
                 "waiter": "Bar staff",
                 "promoter": "Promoter"
             },
-            "roleHelp": "Owner: the whole dashboard. Security: Door (capacity, lists, tickets and alerts) and QR code.",
+            "roleHelp": "Owner: the whole dashboard. Door control: Door (capacity, lists, tickets and alerts) and QR code.",
             "add": "Add",
             "added": "Member added",
             "removed": "Member removed",
@@ -970,7 +970,7 @@
             "count_other": "{{count}} people",
             "links": {
                 "title": "Team links",
-                "body": "No account: they open on any phone. Security and bar staff links last one night; each promoter's link lasts until you revoke it.",
+                "body": "No account: they open on any phone. Door control and bar staff links last one night; each promoter's link lasts until you revoke it.",
                 "new": "New link",
                 "name": "Name",
                 "namePlaceholder": "Door 1, Bar Laura, Adrián…",
@@ -3644,7 +3644,9 @@
             "tooMany": "Too many active links: revoke some.",
             "commission": "Invalid commission.",
             "entryLocked": "Someone from that entry is already in: it can't be removed."
-        }
+        },
+        "scanTicket": "Scan ticket",
+        "scanTicketBody": "Point the camera at the ticket QR or type the code. Each ticket works only once."
     },
     "completeProfile": {
         "title": "Complete your profile",

@@ -955,11 +955,11 @@
             "role": "Rol",
             "roles": {
                 "owner": "Propietari",
-                "security": "Seguretat",
+                "security": "Control porta",
                 "waiter": "Cambrer",
                 "promoter": "RRPP"
             },
-            "roleHelp": "Propietari: tot el tauler. Seguretat: Porta (aforament, llistes, entrades i alertes) i Codi QR.",
+            "roleHelp": "Propietari: tot el tauler. Control porta: Porta (aforament, llistes, entrades i alertes) i Codi QR.",
             "add": "Afegir",
             "added": "Membre afegit",
             "removed": "Membre eliminat",
@@ -970,7 +970,7 @@
             "count_other": "{{count}} persones",
             "links": {
                 "title": "Enllaços de l'equip",
-                "body": "Sense compte: s'obren a qualsevol mòbil. Els de Seguretat i Cambrers valen per a una nit; el de cada RRPP dura fins que el revoquis.",
+                "body": "Sense compte: s'obren a qualsevol mòbil. Els de Control porta i Cambrers valen per a una nit; el de cada RRPP dura fins que el revoquis.",
                 "new": "Nou enllaç",
                 "name": "Nom",
                 "namePlaceholder": "Porta 1, Barra Laura, Adrián…",
@@ -3644,7 +3644,9 @@
             "tooMany": "Massa enllaços actius: revoca'n algun.",
             "commission": "Comissió no vàlida.",
             "entryLocked": "Ja ha entrat algú d'aquesta línia: no es pot treure."
-        }
+        },
+        "scanTicket": "Escanejar entrada",
+        "scanTicketBody": "Apunta la càmera al QR de l'entrada o escriu el codi. Cada entrada val una sola vegada."
     },
     "completeProfile": {
         "title": "Completa el teu perfil",
