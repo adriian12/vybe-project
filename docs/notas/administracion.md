@@ -62,6 +62,10 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
     `send-push`, `newEvents` en `push-texts`) que abre `/map`.
   - Las ya añadidas salen al final, al 40 % de opacidad y sin poder marcarse.
   - Funout no pasa por aquí: sigue avisando fiesta a fiesta.
+  - **También sin el panel nuevo** (migración 120): si una sola llamada trae
+    más de 3 fiestas sin `p_quiet` (un panel abierto desde antes de publicar),
+    el servidor calla y manda él el aviso único. El 22-10-2026 llegaron 527
+    avisos de Barcelona por añadir con la página abierta desde antes de la 119.
 - **Plan de un usuario con Premium de una fiesta** (migración 117): el
   selector de Usuarios ya no se bloquea. «Sin Premium» cancela también el de la
   fiesta; mensual o vitalicio se añaden y dejan el de la fiesta. (En Aurora,
