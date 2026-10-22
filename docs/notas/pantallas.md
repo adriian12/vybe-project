@@ -67,7 +67,7 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
   Reggaeton, Electrónica, Techno y Otras (lo demás y sin género). `musicaDe()`
   reparte el género que trae la fiesta por expresiones en orden (Techno antes
   que Electrónica, Electrónica antes que Reggaeton: «Latin House» es
-  Electrónica). El filtro de inicio y el del mapa guardan la categoría, no el
+  Electrónica; Hip-Hop, Rap y R&B, Comercial). El filtro de inicio y el del mapa guardan la categoría, no el
   género. Antes salían más de sesenta etiquetas.
 - **Hoja de filtros del mapa** en columna: la lista se desplaza y el pie
   («Quitar filtros», «Ver N fiestas») queda abajo; con el pie `sticky` y la

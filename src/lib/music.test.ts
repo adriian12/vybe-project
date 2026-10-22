@@ -25,7 +25,10 @@ describe('musicaDe', () => {
       ['90s - 00s', 'comercial'],
       ["80's", 'comercial'],
       ['Pop', 'comercial'],
-      ['Hip-Hop', 'otras'],
+      ['Hip-Hop', 'comercial'],
+      ['Hip-hop', 'comercial'],
+      ['Rap', 'comercial'],
+      ['R&B', 'comercial'],
       ['Funk / Soul', 'otras'],
       ['Post-Punk', 'otras'],
     ];

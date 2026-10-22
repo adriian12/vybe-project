@@ -15,7 +15,7 @@ const REGLAS: [Musica, RegExp][] = [
     /house|electr|\bedm\b|trance|psy|drum ?(and|&|n) ?bass|\bdnb\b|\bbass\b|breakbeat|dubstep|garage|progressive|disco|ambient|downtempo|\bidm\b|experimental|afro ?tech|jungle/,
   ],
   ['reggaeton', /reggaet|regueton|latin|dembow|perreo|guaracha|dancehall|baile ?funk|salsa|bachata|urban/],
-  ['comercial', /comercial|commercial|\bhits?\b|\bpop\b|remember|petardeo|\b(80|90|00)'?s?\b|\bclub\b|internacional|joven|mainstream|top ?40/],
+  ['comercial', /comercial|commercial|\bhits?\b|\bpop\b|remember|petardeo|\b(80|90|00)'?s?\b|\bclub\b|internacional|joven|mainstream|top ?40|hip ?-?hop|\brap\b|\br ?& ?b\b|\brnb\b|\btrap\b/],
 ];
 
 /** La categoría de un género; sin género, u otro cualquiera, «otras». */
