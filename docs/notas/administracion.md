@@ -46,11 +46,18 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
   `sala-wave-club`, `boomerang`), con el mismo final. **Fourvenues enseña la
   fiesta con cualquier micrositio**, así que «no da 404» no basta: la página
   del RRPP trae `"organization":{"id":…,"slug":…}` y cada micrositio el id de
-  su organización (`transfer-state-microsite-<slug>` → `channel.id`); se
-  empareja por ese id. Fourvenues está detrás de Cloudflare: sólo se puede
-  leer desde un Chrome de verdad (el del usuario), despacio (más de 3 o 4
-  peticiones seguidas → «Too much hype» un buen rato). `funout_upsert_event`
+  su organización (`transfer-state-microsite-<slug>` → `channel.id`). Así se
+  corrigieron 21, todas pasadas. Fourvenues está detrás de Cloudflare y el
+  usuario no quiere que se use su Chrome para esto. `funout_upsert_event`
   ya no pisa un enlace de Fourvenues corregido si apunta al mismo evento.
+- **Ahora se cambia por la sala** (migración 116): la tabla
+  `fourvenues_microsites` (`venue_search_key(place_name)` → slug) y el
+  disparador `events_fourvenues_venue_link` reescriben el canal de cualquier
+  enlace de Fourvenues al del local, al crear o editar la fiesta (también lo
+  que trae Funout). Sala sin fila: el enlace se queda como venga. Para un local
+  nuevo, una fila más (con sus variantes de nombre). Quedan con RRPP las
+  fiestas de Sala Sunset, La Santa, Son Fusteret y «Club» (PARAO), que no
+  tienen micrositio conocido.
 - **Escáner** (migración 114, `scan-sync`, `admin-scanner.tsx`): Eventos →
   ESCÁNER, al lado de FUNOUT. Lee Xceed (la página pública de eventos de cada
   ciudad, estado de Next en `self.__next_f`; su API pide clave) y Resident
