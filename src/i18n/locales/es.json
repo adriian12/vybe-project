@@ -344,7 +344,11 @@
         "onlyHere": "Solo ves a gente que está en esta fiesta ahora mismo.",
         "verificationPendingTitle": "Verificación pendiente",
         "verificationPending": "Tus fotos se han guardado, pero no hemos podido confirmar que se te vea la cara. Hazte otras con la cara bien visible.",
-        "cameraOnly": "La foto de esta noche se hace con la cámara en el momento. La galería sólo se puede usar para las fotos del perfil."
+        "cameraOnly": "La foto de esta noche se hace con la cámara en el momento. La galería sólo se puede usar para las fotos del perfil.",
+        "likesLimitTitle": "Ya has dado tus 5 me gusta de esta fiesta",
+        "likesLimitBody": "Con Premium son ilimitados. Puedes seguir descartando y mandar supercrush.",
+        "likesLeft_one": "Me gusta: te queda {{count}} en esta fiesta",
+        "likesLeft_other": "Me gusta: te quedan {{count}} en esta fiesta"
     },
     "filters": {
         "title": "Filtrar perfiles",
@@ -697,7 +701,10 @@
             "secondChance": "Segunda oportunidad",
             "secondChanceBody": "Recupera a quien descartaste por error mientras siga en la fiesta.",
             "boost": "Destacar una hora",
-            "boostBody": "Tu perfil el primero del tablón durante 60 minutos."
+            "boostBody": "Tu perfil el primero del tablón durante 60 minutos.",
+            "unlimitedLikes": "Me gusta ilimitados",
+            "unlimitedLikesBody": "Da todos los me gusta que quieras en cada fiesta.",
+            "unlimitedLikesFree": "Gratis: 5 me gusta por fiesta"
         },
         "required": "Esto es de Fiestea Premium.",
         "boost": {
@@ -2493,7 +2500,8 @@
         "left": "{{time}} restantes",
         "sendMessage": "Enviar mensaje",
         "viewProfile": "Ver perfil de {{name}}",
-        "viewProfileShort": "Ver perfil"
+        "viewProfileShort": "Ver perfil",
+        "superCrush": "Supercrush"
     },
     "userProfile": {
         "notFound": "Este perfil ya no está disponible",

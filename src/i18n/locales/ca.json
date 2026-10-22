@@ -344,7 +344,11 @@
         "onlyHere": "Només veus gent que és en aquesta festa ara mateix.",
         "verificationPendingTitle": "Verificació pendent",
         "verificationPending": "Les teves fotos s'han desat, però no hem pogut confirmar que se't vegi la cara. Fes-ne d'altres amb la cara ben visible.",
-        "cameraOnly": "La foto d'aquesta nit es fa amb la càmera en el moment. La galeria només es pot fer servir per a les fotos del perfil."
+        "cameraOnly": "La foto d'aquesta nit es fa amb la càmera en el moment. La galeria només es pot fer servir per a les fotos del perfil.",
+        "likesLimitTitle": "Ja has donat els teus 5 m'agrada d'aquesta festa",
+        "likesLimitBody": "Amb Premium són il·limitats. Pots continuar descartant i enviar supercrush.",
+        "likesLeft_one": "M'agrada: te'n queda {{count}} en aquesta festa",
+        "likesLeft_other": "M'agrada: te'n queden {{count}} en aquesta festa"
     },
     "filters": {
         "title": "Filtrar perfils",
@@ -697,7 +701,10 @@
             "secondChance": "Segona oportunitat",
             "secondChanceBody": "Recupera qui vas descartar per error mentre segueixi a la festa.",
             "boost": "Destacar una hora",
-            "boostBody": "El teu perfil el primer del tauler durant 60 minuts."
+            "boostBody": "El teu perfil el primer del tauler durant 60 minuts.",
+            "unlimitedLikes": "M'agrada il·limitats",
+            "unlimitedLikesBody": "Dona tots els m'agrada que vulguis a cada festa.",
+            "unlimitedLikesFree": "Gratis: 5 m'agrada per festa"
         },
         "required": "Això és de Fiestea Premium.",
         "boost": {
@@ -2493,7 +2500,8 @@
         "left": "{{time}} restants",
         "sendMessage": "Enviar missatge",
         "viewProfile": "Veure el perfil de {{name}}",
-        "viewProfileShort": "Veure perfil"
+        "viewProfileShort": "Veure perfil",
+        "superCrush": "Supercrush"
     },
     "userProfile": {
         "notFound": "Aquest perfil ja no està disponible",

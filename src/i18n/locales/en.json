@@ -344,7 +344,11 @@
         "onlyHere": "You only see people who are at this party right now.",
         "verificationPendingTitle": "Verification pending",
         "verificationPending": "Your photos were saved, but we couldn't confirm your face is visible. Take new ones with your face clearly in view.",
-        "cameraOnly": "Tonight's photo is taken with the camera on the spot. The gallery can only be used for profile photos."
+        "cameraOnly": "Tonight's photo is taken with the camera on the spot. The gallery can only be used for profile photos.",
+        "likesLimitTitle": "You've used your 5 likes for this party",
+        "likesLimitBody": "With Premium they are unlimited. You can still pass and send supercrushes.",
+        "likesLeft_one": "Likes: {{count}} left at this party",
+        "likesLeft_other": "Likes: {{count}} left at this party"
     },
     "filters": {
         "title": "Filter profiles",
@@ -697,7 +701,10 @@
             "secondChance": "Second chance",
             "secondChanceBody": "Bring back someone you passed by mistake, while they are still at the party.",
             "boost": "Stand out for an hour",
-            "boostBody": "Your profile first on the board for 60 minutes."
+            "boostBody": "Your profile first on the board for 60 minutes.",
+            "unlimitedLikes": "Unlimited likes",
+            "unlimitedLikesBody": "Give as many likes as you want at every party.",
+            "unlimitedLikesFree": "Free: 5 likes per party"
         },
         "required": "This is a Fiestea Premium feature.",
         "boost": {
@@ -2493,7 +2500,8 @@
         "left": "{{time}} left",
         "sendMessage": "Send message",
         "viewProfile": "View {{name}}'s profile",
-        "viewProfileShort": "View profile"
+        "viewProfileShort": "View profile",
+        "superCrush": "Supercrush"
     },
     "userProfile": {
         "notFound": "This profile is no longer available",

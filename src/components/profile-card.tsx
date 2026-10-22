@@ -16,6 +16,11 @@ export interface ProfileCardHandle {
 interface ProfileCardProps {
   user: User;
   onSwipe: (direction: SwipeDirection, userId: string) => void;
+  /**
+   * Se pregunta antes de que la tarjeta salga; si devuelve `false` vuelve al
+   * centro (sin me gusta disponibles, por ejemplo).
+   */
+  canSwipe?: (direction: SwipeDirection) => boolean;
 }
 
 const FALLBACK_PHOTO = '/placeholder.svg';
@@ -48,7 +53,7 @@ const EXIT_MS = 260;
  * debajo, fuera de la foto, y la pantalla los pulsa a través de `swipe()`. Así
  * el gesto y el botón hacen la misma animación.
  */
-const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(({ user, onSwipe }, ref) => {
+const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(({ user, onSwipe, canSwipe }, ref) => {
   const { t } = useTranslation();
   const interestLabel = useInterestLabel();
 
@@ -96,6 +101,10 @@ const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(({ user, onS
   const lanzar = useCallback(
     (direction: SwipeDirection) => {
       if (salida) return;
+      if (canSwipe && !canSwipe(direction)) {
+        moverA(0);
+        return;
+      }
       setSalida(direction);
       setTimeout(() => {
         onSwipe(direction, user.id);
@@ -107,7 +116,7 @@ const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(({ user, onS
         }, 600);
       }, EXIT_MS);
     },
-    [onSwipe, salida, user.id, moverA],
+    [onSwipe, canSwipe, salida, user.id, moverA],
   );
 
   useImperativeHandle(ref, () => ({ swipe: lanzar }), [lanzar]);

@@ -30,7 +30,7 @@ import { EventActionButton } from '@/components/ui-custom/event-action-button';
 import { useAppContext } from '@/context/app-context';
 import { usePremium } from '@/context/premium-context';
 import { useToast } from '@/components/ui/use-toast';
-import { api } from '@/services/api';
+import { api, ApiError } from '@/services/api';
 import { socialService } from '@/services/social';
 import { track } from '@/lib/observability';
 import { cn } from '@/lib/utils';
@@ -80,8 +80,14 @@ const EventSwipingPage = () => {
     refreshActiveEvent,
     leaveEvent,
   } = useAppContext();
-  const { supercrushBalance, supercrushIncluded, setShowSupercrushDialog, refreshSupercrush } =
-    usePremium();
+  const {
+    supercrushBalance,
+    supercrushIncluded,
+    setShowSupercrushDialog,
+    refreshSupercrush,
+    isPremium,
+    setShowPremiumDialog,
+  } = usePremium();
   // Supercrush que puede mandar ahora: el de regalo de esta fiesta (uno por
   // persona y fiesta, migración 109) más los comprados o regalados.
   const supercrushDisponibles = supercrushBalance + (supercrushIncluded ? 1 : 0);
@@ -115,6 +121,10 @@ const EventSwipingPage = () => {
   const [showMatchDialog, setShowMatchDialog] = useState(false);
   const [showSafety, setShowSafety] = useState(false);
   const [matchedUser, setMatchedUser] = useState<User | null>(null);
+  const [matchSuper, setMatchSuper] = useState(false);
+  // Sin Premium, 5 me gusta por fiesta (migración 115); `null` = sin límite.
+  // La cuenta la lleva el servidor y no se reinicia al salir y volver.
+  const [likesLeft, setLikesLeft] = useState<number | null>(null);
   const [dentro, setDentro] = useState<number | null>(null);
   // El negocio puede no dejar conocer gente en su fiesta (migración 081).
   const [sinSwipe, setSinSwipe] = useState(false);
@@ -186,6 +196,32 @@ const EventSwipingPage = () => {
     void socialService.getMyInterests().then(setMisIntereses);
   }, []);
 
+  const eventoActivo = activeEvent?.eventId;
+  useEffect(() => {
+    if (!eventoActivo) return;
+    let vivo = true;
+    void api.getLikesLeft(eventoActivo).then((n) => vivo && setLikesLeft(n));
+    return () => {
+      vivo = false;
+    };
+  }, [eventoActivo, isPremium]);
+
+  const sinLikes = likesLeft !== null && likesLeft <= 0;
+  const avisarSinLikes = useCallback(() => {
+    toast({ title: t('swiping.likesLimitTitle'), description: t('swiping.likesLimitBody') });
+    setShowPremiumDialog(true);
+  }, [toast, t, setShowPremiumDialog]);
+
+  /** Sin me gusta, la tarjeta no sale a la derecha: se ofrece Premium. */
+  const puedeSwipe = useCallback(
+    (direction: SwipeDirection) => {
+      if (direction !== 'right' || !sinLikes) return true;
+      avisarSinLikes();
+      return false;
+    },
+    [sinLikes, avisarSinLikes],
+  );
+
   /** Sube la foto de esta noche y entra al tablón. */
   const submitEventPhoto = useCallback(async () => {
     if (!eventPhoto || !activeEvent) return;
@@ -234,18 +270,37 @@ const EventSwipingPage = () => {
         return;
       }
 
-      const isMatch =
-        direction === 'super'
-          ? await handleSuperLike(userId).finally(() => void refreshSupercrush())
-          : await handleSwipeRight(userId);
+      let match;
+      try {
+        match =
+          direction === 'super'
+            ? await handleSuperLike(userId).finally(() => void refreshSupercrush())
+            : await handleSwipeRight(userId);
+      } catch (error) {
+        if (error instanceof ApiError && error.code === 'LIKE_LIMIT') {
+          setLikesLeft(0);
+          avisarSinLikes();
+        }
+        return;
+      }
+      if (direction === 'right') setLikesLeft((n) => (n === null ? n : Math.max(n - 1, 0)));
 
-      if (isMatch && swiped) {
+      if (match && swiped) {
         track('match', { eventId: activeEvent?.eventId });
         setMatchedUser(swiped);
+        setMatchSuper(match.superCrush);
         setShowMatchDialog(true);
       }
     },
-    [nearbyProfiles, handleSwipeLeft, handleSwipeRight, handleSuperLike, refreshSupercrush, activeEvent?.eventId],
+    [
+      nearbyProfiles,
+      handleSwipeLeft,
+      handleSwipeRight,
+      handleSuperLike,
+      refreshSupercrush,
+      avisarSinLikes,
+      activeEvent?.eventId,
+    ],
   );
 
   const handleExit = () => {
@@ -440,6 +495,7 @@ const EventSwipingPage = () => {
                 ref={tarjeta}
                 user={currentProfile}
                 onSwipe={(direction, userId) => void onSwipe(direction, userId)}
+                canSwipe={puedeSwipe}
               />
             </>
           ) : (
@@ -515,11 +571,22 @@ const EventSwipingPage = () => {
           <button
             type="button"
             disabled={!currentProfile}
-            onClick={() => tarjeta.current?.swipe('right')}
-            aria-label={t('likes.likeBack')}
-            className="press flex h-16 w-16 items-center justify-center rounded-full bg-party-primary text-ink shadow-[0_8px_24px_rgba(248,208,0,0.25)] disabled:opacity-40"
+            onClick={() => (sinLikes ? avisarSinLikes() : tarjeta.current?.swipe('right'))}
+            aria-label={
+              likesLeft === null ? t('likes.likeBack') : t('swiping.likesLeft', { count: likesLeft })
+            }
+            className={cn(
+              'press relative flex h-16 w-16 items-center justify-center rounded-full shadow-[0_8px_24px_rgba(248,208,0,0.25)] disabled:opacity-40',
+              sinLikes ? 'bg-card text-party-primary' : 'bg-party-primary text-ink',
+            )}
           >
-            <Heart size={30} className="fill-ink" />
+            <Heart size={30} className={sinLikes ? 'fill-party-primary' : 'fill-ink'} />
+            {/* Cuántos me gusta quedan en esta fiesta, sólo sin Premium. */}
+            {likesLeft !== null && (
+              <span className="absolute -right-1 -top-1 flex h-6 min-w-[1.5rem] items-center justify-center rounded-full bg-ink px-1 text-caption font-bold text-party-primary ring-2 ring-party-primary">
+                {likesLeft}
+              </span>
+            )}
           </button>
         </div>
 
@@ -537,6 +604,7 @@ const EventSwipingPage = () => {
         isOpen={showMatchDialog}
         onClose={() => setShowMatchDialog(false)}
         matchedUser={matchedUser}
+        superCrush={matchSuper}
         currentUserPhoto={activeEvent.photoUrl ?? currentUser?.photos[0]}
         eventName={activeEvent.eventName}
         endsAt={activeEvent.endDate}

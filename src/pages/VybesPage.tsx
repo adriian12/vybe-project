@@ -5,6 +5,8 @@ import { Heart, Hourglass, Loader2, Lock, Star, Zap } from 'lucide-react';
 import Header from '@/components/header';
 import Footer from '@/components/footer';
 import ConnectionListItem from '@/components/connection-list-item';
+import MatchDialog from '@/components/match-dialog';
+import type { User } from '@/types/user';
 import { PartyButton } from '@/components/ui-custom/party-button';
 import { useToast } from '@/components/ui/use-toast';
 import { useAppContext } from '@/context/app-context';
@@ -45,6 +47,9 @@ const VybesPage = () => {
   const { toast } = useToast();
   const { connections, messages, currentUser, activeEvent, events, refreshConnections } = useAppContext();
   const { isPremium, setShowPremiumDialog } = usePremium();
+  // El crush que acaba de salir al devolver un like: se celebra igual que en
+  // el tablón antes de ir al chat.
+  const [crush, setCrush] = useState<{ user: User; superCrush: boolean; eventName?: string } | null>(null);
 
   const [pestana, setPestana] = useState<Pestana>(initialTab);
   const [likes, setLikes] = useState<LikeReceived[] | null>(null);
@@ -131,18 +136,37 @@ const VybesPage = () => {
 
   const likeBack = async (profileId: string) => {
     setBusyId(profileId);
+    // Lo que se sabe de esa persona, para el aviso del crush.
+    const completo = likes?.find((l) => l.id === profileId);
+    const previo = vistaPrevia.find((l) => l.profileId === profileId);
     try {
-      const isMatch = await api.swipe(profileId, 'like', activeEvent?.eventId);
+      const match = await api.swipe(profileId, 'like', activeEvent?.eventId);
       setLikes((prev) => (prev ?? []).filter((l) => l.id !== profileId));
-      if (isMatch) {
+      if (match) {
         track('match', { from: 'likes' });
-        toast({ title: t('match.newConnection') });
         // El crush acaba de crearse: sin recargar, el chat aún no lo conoce.
         await refreshConnections();
-        navigate(`/chat/${profileId}`);
+        const foto = completo?.photos[0] ?? completo?.avatar ?? previo?.photo ?? undefined;
+        setCrush({
+          user: {
+            id: profileId,
+            name: completo?.name ?? previo?.name ?? '',
+            age: completo?.age ?? previo?.age ?? 0,
+            bio: completo?.bio ?? '',
+            photos: foto ? [foto] : [],
+            isVerified: true,
+          },
+          superCrush: match.superCrush,
+          eventName: completo?.eventName ?? previo?.eventName ?? undefined,
+        });
       }
-    } catch {
-      toast({ title: t('common.error'), variant: 'destructive' });
+    } catch (error) {
+      if (error instanceof ApiError && error.code === 'LIKE_LIMIT') {
+        toast({ title: t('swiping.likesLimitTitle'), description: t('swiping.likesLimitBody') });
+        setShowPremiumDialog(true);
+      } else {
+        toast({ title: t('common.error'), variant: 'destructive' });
+      }
     } finally {
       setBusyId(null);
     }
@@ -497,6 +521,21 @@ const VybesPage = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <MatchDialog
+        isOpen={crush !== null}
+        onClose={() => setCrush(null)}
+        matchedUser={crush?.user ?? null}
+        superCrush={crush?.superCrush}
+        currentUserPhoto={activeEvent?.photoUrl ?? currentUser?.photos[0]}
+        eventName={crush?.eventName}
+        onSendMessage={() => {
+          if (crush) navigate(`/chat/${crush.user.id}`);
+        }}
+        onViewProfile={() => {
+          if (crush) navigate(`/u/${crush.user.id}`);
+        }}
+      />
 
       <Footer />
     </div>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Crown, Bookmark, Users, RotateCcw, Rocket, Eye, Check } from 'lucide-react';
+import { Crown, Bookmark, Users, RotateCcw, Rocket, Eye, Check, Heart } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { PartyButton } from './ui-custom/party-button';
 import { PREMIUM_PRICES, usePremium } from '@/context/premium-context';
@@ -20,6 +20,9 @@ import { useAppContext } from '@/context/app-context';
  * por escribir sin permiso a alguien que está a diez metros es vender acoso.
  */
 const FEATURES = [
+  // Sin Premium, 5 me gusta por fiesta (migración 115): se dice qué tiene la
+  // cuenta gratuita para que se vea la diferencia.
+  { icon: <Heart size={20} />, key: 'unlimitedLikes', free: 'unlimitedLikesFree' },
   { icon: <Bookmark size={20} />, key: 'keepAlone' },
   { icon: <Users size={20} />, key: 'whoIsGoing' },
   { icon: <RotateCcw size={20} />, key: 'secondChance' },
@@ -87,6 +90,11 @@ const PremiumFeatures: React.FC = () => {
               <div>
                 <h3 className="mb-0.5 font-display text-title-card">{t(`premium.features.${feature.key}`)}</h3>
                 <p className="text-body-sm text-party-gray">{t(`premium.features.${feature.key}Body`)}</p>
+                {'free' in feature && (
+                  <p className="mt-1 inline-flex rounded-full bg-surface-high px-2 py-0.5 text-caption text-party-gray">
+                    {t(`premium.features.${feature.free}`)}
+                  </p>
+                )}
               </div>
             </div>
           ))}

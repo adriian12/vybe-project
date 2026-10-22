@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { BadgeCheck, MessageCircle, Timer, UserRound, Zap } from 'lucide-react';
+import { BadgeCheck, MessageCircle, Star, Timer, UserRound, Zap } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { User } from '@/types/user';
 import { useInterestLabel } from './interest-picker';
@@ -19,6 +19,8 @@ interface MatchDialogProps {
   endsAt?: string;
   /** Intereses propios, para enseñar los que compartís. */
   myInterests?: string[];
+  /** Alguno de los dos dio supercrush: se dice encima del título. */
+  superCrush?: boolean;
 }
 
 const FALLBACK_PHOTO = '/placeholder.svg';
@@ -38,6 +40,7 @@ const MatchDialog: React.FC<MatchDialogProps> = ({
   eventName,
   endsAt,
   myInterests = [],
+  superCrush = false,
 }) => {
   const { t } = useTranslation();
   const interestLabel = useInterestLabel();
@@ -69,6 +72,15 @@ const MatchDialog: React.FC<MatchDialogProps> = ({
         )}
 
         <div className="text-center">
+          {superCrush && (
+            <span
+              className="celebrate-pop mb-2 inline-flex items-center gap-1.5 rounded-full bg-party-primary px-3 py-1 text-label-pill uppercase tracking-wider text-ink"
+              style={{ '--d': '120ms' } as React.CSSProperties}
+            >
+              <Star size={13} className="fill-ink" />
+              {t('matchDialog.superCrush')}
+            </span>
+          )}
           <h2 className="flex items-center justify-center gap-1 font-display text-headline-xl uppercase text-[#FFEFBC]">
             <Zap size={22} className="fill-party-primary text-party-primary" />
             {t('matchDialog.title')}

@@ -11,7 +11,7 @@ import { useTranslation } from 'react-i18next';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import { User, Message, ReportType, MatchConnection } from '@/types/user';
 import { Venue, Event, EventAccess } from '@/types/venue';
-import { api, ApiError } from '@/services/api';
+import { api, ApiError, SwipeMatch } from '@/services/api';
 import { socialService, DiscoveryFilters } from '@/services/social';
 import { identifyUser } from '@/lib/observability';
 import { getCurrentPosition, Coordinates, FAST_POSITION } from '@/services/geo';
@@ -79,8 +79,9 @@ interface AppContextType {
 
   loadProfiles: () => Promise<void>;
   handleSwipeLeft: (userId: string) => Promise<void>;
-  handleSwipeRight: (userId: string) => Promise<boolean>;
-  handleSuperLike: (userId: string) => Promise<boolean>;
+  /** El match, si lo hay. Sin me gusta disponibles lanza `ApiError('LIKE_LIMIT')`. */
+  handleSwipeRight: (userId: string) => Promise<SwipeMatch | null>;
+  handleSuperLike: (userId: string) => Promise<SwipeMatch | null>;
 
   sendMessage: (receiverId: string, content: string) => Promise<boolean>;
   markMessagesAsRead: (senderId: string) => Promise<void>;
@@ -607,7 +608,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const registerSwipe = useCallback(
-    async (userId: string, type: 'like' | 'dislike' | 'super_like'): Promise<boolean> => {
+    async (userId: string, type: 'like' | 'dislike' | 'super_like'): Promise<SwipeMatch | null> => {
       // Optimista: la siguiente persona sale al momento y el servidor guarda
       // la decisión por detrás. Antes se esperaba a la red (y, con match, a
       // recargar los crushes) y entre tarjeta y tarjeta quedaba un hueco.
@@ -635,12 +636,14 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
           setNearbyProfiles((prev) => (prev.some((p) => p.id === userId) ? prev : [perfil, ...prev]));
           setCurrentProfile(perfil);
         }
+        // Sin me gusta en esta fiesta: lo explica la pantalla, con Premium.
+        if (error instanceof ApiError && error.code === 'LIKE_LIMIT') throw error;
         toast({
           title: t('common.error'),
           description: error instanceof ApiError ? error.message : t('errors.generic'),
           variant: 'destructive',
         });
-        return false;
+        return null;
       }
     },
     [activeEvent?.eventId, nearbyProfiles, advanceProfile, loadConnections, toast, t],

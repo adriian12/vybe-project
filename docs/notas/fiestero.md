@@ -105,7 +105,25 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
     y el latido de la app no le vuelve a meter.
   - Si vuelve a canjear el código, `left_at` se borra.
   - Al salir se **borran los likes que diste en ese evento y no llegaron a
-    match** (migración 048).
+    match** (migración 048). También los supercrush sin match: el que se gastó
+    no se devuelve.
+- **Sin Premium, 5 me gusta por fiesta** (migración 115):
+  - Cuenta sólo el `like` con `event_id`; ni descartar ni el supercrush.
+    Devolver un like desde «Le gustas» dentro de la fiesta también cuenta.
+  - El contador va en `event_like_usage` y no en `swipes`, porque al salir se
+    borran los likes sin match y el límite se reiniciaría al volver a entrar.
+  - El disparador `b_free_like_limit` lanza `LIKE_LIMIT`; `my_likes_left()`
+    devuelve lo que queda (`NULL` = sin límite: Premium mensual, el de esa
+    fiesta o admin). El corazón del tablón enseña el número y, a 0, abre
+    Premium sin que la tarjeta salga (`canSwipe` de `ProfileCard`).
+  - `likes_are_limited()` deja fuera a `revision.apple@fiestea.es` mientras
+    Apple revisa la 1.0 (esa versión no sabe enseñar el límite): **quitarlo
+    cuando la aprueben**.
+- **Aviso de match**: sale en el tablón y también al devolver un like desde
+  «Le gustas» (antes iba directo al chat). Si alguno de los dos dio
+  supercrush (`connection_type = 'vybe_check'`), lleva la marca «Supercrush».
+  Un supercrush a quien no te ha dado like no es match: le sale a esa persona
+  en «Le gustas» con nombre y foto.
 - **«Le gustas» sin premium** (Edge Function `likes-preview`):
   - Enseña cuánta gente te ha dado like, cada una con una miniatura de 10 × 12
     píxeles hecha en el servidor con `imagescript`, sin nombre ni id. Al móvil

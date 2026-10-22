@@ -344,7 +344,11 @@
         "onlyHere": "Du siehst nur Leute, die gerade auf dieser Party sind.",
         "verificationPendingTitle": "Verifizierung ausstehend",
         "verificationPending": "Deine Fotos wurden gespeichert, aber wir konnten dein Gesicht nicht erkennen. Mach neue, auf denen dein Gesicht gut zu sehen ist.",
-        "cameraOnly": "Das Foto der Nacht wird direkt mit der Kamera gemacht. Die Galerie ist nur für Profilfotos."
+        "cameraOnly": "Das Foto der Nacht wird direkt mit der Kamera gemacht. Die Galerie ist nur für Profilfotos.",
+        "likesLimitTitle": "Du hast deine 5 Likes für diese Party verbraucht",
+        "likesLimitBody": "Mit Premium sind sie unbegrenzt. Weiterwischen und Supercrushes gehen weiterhin.",
+        "likesLeft_one": "Likes: noch {{count}} auf dieser Party",
+        "likesLeft_other": "Likes: noch {{count}} auf dieser Party"
     },
     "filters": {
         "title": "Profile filtern",
@@ -697,7 +701,10 @@
             "secondChance": "Zweite Chance",
             "secondChanceBody": "Hol jemanden zurück, den du versehentlich weggewischt hast, solange er noch da ist.",
             "boost": "Eine Stunde hervorstechen",
-            "boostBody": "Dein Profil 60 Minuten lang ganz oben."
+            "boostBody": "Dein Profil 60 Minuten lang ganz oben.",
+            "unlimitedLikes": "Unbegrenzte Likes",
+            "unlimitedLikesBody": "Vergib auf jeder Party so viele Likes, wie du willst.",
+            "unlimitedLikesFree": "Gratis: 5 Likes pro Party"
         },
         "required": "Das gehört zu Fiestea Premium.",
         "boost": {
@@ -2493,7 +2500,8 @@
         "left": "noch {{time}}",
         "sendMessage": "Nachricht senden",
         "viewProfile": "Profil von {{name}} ansehen",
-        "viewProfileShort": "Profil ansehen"
+        "viewProfileShort": "Profil ansehen",
+        "superCrush": "Supercrush"
     },
     "userProfile": {
         "notFound": "Dieses Profil ist nicht mehr verfügbar",

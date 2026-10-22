@@ -43,6 +43,11 @@ const CONVERSATION_PAGE_SIZE = 50;
 
 export type StorageBucket = 'avatars' | 'event-photos' | 'event-posters' | 'documents';
 
+/** Un swipe que ha acabado en match; `superCrush` si alguno de los dos lo dio. */
+export interface SwipeMatch {
+  superCrush: boolean;
+}
+
 /** Error de dominio con un código estable que la UI puede traducir. */
 export class ApiError extends Error {
   constructor(
@@ -599,7 +604,7 @@ export const api = {
     swipedId: string,
     swipeType: 'like' | 'dislike' | 'super_like',
     eventId?: string,
-  ): Promise<boolean> => {
+  ): Promise<SwipeMatch | null> => {
     const profileId = await requireProfileId();
 
     const { error: swipeError } = await supabase.from('swipes').insert({
@@ -613,23 +618,35 @@ export const api = {
     if (swipeError && swipeError.message?.includes('NO_SUPERCRUSH')) {
       throw new ApiError('NO_SUPERCRUSH', 'No te quedan supercrush');
     }
+    // Sin Premium, 5 me gusta por fiesta (migración 115).
+    if (swipeError && swipeError.message?.includes('LIKE_LIMIT')) {
+      throw new ApiError('LIKE_LIMIT', 'Has usado tus me gusta de esta fiesta');
+    }
     if (swipeError && swipeError.code !== '23505') {
       console.error('Error creating swipe:', swipeError);
       throw new ApiError('SWIPE_FAILED', 'No se pudo registrar tu decisión');
     }
 
-    if (swipeType === 'dislike') return false;
+    if (swipeType === 'dislike') return null;
 
     // El trigger check_match() crea la conexión; sólo comprobamos si existe.
+    // `vybe_check` es la que lleva un supercrush de por medio, de quien sea.
     const { data: connection } = await supabase
       .from('connections')
-      .select('id')
+      .select('id, connection_type')
       .or(
         `and(user_id_1.eq.${profileId},user_id_2.eq.${swipedId}),and(user_id_1.eq.${swipedId},user_id_2.eq.${profileId})`,
       )
       .maybeSingle();
 
-    return Boolean(connection);
+    return connection ? { superCrush: connection.connection_type === 'vybe_check' } : null;
+  },
+
+  /** Los me gusta que te quedan en esa fiesta; `null` si no tienes límite. */
+  getLikesLeft: async (eventId: string): Promise<number | null> => {
+    const { data, error } = await supabase.rpc('my_likes_left' as never, { p_event_id: eventId } as never);
+    if (error) return null;
+    return typeof data === 'number' ? data : null;
   },
 
   getMatches: async (): Promise<MatchConnection[]> => {
