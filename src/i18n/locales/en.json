@@ -386,7 +386,14 @@
             "nocheo": "Starts between 23:00 and 5:00",
             "after": "Starts between 5:00 and 14:00"
         },
-        "flechazo": "With Flechazo"
+        "flechazo": "With Flechazo",
+        "musicas": {
+            "comercial": "Commercial",
+            "reggaeton": "Reggaeton",
+            "electronica": "Electronic",
+            "techno": "Techno",
+            "otras": "Other"
+        }
     },
     "match": {
         "title": "{{name}}!",
@@ -1851,7 +1858,18 @@
                 "oldest": "Oldest first"
             },
             "tabPast": "Past ({{count}})",
-            "emptyPast": "No past events."
+            "emptyPast": "No past events.",
+            "bulk": {
+                "button": "Enable features ({{count}})",
+                "title": "Enable features",
+                "body": "Applies to {{count}} parties. Anything left on \"Same\" stays as it is.",
+                "keep": "Same",
+                "on": "On",
+                "off": "Off",
+                "apply": "Apply to {{count}} parties",
+                "done_one": "{{count}} party updated",
+                "done_other": "{{count}} parties updated"
+            }
         },
         "reports": {
             "title": "User reports",

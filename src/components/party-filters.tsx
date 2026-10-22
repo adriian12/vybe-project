@@ -173,7 +173,7 @@ const PartyFilters = ({
 
       <button type="button" onClick={() => setMusicaAbierta(true)} aria-pressed={theme !== null} className={pill(theme !== null)}>
         <Music size={15} />
-        {theme ?? t('filters.music')}
+        {theme ? t(`filters.musicas.${theme}`) : t('filters.music')}
         {theme ? (
           <X size={14} role="button" aria-label={t('filters.clear')} onClick={(e) => borrar(e, () => onTheme(null))} />
         ) : (
@@ -212,7 +212,7 @@ const PartyFilters = ({
                   className={pill(activa)}
                 >
                   {activa && <Check size={14} />}
-                  {nombre ?? t('home.allThemes')}
+                  {nombre ? t(`filters.musicas.${nombre}`) : t('home.allThemes')}
                 </button>
               );
             })}

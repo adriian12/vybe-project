@@ -34,9 +34,11 @@ describe('franjas de la fiesta', () => {
       { event: { ...a(23, 30), theme: 'Techno' } },
       { event: { ...a(23, 30), theme: 'Reggaeton' } },
     ];
-    expect(aplicarFiltros(lista, 'Techno', 'nocheo')).toHaveLength(1);
+    // La música se filtra por categoría (lib/music), no por el género tal cual.
+    expect(aplicarFiltros(lista, 'techno', 'nocheo')).toHaveLength(1);
     expect(aplicarFiltros(lista, null, 'nocheo')).toHaveLength(2);
-    expect(aplicarFiltros(lista, 'Techno', null)).toHaveLength(2);
+    expect(aplicarFiltros(lista, 'techno', null)).toHaveLength(2);
+    expect(aplicarFiltros(lista, 'reggaeton', null)).toHaveLength(1);
   });
 });
 

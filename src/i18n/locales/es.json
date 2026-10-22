@@ -386,7 +386,14 @@
             "nocheo": "Empieza entre las 23:00 y las 5:00",
             "after": "Empieza entre las 5:00 y las 14:00"
         },
-        "flechazo": "Con Flechazo"
+        "flechazo": "Con Flechazo",
+        "musicas": {
+            "comercial": "Comercial",
+            "reggaeton": "Reggaeton",
+            "electronica": "Electrónica",
+            "techno": "Techno",
+            "otras": "Otras"
+        }
     },
     "match": {
         "title": "¡{{name}}!",
@@ -1851,7 +1858,18 @@
                 "oldest": "Más antiguos"
             },
             "tabPast": "Pasados ({{count}})",
-            "emptyPast": "No hay eventos pasados."
+            "emptyPast": "No hay eventos pasados.",
+            "bulk": {
+                "button": "Activar funciones ({{count}})",
+                "title": "Activar funciones",
+                "body": "Se aplica a {{count}} fiestas. Lo que dejes en «Igual» no cambia en ninguna.",
+                "keep": "Igual",
+                "on": "Sí",
+                "off": "No",
+                "apply": "Aplicar a {{count}} fiestas",
+                "done_one": "{{count}} fiesta actualizada",
+                "done_other": "{{count}} fiestas actualizadas"
+            }
         },
         "reports": {
             "title": "Reportes de usuarios",

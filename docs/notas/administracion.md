@@ -50,6 +50,16 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
   corrigieron 21, todas pasadas. Fourvenues está detrás de Cloudflare y el
   usuario no quiere que se use su Chrome para esto. `funout_upsert_event`
   ya no pisa un enlace de Fourvenues corregido si apunta al mismo evento.
+- **Activar funciones en bloque** (migración 121): en Eventos se marcan
+  fiestas y «Activar funciones» enciende, apaga o deja igual (`NULL`) Entrar al
+  evento, Flechazo, Recuento, % hombres y mujeres y Lista Fiestea, con
+  `admin_set_events_features`. Sin «Entrar al evento» no hay Flechazo
+  (`events_swipe_needs_entry`). Los sorteos no son un interruptor: los crea
+  el negocio en cada fiesta.
+- **Valores por defecto al crear una fiesta:** Entrar al evento y Flechazo
+  encendidos; Recuento, % hombres y mujeres y Lista apagados; sellos
+  encendidos y peticiones de canciones apagadas. En las de Fiestea
+  (`platform_events_swipe_off`), Entrar y Flechazo sólo si tienen ubicación.
 - **Escáner rápido y un solo aviso** (migración 119):
   - `admin_list_scanned` tardaba 10,7 s (más que el tope de 8 s de
     `authenticated`: «no hay resultados»); ahora cruza claves precalculadas y

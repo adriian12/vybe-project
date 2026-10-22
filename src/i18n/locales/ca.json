@@ -386,7 +386,14 @@
             "nocheo": "Comença entre les 23:00 i les 5:00",
             "after": "Comença entre les 5:00 i les 14:00"
         },
-        "flechazo": "Amb Flechazo"
+        "flechazo": "Amb Flechazo",
+        "musicas": {
+            "comercial": "Comercial",
+            "reggaeton": "Reggaeton",
+            "electronica": "Electrònica",
+            "techno": "Techno",
+            "otras": "Altres"
+        }
     },
     "match": {
         "title": "{{name}}!",
@@ -1851,7 +1858,18 @@
                 "oldest": "Més antics"
             },
             "tabPast": "Passats ({{count}})",
-            "emptyPast": "No hi ha esdeveniments passats."
+            "emptyPast": "No hi ha esdeveniments passats.",
+            "bulk": {
+                "button": "Activar funcions ({{count}})",
+                "title": "Activar funcions",
+                "body": "S'aplica a {{count}} festes. El que deixis a «Igual» no canvia a cap.",
+                "keep": "Igual",
+                "on": "Sí",
+                "off": "No",
+                "apply": "Aplicar a {{count}} festes",
+                "done_one": "{{count}} festa actualitzada",
+                "done_other": "{{count}} festes actualitzades"
+            }
         },
         "reports": {
             "title": "Reports d'usuaris",

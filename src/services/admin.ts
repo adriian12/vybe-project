@@ -106,6 +106,15 @@ export interface AdminEventInput {
 }
 
 /** Una fiesta del escáner (Xceed o Resident Advisor), migración 114. */
+/** Funciones de una fiesta que administración cambia en bloque; `null` = sin tocar. */
+export interface BulkEventFeatures {
+  entry: boolean | null;
+  swipe: boolean | null;
+  headcount: boolean | null;
+  genderSplit: boolean | null;
+  guestList: boolean | null;
+}
+
 export interface ScannedEvent {
   id: string;
   source: 'xceed' | 'ra' | 'fourvenues';
@@ -357,6 +366,23 @@ export const adminService = {
     const { data, error } = await supabase.rpc(
       'admin_import_scanned' as never,
       { p_groups: groups, p_quiet: quiet } as never,
+    );
+    if (error) fallo(error.message);
+    return Number(data ?? 0);
+  },
+
+  /** Enciende o apaga funciones en varias fiestas (migración 121); `null` = sin tocar. */
+  setEventsFeatures: async (ids: string[], f: BulkEventFeatures): Promise<number> => {
+    const { data, error } = await supabase.rpc(
+      'admin_set_events_features' as never,
+      {
+        p_ids: ids,
+        p_entry: f.entry,
+        p_swipe: f.swipe,
+        p_headcount: f.headcount,
+        p_gender: f.genderSplit,
+        p_guest_list: f.guestList,
+      } as never,
     );
     if (error) fallo(error.message);
     return Number(data ?? 0);

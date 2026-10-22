@@ -27,6 +27,7 @@ import {
   Search,
   Plus,
   Siren,
+  SlidersHorizontal,
   Store,
   UsersRound,
   X,
@@ -48,6 +49,8 @@ import { useToast } from '@/components/ui/use-toast';
 import { useAppContext } from '@/context/app-context';
 import LanguageSwitcher from '@/components/language-switcher';
 import AdminMetrics from '@/components/admin/admin-metrics';
+import AdminBulkFeatures from '@/components/admin/admin-bulk-features';
+import { Checkbox } from '@/components/ui/checkbox';
 import AdminUsers from '@/components/admin/admin-users';
 import AdminCreate from '@/components/admin/admin-create';
 import AdminEventForm from '@/components/admin/admin-event-form';
@@ -167,6 +170,9 @@ const AdminDashboardPage = () => {
   // Orden de la lista: por defecto, lo más cercano a hoy primero.
   const [ordenEventos, setOrdenEventos] = useState<'nearest' | 'newest' | 'oldest'>('nearest');
   const [editandoEvento, setEditandoEvento] = useState<Event | null>(null);
+  // Fiestas marcadas para «Activar funciones» en bloque (migración 121).
+  const [marcadosEventos, setMarcadosEventos] = useState<Set<string>>(new Set());
+  const [funcionesAbiertas, setFuncionesAbiertas] = useState(false);
 
   const [suspendTarget, setSuspendTarget] = useState<Report | null>(null);
   const [suspendDays, setSuspendDays] = useState('');
@@ -1095,6 +1101,17 @@ const AdminDashboardPage = () => {
                 ))}
               </div>
               {pestanaEventos !== 'funout' && pestanaEventos !== 'scanner' && (
+                <button
+                  type="button"
+                  disabled={marcadosEventos.size === 0}
+                  onClick={() => setFuncionesAbiertas(true)}
+                  className="press mb-3 ml-3 inline-flex h-9 items-center gap-1.5 rounded-lg bg-party-primary px-3 text-caption font-extrabold uppercase text-ink disabled:opacity-40"
+                >
+                  <SlidersHorizontal size={14} />
+                  {t('admin.events.bulk.button', { count: marcadosEventos.size })}
+                </button>
+              )}
+              {pestanaEventos !== 'funout' && pestanaEventos !== 'scanner' && (
                 <label className="mb-3 ml-3 inline-flex items-center gap-2 text-caption font-bold text-white/70">
                   {t('admin.events.sortBy')}
                   <select
@@ -1110,6 +1127,15 @@ const AdminDashboardPage = () => {
                   </select>
                 </label>
               )}
+              <AdminBulkFeatures
+                ids={[...marcadosEventos]}
+                open={funcionesAbiertas}
+                onOpenChange={setFuncionesAbiertas}
+                onDone={() => {
+                  setMarcadosEventos(new Set());
+                  void loadAll(true);
+                }}
+              />
               {pestanaEventos === 'funout' ? (
                 <AdminFunout onImported={() => void loadAll(true)} />
               ) : pestanaEventos === 'scanner' ? (
@@ -1121,6 +1147,15 @@ const AdminDashboardPage = () => {
                   <table className="w-full text-left text-body-sm">
                     <thead className="hidden border-b border-black/[0.06] text-caption uppercase tracking-wide text-party-gray sm:table-header-group">
                       <tr>
+                        <th className="w-10 py-3 pl-4">
+                          <Checkbox
+                            checked={eventosVisibles.length > 0 && eventosVisibles.every((e) => marcadosEventos.has(e.id))}
+                            onCheckedChange={(v) =>
+                              setMarcadosEventos(v === true ? new Set(eventosVisibles.map((e) => e.id)) : new Set())
+                            }
+                            aria-label={t('admin.funout.selectAll')}
+                          />
+                        </th>
                         <th className="px-4 py-3 font-bold">{t('admin.events.colEvent')}</th>
                         <th className="px-3 py-3 font-bold">{t('admin.events.colDate')}</th>
                         <th className="px-3 py-3 font-bold">{t('admin.events.colStatus')}</th>
@@ -1134,6 +1169,20 @@ const AdminDashboardPage = () => {
                         const estado = inicio <= ahora && fin > ahora ? 'live' : fin <= ahora ? 'past' : 'scheduled';
                         return (
                           <tr key={event.id} className="hover:bg-black/[0.02]">
+                            <td className="w-10 py-3 pl-4 align-middle">
+                              <Checkbox
+                                checked={marcadosEventos.has(event.id)}
+                                onCheckedChange={() =>
+                                  setMarcadosEventos((prev) => {
+                                    const nuevo = new Set(prev);
+                                    if (nuevo.has(event.id)) nuevo.delete(event.id);
+                                    else nuevo.add(event.id);
+                                    return nuevo;
+                                  })
+                                }
+                                aria-label={event.name}
+                              />
+                            </td>
                             <td className="px-4 py-3">
                               <div className="flex items-center gap-3">
                                 <span className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-black/[0.06]">

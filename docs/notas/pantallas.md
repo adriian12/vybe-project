@@ -63,6 +63,15 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
     cuyo nombre contiene lo escrito.
   - Mientras se escribe, los resultados van en `z-[650]`, por encima de la
     hoja de abajo (`z-[600]`), con scroll propio.
+- **Música en cinco categorías** (`lib/music.ts`, con tests): Comercial,
+  Reggaeton, Electrónica, Techno y Otras (lo demás y sin género). `musicaDe()`
+  reparte el género que trae la fiesta por expresiones en orden (Techno antes
+  que Electrónica, Electrónica antes que Reggaeton: «Latin House» es
+  Electrónica). El filtro de inicio y el del mapa guardan la categoría, no el
+  género. Antes salían más de sesenta etiquetas.
+- **Hoja de filtros del mapa** en columna: la lista se desplaza y el pie
+  («Quitar filtros», «Ver N fiestas») queda abajo; con el pie `sticky` y la
+  atribución detrás, el pie se quedaba a media hoja.
 - **Salas sin negocio** (`/sala/<nombre>`, `PlacePage.tsx`): el buscador del
   mapa enseña «Salas» con los `place_name` de las fiestas (Funout, escáner) que
   contienen lo escrito (`clave()`, sin espacios ni tildes). La ficha es la de un

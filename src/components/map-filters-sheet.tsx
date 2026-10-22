@@ -77,7 +77,11 @@ const MapFiltersSheet = ({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto">
+      {/* En columna: lo de arriba se desplaza y el pie se queda abajo del
+          todo. Con el pie `sticky` y la atribución detrás, el pie quedaba a
+          media hoja y los géneros pasaban por debajo. */}
+      <SheetContent side="bottom" className="flex max-h-[85vh] flex-col gap-0 p-0">
+        <div className="min-h-0 flex-1 overflow-y-auto px-6 pt-6">
         <SheetHeader className="text-left">
           <SheetTitle>{t('map.filters')}</SheetTitle>
           <SheetDescription>{t('map.filtersHelp')}</SheetDescription>
@@ -149,7 +153,7 @@ const MapFiltersSheet = ({
                   className={pill(theme === nombre)}
                 >
                   {theme === nombre && <Check size={14} />}
-                  {nombre ?? t('home.allThemes')}
+                  {nombre ? t(`filters.musicas.${nombre}`) : t('home.allThemes')}
                 </button>
               ))
             ) : (
@@ -158,7 +162,14 @@ const MapFiltersSheet = ({
           )}
         </div>
 
-        <div className="sticky bottom-0 -mx-6 flex items-center gap-2 border-t border-white/10 bg-card px-6 py-3">
+        {/* La atribución de OpenStreetMap y CARTO es obligatoria. */}
+        <p
+          className="pb-4 text-[10px] leading-snug text-party-gray/80 [&_a]:underline"
+          dangerouslySetInnerHTML={{ __html: TILES_ATTRIBUTION }}
+        />
+        </div>
+
+        <div className="flex shrink-0 items-center gap-2 border-t border-white/10 bg-card px-6 pb-[calc(env(safe-area-inset-bottom,0px)+0.75rem)] pt-3">
           <button type="button" onClick={onReset} className="press h-11 shrink-0 px-2 text-body-sm text-party-gray">
             {t('filters.reset')}
           </button>
@@ -166,12 +177,6 @@ const MapFiltersSheet = ({
             {t('map.showResults', { count: results })}
           </PartyButton>
         </div>
-
-        {/* La atribución de OpenStreetMap y CARTO es obligatoria. */}
-        <p
-          className="pb-2 text-[10px] leading-snug text-party-gray/80 [&_a]:underline"
-          dangerouslySetInnerHTML={{ __html: TILES_ATTRIBUTION }}
-        />
       </SheetContent>
     </Sheet>
   );

@@ -26,6 +26,7 @@ import { VenueType } from '@/types/venue';
 import { featuredFirst, isFeatured } from '@/lib/featured';
 import MapFiltersSheet from '@/components/map-filters-sheet';
 import { aplicarFiltros, conFlechazo, Franja } from '@/lib/party-filters';
+import { MUSICAS, musicaDe } from '@/lib/music';
 import VenueSearchResults from '@/components/venue-search-results';
 import CitySearchResults from '@/components/city-search-results';
 import PlaceSearchResults, { PlaceResult } from '@/components/place-search-results';
@@ -243,10 +244,10 @@ const MapPage = () => {
     }));
   }, [conPunto, busqueda, zona, tipo, soloDirecto, soloFlechazo, fecha, soloGratis, desde, theme, franja]);
 
+  // Las categorías de música con alguna fiesta en el mapa (lib/music).
   const temasMapa = useMemo(() => {
-    const encontrados = new Set<string>();
-    for (const { event } of conPunto) if (event.theme) encontrados.add(event.theme);
-    return [...encontrados].sort();
+    const presentes = new Set(conPunto.map(({ event }) => musicaDe(event.theme)));
+    return MUSICAS.filter((m) => presentes.has(m));
   }, [conPunto]);
 
   // --------------------------------------------------------------- el mapa

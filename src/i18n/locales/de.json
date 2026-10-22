@@ -386,7 +386,14 @@
             "nocheo": "Beginnt zwischen 23 und 5 Uhr",
             "after": "Beginnt zwischen 5 und 14 Uhr"
         },
-        "flechazo": "Mit Flechazo"
+        "flechazo": "Mit Flechazo",
+        "musicas": {
+            "comercial": "Charts",
+            "reggaeton": "Reggaeton",
+            "electronica": "Elektronisch",
+            "techno": "Techno",
+            "otras": "Andere"
+        }
     },
     "match": {
         "title": "{{name}}!",
@@ -1851,7 +1858,18 @@
                 "oldest": "Älteste zuerst"
             },
             "tabPast": "Vergangene ({{count}})",
-            "emptyPast": "Keine vergangenen Events."
+            "emptyPast": "Keine vergangenen Events.",
+            "bulk": {
+                "button": "Funktionen aktivieren ({{count}})",
+                "title": "Funktionen aktivieren",
+                "body": "Gilt für {{count}} Partys. Was auf „Gleich“ bleibt, ändert sich nirgends.",
+                "keep": "Gleich",
+                "on": "An",
+                "off": "Aus",
+                "apply": "Auf {{count}} Partys anwenden",
+                "done_one": "{{count}} Party aktualisiert",
+                "done_other": "{{count}} Partys aktualisiert"
+            }
         },
         "reports": {
             "title": "Nutzermeldungen",

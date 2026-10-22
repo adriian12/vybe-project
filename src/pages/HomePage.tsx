@@ -15,6 +15,7 @@ import PartyFilters, { useDateLabel } from '@/components/party-filters';
 import { isNearDate, matchesDate, nightOf, useDateSelection } from '@/lib/date-filter';
 import RatePartyPrompt from '@/components/rate-party';
 import { aplicarFiltros, conFlechazo, Franja } from '@/lib/party-filters';
+import { MUSICAS, musicaDe } from '@/lib/music';
 
 /** Cuántas tarjetas caben en el carrusel de destacados. */
 const DESTACADOS = 5;
@@ -58,10 +59,10 @@ const HomePage = () => {
    * una píldora de «Reggaetón» en una noche sin reggaetón sólo lleva a una
    * pantalla vacía.
    */
+  // Las categorías de música con alguna fiesta, en su orden (lib/music).
   const themes = useMemo(() => {
-    const encontradas = new Set<string>();
-    for (const { event } of withDistance) if (event.theme) encontradas.add(event.theme);
-    return [...encontradas].sort();
+    const presentes = new Set(withDistance.map(({ event }) => musicaDe(event.theme)));
+    return MUSICAS.filter((m) => presentes.has(m));
   }, [withDistance]);
 
   // Música y horario; después, la fecha (por defecto, hoy).
@@ -90,7 +91,7 @@ const HomePage = () => {
   );
 
   useEffect(() => {
-    if (theme && !themes.includes(theme)) setTheme(null);
+    if (theme && !(themes as string[]).includes(theme)) setTheme(null);
   }, [themes, theme]);
 
   const enDirecto = useMemo(() => filtrados.filter(({ event }) => isEventLive(event)), [filtrados]);

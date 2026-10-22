@@ -1,4 +1,5 @@
 import type { Event } from '@/types/venue';
+import { musicaDe } from '@/lib/music';
 
 /** Franjas de la fiesta, según la hora a la que empieza. */
 export type Franja = 'tardeo' | 'nocheo' | 'after';
@@ -23,14 +24,17 @@ export const franjaDe = (event: Pick<Event, 'startDate'>): Franja | null => {
   return null;
 };
 
-/** Aplica los dos filtros a una lista con eventos. */
+/**
+ * Aplica los dos filtros a una lista con eventos. `musica` es una de las
+ * cinco categorías de `lib/music` («techno», «otras»…), no el género tal cual.
+ */
 export const aplicarFiltros = <T extends { event: Pick<Event, 'startDate' | 'theme'> }>(
   lista: T[],
-  theme: string | null,
+  musica: string | null,
   franja: Franja | null,
 ): T[] =>
   lista.filter(
-    ({ event }) => (!theme || event.theme === theme) && (!franja || franjaDe(event) === franja),
+    ({ event }) => (!musica || musicaDe(event.theme) === musica) && (!franja || franjaDe(event) === franja),
   );
 
 /**
