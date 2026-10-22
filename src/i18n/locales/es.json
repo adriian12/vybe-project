@@ -2305,7 +2305,12 @@
         "venues": "Negocios",
         "venueParties_one": "{{count}} fiesta próxima",
         "venueParties_other": "{{count}} fiestas próximas",
-        "venueParties_zero": "Sin fiestas anunciadas"
+        "venueParties_zero": "Sin fiestas anunciadas",
+        "cities": "Ciudades",
+        "emptyIn": "No hay fiestas en {{name}} con estos filtros. Prueba otra fecha.",
+        "clearZone": "Quitar {{name}}",
+        "locationOffTitle": "No sabemos dónde estás",
+        "locationOffBody": "Activa la ubicación del móvil y el permiso de Fiestea para centrar el mapa en tu zona."
     },
     "tickets": {
         "external": {

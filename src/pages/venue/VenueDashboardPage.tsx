@@ -1119,7 +1119,7 @@ const VenueDashboardPage = () => {
         )}
 
         {section === 'team' && (
-          <div className="mx-auto max-w-2xl">
+          <div>
             <VenueTeam
               venueId={currentVenue.id}
               role={papel}

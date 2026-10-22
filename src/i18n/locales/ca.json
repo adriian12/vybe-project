@@ -2305,7 +2305,12 @@
         "venues": "Negocis",
         "venueParties_one": "{{count}} festa propera",
         "venueParties_other": "{{count}} festes properes",
-        "venueParties_zero": "Sense festes anunciades"
+        "venueParties_zero": "Sense festes anunciades",
+        "cities": "Ciutats",
+        "emptyIn": "No hi ha festes a {{name}} amb aquests filtres. Prova una altra data.",
+        "clearZone": "Treure {{name}}",
+        "locationOffTitle": "No sabem on ets",
+        "locationOffBody": "Activa la ubicació del mòbil i el permís de Fiestea per centrar el mapa a la teva zona."
     },
     "tickets": {
         "external": {

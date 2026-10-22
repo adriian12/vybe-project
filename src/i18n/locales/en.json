@@ -2305,7 +2305,12 @@
         "venues": "Venues",
         "venueParties_one": "{{count}} upcoming party",
         "venueParties_other": "{{count}} upcoming parties",
-        "venueParties_zero": "No parties announced"
+        "venueParties_zero": "No parties announced",
+        "cities": "Cities",
+        "emptyIn": "No parties in {{name}} with these filters. Try another date.",
+        "clearZone": "Remove {{name}}",
+        "locationOffTitle": "We don't know where you are",
+        "locationOffBody": "Turn on your phone's location and Fiestea's permission to center the map on your area."
     },
     "tickets": {
         "external": {

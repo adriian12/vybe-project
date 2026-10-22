@@ -183,10 +183,16 @@ const residentAdvisor = async (ciudad: string): Promise<Fila[]> => {
       const titulo = texto(e.title);
       if (!inicio || !titulo) continue;
       const venue = (e.venue ?? {}) as { name?: string; address?: string; location?: { latitude?: number; longitude?: number } };
-      // Sala sin anunciar («TBA»): RA pone 0,0.
+      // Sala sin anunciar («TBA»): RA pone 0,0. Y a algunas salas les pone el
+      // centro de Madrid aunque estén en Alicante («Sonido Alicante»): lo que
+      // cae lejos de la ciudad se descarta y se busca por el nombre o la calle.
       const lat = venue.location?.latitude;
       const lng = venue.location?.longitude;
-      const conPunto = typeof lat === 'number' && typeof lng === 'number' && !(lat === 0 && lng === 0);
+      const conPunto =
+        typeof lat === 'number' &&
+        typeof lng === 'number' &&
+        !(lat === 0 && lng === 0) &&
+        cercaDe(ciudad, lat, lng);
       const imagenes = Array.isArray(e.images) ? (e.images as { filename?: string }[]) : [];
       const url = texto(e.contentUrl);
       filas.push({
@@ -216,6 +222,21 @@ const residentAdvisor = async (ciudad: string): Promise<Fila[]> => {
 };
 
 // ------------------------------------------------------------- ubicaciones
+/** A qué distancia de la ciudad se acepta una sala: RA cuenta la provincia. */
+const RADIO_CIUDAD_KM = 120;
+
+/** Si un punto cae a menos de `RADIO_CIUDAD_KM` del centro de la ciudad. */
+const cercaDe = (ciudad: string, lat: number, lng: number): boolean => {
+  const [o, s, e, n] = CIUDADES[ciudad].bbox.split(',').map(Number);
+  const cLat = (s + n) / 2;
+  const cLng = (o + e) / 2;
+  const rad = Math.PI / 180;
+  const h =
+    Math.sin(((lat - cLat) * rad) / 2) ** 2 +
+    Math.cos(cLat * rad) * Math.cos(lat * rad) * Math.sin(((lng - cLng) * rad) / 2) ** 2;
+  return 2 * 6371 * Math.asin(Math.sqrt(h)) <= RADIO_CIUDAD_KM;
+};
+
 /** Coordenadas y dirección de una sala por su nombre, dentro de la ciudad. */
 const buscarSala = async (nombre: string, ciudad: string): Promise<{ lat: number; lng: number; address: string | null } | null> => {
   try {
@@ -269,8 +290,9 @@ serve(async (req: Request): Promise<Response> => {
       }
     }
 
-    // Las salas de Xceed sin ubicación: primero, la que ya conozca RA por el
-    // mismo nombre; si no, Photon (una vez por sala).
+    // Las salas sin ubicación (las de Xceed y las de RA mal puestas):
+    // primero, la que ya se conozca por el mismo nombre; si no, Photon (una
+    // vez por sala), por el nombre y, si no, por la dirección.
     const conocidas = new Map<string, { lat: number; lng: number; address: string | null }>();
     for (const f of filas) {
       if (f.place_name && f.latitude !== null && f.longitude !== null) {
@@ -281,7 +303,9 @@ serve(async (req: Request): Promise<Response> => {
       if (f.latitude !== null || !f.place_name) continue;
       const clave = f.place_name.toLowerCase();
       if (!conocidas.has(clave)) {
-        const sala = await buscarSala(f.place_name, ciudad);
+        const sala =
+          (await buscarSala(f.place_name.replace(/^TBA\s*-\s*/i, ''), ciudad)) ??
+          (f.address ? await buscarSala(f.address, ciudad) : null);
         if (sala) conocidas.set(clave, sala);
         else conocidas.set(clave, { lat: NaN, lng: NaN, address: null });
       }

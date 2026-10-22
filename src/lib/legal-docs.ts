@@ -220,7 +220,7 @@ export const legalDocs = (app: string, web: string, panel: string, miembro: stri
         },
         {
           title: 'Terceros',
-          body: 'Al pagar, se abre la página de Stripe, que usa sus propias cookies para prevenir el fraude (stripe.com/cookies-policy). El mapa carga imágenes de CARTO, que recibe tu dirección IP como cualquier servidor web.',
+          body: 'Al pagar, se abre la página de Stripe, que usa sus propias cookies para prevenir el fraude (stripe.com/cookies-policy). El mapa carga imágenes de CARTO, que recibe tu dirección IP como cualquier servidor web. Al buscar una ciudad en el mapa, lo que escribes se envía a Photon (komoot), el buscador de lugares de OpenStreetMap, sin ningún otro dato tuyo.',
         },
         {
           title: 'Consentimiento',

@@ -1214,15 +1214,27 @@ export const api = {
 
   /** Eventos vigentes de locales verificados. */
   getEvents: async (): Promise<Event[]> => {
-    const { data: events, error } = await supabase
-      .from('events')
-      .select(`*, venues!inner(${VENUE_PUBLICO})`)
-      .gt('end_date', new Date().toISOString())
-      .order('start_date', { ascending: true });
-
-    if (error || !events) {
-      if (error) console.error('Error getting events:', error);
-      return [];
+    // Por páginas: la API devuelve como mucho 1.000 filas por petición, y con
+    // fiestas de toda España (Madrid y Barcelona tienen cientos) se cortaba
+    // sin avisar. Tope de 10 páginas por si algo se dispara.
+    const PAGINA = 1000;
+    const desde = new Date().toISOString();
+    const events: unknown[] = [];
+    for (let pagina = 0; pagina < 10; pagina++) {
+      const { data, error } = await supabase
+        .from('events')
+        .select(`*, venues!inner(${VENUE_PUBLICO})`)
+        .gt('end_date', desde)
+        .order('start_date', { ascending: true })
+        .order('id', { ascending: true })
+        .range(pagina * PAGINA, pagina * PAGINA + PAGINA - 1);
+      if (error) {
+        console.error('Error getting events:', error);
+        if (pagina === 0) return [];
+        break;
+      }
+      events.push(...(data ?? []));
+      if (!data || data.length < PAGINA) break;
     }
 
     return events.map((row) => {

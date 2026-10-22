@@ -40,9 +40,27 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
 - **Mapa:** al abrirlo sólo se ve el mapa. Tocar un alfiler enseña su tarjeta
   y tocar la tarjeta abre el evento; la lista sale con «Ver lista». Los
   destacados llevan una llama sobre el alfiler (`.vybe-pin-fire`).
+  - **Encuadre:** con ubicación, tu localidad (`ZOOM_LOCALIDAD = 12`); sin ella,
+    todas las fiestas. Sólo una vez: si ya has arrastrado el mapa no se mueve.
+    La posición se pide primero rápida (`FAST_POSITION`, vale la de la red) y,
+    si falla, con GPS: con GPS fino solo, dentro de casa se quedaba sin ella.
+  - **Botón de ubicación** siempre a la vista (`relocate()` de
+    `useEventsFeed` si aún no hay posición); vuelve a tu zona y quita la ciudad.
+  - **Ciudades en el buscador** (`lib/places.ts`, `city-search-results.tsx`):
+    Photon (komoot) con `bbox` de España y Canarias, capas city/locality/
+    district, desde 3 letras. Al elegir una, el mapa va a su término
+    (`extent`) y sólo salen las fiestas dentro (`enZona`, con 0,04° de margen;
+    sin término, 15 km). El chip de la ciudad la quita. Photon se nombra en los
+    textos legales.
+  - **Las fiestas se leen por páginas** (`getEvents`, 1.000 por petición, hasta
+    10): con toda España se cortaba sin avisar en la primera página.
+  - Una ciudad sin fiestas es una ciudad sin fiestas en Fiestea: las de Madrid y
+    Barcelona del Escáner no salen hasta que se añaden desde administración.
 - **La cabecera superior está oculta** (`MOSTRAR_CABECERA` en `header.tsx`, y
   `--header-h` reducida a la zona segura).
-- **Calendario del filtro de fecha** (inicio y mapa): es el de la ficha del
+- **Calendario del filtro de fecha** (inicio y mapa): a pantalla completa
+  (`closeClassName` de `SheetContent` baja la X bajo la barra de estado) y con
+  los atajos en una fila, para ver el mes entero sin desplazar. Es el de la ficha del
   negocio (`venue-calendar.tsx`) con todas las fiestas: el cartel en cada
   noche y «×N» si hay varias. Agrupa por noche (`nightOf`, lo de madrugada a
   la anterior), no por día, para cuadrar con el filtro.

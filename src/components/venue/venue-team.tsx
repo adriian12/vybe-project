@@ -197,9 +197,12 @@ const VenueTeam: React.FC<VenueTeamProps> = ({ venueId, role, events, canCommiss
         : null;
 
   // «Equipo» de Stitch: los miembros en una tarjeta blanca, con el rol en una
-  // etiqueta (amarilla la del propietario) y la invitación en otra.
+  // etiqueta (amarilla la del propietario) y la invitación en otra. En
+  // pantalla ancha, en dos columnas como Promociones (cuentas a un lado,
+  // enlaces al otro): una sola columna obligaba a bajar mucho.
   return (
-    <div className="space-y-4">
+    <div className="grid items-start gap-4 lg:grid-cols-2">
+      <div className="min-w-0 space-y-4">
       {/* --------------------------------------------------------- cuentas */}
       <section className="surface-light rounded-2xl p-4">
         <div className="mb-2 flex items-center justify-between gap-3">
@@ -299,6 +302,9 @@ const VenueTeam: React.FC<VenueTeamProps> = ({ venueId, role, events, canCommiss
         <p className="rounded-2xl bg-card p-4 text-body-sm text-party-gray">{t('venue.team.onlyOwner')}</p>
       )}
 
+      </div>
+
+      <div className="min-w-0 space-y-4">
       {/* --------------------------------------------------------- enlaces */}
       {isOwner && (
         <section className="surface-light space-y-3 rounded-2xl p-4">
@@ -465,17 +471,18 @@ const VenueTeam: React.FC<VenueTeamProps> = ({ venueId, role, events, canCommiss
           </ul>
         </section>
       )}
+      </div>
 
       {/* ------------------------------------------ equipos y ranking de RRPP */}
       {isOwner && (
-        <>
+        <div className="grid min-w-0 items-start gap-4 lg:col-span-2 lg:grid-cols-2">
           <PromoterTeams
             teams={teams}
             promoters={links.filter((l) => l.role === 'promoter' && !l.revokedAt)}
             onChanged={loadTeams}
           />
           <PromoterRanking events={events} teams={teams} showMoney={canCommission} version={teamsVersion} />
-        </>
+        </div>
       )}
 
       <Dialog open={Boolean(viendo)} onOpenChange={(open) => !open && setViendo(null)}>

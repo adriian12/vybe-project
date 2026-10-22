@@ -70,14 +70,25 @@ export const DateFilter = ({
       </button>
 
       <Sheet open={abierto} onOpenChange={setAbierto}>
-        <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto">
+        {/* Con el calendario de carteles, a pantalla completa: a 85 % del alto
+            había que desplazarse para ver el final del mes. */}
+        <SheetContent
+          side="bottom"
+          className={cn(
+            'overflow-y-auto',
+            events
+              ? 'h-[100dvh] max-h-[100dvh] rounded-none pb-[calc(env(safe-area-inset-bottom,0px)+1rem)] pt-[calc(env(safe-area-inset-top,0px)+1rem)]'
+              : 'max-h-[85vh]',
+          )}
+          closeClassName={events ? 'top-[calc(env(safe-area-inset-top,0px)+1rem)]' : undefined}
+        >
           <SheetHeader className="text-left">
             <SheetTitle>{t('filters.dates.title')}</SheetTitle>
             <SheetDescription>{t('filters.dates.help')}</SheetDescription>
           </SheetHeader>
-          <div className="flex flex-wrap gap-2 py-4">
+          <div className={cn('flex gap-2 py-4', events ? 'no-scrollbar -mx-6 overflow-x-auto px-6' : 'flex-wrap')}>
             {ATAJOS.map((m) => (
-              <button key={m} type="button" onClick={() => elegir({ mode: m })} aria-pressed={sel.mode === m} className={pill(sel.mode === m)}>
+              <button key={m} type="button" onClick={() => elegir({ mode: m })} aria-pressed={sel.mode === m} className={cn(pill(sel.mode === m), 'shrink-0')}>
                 {sel.mode === m && <Check size={14} />}
                 {t(`filters.dates.${m}`)}
               </button>

@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { ChevronRight, LocateFixed, Music, Navigation, Search, SlidersHorizontal, X } from 'lucide-react';
+import { ChevronRight, LocateFixed, MapPin, Music, Navigation, Search, SlidersHorizontal, X } from 'lucide-react';
 import Header from '@/components/header';
 import Footer from '@/components/footer';
 import { DARK_TILES, HAS_MAP_TILES, TILES_ATTRIBUTION } from '@/components/map-thumb';
@@ -27,9 +27,19 @@ import { featuredFirst, isFeatured } from '@/lib/featured';
 import MapFiltersSheet from '@/components/map-filters-sheet';
 import { aplicarFiltros, conFlechazo, Franja } from '@/lib/party-filters';
 import VenueSearchResults from '@/components/venue-search-results';
+import CitySearchResults from '@/components/city-search-results';
+import { useToast } from '@/components/ui/use-toast';
+import { enZona, Zona } from '@/lib/places';
 
 /** Centro por defecto: Palma, cuando no hay ubicación ni eventos con punto. */
 const PALMA: L.LatLngTuple = [39.5696, 2.6502];
+
+/**
+ * Lo que se ve al abrir el mapa con tu ubicación: tu localidad y las de al
+ * lado (en Palma, media Mallorca). Antes se encuadraban todas las fiestas de
+ * España y se veía la península entera.
+ */
+const ZOOM_LOCALIDAD = 12;
 
 const NOTA =
   '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#111114" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>';
@@ -77,16 +87,22 @@ const MapPage = () => {
   const { currentUser } = useAppContext();
   // Los invitados no usan el Flechazo: no se les ofrece ese filtro.
   const esInvitado = currentUser?.accountType === 'guest';
-  const { withDistance, position, activity } = useEventsFeed();
+  const { withDistance, position, activity, relocate } = useEventsFeed();
+  const { toast } = useToast();
 
   const contenedor = useRef<HTMLDivElement | null>(null);
   const mapa = useRef<L.Map | null>(null);
   const capa = useRef<L.LayerGroup | null>(null);
   const yo = useRef<L.Marker | null>(null);
   const encuadrado = useRef(false);
+  const encuadradoEnMi = useRef(false);
+  // La persona ya ha movido el mapa (o ha elegido una ciudad): no se le recoloca.
+  const movido = useRef(false);
   const tarjetas = useRef<Record<string, HTMLElement | null>>({});
 
   const [busqueda, setBusqueda] = useState('');
+  // Ciudad elegida en el buscador: el mapa va allí y sólo salen sus fiestas.
+  const [zona, setZona] = useState<Zona | null>(null);
   const [tipo, setTipo] = useState<VenueType | null>(null);
   const [soloDirecto, setSoloDirecto] = useState(false);
   const [soloFlechazo, setSoloFlechazo] = useState(false);
@@ -139,6 +155,7 @@ const MapPage = () => {
       if (soloFlechazo && !conFlechazo(event)) return false;
       if (!matchesDate(event, fecha)) return false;
       if (soloGratis && (event.price ?? 0) > 0) return false;
+      if (zona && event.location && !enZona(zona, event.location.latitude, event.location.longitude)) return false;
       if (
         desde &&
         (new Date(event.endDate).getTime() <= desde.getTime() + 30 * 60_000 ||
@@ -155,7 +172,7 @@ const MapPage = () => {
         .replace(/\p{Diacritic}/gu, '');
       return texto.includes(q);
     }));
-  }, [conPunto, busqueda, tipo, soloDirecto, soloFlechazo, fecha, soloGratis, desde, theme, franja]);
+  }, [conPunto, busqueda, zona, tipo, soloDirecto, soloFlechazo, fecha, soloGratis, desde, theme, franja]);
 
   const temasMapa = useMemo(() => {
     const encontrados = new Set<string>();
@@ -187,6 +204,9 @@ const MapPage = () => {
     mapa.current = m;
     // Tocar el mapa fuera de un alfiler cierra la tarjeta.
     m.on('click', () => setSeleccion(null));
+    m.on('dragstart', () => {
+      movido.current = true;
+    });
 
     return () => {
       m.remove();
@@ -243,24 +263,63 @@ const MapPage = () => {
     }
   }, [visibles, seleccion]);
 
-  // Encuadre inicial: todos los eventos y tú, una sola vez. Después manda la
-  // persona, que puede estar mirando otra zona a propósito.
+  // Encuadre inicial, una sola vez; después manda la persona, que puede estar
+  // mirando otra zona a propósito. Con tu ubicación, tu localidad; sin ella,
+  // todas las fiestas. Si la ubicación llega cuando ya se habían encuadrado
+  // las fiestas y aún no has tocado el mapa, se va a tu zona.
   useEffect(() => {
     const m = mapa.current;
-    if (!m || encuadrado.current || conPunto.length === 0) return;
+    if (!m) return;
+
+    if (position && !encuadradoEnMi.current && !movido.current) {
+      m.setView([position.latitude, position.longitude], ZOOM_LOCALIDAD);
+      encuadradoEnMi.current = true;
+      encuadrado.current = true;
+      return;
+    }
+    if (encuadrado.current || conPunto.length === 0) return;
 
     const puntos: L.LatLngTuple[] = conPunto.map(({ event }) => [
       event.location!.latitude,
       event.location!.longitude,
     ]);
-    if (position) puntos.push([position.latitude, position.longitude]);
-
     m.fitBounds(L.latLngBounds(puntos), { padding: [48, 48], maxZoom: 15 });
     encuadrado.current = true;
   }, [conPunto, position]);
 
-  const centrarEnMi = () => {
-    if (position) mapa.current?.flyTo([position.latitude, position.longitude], 15, { duration: 0.6 });
+  /** El botón de ubicación: vuelve a tu zona (y quita la ciudad elegida). */
+  const centrarEnMi = async () => {
+    const aqui = position ?? (await relocate());
+    if (!aqui) {
+      toast({ title: t('map.locationOffTitle'), description: t('map.locationOffBody') });
+      return;
+    }
+    setZona(null);
+    movido.current = true;
+    const m = mapa.current;
+    m?.flyTo([aqui.latitude, aqui.longitude], Math.max(m.getZoom(), 14), { duration: 0.6 });
+  };
+
+  /** Una ciudad del buscador: el mapa va a su término y enseña sus fiestas. */
+  const irAZona = (destino: Zona) => {
+    setZona(destino);
+    setBusqueda('');
+    setSeleccion(null);
+    movido.current = true;
+    const m = mapa.current;
+    if (!m) return;
+    if (destino.limites) {
+      const [sur, oeste, norte, este] = destino.limites;
+      m.flyToBounds(
+        [
+          [sur, oeste],
+          [norte, este],
+        ],
+        { padding: [48, 48], maxZoom: 14, duration: 0.8 },
+      );
+    } else {
+      m.flyTo([destino.latitude, destino.longitude], ZOOM_LOCALIDAD, { duration: 0.8 });
+    }
   };
 
   const seleccionar = (item: EventWithDistance) => {
@@ -327,11 +386,24 @@ const MapPage = () => {
             </button>
           </div>
 
-          {/* Negocios que coinciden con la búsqueda, para ir a su ficha. */}
+          {/* Ciudades (para ir allí) y negocios (para ir a su ficha). */}
+          <CitySearchResults query={busqueda} onPick={irAZona} />
           <VenueSearchResults query={busqueda} />
 
-          <div className="pointer-events-auto flex">
+          <div className="pointer-events-auto flex flex-wrap items-center gap-2">
             <DateFilter nights={noches} events={paraCalendario} className="shadow-lg shadow-black/30" />
+            {zona && (
+              <button
+                type="button"
+                onClick={() => setZona(null)}
+                aria-label={t('map.clearZone', { name: zona.nombre })}
+                className="press flex h-9 items-center gap-1.5 rounded-full bg-white px-3.5 text-label-pill text-ink shadow-lg shadow-black/30"
+              >
+                <MapPin size={15} className="text-[#554600]" />
+                <span className="max-w-[10rem] truncate">{zona.nombre}</span>
+                <X size={15} className="text-ink/60" />
+              </button>
+            )}
           </div>
 
           {desde && (
@@ -378,19 +450,19 @@ const MapPage = () => {
         />
 
         {/* ------------------------------------------------- centrar en mí */}
-        {position && (
-          <button
-            type="button"
-            onClick={centrarEnMi}
-            aria-label={t('map.recenter')}
-            className={cn(
-              'press absolute right-margin z-[500] flex h-11 w-11 items-center justify-center rounded-full bg-surface-high/90 text-foreground shadow-xl backdrop-blur-md',
-              lista ? 'hidden' : 'bottom-[calc(var(--nav-h)+13rem)]',
-            )}
-          >
-            <LocateFixed size={20} />
-          </button>
-        )}
+        {/* Siempre a la vista: si aún no hay ubicación, la pide al pulsarlo. */}
+        <button
+          type="button"
+          onClick={() => void centrarEnMi()}
+          aria-label={t('map.recenter')}
+          className={cn(
+            'press absolute right-margin z-[500] flex h-11 w-11 items-center justify-center rounded-full bg-surface-high/90 text-foreground shadow-xl backdrop-blur-md',
+            lista ? 'hidden' : 'bottom-[calc(var(--nav-h)+13rem)]',
+            position && 'text-party-primary',
+          )}
+        >
+          <LocateFixed size={20} />
+        </button>
 
         {/* ------------------------------------------------- hoja de abajo */}
         <section
@@ -410,10 +482,10 @@ const MapPage = () => {
           <div className="flex shrink-0 items-center justify-between pt-0.5">
             <div className="flex min-w-0 items-center gap-1.5">
               <span className="truncate font-display text-title-card">
-                {busqueda ? t('map.results') : t('map.nearby')}
+                {zona ? zona.nombre : busqueda ? t('map.results') : t('map.nearby')}
               </span>
               <span className="shrink-0 rounded-full bg-surface-high px-2 py-0.5 text-caption text-[#FFEFBC]">
-                {position ? t('map.nearCount', { count: cercanos }) : t('map.count', { count: visibles.length })}
+                {position && !zona ? t('map.nearCount', { count: cercanos }) : t('map.count', { count: visibles.length })}
               </span>
             </div>
             <button
@@ -426,7 +498,9 @@ const MapPage = () => {
           </div>
 
           {visibles.length === 0 ? (
-            <p className="py-6 text-center text-body-sm text-party-gray">{t('map.empty')}</p>
+            <p className="py-6 text-center text-body-sm text-party-gray">
+              {zona ? t('map.emptyIn', { name: zona.nombre }) : t('map.empty')}
+            </p>
           ) : !lista && !seleccion ? (
             <p className="pb-1 text-caption text-party-gray">{t('map.tapPin')}</p>
           ) : (

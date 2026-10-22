@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppContext } from '@/context/app-context';
 import { useToast } from '@/components/ui/use-toast';
-import { calculateDistance, Coordinates, getCurrentPosition } from '@/services/geo';
+import { calculateDistance, Coordinates, FAST_POSITION, getCurrentPosition } from '@/services/geo';
 import { EMPTY_ACTIVITY, EventActivity, socialService } from '@/services/social';
 import { track } from '@/lib/observability';
 import { Event } from '@/types/venue';
@@ -53,7 +53,10 @@ export const useEventsFeed = () => {
     });
 
     // La distancia es opcional: sin permiso se siguen enseñando los eventos.
-    void getCurrentPosition()
+    // Primero la posición rápida (la de la red vale para saber la ciudad); el
+    // GPS fino tardaba hasta 15 s y dentro de casa se quedaba sin posición.
+    void getCurrentPosition(FAST_POSITION)
+      .catch(() => getCurrentPosition())
       .then((coords) => {
         if (!cancelled) setPosition(coords);
       })
@@ -152,11 +155,25 @@ export const useEventsFeed = () => {
     [events, position],
   );
 
+  /** Vuelve a pedir la posición (el botón del mapa); `null` si no se puede. */
+  const relocate = useCallback(async (): Promise<Coordinates | null> => {
+    try {
+      const coords = await getCurrentPosition(FAST_POSITION).catch(() => getCurrentPosition());
+      setPosition(coords);
+      setLocationDenied(false);
+      return coords;
+    } catch {
+      setLocationDenied(true);
+      return null;
+    }
+  }, []);
+
   return {
     events,
     withDistance,
     isLoading,
     position,
+    relocate,
     locationDenied,
     activity,
     intents,
