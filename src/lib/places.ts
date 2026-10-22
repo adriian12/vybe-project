@@ -5,6 +5,8 @@
  * un sitio que existe.
  */
 
+import { clave } from '@/lib/scan-groups';
+
 export interface Zona {
   /** Lo que se enseña: «Palma», «Madrid». */
   nombre: string;
@@ -69,7 +71,11 @@ export const buscarCiudades = async (texto: string, signal?: AbortSignal): Promi
   const respuesta = await fetch(url, { signal, headers: { Accept: 'application/json' } });
   if (!respuesta.ok) return [];
   const datos = (await respuesta.json()) as { features?: PhotonFeature[] };
-  return zonasDePhoton(datos.features ?? []).slice(0, 5);
+  // Photon corrige de más («amok» → «A Moa»): sólo las que contienen lo escrito.
+  const buscado = clave(q);
+  return zonasDePhoton(datos.features ?? [])
+    .filter((z) => clave(z.nombre).includes(buscado))
+    .slice(0, 5);
 };
 
 const distanciaM = (aLat: number, aLng: number, bLat: number, bLng: number): number => {

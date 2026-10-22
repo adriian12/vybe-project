@@ -28,6 +28,8 @@ import MapFiltersSheet from '@/components/map-filters-sheet';
 import { aplicarFiltros, conFlechazo, Franja } from '@/lib/party-filters';
 import VenueSearchResults from '@/components/venue-search-results';
 import CitySearchResults from '@/components/city-search-results';
+import PlaceSearchResults, { PlaceResult } from '@/components/place-search-results';
+import { clave } from '@/lib/scan-groups';
 import { useToast } from '@/components/ui/use-toast';
 import { enZona, Zona } from '@/lib/places';
 
@@ -40,6 +42,42 @@ const PALMA: L.LatLngTuple = [39.5696, 2.6502];
  * España y se veía la península entera.
  */
 const ZOOM_LOCALIDAD = 12;
+
+/** La ciudad elegida se recuerda entre visitas: si buscas Madrid, sigues en Madrid. */
+const ZONA_KEY = 'fiestea_map_zona';
+const leerZona = (): Zona | null => {
+  try {
+    const guardada = localStorage.getItem(ZONA_KEY);
+    return guardada ? (JSON.parse(guardada) as Zona) : null;
+  } catch {
+    return null;
+  }
+};
+const guardarZona = (zona: Zona | null) => {
+  try {
+    if (zona) localStorage.setItem(ZONA_KEY, JSON.stringify(zona));
+    else localStorage.removeItem(ZONA_KEY);
+  } catch {
+    // Sin almacenamiento sólo se pierde el recuerdo.
+  }
+};
+
+/** Mueve el mapa a una ciudad: a su término municipal, o a su centro. */
+const encuadrarZona = (m: L.Map, zona: Zona, animado: boolean) => {
+  if (zona.limites) {
+    const [sur, oeste, norte, este] = zona.limites;
+    const limites: L.LatLngBoundsExpression = [
+      [sur, oeste],
+      [norte, este],
+    ];
+    if (animado) m.flyToBounds(limites, { padding: [48, 48], maxZoom: 14, duration: 0.8 });
+    else m.fitBounds(limites, { padding: [48, 48], maxZoom: 14 });
+  } else if (animado) {
+    m.flyTo([zona.latitude, zona.longitude], ZOOM_LOCALIDAD, { duration: 0.8 });
+  } else {
+    m.setView([zona.latitude, zona.longitude], ZOOM_LOCALIDAD);
+  }
+};
 
 const NOTA =
   '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#111114" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>';
@@ -101,8 +139,13 @@ const MapPage = () => {
   const tarjetas = useRef<Record<string, HTMLElement | null>>({});
 
   const [busqueda, setBusqueda] = useState('');
-  // Ciudad elegida en el buscador: el mapa va allí y sólo salen sus fiestas.
-  const [zona, setZona] = useState<Zona | null>(null);
+  // Ciudad elegida en el buscador: el mapa va allí y sólo salen sus fiestas
+  // (también en el calendario). Se recuerda al volver.
+  const [zona, setZonaEstado] = useState<Zona | null>(leerZona);
+  const setZona = (nueva: Zona | null) => {
+    setZonaEstado(nueva);
+    guardarZona(nueva);
+  };
   const [tipo, setTipo] = useState<VenueType | null>(null);
   const [soloDirecto, setSoloDirecto] = useState(false);
   const [soloFlechazo, setSoloFlechazo] = useState(false);
@@ -125,17 +168,43 @@ const MapPage = () => {
   }, [params]);
 
   const conPunto = useMemo(() => withDistance.filter(({ event }) => event.location), [withDistance]);
-  const noches = useMemo(() => [...new Set(conPunto.map(({ event }) => nightOf(event.startDate)))], [conPunto]);
+  // El calendario, con las fiestas de la ciudad elegida: con «Madrid», sólo
+  // las noches con fiesta en Madrid.
+  const deLaZona = useMemo(
+    () =>
+      zona
+        ? conPunto.filter(({ event }) => enZona(zona, event.location!.latitude, event.location!.longitude))
+        : conPunto,
+    [conPunto, zona],
+  );
+  const noches = useMemo(() => [...new Set(deLaZona.map(({ event }) => nightOf(event.startDate)))], [deLaZona]);
   const paraCalendario = useMemo(
     () =>
-      conPunto.map(({ event }) => ({
+      deLaZona.map(({ event }) => ({
         id: event.id,
         name: event.name,
         startDate: event.startDate,
         posterUrl: event.posterUrl ?? null,
       })),
-    [conPunto],
+    [deLaZona],
   );
+
+  // Salas que nombran las fiestas (aunque no sean negocios de Fiestea) y
+  // coinciden con lo que se escribe: «amok» → «Amok Mallorca».
+  const salas = useMemo<PlaceResult[]>(() => {
+    const q = clave(busqueda);
+    if (q.length < 3) return [];
+    const ahora = Date.now();
+    const porSala = new Map<string, PlaceResult>();
+    for (const { event } of withDistance) {
+      if (!event.placeName || !clave(event.placeName).includes(q)) continue;
+      const k = clave(event.placeName);
+      const actual = porSala.get(k) ?? { name: event.placeName, city: event.city ?? null, upcoming: 0 };
+      if (new Date(event.endDate).getTime() > ahora) actual.upcoming += 1;
+      porSala.set(k, actual);
+    }
+    return [...porSala.values()].sort((a, b) => b.upcoming - a.upcoming).slice(0, 4);
+  }, [withDistance, busqueda]);
 
   const tiposPresentes = useMemo(
     () => TIPOS.filter((tp) => conPunto.some(({ event }) => event.venueType === tp)),
@@ -164,7 +233,7 @@ const MapPage = () => {
         return false;
       }
       if (!q) return true;
-      const texto = [event.name, event.venueName, event.city, event.region, event.theme]
+      const texto = [event.name, event.venueName, event.placeName, event.city, event.region, event.theme]
         .filter(Boolean)
         .join(' ')
         .toLocaleLowerCase()
@@ -271,6 +340,14 @@ const MapPage = () => {
     const m = mapa.current;
     if (!m) return;
 
+    // Con una ciudad guardada se abre en ella, no en tu ubicación.
+    if (zona && !encuadrado.current) {
+      encuadrarZona(m, zona, false);
+      encuadrado.current = true;
+      encuadradoEnMi.current = true;
+      movido.current = true;
+      return;
+    }
     if (position && !encuadradoEnMi.current && !movido.current) {
       m.setView([position.latitude, position.longitude], ZOOM_LOCALIDAD);
       encuadradoEnMi.current = true;
@@ -285,6 +362,7 @@ const MapPage = () => {
     ]);
     m.fitBounds(L.latLngBounds(puntos), { padding: [48, 48], maxZoom: 15 });
     encuadrado.current = true;
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- la zona sólo cuenta al abrir; después la mueve irAZona
   }, [conPunto, position]);
 
   /** El botón de ubicación: vuelve a tu zona (y quita la ciudad elegida). */
@@ -306,20 +384,7 @@ const MapPage = () => {
     setBusqueda('');
     setSeleccion(null);
     movido.current = true;
-    const m = mapa.current;
-    if (!m) return;
-    if (destino.limites) {
-      const [sur, oeste, norte, este] = destino.limites;
-      m.flyToBounds(
-        [
-          [sur, oeste],
-          [norte, este],
-        ],
-        { padding: [48, 48], maxZoom: 14, duration: 0.8 },
-      );
-    } else {
-      m.flyTo([destino.latitude, destino.longitude], ZOOM_LOCALIDAD, { duration: 0.8 });
-    }
+    if (mapa.current) encuadrarZona(mapa.current, destino, true);
   };
 
   const seleccionar = (item: EventWithDistance) => {
@@ -347,7 +412,14 @@ const MapPage = () => {
         <div ref={contenedor} className="absolute inset-0 bottom-[var(--nav-h)] z-0 bg-[#0E0E11]" />
 
         {/* -------------------------------------------- buscador y filtros */}
-        <div className="pointer-events-none absolute inset-x-0 top-3 z-[500] mx-auto flex max-w-2xl flex-col gap-2 px-margin">
+        {/* Mientras se escribe, los resultados van por encima de la hoja de
+            abajo (z-[600]); antes la lista de negocios quedaba tapada. */}
+        <div
+          className={cn(
+            'pointer-events-none absolute inset-x-0 top-3 mx-auto flex max-w-2xl flex-col gap-2 px-margin',
+            busqueda.trim() ? 'z-[650] max-h-[calc(100%-1.5rem)] overflow-y-auto' : 'z-[500]',
+          )}
+        >
           <div className="pointer-events-auto flex items-center gap-2">
             <label className="relative flex h-12 flex-1 items-center rounded-full bg-[#E4E1E6] px-4 shadow-lg shadow-black/30">
               <Search size={20} className="mr-2 shrink-0 text-[#554600]" />
@@ -388,6 +460,7 @@ const MapPage = () => {
 
           {/* Ciudades (para ir allí) y negocios (para ir a su ficha). */}
           <CitySearchResults query={busqueda} onPick={irAZona} />
+          <PlaceSearchResults places={salas} />
           <VenueSearchResults query={busqueda} />
 
           <div className="pointer-events-auto flex flex-wrap items-center gap-2">

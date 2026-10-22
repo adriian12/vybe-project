@@ -56,6 +56,20 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
     10): con toda España se cortaba sin avisar en la primera página.
   - Una ciudad sin fiestas es una ciudad sin fiestas en Fiestea: las de Madrid y
     Barcelona del Escáner no salen hasta que se añaden desde administración.
+  - **La ciudad se recuerda** (`fiestea_map_zona` en `localStorage`): al volver,
+    el mapa se abre en ella y no en tu ubicación. El calendario del filtro de
+    fecha sólo enseña las noches con fiesta en esa ciudad (`deLaZona`).
+  - Photon corrige de más («amok» → «A Moa»): sólo se sugieren las ciudades
+    cuyo nombre contiene lo escrito.
+  - Mientras se escribe, los resultados van en `z-[650]`, por encima de la
+    hoja de abajo (`z-[600]`), con scroll propio.
+- **Salas sin negocio** (`/sala/<nombre>`, `PlacePage.tsx`): el buscador del
+  mapa enseña «Salas» con los `place_name` de las fiestas (Funout, escáner) que
+  contienen lo escrito (`clave()`, sin espacios ni tildes). La ficha es la de un
+  negocio sin «Seguir» (no hay a quién seguir): sitio, en directo y próximas
+  fiestas en lista o calendario; varias la misma noche salen debajo. Sale de
+  las fiestas ya cargadas, sin RPC. El texto del buscador también filtra el
+  mapa por `placeName`.
 - **La cabecera superior está oculta** (`MOSTRAR_CABECERA` en `header.tsx`, y
   `--header-h` reducida a la zona segura).
 - **Calendario del filtro de fecha** (inicio y mapa): a pantalla completa

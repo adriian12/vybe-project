@@ -11,6 +11,10 @@ import { cn } from '@/lib/utils';
 /** Pasadas 6 horas, al abrir la sección se vuelve a escanear sola. */
 const CADUCA_MS = 6 * 3_600_000;
 const POR_PAGINA = 60;
+/** Fiestas por llamada al añadir: muchas a la vez pasaban del tope de 8 s. */
+const TANDA = 40;
+/** Con más fiestas que esto, un solo aviso a los seguidores en vez de uno por fiesta. */
+const AVISO_UNICO = 3;
 const CIUDADES = ['Barcelona', 'Madrid', 'Alicante'] as const;
 const FUENTE: Record<ScannedEvent['source'], string> = { xceed: 'Xceed', ra: 'Resident Advisor', fourvenues: 'Fourvenues' };
 
@@ -35,6 +39,7 @@ const AdminScanner = ({ onImported }: { onImported?: () => void }) => {
   const [visibles, setVisibles] = useState(POR_PAGINA);
   const [escaneando, setEscaneando] = useState(false);
   const [importando, setImportando] = useState(false);
+  const [progreso, setProgreso] = useState<{ hechas: number; total: number } | null>(null);
 
   const cargar = useCallback(async () => {
     const lista = await adminService.listScanned();
@@ -74,7 +79,9 @@ const AdminScanner = ({ onImported }: { onImported?: () => void }) => {
         (!ciudad || e.city === ciudad) &&
         (!q || clave(e.title).includes(q) || clave(e.placeName).includes(q) || e.lineup.some((a) => clave(a).includes(q))),
     );
-    return agrupar(lista);
+    // Las ya añadidas, al final: lo que queda por revisar va arriba.
+    const orden = (g: ScannedEvent[]) => (g.some((e) => e.importedEventId) ? 1 : 0);
+    return agrupar(lista).sort((a, b) => orden(a) - orden(b));
   }, [eventos, ciudad, busqueda]);
 
   // Al cambiar el filtro se vuelve a la primera página.
@@ -94,18 +101,35 @@ const AdminScanner = ({ onImported }: { onImported?: () => void }) => {
     });
 
   const importar = async () => {
-    const elegidos = grupos.filter((g) => marcados.has(idDe(g)));
+    const elegidos = grupos
+      .filter((g) => marcados.has(idDe(g)))
+      .map((g) => ({ ids: g.map((e) => e.id), ticket: enlace[idDe(g)] ?? g[0].id }));
+    // Por tandas: cientos de fiestas en una sola llamada pasaban del tope de
+    // 8 s de la base de datos. Con más de AVISO_UNICO, ningún aviso por fiesta:
+    // uno solo al final («Fiestea ha añadido varias fiestas nuevas»).
+    const enBloque = elegidos.length > AVISO_UNICO;
     setImportando(true);
+    setProgreso({ hechas: 0, total: elegidos.length });
+    let n = 0;
     try {
-      const n = await adminService.importScanned(
-        elegidos.map((g) => ({ ids: g.map((e) => e.id), ticket: enlace[idDe(g)] ?? g[0].id })),
-      );
+      for (let i = 0; i < elegidos.length; i += TANDA) {
+        n += await adminService.importScanned(elegidos.slice(i, i + TANDA), enBloque);
+        setProgreso({ hechas: Math.min(i + TANDA, elegidos.length), total: elegidos.length });
+      }
+      if (enBloque && n > 0) await adminService.announceNewEvents(n).catch(() => undefined);
       setMarcados(new Set());
       await cargar();
       onImported?.();
       toast({ title: t('admin.scanner.imported', { count: n, app: t('common.appName') }), description: t('admin.funout.importedBody') });
     } catch (error) {
       const motivo = error instanceof Error ? error.message : '';
+      // Las tandas que entraron, entraron: se recarga para verlas marcadas.
+      if (n > 0) {
+        setMarcados(new Set());
+        await cargar().catch(() => undefined);
+        onImported?.();
+        if (enBloque) await adminService.announceNewEvents(n).catch(() => undefined);
+      }
       toast({
         title: t('admin.funout.importError'),
         description: motivo ? t(`admin.funout.errors.${motivo}`, { defaultValue: motivo }) : undefined,
@@ -113,6 +137,7 @@ const AdminScanner = ({ onImported }: { onImported?: () => void }) => {
       });
     } finally {
       setImportando(false);
+      setProgreso(null);
     }
   };
 
@@ -169,7 +194,9 @@ const AdminScanner = ({ onImported }: { onImported?: () => void }) => {
               className="press flex h-10 items-center gap-1.5 rounded-lg bg-party-primary px-3 text-caption font-extrabold uppercase text-ink disabled:opacity-40"
             >
               {importando ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
-              {t('admin.funout.add', { app: t('common.appName').toUpperCase() })}
+              {importando && progreso
+                ? t('admin.scanner.importing', { done: progreso.hechas, total: progreso.total })
+                : t('admin.funout.add', { app: t('common.appName').toUpperCase() })}
             </button>
           </div>
         </div>
@@ -199,7 +226,7 @@ const AdminScanner = ({ onImported }: { onImported?: () => void }) => {
               const generos = [...new Set(g.flatMap((e) => e.genres))];
               const elegido = enlace[id] ?? primero.id;
               return (
-                <li key={id} className={cn('surface-light rounded-2xl p-3 ring-2 ring-transparent', marcado && 'ring-party-primary', st !== 'new' && 'opacity-70')}>
+                <li key={id} className={cn('surface-light rounded-2xl p-3 ring-2 ring-transparent', marcado && 'ring-party-primary', st === 'added' ? 'opacity-40' : st === 'repeated' && 'opacity-60')}>
                   <label className={cn('flex items-start gap-3', st === 'new' ? 'cursor-pointer' : 'cursor-default')}>
                     <Checkbox
                       checked={marcado || st === 'added'}

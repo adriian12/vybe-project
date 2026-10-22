@@ -32,6 +32,8 @@ interface Texts {
   raffleWon: (event: string, prize: string) => { title: string; body: string };
   raffleWinner: (event: string, prize: string, winner: string) => { title: string; body: string };
   newEvent: (venue: string, event: string, when: string) => { title: string; body: string };
+  /** Varias fiestas del local a la vez (importación del escáner): un solo aviso. */
+  newEvents: (venue: string, count: number) => { title: string; body: string };
   photosPending: (count: number) => { title: string; body: string };
   /** Alguien pide ayuda dentro de una fiesta: al equipo del local y a administración. */
   sosHelp: (name: string, event: string) => { title: string; body: string };
@@ -96,6 +98,10 @@ const TEXTS: Record<Locale, Texts> = {
     raffleWinner: (event, prize, winner) => ({
       title: `Sorteo de ${event}`,
       body: `El ganador de «${prize}» ha sido ${winner}.`,
+    }),
+    newEvents: (venue, count) => ({
+      title: `${venue} ha añadido varias fiestas nuevas`,
+      body: `${count} fiestas nuevas. Toca para verlas en el mapa.`,
     }),
     newEvent: (venue, event, when) => ({
       title: `${venue} tiene nueva fiesta`,
@@ -170,6 +176,10 @@ const TEXTS: Record<Locale, Texts> = {
     raffleWinner: (event, prize, winner) => ({
       title: `${event} raffle`,
       body: `The winner of «${prize}» is ${winner}.`,
+    }),
+    newEvents: (venue, count) => ({
+      title: `${venue} has added several new parties`,
+      body: `${count} new parties. Tap to see them on the map.`,
     }),
     newEvent: (venue, event, when) => ({
       title: `New party at ${venue}`,
@@ -247,6 +257,10 @@ const TEXTS: Record<Locale, Texts> = {
       title: `Verlosung bei ${event}`,
       body: `Gewonnen hat «${prize}»: ${winner}.`,
     }),
+    newEvents: (venue, count) => ({
+      title: `${venue} hat mehrere neue Partys hinzugefügt`,
+      body: `${count} neue Partys. Tippe, um sie auf der Karte zu sehen.`,
+    }),
     newEvent: (venue, event, when) => ({
       title: `Neue Party bei ${venue}`,
       body: `${event} · ${when}. Markier „Ich gehe hin“, damit du sie nicht verpasst.`,
@@ -322,6 +336,10 @@ const TEXTS: Record<Locale, Texts> = {
     raffleWinner: (event, prize, winner) => ({
       title: `Sorteig de ${event}`,
       body: `El guanyador de «${prize}» ha estat ${winner}.`,
+    }),
+    newEvents: (venue, count) => ({
+      title: `${venue} ha afegit diverses festes noves`,
+      body: `${count} festes noves. Toca per veure-les al mapa.`,
     }),
     newEvent: (venue, event, when) => ({
       title: `${venue} té festa nova`,

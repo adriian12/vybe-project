@@ -2139,7 +2139,8 @@
             "imported_one": "{{count}} festa afegida a {{app}}",
             "imported_other": "{{count}} festes afegides a {{app}}",
             "more": "Veure més ({{count}})",
-            "note": "Festes de Barcelona, Madrid i Alacant a Xceed i Resident Advisor. «Repetida»: ja hi ha una festa amb aquest nom aquella nit. Fourvenues no s'escaneja: bloqueja els robots."
+            "note": "Festes de Barcelona, Madrid i Alacant a Xceed i Resident Advisor. «Repetida»: ja hi ha una festa amb aquest nom aquella nit. Fourvenues no s'escaneja: bloqueja els robots.",
+            "importing": "Afegint {{done}}/{{total}}"
         }
     },
     "pwa": {
@@ -2310,7 +2311,8 @@
         "emptyIn": "No hi ha festes a {{name}} amb aquests filtres. Prova una altra data.",
         "clearZone": "Treure {{name}}",
         "locationOffTitle": "No sabem on ets",
-        "locationOffBody": "Activa la ubicació del mòbil i el permís de Fiestea per centrar el mapa a la teva zona."
+        "locationOffBody": "Activa la ubicació del mòbil i el permís de Fiestea per centrar el mapa a la teva zona.",
+        "places": "Sales"
     },
     "tickets": {
         "external": {
@@ -3706,5 +3708,10 @@
         "title": "Negocis que segueixes",
         "empty": "Encara no segueixes cap negoci. Entra a la fitxa d’una festa i prem «Segueix» a «Organitza» per saber les seves properes festes.",
         "noParties": "Sense festes"
+    },
+    "placePage": {
+        "notFound": "No hi ha festes en aquesta sala",
+        "kind": "Sala",
+        "noUpcoming": "No hi ha festes properes en aquesta sala."
     }
 }

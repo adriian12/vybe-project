@@ -28,7 +28,16 @@ interface PushRequest {
 }
 
 interface WebhookPayload {
-  type: 'INSERT' | 'RAFFLE_CREATED' | 'RAFFLE_DRAWN' | 'EVENT_PUBLISHED' | 'PHOTOS_PENDING' | 'SOS' | 'REPORT' | 'EXPELLED';
+  type:
+    | 'INSERT'
+    | 'RAFFLE_CREATED'
+    | 'RAFFLE_DRAWN'
+    | 'EVENT_PUBLISHED'
+    | 'EVENTS_BULK'
+    | 'PHOTOS_PENDING'
+    | 'SOS'
+    | 'REPORT'
+    | 'EXPELLED';
   table: 'connections' | 'messages' | 'raffles' | 'venue_events' | 'moderation_queue' | 'sos_alerts';
   record: Record<string, unknown>;
 }
@@ -84,6 +93,37 @@ const fromVenueEvent = async (
       ...pushTexts(locale).newEvent(venueName, evento.name, cuandoLocal(evento.start_date, locale)),
       url: `/event/${evento.id}`,
       tag: `venue-event-${evento.id}`,
+    };
+  });
+};
+
+/**
+ * Varias fiestas nuevas de golpe (el escáner, migración 119): un solo aviso a
+ * los seguidores del local, que abre el mapa, en vez de uno por fiesta.
+ */
+const fromVenueEventsBulk = async (
+  supabase: ReturnType<typeof adminClient>,
+  payload: WebhookPayload,
+): Promise<PushRequest[]> => {
+  const { venue_id: venueId, count } = payload.record as { venue_id?: string; count?: number };
+  if (!venueId || !count) return [];
+
+  const { data: venue } = await supabase.from('venues').select('name').eq('id', venueId).maybeSingle();
+  const venueName = venue?.name ?? 'Fiestea';
+  const { data: seguidores } = await supabase
+    .from('venue_followers')
+    .select('profile_id, profiles(locale)')
+    .eq('venue_id', venueId)
+    .limit(5000);
+
+  return (seguidores ?? []).map((row) => {
+    const locale = (row.profiles as { locale?: string | null } | null)?.locale ?? null;
+    return {
+      profileId: row.profile_id as string,
+      kind: 'event' as const,
+      ...pushTexts(locale).newEvents(venueName, count),
+      url: '/map',
+      tag: `venue-events-${venueId}`,
     };
   });
 };
@@ -541,7 +581,9 @@ serve(async (req: Request): Promise<Response> => {
         ? body.table === 'raffles'
           ? await fromRaffle(supabase, body)
           : body.table === 'venue_events'
-            ? await fromVenueEvent(supabase, body)
+            ? body.type === 'EVENTS_BULK'
+              ? await fromVenueEventsBulk(supabase, body)
+              : await fromVenueEvent(supabase, body)
             : body.table === 'moderation_queue'
               ? await fromPendingPhotos(supabase)
               : body.table === 'sos_alerts'

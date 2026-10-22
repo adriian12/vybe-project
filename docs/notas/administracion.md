@@ -50,6 +50,18 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
   corrigieron 21, todas pasadas. Fourvenues está detrás de Cloudflare y el
   usuario no quiere que se use su Chrome para esto. `funout_upsert_event`
   ya no pisa un enlace de Fourvenues corregido si apunta al mismo evento.
+- **Escáner rápido y un solo aviso** (migración 119):
+  - `admin_list_scanned` tardaba 10,7 s (más que el tope de 8 s de
+    `authenticated`: «no hay resultados»); ahora cruza claves precalculadas y
+    tarda 0,1 s.
+  - El panel añade por tandas de 40 (`TANDA`); con más de 3 fiestas
+    (`AVISO_UNICO`), `admin_import_scanned(…, p_quiet)` fija
+    `vybe.quiet_events` y `push_on_event_published` no avisa por cada una. Al
+    acabar, `admin_announce_new_events(n)` manda a los seguidores de Fiestea
+    un único «Fiestea ha añadido varias fiestas nuevas» (`EVENTS_BULK` en
+    `send-push`, `newEvents` en `push-texts`) que abre `/map`.
+  - Las ya añadidas salen al final, al 40 % de opacidad y sin poder marcarse.
+  - Funout no pasa por aquí: sigue avisando fiesta a fiesta.
 - **Plan de un usuario con Premium de una fiesta** (migración 117): el
   selector de Usuarios ya no se bloquea. «Sin Premium» cancela también el de la
   fiesta; mensual o vitalicio se añaden y dejan el de la fiesta. (En Aurora,

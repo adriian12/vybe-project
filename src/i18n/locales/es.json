@@ -2139,7 +2139,8 @@
             "imported_one": "{{count}} fiesta añadida a {{app}}",
             "imported_other": "{{count}} fiestas añadidas a {{app}}",
             "more": "Ver más ({{count}})",
-            "note": "Fiestas de Barcelona, Madrid y Alicante en Xceed y Resident Advisor. «Repetida»: ya hay una fiesta con ese nombre esa noche. Fourvenues no se escanea: bloquea a los robots."
+            "note": "Fiestas de Barcelona, Madrid y Alicante en Xceed y Resident Advisor. «Repetida»: ya hay una fiesta con ese nombre esa noche. Fourvenues no se escanea: bloquea a los robots.",
+            "importing": "Añadiendo {{done}}/{{total}}"
         }
     },
     "pwa": {
@@ -2310,7 +2311,8 @@
         "emptyIn": "No hay fiestas en {{name}} con estos filtros. Prueba otra fecha.",
         "clearZone": "Quitar {{name}}",
         "locationOffTitle": "No sabemos dónde estás",
-        "locationOffBody": "Activa la ubicación del móvil y el permiso de Fiestea para centrar el mapa en tu zona."
+        "locationOffBody": "Activa la ubicación del móvil y el permiso de Fiestea para centrar el mapa en tu zona.",
+        "places": "Salas"
     },
     "tickets": {
         "external": {
@@ -3706,5 +3708,10 @@
         "title": "Negocios que sigues",
         "empty": "Aún no sigues ningún negocio. Entra en la ficha de una fiesta y pulsa «Seguir» en «Organiza» para enterarte de sus próximas fiestas.",
         "noParties": "Sin fiestas"
+    },
+    "placePage": {
+        "notFound": "No hay fiestas en esta sala",
+        "kind": "Sala",
+        "noUpcoming": "No hay fiestas próximas en esta sala."
     }
 }

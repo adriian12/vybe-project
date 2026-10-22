@@ -2139,7 +2139,8 @@
             "imported_one": "{{count}} party added to {{app}}",
             "imported_other": "{{count}} parties added to {{app}}",
             "more": "Show more ({{count}})",
-            "note": "Parties in Barcelona, Madrid and Alicante on Xceed and Resident Advisor. “Duplicate”: there is already a party with that name that night. Fourvenues is not scanned: it blocks bots."
+            "note": "Parties in Barcelona, Madrid and Alicante on Xceed and Resident Advisor. “Duplicate”: there is already a party with that name that night. Fourvenues is not scanned: it blocks bots.",
+            "importing": "Adding {{done}}/{{total}}"
         }
     },
     "pwa": {
@@ -2310,7 +2311,8 @@
         "emptyIn": "No parties in {{name}} with these filters. Try another date.",
         "clearZone": "Remove {{name}}",
         "locationOffTitle": "We don't know where you are",
-        "locationOffBody": "Turn on your phone's location and Fiestea's permission to center the map on your area."
+        "locationOffBody": "Turn on your phone's location and Fiestea's permission to center the map on your area.",
+        "places": "Venues"
     },
     "tickets": {
         "external": {
@@ -3706,5 +3708,10 @@
         "title": "Venues you follow",
         "empty": "You do not follow any venue yet. Open a party and tap «Follow» under «Organised by» to hear about their next parties.",
         "noParties": "No parties"
+    },
+    "placePage": {
+        "notFound": "No parties at this venue",
+        "kind": "Venue",
+        "noUpcoming": "No upcoming parties at this venue."
     }
 }

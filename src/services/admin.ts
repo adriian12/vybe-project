@@ -349,10 +349,23 @@ export const adminService = {
   },
 
   /** Crea una fiesta por grupo, con el enlace de entradas elegido. */
-  importScanned: async (groups: ScannedGroup[]): Promise<number> => {
-    const { data, error } = await supabase.rpc('admin_import_scanned' as never, { p_groups: groups } as never);
+  /**
+   * Añade fiestas escaneadas. `quiet`: sin el aviso de cada una a los
+   * seguidores (migración 119); se manda uno solo con `announceNewEvents`.
+   */
+  importScanned: async (groups: ScannedGroup[], quiet = false): Promise<number> => {
+    const { data, error } = await supabase.rpc(
+      'admin_import_scanned' as never,
+      { p_groups: groups, p_quiet: quiet } as never,
+    );
     if (error) fallo(error.message);
     return Number(data ?? 0);
+  },
+
+  /** «Fiestea ha añadido varias fiestas nuevas», a sus seguidores; abre el mapa. */
+  announceNewEvents: async (count: number): Promise<void> => {
+    const { error } = await supabase.rpc('admin_announce_new_events' as never, { p_count: count } as never);
+    if (error) fallo(error.message);
   },
 
   listUsers: async (search = '', limit = 50, offset = 0): Promise<AdminUser[]> => {
