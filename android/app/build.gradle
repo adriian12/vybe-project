@@ -47,6 +47,11 @@ android {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            // Los símbolos del código nativo de las librerías van dentro del
+            // AAB: Google Play los pide para leer los fallos y ANR.
+            ndk {
+                debugSymbolLevel 'SYMBOL_TABLE'
+            }
         }
     }
 }
