@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-        <string>Fiestea</string>
+	<string>Fiestea</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -85,7 +85,8 @@
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Para comprobar que estás en el local y dejarte entrar al evento. Solo se consulta mientras usas la aplicación.</string>
 
-	<!-- La localización también viaja en la alerta de ayuda a tus contactos. -->
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Para verificar tu acceso en el local del evento y adjuntar tu posición en caso de que actives una alerta de ayuda para tus contactos.</string>
 
 	<!--
 		Sin NSUserTrackingUsageDescription: la app no rastrea ni pide el aviso
