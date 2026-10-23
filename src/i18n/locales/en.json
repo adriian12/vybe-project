@@ -375,7 +375,7 @@
             "today": "Today",
             "tomorrow": "Tomorrow",
             "weekend": "This weekend",
-            "week": "Next 7 days",
+            "week": "This week",
             "date": "Date"
         },
         "schedule": "Time",
@@ -548,7 +548,12 @@
         "cancelBody": "You'll keep Premium until the end of the period you've already paid for.",
         "tagline": "Fiestea · Nightlife in Spain",
         "cancelledUntil": "Cancelled · active until {{date}}",
-        "editName": "Change your name"
+        "editName": "Change your name",
+        "birthDate": {
+            "underage": "Fiestea is only for people over 18.",
+            "age_one": "{{count}} year old",
+            "age_other": "{{count}} years old"
+        }
     },
     "faceVerification": {
         "title": "Identity verification",
@@ -2330,7 +2335,12 @@
         "clearZone": "Remove {{name}}",
         "locationOffTitle": "We don't know where you are",
         "locationOffBody": "Turn on your phone's location and Fiestea's permission to center the map on your area.",
-        "places": "Venues"
+        "places": "Venues",
+        "placeTypes": {
+            "discoteca": "Club",
+            "terraza": "Terrace",
+            "aire_libre": "Open air"
+        }
     },
     "tickets": {
         "external": {
@@ -2550,7 +2560,11 @@
         "agoHours": "{{count}} h ago",
         "agoDays": "{{count}} d ago",
         "openChat": "Open chat",
-        "backToDeck": "Back to the floor"
+        "backToDeck": "Back to the floor",
+        "supercrush": {
+            "no": "Not for me",
+            "yes": "Like"
+        }
     },
     "landing": {
         "nav": {
@@ -3700,7 +3714,9 @@
         "chooseGuest": "Just parties: see events, buy tickets, offers and raffles. You’re in right away, nothing else to fill.",
         "chooseLater": "As a guest you can switch to Fiester@ whenever you like.",
         "chooseContinue": "Continue with {{kind}}",
-        "chooseFirst": "Choose an option"
+        "chooseFirst": "Choose an option",
+        "birthDate": "Date of birth",
+        "birthDateHelp": "Your age comes from this. Only you see it, and it fills in the tickets you buy."
     },
     "share": {
         "title": "Share",

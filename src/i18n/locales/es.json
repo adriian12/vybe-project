@@ -375,7 +375,7 @@
             "today": "Hoy",
             "tomorrow": "Mañana",
             "weekend": "Este finde",
-            "week": "Próximos 7 días",
+            "week": "Esta semana",
             "date": "Fecha"
         },
         "schedule": "Horario",
@@ -548,7 +548,12 @@
         "cancelBody": "Seguirás teniendo Premium hasta que acabe el periodo que ya has pagado.",
         "tagline": "Fiestea · La noche en España",
         "cancelledUntil": "Cancelada · activa hasta el {{date}}",
-        "editName": "Cambiar el nombre"
+        "editName": "Cambiar el nombre",
+        "birthDate": {
+            "underage": "Fiestea es sólo para mayores de 18 años.",
+            "age_one": "{{count}} año",
+            "age_other": "{{count}} años"
+        }
     },
     "faceVerification": {
         "title": "Verificación de identidad",
@@ -2330,7 +2335,12 @@
         "clearZone": "Quitar {{name}}",
         "locationOffTitle": "No sabemos dónde estás",
         "locationOffBody": "Activa la ubicación del móvil y el permiso de Fiestea para centrar el mapa en tu zona.",
-        "places": "Salas"
+        "places": "Salas",
+        "placeTypes": {
+            "discoteca": "Discoteca",
+            "terraza": "Terraza",
+            "aire_libre": "Al aire libre"
+        }
     },
     "tickets": {
         "external": {
@@ -2550,7 +2560,11 @@
         "agoHours": "hace {{count}} h",
         "agoDays": "hace {{count}} d",
         "openChat": "Abrir chat",
-        "backToDeck": "Volver a la pista"
+        "backToDeck": "Volver a la pista",
+        "supercrush": {
+            "no": "No me gusta",
+            "yes": "Me gusta"
+        }
     },
     "landing": {
         "nav": {
@@ -3700,7 +3714,9 @@
         "chooseGuest": "Sólo fiestas: ver eventos, comprar entradas, ofertas y sorteos. Entras ya, sin más datos.",
         "chooseLater": "Como invitado puedes pasarte a Fiester@ cuando quieras.",
         "chooseContinue": "Continuar con {{kind}}",
-        "chooseFirst": "Elige una opción"
+        "chooseFirst": "Elige una opción",
+        "birthDate": "Fecha de nacimiento",
+        "birthDateHelp": "Tu edad sale de aquí. Sólo la ves tú, y rellena las entradas que compres."
     },
     "share": {
         "title": "Compartir",

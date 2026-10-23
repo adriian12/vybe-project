@@ -33,6 +33,9 @@ const Seccion: React.FC<{ titulo: React.ReactNode; extra?: React.ReactNode }> = 
  * lo que está en directo, tres cifras, destacados en carrusel, filtro por
  * género y la lista completa.
  */
+/** Lo que cuenta como «tu zona» en inicio cuando se sabe dónde estás. */
+const RADIO_ZONA_M = 80_000;
+
 const HomePage = () => {
   const { activeEvent, currentUser } = useAppContext();
   const navigate = useNavigate();
@@ -40,6 +43,17 @@ const HomePage = () => {
 
   const { withDistance, isLoading, activity, intents, busyIntent, toggleIntent } =
     useEventsFeed();
+
+  /**
+   * Con tu ubicación, sólo las fiestas de tu zona: a quien está en Palma no le
+   * sirven las de Madrid o Barcelona. 80 km cubren Mallorca entera desde
+   * Palma sin llegar a Ibiza, y Madrid con sus alrededores. Sin ubicación, o
+   * si no hay nada tan cerca, todas.
+   */
+  const deTuZona = useMemo(() => {
+    const cerca = withDistance.filter(({ distance }) => distance !== null && distance <= RADIO_ZONA_M);
+    return cerca.length > 0 ? cerca : withDistance;
+  }, [withDistance]);
 
   const [theme, setTheme] = useState<string | null>(null);
   const [franja, setFranja] = useState<Franja | null>(null);
@@ -61,14 +75,14 @@ const HomePage = () => {
    */
   // Las categorías de música con alguna fiesta, en su orden (lib/music).
   const themes = useMemo(() => {
-    const presentes = new Set(withDistance.map(({ event }) => musicaDe(event.theme)));
+    const presentes = new Set(deTuZona.map(({ event }) => musicaDe(event.theme)));
     return MUSICAS.filter((m) => presentes.has(m));
-  }, [withDistance]);
+  }, [deTuZona]);
 
   // Música y horario; después, la fecha (por defecto, hoy).
   const filtrados = useMemo(
-    () => aplicarFiltros(withDistance, theme, franja).filter(({ event }) => !soloFlechazo || conFlechazo(event)),
-    [withDistance, theme, franja, soloFlechazo],
+    () => aplicarFiltros(deTuZona, theme, franja).filter(({ event }) => !soloFlechazo || conFlechazo(event)),
+    [deTuZona, theme, franja, soloFlechazo],
   );
   const fecha = useDateSelection();
   const etiquetaFecha = useDateLabel();
@@ -77,17 +91,17 @@ const HomePage = () => {
   // Sin fiestas ese día no se enseña la pantalla vacía: las próximas.
   const sinFiestas = !isLoading && delDia.length === 0 && cercaDeLaFecha.length === 0;
   const visible = sinFiestas ? filtrados : delDia;
-  const noches = useMemo(() => [...new Set(withDistance.map(({ event }) => nightOf(event.startDate)))], [withDistance]);
+  const noches = useMemo(() => [...new Set(deTuZona.map(({ event }) => nightOf(event.startDate)))], [deTuZona]);
   // El calendario del filtro de fecha, con el cartel de cada noche (todas las fiestas).
   const paraCalendario = useMemo(
     () =>
-      withDistance.map(({ event }) => ({
+      deTuZona.map(({ event }) => ({
         id: event.id,
         name: event.name,
         startDate: event.startDate,
         posterUrl: event.posterUrl ?? null,
       })),
-    [withDistance],
+    [deTuZona],
   );
 
   useEffect(() => {

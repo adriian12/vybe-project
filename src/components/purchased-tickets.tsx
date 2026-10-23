@@ -179,16 +179,6 @@ const PurchasedTickets = ({
             <p className="truncate font-display text-title-card">{ticket.eventName}</p>
             <p className="truncate text-caption text-ink/60">{fecha(ticket)}</p>
             {ticket.holderName && <p className="mt-1 truncate text-caption font-bold text-ink/80">{ticket.holderName}</p>}
-            <p className="mt-1 text-body-sm font-bold">
-              {ticket.typeName}
-              {ticket.kind === 'table' && ticket.guests ? ` · ${t('tickets.buy.guests', { count: ticket.guests })}` : ''}
-            </p>
-            {ticket.kind === 'table' && (
-              <p className="text-caption text-ink/60">
-                {t('tickets.mine.depositPaid', { amount: euros(ticket.unitCents) })}
-                {ticket.minSpendCents ? ` · ${t('tickets.buy.minSpend', { amount: euros(ticket.minSpendCents) })}` : ''}
-              </p>
-            )}
           </div>
           <button
             type="button"
@@ -201,6 +191,19 @@ const PurchasedTickets = ({
             {ticket.archived ? t('tickets.mine.restore') : t('tickets.mine.archive')}
           </button>
         </div>
+        {/* El tipo, a lo ancho: al lado del botón de archivar se partía en dos líneas. */}
+        <div className="-mt-2 px-4 pb-4">
+          <p className="text-body-sm font-bold">
+            {ticket.typeName}
+            {ticket.kind === 'table' && ticket.guests ? ` · ${t('tickets.buy.guests', { count: ticket.guests })}` : ''}
+          </p>
+          {ticket.kind === 'table' && (
+            <p className="text-caption text-ink/60">
+              {t('tickets.mine.depositPaid', { amount: euros(ticket.unitCents) })}
+              {ticket.minSpendCents ? ` · ${t('tickets.buy.minSpend', { amount: euros(ticket.minSpendCents) })}` : ''}
+            </p>
+          )}
+        </div>
         {ticket.archived ? null : (
           <div className="flex flex-col items-center gap-2 border-t border-dashed border-black/15 p-4">
             <QRCodeSVG value={ticket.code} size={168} level="M" />
@@ -210,7 +213,6 @@ const PurchasedTickets = ({
               <TicketDownloadButtons
                 token={ticket.downloadToken}
                 code={ticket.code}
-                names={{ [ticket.code]: ticket.holderName }}
                 tone="light"
                 className="w-full pt-1"
               />

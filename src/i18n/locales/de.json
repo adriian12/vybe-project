@@ -375,7 +375,7 @@
             "today": "Heute",
             "tomorrow": "Morgen",
             "weekend": "Dieses Wochenende",
-            "week": "Nächste 7 Tage",
+            "week": "Diese Woche",
             "date": "Datum"
         },
         "schedule": "Uhrzeit",
@@ -548,7 +548,12 @@
         "cancelBody": "Premium bleibt bis zum Ende des bereits bezahlten Zeitraums aktiv.",
         "tagline": "Fiestea · Nachtleben in Spanien",
         "cancelledUntil": "Gekündigt · aktiv bis {{date}}",
-        "editName": "Namen ändern"
+        "editName": "Namen ändern",
+        "birthDate": {
+            "underage": "Fiestea ist nur für Personen ab 18.",
+            "age_one": "{{count}} Jahr",
+            "age_other": "{{count}} Jahre"
+        }
     },
     "faceVerification": {
         "title": "Identitätsprüfung",
@@ -2330,7 +2335,12 @@
         "clearZone": "{{name}} entfernen",
         "locationOffTitle": "Wir wissen nicht, wo du bist",
         "locationOffBody": "Aktiviere den Standort deines Handys und die Berechtigung für Fiestea, um die Karte auf deine Gegend zu zentrieren.",
-        "places": "Locations"
+        "places": "Locations",
+        "placeTypes": {
+            "discoteca": "Club",
+            "terraza": "Terrasse",
+            "aire_libre": "Open Air"
+        }
     },
     "tickets": {
         "external": {
@@ -2550,7 +2560,11 @@
         "agoHours": "vor {{count}} Std.",
         "agoDays": "vor {{count}} T.",
         "openChat": "Chat öffnen",
-        "backToDeck": "Zurück zur Party"
+        "backToDeck": "Zurück zur Party",
+        "supercrush": {
+            "no": "Gefällt mir nicht",
+            "yes": "Gefällt mir"
+        }
     },
     "landing": {
         "nav": {
@@ -3700,7 +3714,9 @@
         "chooseGuest": "Nur Partys: Events ansehen, Tickets kaufen, Angebote und Verlosungen. Sofort drin, ohne weitere Angaben.",
         "chooseLater": "Als Gast kannst du jederzeit zu Fiester@ wechseln.",
         "chooseContinue": "Weiter mit {{kind}}",
-        "chooseFirst": "Wähle eine Option"
+        "chooseFirst": "Wähle eine Option",
+        "birthDate": "Geburtsdatum",
+        "birthDateHelp": "Daraus ergibt sich dein Alter. Nur du siehst es, und es füllt die Tickets aus, die du kaufst."
     },
     "share": {
         "title": "Teilen",

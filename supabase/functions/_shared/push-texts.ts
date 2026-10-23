@@ -19,6 +19,8 @@ export const pickLocale = (value: unknown): Locale => {
 interface Texts {
   match: (name: string) => { title: string; body: string };
   vybeCheck: (name: string) => { title: string; body: string };
+  /** Te han dado un supercrush y aún no es match (migración 124). */
+  supercrush: (name: string) => { title: string; body: string };
   doorsOpen: (event: string, venue: string) => { title: string; body: string };
   fillingUp: (event: string, inside: number) => { title: string; body: string };
   /** Por el ambiente que da el local: nunca su cifra. */
@@ -48,6 +50,10 @@ const TEXTS: Record<Locale, Texts> = {
     match: (name) => ({
       title: '¡Crush!',
       body: `A ${name} también le gustas. Escríbele antes de que acabe la noche.`,
+    }),
+    supercrush: (name) => ({
+      title: '¡Has recibido un supercrush!',
+      body: `${name} te ha dado un supercrush. Toca para ver su perfil y decidir.`,
     }),
     vybeCheck: (name) => ({
       title: '¡Flechazo!',
@@ -129,6 +135,10 @@ const TEXTS: Record<Locale, Texts> = {
       title: 'Crush!',
       body: `${name} likes you too. Say hi before the night is over.`,
     }),
+    supercrush: (name) => ({
+      title: "You've got a supercrush!",
+      body: `${name} gave you a supercrush. Tap to see their profile and decide.`,
+    }),
     vybeCheck: (name) => ({
       title: 'Flechazo!',
       body: `You and ${name} super-liked each other. Say hi.`,
@@ -206,6 +216,10 @@ const TEXTS: Record<Locale, Texts> = {
     match: (name) => ({
       title: 'Crush!',
       body: `${name} mag dich auch. Schreib, bevor die Nacht vorbei ist.`,
+    }),
+    supercrush: (name) => ({
+      title: 'Du hast einen Supercrush bekommen!',
+      body: `${name} hat dir einen Supercrush gegeben. Tippe, um das Profil zu sehen und zu entscheiden.`,
     }),
     vybeCheck: (name) => ({
       title: 'Flechazo!',
@@ -286,6 +300,10 @@ const TEXTS: Record<Locale, Texts> = {
     match: (name) => ({
       title: 'Crush!',
       body: `A ${name} també li agrades. Escriu-li abans que s'acabi la nit.`,
+    }),
+    supercrush: (name) => ({
+      title: 'Has rebut un supercrush!',
+      body: `${name} t'ha donat un supercrush. Toca per veure el seu perfil i decidir.`,
     }),
     vybeCheck: (name) => ({
       title: 'Flechazo!',

@@ -4,6 +4,8 @@ export interface User {
   id: string;
   name: string;
   age: number;
+  /** Sólo la propia (migración 122): «AAAA-MM-DD». Rellena la compra de entradas. */
+  birthDate?: string;
   bio: string;
   photos: string[];
   avatar?: string;

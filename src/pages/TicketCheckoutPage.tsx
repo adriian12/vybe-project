@@ -75,7 +75,18 @@ const TicketCheckoutPage = () => {
       const [primero, ...resto] = prev;
       if (primero.name || primero.email) return prev;
       const correo = user.email ?? '';
-      return [{ ...primero, name: user.name ?? '', email: correo, emailConfirm: correo, phone: user.phone ?? '' }, ...resto];
+      return [
+        {
+          ...primero,
+          name: user.name ?? '',
+          email: correo,
+          emailConfirm: correo,
+          phone: user.phone ?? '',
+          // La de la cuenta (migración 122), si la tiene.
+          birthdate: primero.birthdate || user.birthDate || '',
+        },
+        ...resto,
+      ];
     });
   }, [user]);
 

@@ -24,6 +24,9 @@ export interface Venue {
   createdAt?: string;
 }
 
+/** Dónde es la fiesta (migración 123): para el filtro del mapa. */
+export type PlaceType = 'discoteca' | 'terraza' | 'aire_libre';
+
 export type VenueType =
   | 'discoteca'
   | 'bar'
@@ -56,6 +59,8 @@ export interface Event {
    * traídas de Funout): «Amok Mallorca».
    */
   placeName?: string;
+  /** Discoteca, terraza o al aire libre (migración 123). */
+  placeType?: PlaceType;
   /** De dónde viene, si se importó (`funout`). */
   externalSource?: string;
   venueType?: VenueType;

@@ -22,7 +22,7 @@ import { DateFilter } from '@/components/party-filters';
 import { matchesDate, nightOf, useDateSelection } from '@/lib/date-filter';
 import { formatDistance } from '@/services/geo';
 import { cn } from '@/lib/utils';
-import { VenueType } from '@/types/venue';
+import { PlaceType } from '@/types/venue';
 import { featuredFirst, isFeatured } from '@/lib/featured';
 import MapFiltersSheet from '@/components/map-filters-sheet';
 import { aplicarFiltros, conFlechazo, Franja } from '@/lib/party-filters';
@@ -111,7 +111,11 @@ const icono = (nombre: string, seleccionado: boolean, directo: boolean, destacad
       : `<div class="vybe-pin-simple">${destacado ? `<span class="vybe-pin-fire">${FUEGO}</span>` : ''}<span class="vybe-pin-dot${destacado ? ' vybe-pin-dot-hot' : ''}">${NOTA}</span></div>`,
   });
 
-const TIPOS: VenueType[] = ['discoteca', 'bar', 'festival', 'fiesta_privada', 'evento_empresarial', 'local'];
+/**
+ * El tipo de sitio de la fiesta (migración 123). Antes era el tipo del negocio,
+ * y casi todas son de Fiestea («local»): el filtro no servía.
+ */
+const TIPOS: PlaceType[] = ['discoteca', 'terraza', 'aire_libre'];
 
 /**
  * El mapa de eventos cerca, según «Mapa de Eventos Cerca» de Stitch.
@@ -138,6 +142,11 @@ const MapPage = () => {
   // La persona ya ha movido el mapa (o ha elegido una ciudad): no se le recoloca.
   const movido = useRef(false);
   const tarjetas = useRef<Record<string, HTMLElement | null>>({});
+  // La hoja de abajo se abre deslizando hacia arriba y, con la lista al
+  // principio, se cierra deslizando hacia abajo: el botón «Ver mapa» y la
+  // barrita de arriba eran pequeños y quedaban lejos del dedo.
+  const listaScroll = useRef<HTMLDivElement | null>(null);
+  const gesto = useRef<{ y: number; enTope: boolean } | null>(null);
 
   const [busqueda, setBusqueda] = useState('');
   // Ciudad elegida en el buscador: el mapa va allí y sólo salen sus fiestas
@@ -147,7 +156,7 @@ const MapPage = () => {
     setZonaEstado(nueva);
     guardarZona(nueva);
   };
-  const [tipo, setTipo] = useState<VenueType | null>(null);
+  const [tipo, setTipo] = useState<PlaceType | null>(null);
   const [soloDirecto, setSoloDirecto] = useState(false);
   const [soloFlechazo, setSoloFlechazo] = useState(false);
   // La fecha es la misma que en inicio (por defecto, hoy).
@@ -208,7 +217,7 @@ const MapPage = () => {
   }, [withDistance, busqueda]);
 
   const tiposPresentes = useMemo(
-    () => TIPOS.filter((tp) => conPunto.some(({ event }) => event.venueType === tp)),
+    () => TIPOS.filter((tp) => conPunto.some(({ event }) => event.placeType === tp)),
     [conPunto],
   );
 
@@ -220,7 +229,7 @@ const MapPage = () => {
       .replace(/\p{Diacritic}/gu, '');
 
     return featuredFirst(aplicarFiltros(conPunto, theme, franja).filter(({ event }) => {
-      if (tipo && event.venueType !== tipo) return false;
+      if (tipo && event.placeType !== tipo) return false;
       if (soloDirecto && !isEventLive(event)) return false;
       if (soloFlechazo && !conFlechazo(event)) return false;
       if (!matchesDate(event, fecha)) return false;
@@ -542,16 +551,36 @@ const MapPage = () => {
         <section
           aria-label={t('map.nearby')}
           className={cn(
-            'absolute inset-x-0 bottom-[var(--nav-h)] z-[600] mx-auto flex max-w-2xl flex-col gap-2 rounded-t-[24px] bg-[#0E0E11] px-margin pb-3 pt-2.5 shadow-[0_-8px_30px_rgba(0,0,0,0.7)] transition-[max-height] duration-300 [transition-timing-function:var(--ease-drawer)]',
+            'absolute inset-x-0 bottom-[var(--nav-h)] z-[600] mx-auto flex max-w-2xl flex-col gap-2 rounded-t-[24px] bg-[#0E0E11] px-margin pb-3 pt-1 shadow-[0_-8px_30px_rgba(0,0,0,0.7)] transition-[max-height] duration-300 [transition-timing-function:var(--ease-drawer)]',
             lista ? 'max-h-[calc(100%-5rem)]' : 'max-h-[13rem]',
           )}
+          onTouchStart={(e) => {
+            gesto.current = { y: e.touches[0].clientY, enTope: (listaScroll.current?.scrollTop ?? 0) <= 0 };
+          }}
+          onTouchMove={(e) => {
+            const g = gesto.current;
+            if (!g) return;
+            const dy = e.touches[0].clientY - g.y;
+            if (lista && g.enTope && dy > 70) {
+              setLista(false);
+              gesto.current = null;
+            } else if (!lista && dy < -50) {
+              setLista(true);
+              gesto.current = null;
+            }
+          }}
+          onTouchEnd={() => {
+            gesto.current = null;
+          }}
         >
           <button
             type="button"
             onClick={() => setLista((v) => !v)}
             aria-label={lista ? t('map.showMap') : t('map.showList')}
-            className="mx-auto h-1 w-10 shrink-0 rounded-full bg-surface-highest"
-          />
+            className="flex h-6 w-full shrink-0 items-center justify-center"
+          >
+            <span className="h-1 w-10 rounded-full bg-surface-highest" />
+          </button>
 
           <div className="flex shrink-0 items-center justify-between pt-0.5">
             <div className="flex min-w-0 items-center gap-1.5">
@@ -578,7 +607,7 @@ const MapPage = () => {
           ) : !lista && !seleccion ? (
             <p className="pb-1 text-caption text-party-gray">{t('map.tapPin')}</p>
           ) : (
-            <div className="no-scrollbar -mx-margin flex-1 space-y-2 overflow-y-auto px-margin pb-1">
+            <div ref={listaScroll} className="no-scrollbar -mx-margin flex-1 space-y-2 overflow-y-auto overscroll-contain px-margin pb-1">
               {/* Al abrir el mapa sólo se ve el mapa: la tarjeta sale al tocar un
                   alfiler, y la lista entera con «Ver lista». */}
               {(lista ? visibles : visibles.filter((item) => item.event.id === seleccion)).map((item) => {

@@ -86,6 +86,8 @@ const profileToUser = (profile: ProfileRow, distance?: number): User => ({
   id: profile.id,
   name: profile.name,
   age: profile.age,
+  // Privada: sólo llega en la fila propia (get_my_profile).
+  birthDate: (profile as { birth_date?: string | null }).birth_date ?? undefined,
   bio: profile.bio || '',
   photos: profile.photos || [],
   avatar: profile.avatar || undefined,
@@ -139,6 +141,7 @@ const dbEventToEvent = (dbEvent: EventRow, venue?: Partial<VenueRow>): Event => 
   venueName: venue?.name,
   byPlatform: venue?.is_platform ?? false,
   placeName: dbEvent.place_name ?? undefined,
+  placeType: ((dbEvent as { place_type?: string | null }).place_type ?? undefined) as Event['placeType'],
   externalSource: dbEvent.external_source ?? undefined,
   venueType: venue?.type as VenueType | undefined,
   eventRadius: venue?.event_radius,
@@ -353,6 +356,8 @@ export const api = {
   /** La ficha de fiester@ (migración 075): se rellena una vez al entrar. */
   completeProfile: async (input: {
     age: number;
+    /** «AAAA-MM-DD»; si viene, se guarda con `set_my_birth_date` (pone la edad). */
+    birthDate?: string;
     gender: 'man' | 'woman';
     wants: 'men' | 'women' | 'all';
     planTonight?: string;
@@ -366,6 +371,19 @@ export const api = {
       p_bio: input.bio ?? null,
     } as never);
     if (error) throw new ApiError('PROFILE_FAILED', 'errors.generic');
+    if (input.birthDate) await api.setBirthDate(input.birthDate);
+  },
+
+  /** Tu fecha de nacimiento (migración 122): la edad sale de ella. */
+  setBirthDate: async (date: string): Promise<number> => {
+    const { data, error } = await supabase.rpc('set_my_birth_date' as never, { p_date: date } as never);
+    if (error) {
+      throw new ApiError(
+        error.message.includes('UNDERAGE') ? 'UNDERAGE' : 'BIRTH_DATE_FAILED',
+        error.message.includes('UNDERAGE') ? 'profile.birthDate.underage' : 'errors.generic',
+      );
+    }
+    return Number(data);
   },
 
   setAccountType: async (type: 'vyber' | 'guest'): Promise<void> => {
@@ -640,6 +658,27 @@ export const api = {
       .maybeSingle();
 
     return connection ? { superCrush: connection.connection_type === 'vybe_check' } : null;
+  },
+
+  /**
+   * Quien te ha dado un supercrush y aún no le has contestado (migración 124),
+   * para enseñar su ficha aunque no esté en tu tablón. `null` si no.
+   */
+  getSupercrushSender: async (profileId: string): Promise<(User & { eventId: string | null }) | null> => {
+    const { data, error } = await supabase.rpc('get_supercrush_sender' as never, { p_profile_id: profileId } as never);
+    const fila = error ? undefined : ((data as Record<string, unknown>[] | null) ?? [])[0];
+    if (!fila) return null;
+    const persona = await signPhotosOfOne({
+      id: String(fila.id),
+      name: String(fila.name ?? ''),
+      age: Number(fila.age ?? 0),
+      bio: String(fila.bio ?? ''),
+      photos: (fila.photos as string[] | null) ?? [],
+      avatar: (fila.avatar as string | null) ?? undefined,
+      isVerified: Boolean(fila.is_verified),
+      interests: (fila.interests as string[] | null) ?? [],
+    });
+    return { ...persona, eventId: (fila.event_id as string | null) ?? null };
   },
 
   /** Los me gusta que te quedan en esa fiesta; `null` si no tienes límite. */

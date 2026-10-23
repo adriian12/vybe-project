@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   Ban,
@@ -7,6 +7,7 @@ import {
   CalendarHeart,
   Clock,
   Flag,
+  Heart,
   Languages,
   MapPin,
   MessageSquare,
@@ -39,6 +40,11 @@ import {
 import { useAppContext } from '@/context/app-context';
 import { formatDistance } from '@/services/geo';
 import { Reputation, socialService } from '@/services/social';
+import { api, ApiError } from '@/services/api';
+import { usePremium } from '@/context/premium-context';
+import { useToast } from '@/components/ui/use-toast';
+import MatchDialog from '@/components/match-dialog';
+import type { User } from '@/types/user';
 import { cn } from '@/lib/utils';
 
 const FALLBACK_PHOTO = '/placeholder.svg';
@@ -66,7 +72,15 @@ const UserProfilePage = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const interestLabel = useInterestLabel();
-  const { connections, nearbyProfiles, activeEvent, events, blockUser } = useAppContext();
+  const { connections, nearbyProfiles, activeEvent, events, blockUser, refreshConnections, currentUser } = useAppContext();
+  const { setShowPremiumDialog } = usePremium();
+  const { toast } = useToast();
+  const [params] = useSearchParams();
+  // Quien te ha dado un supercrush (migración 124): su ficha se ve aunque no
+  // esté en tu tablón, y abajo eliges «Me gusta» (match) o «No me gusta».
+  const [delSupercrush, setDelSupercrush] = useState<(User & { eventId: string | null }) | null>(null);
+  const [contestando, setContestando] = useState(false);
+  const [match, setMatch] = useState(false);
 
   const [foto, setFoto] = useState(0);
   const [misIntereses, setMisIntereses] = useState<string[]>([]);
@@ -75,7 +89,42 @@ const UserProfilePage = () => {
   const [showBlock, setShowBlock] = useState(false);
 
   const conexion = connections.find((c) => c.user.id === userId);
-  const persona = conexion?.user ?? nearbyProfiles.find((p) => p.id === userId);
+  const delTablon = nearbyProfiles.find((p) => p.id === userId);
+  const persona = conexion?.user ?? delTablon ?? delSupercrush ?? undefined;
+  const responder = !conexion && Boolean(delSupercrush);
+
+  useEffect(() => {
+    if (!userId || conexion || delTablon) return;
+    let vivo = true;
+    void api.getSupercrushSender(userId).then((p) => vivo && setDelSupercrush(p));
+    return () => {
+      vivo = false;
+    };
+  }, [userId, conexion, delTablon]);
+
+  /** «Me gusta» hace match (ya te había dado supercrush); «No me gusta», fuera. */
+  const contestar = async (gusta: boolean) => {
+    if (!delSupercrush) return;
+    setContestando(true);
+    try {
+      const hecho = await api.swipe(
+        delSupercrush.id,
+        gusta ? 'like' : 'dislike',
+        delSupercrush.eventId ?? activeEvent?.eventId,
+      );
+      if (gusta && hecho) {
+        await refreshConnections();
+        setMatch(true);
+      } else {
+        navigate('/likes', { replace: true });
+      }
+    } catch (error) {
+      if (error instanceof ApiError && error.code === 'LIKE_LIMIT') setShowPremiumDialog(true);
+      else toast({ title: t('common.error'), description: t('errors.generic'), variant: 'destructive' });
+    } finally {
+      setContestando(false);
+    }
+  };
 
   useEffect(() => {
     void socialService.getMyInterests().then(setMisIntereses);
@@ -319,7 +368,27 @@ const UserProfilePage = () => {
           >
             <Flag size={22} />
           </button>
-          {conexion ? (
+          {responder ? (
+            <>
+              <button
+                type="button"
+                disabled={contestando}
+                onClick={() => void contestar(false)}
+                className="press flex h-14 flex-1 items-center justify-center rounded-2xl bg-card font-display text-title-card disabled:opacity-50"
+              >
+                {t('userProfile.supercrush.no')}
+              </button>
+              <button
+                type="button"
+                disabled={contestando}
+                onClick={() => void contestar(true)}
+                className="press flex h-14 flex-1 items-center justify-center gap-2 rounded-2xl bg-party-primary font-display text-title-card text-ink disabled:opacity-50"
+              >
+                <Heart size={20} className="fill-ink" />
+                {t('userProfile.supercrush.yes')}
+              </button>
+            </>
+          ) : conexion ? (
             <button
               type="button"
               onClick={() => navigate(`/chat/${persona.id}`)}
@@ -359,6 +428,21 @@ const UserProfilePage = () => {
       </div>
 
       <Footer />
+
+      {responder && (
+        <MatchDialog
+          isOpen={match}
+          onClose={() => {
+            setMatch(false);
+            navigate(`/chat/${persona.id}`, { replace: true });
+          }}
+          matchedUser={persona}
+          superCrush
+          currentUserPhoto={activeEvent?.photoUrl ?? currentUser?.photos[0]}
+          onSendMessage={() => navigate(`/chat/${persona.id}`, { replace: true })}
+          onViewProfile={() => setMatch(false)}
+        />
+      )}
 
       <ReportUserDialog
         isOpen={showReport}

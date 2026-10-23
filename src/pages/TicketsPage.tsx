@@ -189,84 +189,14 @@ const TicketsPage = () => {
               <ExternalTickets events={eventosFeed} addOpen={anadir} onAddOpenChange={setAnadir} />
             </section>
 
-            {/* ------------------------------------------------- pase activo */}
-            {activeEvent && (
-              <article className="overflow-hidden rounded-2xl bg-white text-ink">
-                <div className="relative h-44 overflow-hidden bg-surface">
-                  {eventoActivo?.posterUrl ? (
-                    <img src={eventoActivo.posterUrl} alt="" className="h-full w-full object-cover" />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center bg-surface-high">
-                      <Music size={48} className="text-party-primary/30" />
-                    </div>
-                  )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
-
-                  <span className="absolute left-4 top-4 flex items-center gap-1.5 rounded-full bg-party-primary px-3 py-1 text-label-pill uppercase tracking-wider text-ink">
-                    <span className="h-2 w-2 animate-pulse rounded-full bg-ink" />
-                    {t('tickets.insideNow')}
-                  </span>
-
-                  <span className="absolute right-4 top-4 flex flex-col items-center rounded-lg bg-ink/90 px-2.5 py-1 leading-none">
-                    <span className="text-[10px] font-bold uppercase text-party-primary">
-                      {dayAndMonth(activeEvent.startDate).weekday}
-                    </span>
-                    <span className="font-display text-headline-md font-black text-white">
-                      {dayAndMonth(activeEvent.startDate).day}
-                    </span>
-                  </span>
-
-                  <div className="absolute inset-x-4 bottom-3">
-                    <p className="truncate text-label-pill uppercase tracking-wider text-party-primary">
-                      {activeEvent.venueName}
-                    </p>
-                    <h2 className="truncate font-display text-headline-lg text-white">
-                      {activeEvent.eventName}
-                    </h2>
-                  </div>
-                </div>
-
-                <div className="space-y-4 p-4">
-                  <div className="flex items-center justify-between gap-3">
-                    <p className="flex min-w-0 items-center gap-2 text-body-md font-semibold">
-                      <MapPin size={18} className="shrink-0" />
-                      <span className="truncate">
-                        {[eventoActivo?.venueName, eventoActivo?.city].filter(Boolean).join(' · ') ||
-                          activeEvent.venueName}
-                      </span>
-                    </p>
-                    <span className="flex shrink-0 items-center gap-1.5 rounded-lg bg-black/[0.06] px-2.5 py-1.5 text-caption font-bold">
-                      <Clock size={14} />
-                      {formatHourRange(activeEvent.startDate, activeEvent.endDate)}
-                    </span>
-                  </div>
-
-                  <dl className="grid grid-cols-3 rounded-xl bg-black/[0.05] py-3 text-center">
-                    <div>
-                      <dt className="text-caption uppercase text-ink/55">{t('tickets.access')}</dt>
-                      <dd className="font-display text-title-card">{t('tickets.verified')}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-caption uppercase text-ink/55">{t('tickets.ends')}</dt>
-                      <dd className="font-display text-title-card">{formatHour(activeEvent.endDate)}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-caption uppercase text-ink/55">{t('tickets.vouchers')}</dt>
-                      <dd className="font-display text-title-card">{vales.length}</dd>
-                    </div>
-                  </dl>
-                </div>
-
-                {/* Perforación del ticket: dos muescas y la línea de puntos. */}
-                <div className="relative flex items-center" aria-hidden>
-                  <span className="absolute -left-3 h-6 w-6 rounded-full bg-background" />
-                  <span className="mx-5 h-0 flex-1 border-t-2 border-dashed border-black/15" />
-                  <span className="absolute -right-3 h-6 w-6 rounded-full bg-background" />
-                </div>
-
-                <div className="space-y-4 p-4 pt-5">
-                  {vales.length > 0 ? (
-                    vales.map((vale) => (
+            {/* ---------------------------------------------- vales de esta noche */}
+            {/* La fiesta en la que estás ya sale en inicio; aquí sólo sus vales, que
+                se enseñan en la barra. */}
+            {activeEvent && vales.length > 0 && (
+              <section className="space-y-3">
+                <h2 className="font-display text-headline-md uppercase">{t('tickets.vouchers')}</h2>
+                <article className="space-y-5 rounded-2xl bg-white p-4 text-ink">
+                  {vales.map((vale) => (
                       <div key={vale.id} className="flex flex-col items-center gap-2">
                         <div className="relative rounded-2xl border-[6px] border-ink bg-white p-3">
                           <QRCodeSVG value={vale.ticketCode} size={168} level="H" fgColor="#111114" />
@@ -283,37 +213,9 @@ const TicketsPage = () => {
                           {t('tickets.showAtBar')}
                         </p>
                       </div>
-                    ))
-                  ) : (
-                    <div className="flex flex-col items-center gap-1 py-2 text-center">
-                      <CheckCircle2 size={34} className="text-emerald-600" />
-                      <p className="font-display text-title-card">{t('tickets.insideSince')}</p>
-                      <p className="max-w-xs text-body-sm text-ink/60">{t('tickets.noVouchers')}</p>
-                    </div>
-                  )}
-
-                  <div className="flex gap-3">
-                    <button
-                      type="button"
-                      onClick={() => navigate(`/event/${activeEvent.eventId}/live`)}
-                      className="press flex h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-ink text-sm font-bold uppercase tracking-wide text-white"
-                    >
-                      <Undo2 size={18} />
-                      {t('home.goBack')}
-                    </button>
-                    {eventoActivo && (
-                      <button
-                        type="button"
-                        onClick={() => compartir(eventoActivo)}
-                        aria-label={t('eventDetail.share')}
-                        className="press flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-party-primary text-ink"
-                      >
-                        <Share2 size={20} />
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </article>
+                  ))}
+                </article>
+              </section>
             )}
 
             {/* ------------------------------------------------ las que vienen */}

@@ -32,6 +32,12 @@ const FollowedVenues = () => {
       <h2 className="mb-3 flex items-center gap-2 font-display text-title-card uppercase">
         <Heart size={17} className="text-party-primary" />
         {t('followedVenues.title')}
+        {/* Una fila que se desliza de lado: con 20 ocupa lo mismo que con 3. */}
+        {venues.length > 0 && (
+          <span className="rounded-full bg-surface-high px-2 py-0.5 text-caption font-bold normal-case text-party-gray">
+            {venues.length}
+          </span>
+        )}
       </h2>
       {venues.length === 0 ? (
         <p className="text-body-sm text-party-gray">{t('followedVenues.empty')}</p>

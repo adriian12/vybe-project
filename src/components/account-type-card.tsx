@@ -58,6 +58,7 @@ const AccountTypeCard = () => {
       if (ficha) {
         await api.completeProfile({
           age: ficha.age,
+          birthDate: ficha.birthDate,
           gender: ficha.gender,
           wants: ficha.wants,
           planTonight: ficha.planTonight,
@@ -155,6 +156,7 @@ const AccountTypeCard = () => {
             <FiesterForm
               initial={{
                 age: currentUser?.age,
+                birthDate: currentUser?.birthDate,
                 gender: currentUser?.gender,
                 wants: currentUser?.wants,
                 planTonight: currentUser?.planTonight,

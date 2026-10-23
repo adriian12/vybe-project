@@ -60,6 +60,7 @@ import {
 import Flag from '@/components/ui-custom/flag';
 import { SUPPORTED_LANGUAGES, changeLanguage } from '@/i18n';
 import { api } from '@/services/api';
+import { edadDe } from '@/components/complete-profile-dialog';
 import { socialService, Interest, Reputation } from '@/services/social';
 import { pushService, PushStatus } from '@/services/push';
 import { cn } from '@/lib/utils';
@@ -165,7 +166,9 @@ const ProfilePage = () => {
   const [isEditing, setIsEditing] = useState(false);
 
   const [name, setName] = useState('');
-  const [age, setAge] = useState('');
+  // La fecha de nacimiento (migración 122); la edad sale de ella.
+  const [nacimiento, setNacimiento] = useState('');
+  const [menuIdioma, setMenuIdioma] = useState(false);
   const [bio, setBio] = useState('');
   const [planTonight, setPlanTonight] = useState('');
   const [isInvisible, setIsInvisible] = useState(false);
@@ -185,7 +188,7 @@ const ProfilePage = () => {
   useEffect(() => {
     if (!currentUser) return;
     setName(currentUser.name);
-    setAge(String(currentUser.age));
+    setNacimiento(currentUser.birthDate ?? '');
     setBio(currentUser.bio);
     setPlanTonight(currentUser.planTonight ?? '');
     setIsInvisible(Boolean(currentUser.isInvisible));
@@ -293,13 +296,14 @@ const ProfilePage = () => {
   );
 
   const saveDetails = useCallback(async () => {
-    const parsedAge = Number(age);
     if (!name.trim()) {
       toast({ title: t('profile.nameEmpty'), variant: 'destructive' });
       return;
     }
-    if (!Number.isInteger(parsedAge) || parsedAge < 18 || parsedAge > 100) {
-      toast({ title: t('profile.ageRange'), variant: 'destructive' });
+    // Sin fecha (cuentas de antes de pedirla) se queda la edad que había.
+    const edad = nacimiento ? edadDe(nacimiento) : null;
+    if (nacimiento && (edad === null || edad < 18)) {
+      toast({ title: t('profile.birthDate.underage'), variant: 'destructive' });
       return;
     }
 
@@ -307,10 +311,10 @@ const ProfilePage = () => {
     try {
       await api.updateProfile({
         name: name.trim(),
-        age: parsedAge,
         bio: bio.trim(),
         planTonight: planTonight.trim(),
       });
+      if (nacimiento && nacimiento !== currentUser?.birthDate) await api.setBirthDate(nacimiento);
       await refreshProfile();
       setIsEditing(false);
       toast({ title: t('profile.updated') });
@@ -319,7 +323,7 @@ const ProfilePage = () => {
     } finally {
       setIsSaving(false);
     }
-  }, [name, age, bio, planTonight, refreshProfile, toast, t, fail]);
+  }, [name, nacimiento, bio, planTonight, currentUser?.birthDate, refreshProfile, toast, t, fail]);
 
   const saveInterests = useCallback(async () => {
     setIsSaving(true);
@@ -748,28 +752,29 @@ const ProfilePage = () => {
 
             {isEditing ? (
               <div className="space-y-3">
-                <div className="grid grid-cols-[1fr_5.5rem] gap-2">
-                  <label className="space-y-1">
-                    <span className="text-caption text-ink/60">{t('auth.name')}</span>
-                    <input
-                      className={campoClaro}
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      maxLength={60}
-                    />
-                  </label>
-                  <label className="space-y-1">
-                    <span className="text-caption text-ink/60">{t('auth.age')}</span>
-                    <input
-                      className={campoClaro}
-                      type="number"
-                      min={18}
-                      max={100}
-                      value={age}
-                      onChange={(e) => setAge(e.target.value)}
-                    />
-                  </label>
-                </div>
+                <label className="block space-y-1">
+                  <span className="text-caption text-ink/60">{t('auth.name')}</span>
+                  <input
+                    className={campoClaro}
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    maxLength={60}
+                  />
+                </label>
+                <label className="block space-y-1">
+                  <span className="text-caption text-ink/60">
+                    {t('completeProfile.birthDate')}
+                    {edadDe(nacimiento) !== null ? ` · ${t('profile.birthDate.age', { count: edadDe(nacimiento) ?? 0 })}` : ''}
+                  </span>
+                  <input
+                    className={campoClaro}
+                    type="date"
+                    min="1920-01-01"
+                    max={new Date().toISOString().slice(0, 10)}
+                    value={nacimiento}
+                    onChange={(e) => setNacimiento(e.target.value)}
+                  />
+                </label>
                 <label className="block space-y-1">
                   <span className="text-caption text-ink/60">{t('profile.bio')}</span>
                   <textarea
@@ -895,18 +900,25 @@ const ProfilePage = () => {
               </div>
             </div>
 
-            <DropdownMenu>
-              <DropdownMenuTrigger className="press flex w-full items-center gap-3 px-4 py-4 text-left">
+            {/* Sólo el idioma y la flecha abren el menú, y al soltar el dedo:
+                Radix lo abre al posarlo y, con la fila entera de botón, se
+                abría al empezar a desplazar la pantalla. */}
+            <DropdownMenu open={menuIdioma} onOpenChange={setMenuIdioma}>
+              <div className="flex w-full items-center gap-3 px-4 py-4 text-left">
                 <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-surface-high">
                   <Globe size={20} />
                 </span>
                 <span className="flex-1 font-display text-title-card">{t('common.language')}</span>
-                <span className="flex items-center gap-2 text-body-md text-[#C8C6C5]">
+                <DropdownMenuTrigger
+                  onPointerDown={(e) => e.preventDefault()}
+                  onClick={() => setMenuIdioma((v) => !v)}
+                  className="press flex items-center gap-2 rounded-lg py-1 pl-2 text-body-md text-[#C8C6C5]"
+                >
                   <Flag code={idioma.code} size={14} />
                   {idioma.label}
-                </span>
-                <ChevronRight size={18} className="text-party-gray" />
-              </DropdownMenuTrigger>
+                  <ChevronRight size={18} className="text-party-gray" />
+                </DropdownMenuTrigger>
+              </div>
               <DropdownMenuContent align="end">
                 {SUPPORTED_LANGUAGES.map((language) => (
                   <DropdownMenuItem key={language.code} onClick={() => void cambiarIdioma(language.code)}>

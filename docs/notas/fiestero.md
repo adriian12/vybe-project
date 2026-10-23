@@ -107,6 +107,20 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
   - Al salir se **borran los likes que diste en ese evento y no llegaron a
     match** (migración 048). También los supercrush sin match: el que se gastó
     no se devuelve.
+- **Supercrush recibido** (migración 124): `z_push_supercrush_received` (después de
+  `check_match_on_swipe`) manda «¡Has recibido un supercrush!» (`SUPERCRUSH`,
+  tabla `swipes` en `send-push`) salvo si ya es match o lo mete el servidor
+  (salas de pruebas). Abre `/u/<id>?supercrush=1`: `get_supercrush_sender` deja
+  ver la ficha de quien te lo dio mientras no le hayas contestado, y abajo
+  salen «No me gusta» y «Me gusta» (match, con el aviso de Supercrush).
+- **Fecha de nacimiento** (migración 122): `profiles.birth_date`, privada (no
+  está en el `GRANT SELECT`; llega por `get_my_profile`). Se pide al completar
+  el perfil en lugar de la edad y se cambia en el perfil, siempre con
+  `set_my_birth_date` (rechaza menores; un disparador impide cambiarla por otro
+  camino). La edad sale de ella y `fiestea-edades` la recalcula cada noche.
+  Rellena la compra de entradas.
+- **Filtros del tablón**: la hoja se cierra al aplicar y el tablón se recarga
+  detrás; antes esperaba con la hoja abierta a recargar el perfil entero.
 - **Sin Premium, 5 me gusta por fiesta** (migración 115):
   - Cuenta sólo el `like` con `event_id`; ni descartar ni el supercrush.
     Devolver un like desde «Le gustas» dentro de la fiesta también cuenta.

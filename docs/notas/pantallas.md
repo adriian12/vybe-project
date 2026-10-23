@@ -72,6 +72,24 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
 - **Hoja de filtros del mapa** en columna: la lista se desplaza y el pie
   («Quitar filtros», «Ver N fiestas») queda abajo; con el pie `sticky` y la
   atribución detrás, el pie se quedaba a media hoja.
+- **Inicio, sólo tu zona**: con ubicación, las fiestas a menos de 80 km
+  (`RADIO_ZONA_M`): Mallorca entera desde Palma, sin Ibiza ni la península;
+  Madrid con sus alrededores. Destacadas y calendario, igual. Sin ubicación o
+  sin nada tan cerca, todas.
+- **Tipo de sitio** (migración 123): `events.place_type` (discoteca, terraza o
+  al aire libre), deducido por `guess_place_type` del nombre de la sala (y de
+  la fiesta, sólo «festival» u «open air») al crearla. Es lo que filtra el mapa;
+  antes filtraba por el tipo del negocio y casi todas son de Fiestea («local»).
+- **Mapa**: la hoja de abajo se abre deslizando hacia arriba y, con la lista
+  al principio, se cierra deslizando hacia abajo. Los filtros, a pantalla
+  completa; En directo, Gratis y Flechazo en una fila sin título.
+- **Fechas**: sin «Mañana» (está en el calendario) y «Próximos 7 días» se llama
+  «Esta semana».
+- **Entradas**: ya no sale la fiesta en la que estás (está en inicio), sólo sus
+  vales; el botón de Wallet sin el nombre del titular; el tipo de entrada a lo
+  ancho.
+- **Perfil**: el menú de idioma sólo lo abre «Español ›» y al soltar el dedo
+  (Radix lo abría al posarlo, y la fila entera era el botón).
 - **Salas sin negocio** (`/sala/<nombre>`, `PlacePage.tsx`): el buscador del
   mapa enseña «Salas» con los `place_name` de las fiestas (Funout, escáner) que
   contienen lo escrito (`clave()`, sin espacios ni tildes). La ficha es la de un

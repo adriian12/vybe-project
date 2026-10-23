@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Heart, Loader2, Minus, Plus, Ticket } from 'lucide-react';
+import { Heart, Loader2, Ticket } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -43,8 +43,28 @@ const Opciones = <T extends string>({
   </div>
 );
 
+/** Años cumplidos a día de hoy de una fecha «AAAA-MM-DD»; `null` si no vale. */
+// eslint-disable-next-line react-refresh/only-export-components
+export const edadDe = (fecha: string): number | null => {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha)) return null;
+  const [a, m, d] = fecha.split('-').map(Number);
+  const hoy = new Date();
+  let edad = hoy.getFullYear() - a;
+  if (hoy.getMonth() + 1 < m || (hoy.getMonth() + 1 === m && hoy.getDate() < d)) edad -= 1;
+  return edad >= 0 && edad < 120 ? edad : null;
+};
+
+/** El tope del selector: hoy hace 18 años. */
+const hace18 = () => {
+  const d = new Date();
+  d.setFullYear(d.getFullYear() - 18);
+  return d.toISOString().slice(0, 10);
+};
+
 export interface FiesterData {
   age: number;
+  /** «AAAA-MM-DD»: se pide en lugar de la edad, que sale de ella. */
+  birthDate: string;
   gender: 'woman' | 'man';
   wants: 'women' | 'men' | 'all';
   planTonight: string;
@@ -66,7 +86,8 @@ export const FiesterForm = ({
   onSubmit: (data: FiesterData) => Promise<void>;
 }) => {
   const { t } = useTranslation();
-  const [edad, setEdad] = useState(initial?.age && initial.age >= 18 ? initial.age : 18);
+  const [nacimiento, setNacimiento] = useState(initial?.birthDate ?? '');
+  const edad = edadDe(nacimiento);
   const [genero, setGenero] = useState<'woman' | 'man' | null>(initial?.gender ?? null);
   const [quiere, setQuiere] = useState<'women' | 'men' | 'all' | null>(initial?.wants ?? null);
   const [plan, setPlan] = useState<string>('');
@@ -75,13 +96,20 @@ export const FiesterForm = ({
   const [enviando, setEnviando] = useState(false);
 
   const planFinal = otroPlan.trim() || (plan ? t(`completeProfile.plans.${plan}`) : '');
-  const listo = edad >= 18 && edad <= 99 && genero !== null && quiere !== null;
+  const listo = edad !== null && edad >= 18 && edad <= 99 && genero !== null && quiere !== null;
 
   const guardar = async () => {
-    if (!listo || !genero || !quiere) return;
+    if (!listo || !genero || !quiere || edad === null) return;
     setEnviando(true);
     try {
-      await onSubmit({ age: edad, gender: genero, wants: quiere, planTonight: planFinal, bio: bio.trim() });
+      await onSubmit({
+        age: edad,
+        birthDate: nacimiento,
+        gender: genero,
+        wants: quiere,
+        planTonight: planFinal,
+        bio: bio.trim(),
+      });
     } finally {
       setEnviando(false);
     }
@@ -90,25 +118,21 @@ export const FiesterForm = ({
   return (
     <div className="space-y-5">
       <div className="space-y-2">
-        <p className="text-body-sm font-bold">{t('completeProfile.age')}</p>
-        <div className="flex items-center gap-3">
-          <button type="button" aria-label="-1" onClick={() => setEdad((e) => Math.max(18, e - 1))} className="press flex h-11 w-11 items-center justify-center rounded-full bg-surface-high">
-            <Minus size={18} />
-          </button>
-          <Input
-            type="number"
-            inputMode="numeric"
-            min={18}
-            max={99}
-            value={edad}
-            onChange={(e) => setEdad(Math.floor(Number(e.target.value) || 0))}
-            className="h-11 w-20 text-center font-display text-headline-md"
-            aria-label={t('completeProfile.age')}
-          />
-          <button type="button" aria-label="+1" onClick={() => setEdad((e) => Math.min(99, e + 1))} className="press flex h-11 w-11 items-center justify-center rounded-full bg-party-primary text-ink">
-            <Plus size={18} />
-          </button>
-        </div>
+        <p className="text-body-sm font-bold">{t('completeProfile.birthDate')}</p>
+        {/* La fecha y no la edad: la edad sale de ella, y rellena la compra
+            de entradas, que la pide para la edad mínima. */}
+        <Input
+          type="date"
+          value={nacimiento}
+          min="1920-01-01"
+          max={hace18()}
+          onChange={(e) => setNacimiento(e.target.value)}
+          className="h-11"
+          aria-label={t('completeProfile.birthDate')}
+        />
+        <p className="text-caption text-party-gray">
+          {edad !== null && edad < 18 ? t('profile.birthDate.underage') : t('completeProfile.birthDateHelp')}
+        </p>
       </div>
 
       <div className="space-y-2">
@@ -235,6 +259,7 @@ const CompleteProfileDialog = () => {
     try {
       await api.completeProfile({
         age: data.age,
+        birthDate: data.birthDate,
         gender: data.gender,
         wants: data.wants,
         planTonight: data.planTonight,

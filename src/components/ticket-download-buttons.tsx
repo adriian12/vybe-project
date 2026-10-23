@@ -66,8 +66,8 @@ const TicketDownloadButtons = ({ token, code, walletCodes, names, tone = 'dark',
             onClick={() => abrir(ticketDownloadUrl(token, c, 'pkpass'))}
             className="press flex h-11 items-center justify-center gap-2 rounded-xl bg-black px-4 font-bold text-white ring-1 ring-white/15"
           >
-            <Wallet size={16} />
-            {etiqueta(c, 'tickets.download.wallet', 'tickets.download.walletCode')}
+            <Wallet size={16} className="shrink-0" />
+            <span className="truncate">{etiqueta(c, 'tickets.download.wallet', 'tickets.download.walletCode')}</span>
           </button>
         ))}
       {googleWallet &&
@@ -78,8 +78,8 @@ const TicketDownloadButtons = ({ token, code, walletCodes, names, tone = 'dark',
             onClick={() => abrir(ticketDownloadUrl(token, c, 'gwallet'))}
             className="press flex h-11 items-center justify-center gap-2 rounded-xl bg-black px-4 font-bold text-white ring-1 ring-white/15"
           >
-            <Wallet size={16} />
-            {etiqueta(c, 'tickets.download.googleWallet', 'tickets.download.googleWalletCode')}
+            <Wallet size={16} className="shrink-0" />
+            <span className="truncate">{etiqueta(c, 'tickets.download.googleWallet', 'tickets.download.googleWalletCode')}</span>
           </button>
         ))}
     </div>

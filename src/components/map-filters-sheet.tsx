@@ -4,16 +4,16 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '
 import { PartyButton } from '@/components/ui-custom/party-button';
 import { FRANJAS, Franja } from '@/lib/party-filters';
 import { TILES_ATTRIBUTION } from '@/components/map-thumb';
-import type { VenueType } from '@/types/venue';
+import type { PlaceType } from '@/types/venue';
 import { cn } from '@/lib/utils';
 
 interface MapFiltersSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   /** Tipos de local que hay entre los eventos cargados. */
-  venueTypes: VenueType[];
-  venueType: VenueType | null;
-  onVenueType: (value: VenueType | null) => void;
+  venueTypes: PlaceType[];
+  venueType: PlaceType | null;
+  onVenueType: (value: PlaceType | null) => void;
   franja: Franja | null;
   onFranja: (value: Franja | null) => void;
   /** Géneros musicales presentes. */
@@ -80,33 +80,41 @@ const MapFiltersSheet = ({
       {/* En columna: lo de arriba se desplaza y el pie se queda abajo del
           todo. Con el pie `sticky` y la atribución detrás, el pie quedaba a
           media hoja y los géneros pasaban por debajo. */}
-      <SheetContent side="bottom" className="flex max-h-[85vh] flex-col gap-0 p-0">
-        <div className="min-h-0 flex-1 overflow-y-auto px-6 pt-6">
+      {/* A pantalla completa, como el calendario: se ve todo sin desplazar. */}
+      <SheetContent
+        side="bottom"
+        className="flex h-[100dvh] max-h-[100dvh] flex-col gap-0 rounded-none p-0"
+        closeClassName="top-[calc(env(safe-area-inset-top,0px)+1rem)]"
+      >
+        <div className="min-h-0 flex-1 overflow-y-auto px-6 pt-[calc(env(safe-area-inset-top,0px)+1.5rem)]">
         <SheetHeader className="text-left">
           <SheetTitle>{t('map.filters')}</SheetTitle>
           <SheetDescription>{t('map.filtersHelp')}</SheetDescription>
         </SheetHeader>
 
         <div className="space-y-5 py-4">
-          {bloque(
-            t('map.when'),
-            <>
-              <button type="button" onClick={() => onLive(!live)} aria-pressed={live} className={pill(live)}>
-                {live && <Check size={14} />}
-                {t('map.liveOnly')}
+          {/* En directo, gratis y Flechazo: una sola fila y sin título. */}
+          <div className="no-scrollbar -mx-6 flex gap-2 overflow-x-auto px-6">
+            <button type="button" onClick={() => onLive(!live)} aria-pressed={live} className={cn(pill(live), 'shrink-0')}>
+              {live && <Check size={14} />}
+              {t('map.liveOnly')}
+            </button>
+            <button type="button" onClick={() => onFree(!free)} aria-pressed={free} className={cn(pill(free), 'shrink-0')}>
+              {free && <Check size={14} />}
+              {t('map.freeOnly')}
+            </button>
+            {onFlechazo && (
+              <button
+                type="button"
+                onClick={() => onFlechazo(!flechazo)}
+                aria-pressed={flechazo}
+                className={cn(pill(flechazo), 'shrink-0')}
+              >
+                {flechazo && <Check size={14} />}
+                {t('filters.flechazo')}
               </button>
-              <button type="button" onClick={() => onFree(!free)} aria-pressed={free} className={pill(free)}>
-                {free && <Check size={14} />}
-                {t('map.freeOnly')}
-              </button>
-              {onFlechazo && (
-                <button type="button" onClick={() => onFlechazo(!flechazo)} aria-pressed={flechazo} className={pill(flechazo)}>
-                  {flechazo && <Check size={14} />}
-                  {t('filters.flechazo')}
-                </button>
-              )}
-            </>,
-          )}
+            )}
+          </div>
 
           {bloque(
             t('map.partyType'),
@@ -136,7 +144,7 @@ const MapFiltersSheet = ({
                   className={pill(venueType === tp)}
                 >
                   {venueType === tp && <Check size={14} />}
-                  {tp ? t(`venueTypes.${tp}`) : t('map.all')}
+                  {tp ? t(`map.placeTypes.${tp}`) : t('map.all')}
                 </button>
               )),
             )}

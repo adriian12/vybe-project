@@ -14,7 +14,9 @@ const pill = (activa: boolean) =>
     activa ? 'bg-party-primary text-ink shadow-sm' : 'bg-surface-low text-foreground',
   );
 
-const ATAJOS: Exclude<DateMode, 'date'>[] = ['today', 'tomorrow', 'weekend', 'week'];
+// «Mañana» ya no sale (está en el calendario): así caben en una fila sin
+// desplazarse. «week» se lee «Esta semana» (los próximos 7 días).
+const ATAJOS: Exclude<DateMode, 'date'>[] = ['today', 'weekend', 'week'];
 
 /** «Hoy», «Mañana», «Este finde», «Próximos 7 días» o «sáb. 27 sept.». */
 // eslint-disable-next-line react-refresh/only-export-components

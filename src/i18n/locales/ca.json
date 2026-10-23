@@ -375,7 +375,7 @@
             "today": "Avui",
             "tomorrow": "Demà",
             "weekend": "Aquest cap de setmana",
-            "week": "Propers 7 dies",
+            "week": "Aquesta setmana",
             "date": "Data"
         },
         "schedule": "Horari",
@@ -548,7 +548,12 @@
         "cancelBody": "Continuaràs tenint Premium fins que acabi el període que ja has pagat.",
         "tagline": "Fiestea · La nit a Espanya",
         "cancelledUntil": "Cancel·lada · activa fins al {{date}}",
-        "editName": "Canviar el nom"
+        "editName": "Canviar el nom",
+        "birthDate": {
+            "underage": "Fiestea és només per a majors de 18 anys.",
+            "age_one": "{{count}} any",
+            "age_other": "{{count}} anys"
+        }
     },
     "faceVerification": {
         "title": "Verificació d'identitat",
@@ -2330,7 +2335,12 @@
         "clearZone": "Treure {{name}}",
         "locationOffTitle": "No sabem on ets",
         "locationOffBody": "Activa la ubicació del mòbil i el permís de Fiestea per centrar el mapa a la teva zona.",
-        "places": "Sales"
+        "places": "Sales",
+        "placeTypes": {
+            "discoteca": "Discoteca",
+            "terraza": "Terrassa",
+            "aire_libre": "A l'aire lliure"
+        }
     },
     "tickets": {
         "external": {
@@ -2550,7 +2560,11 @@
         "agoHours": "fa {{count}} h",
         "agoDays": "fa {{count}} d",
         "openChat": "Obrir xat",
-        "backToDeck": "Tornar a la pista"
+        "backToDeck": "Tornar a la pista",
+        "supercrush": {
+            "no": "No m'agrada",
+            "yes": "M'agrada"
+        }
     },
     "landing": {
         "nav": {
@@ -3700,7 +3714,9 @@
         "chooseGuest": "Només festes: veure esdeveniments, comprar entrades, ofertes i sortejos. Hi entres ja, sense més dades.",
         "chooseLater": "Com a convidat pots passar a Fiester@ quan vulguis.",
         "chooseContinue": "Continuar amb {{kind}}",
-        "chooseFirst": "Tria una opció"
+        "chooseFirst": "Tria una opció",
+        "birthDate": "Data de naixement",
+        "birthDateHelp": "La teva edat surt d'aquí. Només la veus tu, i omple les entrades que compris."
     },
     "share": {
         "title": "Compartir",

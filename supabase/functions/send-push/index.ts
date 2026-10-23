@@ -34,11 +34,12 @@ interface WebhookPayload {
     | 'RAFFLE_DRAWN'
     | 'EVENT_PUBLISHED'
     | 'EVENTS_BULK'
+    | 'SUPERCRUSH'
     | 'PHOTOS_PENDING'
     | 'SOS'
     | 'REPORT'
     | 'EXPELLED';
-  table: 'connections' | 'messages' | 'raffles' | 'venue_events' | 'moderation_queue' | 'sos_alerts';
+  table: 'connections' | 'messages' | 'raffles' | 'venue_events' | 'moderation_queue' | 'sos_alerts' | 'swipes';
   record: Record<string, unknown>;
 }
 
@@ -95,6 +96,32 @@ const fromVenueEvent = async (
       tag: `venue-event-${evento.id}`,
     };
   });
+};
+
+/**
+ * Te han dado un supercrush (migración 124): el aviso abre la ficha de quien te
+ * lo dio, donde eliges «Me gusta» (match) o «No me gusta».
+ */
+const fromSupercrush = async (
+  supabase: ReturnType<typeof adminClient>,
+  payload: WebhookPayload,
+): Promise<PushRequest[]> => {
+  const { swiper_id: deQuien, swiped_id: paraQuien } = payload.record as { swiper_id?: string; swiped_id?: string };
+  if (!deQuien || !paraQuien) return [];
+
+  const { data: perfiles } = await supabase.from('profiles').select('id, name, locale').in('id', [deQuien, paraQuien]);
+  const nombre = perfiles?.find((p) => p.id === deQuien)?.name ?? 'Alguien';
+  const locale = perfiles?.find((p) => p.id === paraQuien)?.locale ?? null;
+
+  return [
+    {
+      profileId: paraQuien,
+      kind: 'match' as const,
+      ...pushTexts(locale).supercrush(nombre),
+      url: `/u/${deQuien}?supercrush=1`,
+      tag: `supercrush-${deQuien}`,
+    },
+  ];
 };
 
 /**
@@ -588,7 +615,9 @@ serve(async (req: Request): Promise<Response> => {
               ? await fromPendingPhotos(supabase)
               : body.table === 'sos_alerts'
                 ? await fromSos(supabase, body)
-                : body.type === 'REPORT'
+                : body.table === 'swipes'
+                  ? await fromSupercrush(supabase, body)
+                  : body.type === 'REPORT'
                   ? await fromReport(supabase, body)
                   : body.type === 'EXPELLED'
                     ? await fromExpelled(supabase, body)

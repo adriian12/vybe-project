@@ -61,31 +61,38 @@ const DiscoveryFiltersSheet: React.FC<DiscoveryFiltersSheetProps> = ({ filters, 
 
   const active = countActive(filters);
 
-  const guardarWants = async (): Promise<boolean> => {
-    if (wants === (currentUser?.wants ?? 'all')) return false;
-    try {
-      await api.updateProfile({ wants });
-      await refreshProfile();
-      return true;
-    } catch {
-      toast({ title: t('common.error'), description: t('errors.generic'), variant: 'destructive' });
-      return false;
-    }
-  };
-
-  const apply = async () => {
-    const cambioWants = await guardarWants();
+  /**
+   * La hoja se cierra al momento y el tablón se recarga detrás. Antes se
+   * esperaba con la hoja abierta a guardar «Quiero ver», a recargar el perfil
+   * entero (firmando todas las fotos) y al tablón: parecía congelada.
+   */
+  const apply = () => {
     const siguientes: DiscoveryFilters = isPremium
       ? {
           minAge: ageRange[0] > AGE_MIN ? ageRange[0] : undefined,
           maxAge: ageRange[1] < AGE_MAX ? ageRange[1] : undefined,
         }
       : {};
-    onApply(siguientes);
-    // Si sólo cambió «Quiero ver», los filtros son los mismos y el tablón no se
-    // recargaría solo.
-    if (cambioWants) await loadProfiles();
+    const cambioWants = wants !== (currentUser?.wants ?? 'all');
     setOpen(false);
+    void (async () => {
+      if (cambioWants) {
+        try {
+          // Primero se guarda: el tablón lo lee del servidor.
+          await api.updateProfile({ wants });
+        } catch {
+          toast({ title: t('common.error'), description: t('errors.generic'), variant: 'destructive' });
+          return;
+        }
+      }
+      onApply(siguientes);
+      // Si sólo cambió «Quiero ver», los filtros son los mismos y el tablón no
+      // se recargaría solo. El perfil, después y sin esperarlo.
+      if (cambioWants) {
+        await loadProfiles();
+        void refreshProfile();
+      }
+    })();
   };
 
   const reset = () => {
