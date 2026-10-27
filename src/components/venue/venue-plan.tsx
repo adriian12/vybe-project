@@ -7,7 +7,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { venueService, VenuePlanStatus } from '@/services/venue-service';
 import { ApiError } from '@/services/api';
 import { isNative, openExternal } from '@/services/native';
-import { BOOST_PRICE, PLAN_FEATURES, PLAN_PRICES, PLANS, TRIAL_DAYS } from '@/lib/venue-plans';
+import { BOOST_PRICE, PLAN_FEATURES, PLAN_IDS, PLAN_PRICES, PLANS, TRIAL_DAYS } from '@/lib/venue-plans';
 
 interface VenuePlanProps {
   plan: VenuePlanStatus | null;
@@ -17,8 +17,18 @@ interface VenuePlanProps {
 /** Lo que incluye cada plan, en el orden en que se muestra. */
 const FEATURES = PLAN_FEATURES;
 
-/** Barra de consumo de un límite del plan, en tinta oscura sobre el amarillo. */
-const Usage = ({ label, used, max }: { label: string; used: number; max: number }) => {
+/** Barra de consumo de un límite del plan, en tinta oscura sobre el amarillo. `max` null: sin límite. */
+const Usage = ({ label, used, max, unlimited }: { label: string; used: number; max: number | null; unlimited: string }) => {
+  if (max === null) {
+    return (
+      <div className="flex items-center justify-between text-body-sm font-bold">
+        <span>{label}</span>
+        <span>
+          {used} · {unlimited}
+        </span>
+      </div>
+    );
+  }
   const percent = max > 0 ? Math.min(Math.round((used / max) * 100), 100) : 0;
   const full = used >= max;
 
@@ -61,7 +71,7 @@ const VenuePlan = ({ plan, onUpgrade }: VenuePlanProps) => {
    * mano. Ahora abre la pasarela; la suscripción la activa el webhook cuando
    * Stripe confirma el cobro.
    */
-  const contratar = async (elegido: 'pro' | 'business') => {
+  const contratar = async (elegido: 'business') => {
     setContratando(elegido);
     try {
       const url = await venueService.startPlanCheckout(elegido);
@@ -102,7 +112,6 @@ const VenuePlan = ({ plan, onUpgrade }: VenuePlanProps) => {
     );
   }
 
-  const order: Array<'free' | 'pro' | 'business'> = ['free', 'pro', 'business'];
   const enPrueba = plan.status === 'trialing';
   const diasPrueba = enPrueba && plan.expiresAt
     ? Math.max(Math.ceil((new Date(plan.expiresAt).getTime() - Date.now()) / 86_400_000), 0)
@@ -137,19 +146,19 @@ const VenuePlan = ({ plan, onUpgrade }: VenuePlanProps) => {
         )}
 
         <div className="mt-4 space-y-3 border-t border-ink/15 pt-4">
-          <Usage label={t('venue.plan.activeEvents')} used={plan.activeEvents} max={plan.maxActiveEvents} />
-          <Usage label={t('venue.plan.teamMembers')} used={plan.teamMembers} max={plan.maxTeamMembers} />
+          <Usage label={t('venue.plan.activeEvents')} used={plan.activeEvents} max={plan.maxActiveEvents} unlimited={t('venue.plan.unlimited')} />
+          <Usage label={t('venue.plan.teamMembers')} used={plan.teamMembers} max={plan.maxTeamMembers} unlimited={t('venue.plan.unlimited')} />
         </div>
 
-        {plan.activeEvents >= plan.maxActiveEvents && (
+        {plan.maxActiveEvents !== null && plan.activeEvents >= plan.maxActiveEvents && (
           <p className="mt-3 rounded-lg bg-ink px-3 py-2 text-caption font-bold text-party-primary">
             {t('venue.plan.eventLimitReached')}
           </p>
         )}
       </section>
 
-      <div className="grid gap-3 lg:grid-cols-3">
-        {order.map((name) => {
+      <div className="grid gap-3 lg:grid-cols-2">
+        {PLAN_IDS.map((name) => {
           const details = PLANS[name];
           const isCurrent = plan.plan === name;
 
@@ -175,18 +184,18 @@ const VenuePlan = ({ plan, onUpgrade }: VenuePlanProps) => {
               <p className="mt-3 font-display text-headline-lg">
                 {PLAN_PRICES[name] === 0 ? t('venue.plan.free') : t('venue.plan.perMonth', { price: PLAN_PRICES[name] })}
               </p>
-              {name === 'pro' && !enPrueba && plan.plan === 'free' && (
+              {name === 'business' && !enPrueba && plan.plan === 'free' && (
                 <p className="text-caption font-bold text-emerald-700">{t('venue.plan.trialNote', { count: TRIAL_DAYS })}</p>
               )}
 
               <ul className="mt-4 space-y-2 text-body-sm">
                 <li className="flex items-center gap-2 font-semibold">
                   <Check size={15} className="shrink-0 text-emerald-600" />
-                  {t('venue.plan.eventsIncluded', { count: details.events })}
+                  {details.events === null ? t('venue.plan.eventsUnlimited') : t('venue.plan.eventsIncluded', { count: details.events })}
                 </li>
                 <li className="flex items-center gap-2 font-semibold">
                   <Check size={15} className="shrink-0 text-emerald-600" />
-                  {t('venue.plan.teamIncluded', { count: details.team })}
+                  {details.team === null ? t('venue.plan.teamUnlimited') : t('venue.plan.teamIncluded', { count: details.team })}
                 </li>
                 {FEATURES.map((feature) => (
                   <li
@@ -210,7 +219,7 @@ const VenuePlan = ({ plan, onUpgrade }: VenuePlanProps) => {
                 <PartyButton
                   className="mt-5 w-full"
                   disabled={contratando !== null}
-                  onClick={() => void contratar(name as 'pro' | 'business')}
+                  onClick={() => void contratar('business')}
                 >
                   {contratando === name ? t('venue.plan.opening') : t('venue.plan.keepPlan', { plan: t(`venue.plan.names.${name}`) })}
                 </PartyButton>
@@ -226,7 +235,7 @@ const VenuePlan = ({ plan, onUpgrade }: VenuePlanProps) => {
                 <PartyButton
                   className="mt-5 w-full"
                   disabled={contratando !== null}
-                  onClick={() => void contratar(name as 'pro' | 'business')}
+                  onClick={() => void contratar('business')}
                 >
                   {contratando === name
                     ? t('venue.plan.opening')

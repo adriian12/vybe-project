@@ -49,6 +49,7 @@ import VenueBusinessProfile from '@/components/venue/venue-business-profile';
 import PanelTabs from '@/components/venue/panel-tabs';
 import EventLiveSettings from '@/components/venue/event-live-settings';
 import { nightService } from '@/services/night';
+import { ApiError } from '@/services/api';
 import { BOOST_PRICE, planHas } from '@/lib/venue-plans';
 import VenueSosAlerts, { VenueSosStrip } from '@/components/venue/venue-sos-alerts';
 import VenueSosAlarm from '@/components/venue/venue-sos-alarm';
@@ -196,6 +197,8 @@ const VenueDashboardPage = () => {
   const [toDelete, setToDelete] = useState<{ id: string; name: string } | null>(null);
   const [toBoost, setToBoost] = useState<{ id: string; name: string } | null>(null);
   const [boosting, setBoosting] = useState(false);
+  // Business lleva un destacado al mes (migración 126): cuántos le quedan.
+  const [boostsIncluidos, setBoostsIncluidos] = useState(0);
   const [followers, setFollowers] = useState<{ total: number; lastWeek: number } | null>(null);
 
   // El papel en el local: el contexto lo sabe al entrar; `role` lo confirma la
@@ -238,6 +241,7 @@ const VenueDashboardPage = () => {
     // entrar y se pasa a los componentes en lugar de que cada uno lo consulte.
     void venueService.getPlanStatus().then(setPlan);
     void nightService.getFollowersSummary().then(setFollowers);
+    void nightService.getIncludedBoostsLeft().then(setBoostsIncluidos);
   }, []);
 
   // Vuelta de Stripe tras pagar un destacado: el webhook ya lo ha marcado (o lo
@@ -271,6 +275,14 @@ const VenueDashboardPage = () => {
     if (!toBoost) return;
     setBoosting(true);
     try {
+      if (boostsIncluidos > 0) {
+        await nightService.useIncludedBoost(toBoost.id);
+        setBoostsIncluidos((n) => Math.max(n - 1, 0));
+        setToBoost(null);
+        toast({ title: t('venue.boost.paid'), description: t('venue.boost.paidBody') });
+        void refreshEvents();
+        return;
+      }
       const url = await nightService.startBoostCheckout(toBoost.id);
       if (!url) {
         toast({ title: t('venue.plan.notConfigured'), variant: 'destructive' });
@@ -282,8 +294,10 @@ const VenueDashboardPage = () => {
       } else {
         window.location.href = url;
       }
-    } catch {
-      toast({ title: t('common.error'), description: t('venue.plan.checkoutFailed'), variant: 'destructive' });
+    } catch (error) {
+      const description = error instanceof ApiError && error.code === 'NO_INCLUDED_BOOST' ? t(error.message) : t('venue.plan.checkoutFailed');
+      if (error instanceof ApiError && error.code === 'NO_INCLUDED_BOOST') setBoostsIncluidos(0);
+      toast({ title: t('common.error'), description, variant: 'destructive' });
     } finally {
       setBoosting(false);
     }
@@ -914,7 +928,7 @@ const VenueDashboardPage = () => {
                                 {puedeDifundir && !event.featured && (
                                   <DropdownMenuItem onClick={() => setToBoost({ id: event.id, name: event.name })}>
                                     <Sparkles size={15} className="mr-2" />
-                                    {t('venue.boost.action', { price: BOOST_PRICE })}
+                                    {boostsIncluidos > 0 ? t('venue.boost.includedLeft') : t('venue.boost.action', { price: BOOST_PRICE })}
                                   </DropdownMenuItem>
                                 )}
                                 <DropdownMenuItem onClick={() => goTo('stats')}>
@@ -1334,7 +1348,9 @@ const VenueDashboardPage = () => {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{t('venue.boost.title', { name: toBoost?.name ?? '' })}</AlertDialogTitle>
-            <AlertDialogDescription>{t('venue.boost.body', { price: BOOST_PRICE })}</AlertDialogDescription>
+            <AlertDialogDescription>
+              {boostsIncluidos > 0 ? t('venue.boost.includedBody') : t('venue.boost.body', { price: BOOST_PRICE })}
+            </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={boosting}>{t('common.cancel')}</AlertDialogCancel>
@@ -1345,7 +1361,11 @@ const VenueDashboardPage = () => {
                 void destacar();
               }}
             >
-              {boosting ? t('venue.plan.opening') : t('venue.boost.pay', { price: BOOST_PRICE })}
+              {boosting
+                ? t('venue.plan.opening')
+                : boostsIncluidos > 0
+                  ? t('venue.boost.useIncluded')
+                  : t('venue.boost.pay', { price: BOOST_PRICE })}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -45,7 +45,7 @@ import WhatsAppButton from '@/components/whatsapp-button';
 import { COMPANY } from '@/lib/company';
 import { appHref, isExternalHref } from '@/lib/hosts';
 import { cn } from '@/lib/utils';
-import { BOOST_PRICE, PLAN_FEATURES, PLAN_PRICES, PLANS, PlanId, TRIAL_DAYS } from '@/lib/venue-plans';
+import { BOOST_PRICE, PLAN_FEATURES, PLAN_IDS, PLAN_PRICES, PLANS, TRIAL_DAYS } from '@/lib/venue-plans';
 
 /**
  * Landing pública de Vybe, según «Landing Page Oficial Vybes» de Stitch
@@ -165,7 +165,6 @@ const LandingPage = () => {
     { key: 'gdpr', icon: LockKeyhole },
   ];
 
-  const planIds: PlanId[] = ['free', 'pro', 'business'];
   const faqs = ['price', 'location', 'visibility', 'venueStart', 'where', 'apps'];
 
   const usersCard = (
@@ -521,10 +520,10 @@ const LandingPage = () => {
             <Reveal>
               <SectionHeading center eyebrow={t('landing.plans.eyebrow')} title={t('landing.plans.title')} body={t('landing.plans.body')} />
             </Reveal>
-            <div className="mx-auto mt-10 grid max-w-5xl gap-4 md:grid-cols-3">
-              {planIds.map((id, index) => {
+            <div className="mx-auto mt-10 grid max-w-4xl gap-4 md:grid-cols-2">
+              {PLAN_IDS.map((id, index) => {
                 const plan = PLANS[id];
-                const destacado = id === 'pro';
+                const destacado = id === 'business';
                 return (
                   <Reveal
                     key={id}
@@ -562,11 +561,11 @@ const LandingPage = () => {
                     <ul className="mt-5 flex-1 space-y-2.5 text-body-md">
                       <li className="flex items-center gap-2">
                         <Check size={16} className="shrink-0" />
-                        {t('venue.plan.eventsIncluded', { count: plan.events })}
+                        {plan.events === null ? t('venue.plan.eventsUnlimited') : t('venue.plan.eventsIncluded', { count: plan.events })}
                       </li>
                       <li className="flex items-center gap-2">
                         <Check size={16} className="shrink-0" />
-                        {t('venue.plan.teamIncluded', { count: plan.team })}
+                        {plan.team === null ? t('venue.plan.teamUnlimited') : t('venue.plan.teamIncluded', { count: plan.team })}
                       </li>
                       {PLAN_FEATURES.map((feature) => (
                         <li
@@ -607,7 +606,7 @@ const LandingPage = () => {
                 );
               })}
             </div>
-            <div className="mx-auto mt-6 flex max-w-5xl flex-col items-center gap-3 rounded-2xl bg-surface-low p-5 text-center md:flex-row md:text-left">
+            <div className="mx-auto mt-6 flex max-w-4xl flex-col items-center gap-3 rounded-2xl bg-surface-low p-5 text-center md:flex-row md:text-left">
               <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-party-accent text-white">
                 <Sparkles size={20} />
               </span>

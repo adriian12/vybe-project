@@ -314,11 +314,11 @@ export const legalDocs = (app: string, web: string, panel: string, miembro: stri
       sections: [
         {
           title: 'Alta y verificación',
-          body: `Para usar el panel de negocios (${panel.replace(/^https?:\/\//, '')}) hay que registrar el establecimiento con su nombre, NIF, dirección y documentación que acredite la titularidad. Al registrarse, el negocio acepta estas condiciones, los términos y la política de privacidad; queda anotado con la fecha y la versión. Revisamos cada alta antes de aprobarla. Al aprobarse, el negocio tiene 30 días del plan Pro de prueba.`,
+          body: `Para usar el panel de negocios (${panel.replace(/^https?:\/\//, '')}) hay que registrar el establecimiento con su nombre, NIF, dirección y documentación que acredite la titularidad. Al registrarse, el negocio acepta estas condiciones, los términos y la política de privacidad; queda anotado con la fecha y la versión. Revisamos cada alta antes de aprobarla. Al aprobarse, el negocio tiene 30 días del plan Business de prueba.`,
         },
         {
           title: 'Planes',
-          body: 'Hay un plan gratuito y dos de pago (Pro y Business), con las funciones y límites que se ven en el panel, en Plan. Los planes de pago se cobran por meses y se renuevan solos hasta que se cancelan; al cancelar, el plan sigue hasta el final del periodo pagado y después el negocio vuelve al plan gratuito.',
+          body: 'Hay un plan gratuito y uno de pago (Business), con las funciones y límites que se ven en el panel, en Plan. Los planes de pago se cobran por meses y se renuevan solos hasta que se cancelan; al cancelar, el plan sigue hasta el final del periodo pagado y después el negocio vuelve al plan gratuito.',
         },
         {
           title: 'Venta de entradas',

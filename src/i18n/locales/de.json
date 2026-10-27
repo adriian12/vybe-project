@@ -31,7 +31,8 @@
         "boundaryTitle": "Etwas ist schiefgelaufen",
         "boundaryBody": "Ein unerwarteter Fehler ist aufgetreten. Du kannst es erneut versuchen oder zum Start zurückkehren.",
         "network": "Keine Verbindung. Prüfe dein Netzwerk.",
-        "rateLimited": "Zu schnell. Bitte warte einen Moment."
+        "rateLimited": "Zu schnell. Bitte warte einen Moment.",
+        "NO_INCLUDED_BOOST": "Du hast das inklusive Highlight dieses Monats schon genutzt."
     },
     "index": {
         "question": "Wie möchtest du fortfahren?",
@@ -1078,7 +1079,7 @@
         "codes": {
             "title": "Codes und wer Leute bringt",
             "subtitle": "Gib jedem Promoter einen eigenen Code und du weißt, wie viele er wirklich gebracht hat.",
-            "needsPlan": "Codes pro Person gibt es im Pro-Tarif",
+            "needsPlan": "Codes pro Person gibt es im Business-Tarif",
             "kind": "Art",
             "kinds": {
                 "promoter": "Promoter",
@@ -1116,7 +1117,7 @@
             "alreadyUsed": "Dieser Gutschein wurde schon eingelöst",
             "title": "Aktionen",
             "subtitle": "Nur wer eingecheckt hat, sieht sie. Gut, um in ruhigen Stunden Umsatz zu machen.",
-            "needsPlan": "Aktionen gibt es im Pro-Tarif",
+            "needsPlan": "Aktionen gibt es im Business-Tarif",
             "name": "Was du anbietest",
             "namePlaceholder": "2 für 1 bis 1 Uhr",
             "details": "Details",
@@ -1183,7 +1184,7 @@
             "privacyNote": "Publikumszahlen sind immer gruppiert. Sehr kleine Gruppen werden ausgeblendet, weil sie auf einzelne Personen zeigen würden.",
             "headcountTitle": "Echte Auslastung vs. Fiestea",
             "headcountSubtitle": "Was die Tür zählt, Abschnitt für Abschnitt, und wie viele davon Fiestea nutzen.",
-            "headcountNeedsPlan": "Die Auslastungskurve gibt es in Pro und Business",
+            "headcountNeedsPlan": "Die Auslastungskurve gibt es in Business",
             "headcountEmpty": "Heute Nacht wurde an der Tür noch nicht gezählt.",
             "headcountPeak": "Spitze von {{count}} Leuten um {{time}}.",
             "headcountShare": "Im Schnitt nutzten {{percent}} % Fiestea."
@@ -1192,7 +1193,6 @@
             "current": "Dein Tarif",
             "names": {
                 "free": "Gratis",
-                "pro": "Pro",
                 "business": "Business"
             },
             "endsOn": "Endet am {{date}}",
@@ -1215,7 +1215,10 @@
                 "ratings": "Gästebewertungen",
                 "audiences": "Benachrichtigungen an Zielgruppen",
                 "ticketSales": "Verkauf von Tickets und Tischen",
-                "commissions": "Automatische Promoter-Provisionen"
+                "commissions": "Automatische Promoter-Provisionen",
+                "doorTools": "Einlass: Kapazität, Zähler, Scanner und SOS",
+                "guestLists": "Gästelisten",
+                "includedBoost": "Ein Highlight pro Monat inklusive"
             },
             "yourPlan": "Dein aktueller Tarif",
             "choose": "Wählen",
@@ -1230,9 +1233,8 @@
             "checkoutFailed": "Die Zahlungsseite konnte nicht geöffnet werden.",
             "statusActive": "Aktiv",
             "taglines": {
-                "free": "Für kleine Bars oder einzelne Events",
-                "pro": "Für Clubs mit wöchentlichem Betrieb",
-                "business": "Für Gastro-Gruppen und Festivals"
+                "free": "Für jede Nacht: Einlass, Tickets und Listen",
+                "business": "Zum Wachsen: Promoter, Aktionen, Daten und Sichtbarkeit"
             },
             "included": "Dein aktueller Tarif",
             "basic": "Basistarif inklusive",
@@ -1243,9 +1245,12 @@
             "trialEnds": "Dein Gratis-Test endet am {{date}}. Danach wechselst du in den Gratis-Tarif, wenn du nicht buchst.",
             "free": "Gratis",
             "perMonth": "{{price}} €/Monat",
-            "trialNote": "Der erste Monat ist gratis: {{count}} Tage Pro nach Freigabe deiner Location.",
+            "trialNote": "Der erste Monat ist gratis: {{count}} Tage Business nach Freigabe deiner Location.",
             "keepPlan": "Bei {{plan}} bleiben",
-            "boostNote": "Ein Event hervorheben kostet {{price}} € pro Nacht in jedem Tarif: Es steht in der App ganz oben, bis es endet."
+            "boostNote": "Ein Event hervorheben kostet {{price}} € pro Nacht in jedem Tarif: Es erscheint zuerst in der App, bis es endet. Business enthält eins pro Monat.",
+            "unlimited": "unbegrenzt",
+            "eventsUnlimited": "Unbegrenzt Events",
+            "teamUnlimited": "Unbegrenztes Team"
         },
         "safety": {
             "needsHelp": "{{name}} hat um Hilfe gebeten",
@@ -1315,7 +1320,7 @@
                 "never_cameHelp": "Folgen der Location, waren aber nie da.",
                 "reach_one": "erreicht {{count}} Person",
                 "reach_other": "erreicht {{count}} Personen",
-                "locked": "Zielgruppen gibt es in Pro und Business."
+                "locked": "Zielgruppen gibt es im Business-Tarif."
             }
         },
         "documents": {
@@ -1561,7 +1566,10 @@
             "body": "Für {{price}} € steht es auf der Startseite und der Karte der App ganz oben, mit dem Label „Hervorgehoben“, bis die Party endet. Einmalzahlung.",
             "pay": "{{price}} € bezahlen",
             "paid": "Event hervorgehoben",
-            "paidBody": "Es steht jetzt in der App ganz oben. Danke."
+            "paidBody": "Es steht jetzt in der App ganz oben. Danke.",
+            "useIncluded": "Highlight des Monats nutzen",
+            "includedBody": "Dein Business-Tarif enthält ein Highlight pro Monat, und du hast es noch nicht genutzt: Es wird nichts berechnet.",
+            "includedLeft": "Hervorheben (inklusive)"
         },
         "followers": {
             "title": "Follower der Location",
@@ -2103,7 +2111,7 @@
             "expiringTitle_one": "{{count}} ablaufendes Abo benachrichtigen?",
             "expiringTitle_other": "{{count}} ablaufende Abos benachrichtigen?",
             "expiringBodyUsers": "Monatliches Premium, das in 7 Tagen endet und sich nicht selbst verlängert (gekündigt oder von der Verwaltung vergeben). Sie bekommen eine Benachrichtigung und eine E-Mail. Wer automatisch verlängert, bekommt nichts, und niemand bekommt dasselbe Datum zweimal.",
-            "expiringBodyVenues": "Pro- oder Business-Tarife, die in 7 Tagen enden und sich nicht selbst verlängern (gekündigt, im Test oder von der Verwaltung vergeben). Sie bekommen eine E-Mail. Wer automatisch verlängert, bekommt nichts.",
+            "expiringBodyVenues": "Business-Tarife, die in 7 Tagen enden und sich nicht selbst verlängern (gekündigt, im Test oder von der Verwaltung vergeben). Sie bekommen eine E-Mail. Wer automatisch verlängert, bekommt nichts.",
             "send": "Senden",
             "update": "Neuigkeit senden",
             "updateUsers": "Neuigkeit für alle Nutzer",
@@ -2760,7 +2768,7 @@
         "plans": {
             "eyebrow": "Tarife für Locations",
             "title": "Kostenlos starten und wachsen, wenn du es brauchst",
-            "body": "Registriere deine Location und nutze Pro im ersten Monat gratis. Ohne Mindestlaufzeit: Tarif im Dashboard wechseln.",
+            "body": "Registriere deine Location und nutze Business im ersten Monat gratis. Ohne Mindestlaufzeit: Tarif im Dashboard wechseln.",
             "free": "0 €",
             "custom": "Auf Anfrage",
             "recommended": "Empfohlen",
@@ -2769,9 +2777,9 @@
             "base": "QR-Einlass und Geofence, Live-Auslastung und Türansicht in allen Tarifen.",
             "perMonth": "/Monat",
             "trial": "Erster Monat gratis",
-            "ctaTrial": "Pro gratis testen",
+            "ctaTrial": "Business gratis testen",
             "boostTitle": "Event hervorheben: {{price}} € pro Nacht",
-            "boostBody": "In jedem Tarif. Deine Party steht auf der Startseite und der Karte der App ganz oben, bis sie endet.",
+            "boostBody": "In jedem Tarif, mit Business einmal im Monat inklusive. Deine Party erscheint ganz oben auf der Startseite und der Karte der App, bis sie endet.",
             "vat": "Preise zzgl. MwSt. Monatliche Zahlung, ohne Mindestlaufzeit."
         },
         "faq": {
@@ -2780,7 +2788,7 @@
             "items": {
                 "price": {
                     "q": "Was kostet Fiestea?",
-                    "a": "Zum Feiern ist Fiestea kostenlos. Fiestea Premium bietet Extras, etwa zu sehen, wer dich mag, oder dein Profil eine Stunde hervorzuheben. Für Locations gibt es den Gratis-Tarif sowie Pro (49 €/Monat, erster Monat gratis) und Business (129 €/Monat), zzgl. MwSt. und ohne Mindestlaufzeit."
+                    "a": "Zum Feiern ist Fiestea kostenlos. Fiestea Premium bietet Extras, etwa zu sehen, wer dich mag, oder dein Profil eine Stunde hervorzuheben. Für Locations gibt es den Gratis-Tarif und den Business-Tarif (69,99 €/Monat, erster Monat gratis), zzgl. MwSt. und ohne Mindestlaufzeit."
                 },
                 "location": {
                     "q": "Warum fragt die App nach meinem Standort?",
@@ -3257,7 +3265,7 @@
         },
         "venue": {
             "title": "Bewertungen",
-            "locked": "Sieh, welche Note dir deine Gäste geben, Nacht für Nacht, und lies ihre Kommentare. Verfügbar in Pro und Business.",
+            "locked": "Sieh, welche Note dir deine Gäste geben, Nacht für Nacht, und lies ihre Kommentare. Verfügbar in Business.",
             "upgrade": "Tarif upgraden",
             "empty": "Noch keine Bewertungen. Sie werden beim Verlassen der Party abgefragt.",
             "count_one": "{{count}} Bewertung",

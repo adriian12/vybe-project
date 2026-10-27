@@ -391,6 +391,21 @@ export const nightService = {
     return data.url;
   },
 
+  /** Destacados incluidos que le quedan este mes al local (Business: uno; migración 126). */
+  getIncludedBoostsLeft: async (): Promise<number> => {
+    const { data } = await supabase.rpc('get_included_boosts_left' as never);
+    return typeof data === 'number' ? data : 0;
+  },
+
+  /** Destaca el evento con el destacado incluido del mes, sin pasar por Stripe. */
+  useIncludedBoost: async (eventId: string): Promise<void> => {
+    const { error } = await supabase.rpc('use_included_boost' as never, { p_event_id: eventId } as never);
+    if (error) {
+      const codigo = error.message.includes('NO_INCLUDED_BOOST') ? 'NO_INCLUDED_BOOST' : 'BOOST_FAILED';
+      throw new ApiError(codigo, codigo === 'NO_INCLUDED_BOOST' ? 'errors.NO_INCLUDED_BOOST' : 'errors.generic');
+    }
+  },
+
   /** Qué tiene activado el evento: canciones y sellos. */
   getEventFlags: async (eventId: string): Promise<{ songs: boolean; stamps: boolean }> => {
     const { data } = await supabase

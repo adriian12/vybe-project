@@ -47,7 +47,7 @@ export interface AdminVenue {
   isVerified: boolean;
   verificationStatus: string | null;
   createdAt: string;
-  plan: 'free' | 'pro' | 'business';
+  plan: 'free' | 'business';
   planStatus: string;
   planExpiresAt: string | null;
   eventsTotal: number;
@@ -472,7 +472,7 @@ export const adminService = {
     }));
   },
 
-  setVenuePlan: async (venueId: string, plan: 'free' | 'pro' | 'business', days = 30): Promise<void> => {
+  setVenuePlan: async (venueId: string, plan: 'free' | 'business', days = 30): Promise<void> => {
     const { error } = await supabase.rpc('admin_set_venue_plan', {
       p_venue_id: venueId,
       p_plan: plan,

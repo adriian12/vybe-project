@@ -31,7 +31,8 @@
         "boundaryTitle": "Algo ha ido mal",
         "boundaryBody": "Ha ocurrido un error inesperado. Puedes reintentar o volver al inicio.",
         "network": "No hay conexión. Comprueba tu red.",
-        "rateLimited": "Vas demasiado rápido. Espera un momento."
+        "rateLimited": "Vas demasiado rápido. Espera un momento.",
+        "NO_INCLUDED_BOOST": "Ya has usado el destacado incluido de este mes."
     },
     "index": {
         "question": "¿Cómo quieres continuar?",
@@ -1078,7 +1079,7 @@
         "codes": {
             "title": "Códigos y quién trae gente",
             "subtitle": "Da un código a cada relaciones públicas y sabrás a cuánta gente ha traído de verdad.",
-            "needsPlan": "Los códigos por persona son del plan Pro",
+            "needsPlan": "Los códigos por persona son del plan Business",
             "kind": "Tipo",
             "kinds": {
                 "promoter": "Relaciones públicas",
@@ -1116,7 +1117,7 @@
             "alreadyUsed": "Este vale ya se usó",
             "title": "Promociones",
             "subtitle": "Sólo las ve quien ha entrado al evento. Sirven para mover consumo en las horas flojas.",
-            "needsPlan": "Las promociones son del plan Pro",
+            "needsPlan": "Las promociones son del plan Business",
             "name": "Qué ofreces",
             "namePlaceholder": "Copa 2x1 hasta la 1:00",
             "details": "Detalle",
@@ -1183,7 +1184,7 @@
             "privacyNote": "Los datos de público van siempre agrupados. Los grupos con muy poca gente no se muestran, porque señalarían a personas concretas.",
             "headcountTitle": "Aforo real frente a Fiestea",
             "headcountSubtitle": "Lo que cuenta la puerta, tramo a tramo, y cuánto de ese público usa Fiestea.",
-            "headcountNeedsPlan": "La curva de aforo es de los planes Pro y Business",
+            "headcountNeedsPlan": "La curva de aforo es del plan Business",
             "headcountEmpty": "Esta noche aún no se ha contado en la puerta.",
             "headcountPeak": "Pico de {{count}} personas a las {{time}}.",
             "headcountShare": "De media, el {{percent}} % usaba Fiestea."
@@ -1192,7 +1193,6 @@
             "current": "Tu plan",
             "names": {
                 "free": "Gratis",
-                "pro": "Pro",
                 "business": "Business"
             },
             "endsOn": "Termina el {{date}}",
@@ -1215,7 +1215,10 @@
                 "ratings": "Valoraciones de clientes",
                 "audiences": "Avisos a públicos concretos",
                 "ticketSales": "Venta de entradas y mesas",
-                "commissions": "Comisiones de RRPP automáticas"
+                "commissions": "Comisiones de RRPP automáticas",
+                "doorTools": "Puerta: aforo, contador, escáner y SOS",
+                "guestLists": "Listas de invitados",
+                "includedBoost": "Un destacado al mes incluido"
             },
             "yourPlan": "Tu plan actual",
             "choose": "Elegir",
@@ -1230,9 +1233,8 @@
             "checkoutFailed": "No se pudo abrir la pasarela de pago.",
             "statusActive": "Activo",
             "taglines": {
-                "free": "Para bares pequeños o eventos puntuales",
-                "pro": "Para discotecas y salas con actividad cada semana",
-                "business": "Para grupos de ocio y festivales"
+                "free": "Para trabajar cada noche: puerta, entradas y listas",
+                "business": "Para crecer: RRPP, promociones, datos y visibilidad"
             },
             "included": "Tu plan actual",
             "basic": "Plan básico incluido",
@@ -1243,9 +1245,12 @@
             "trialEnds": "La prueba gratis termina el {{date}}. Después pasas al plan Gratis si no contratas.",
             "free": "Gratis",
             "perMonth": "{{price}} €/mes",
-            "trialNote": "El primer mes es gratis: {{count}} días de Pro al aprobar tu negocio.",
+            "trialNote": "El primer mes es gratis: {{count}} días de Business al aprobar tu negocio.",
             "keepPlan": "Seguir con {{plan}}",
-            "boostNote": "Destacar un evento cuesta {{price}} € por noche en cualquier plan: sale primero en la app hasta que termina."
+            "boostNote": "Destacar un evento cuesta {{price}} € por noche en cualquier plan: sale primero en la app hasta que termina. Business incluye uno al mes.",
+            "unlimited": "sin límite",
+            "eventsUnlimited": "Eventos sin límite",
+            "teamUnlimited": "Equipo sin límite"
         },
         "safety": {
             "needsHelp": "{{name}} ha pedido ayuda",
@@ -1315,7 +1320,7 @@
                 "never_cameHelp": "Siguen al negocio pero nunca han venido.",
                 "reach_one": "llegará a {{count}} persona",
                 "reach_other": "llegará a {{count}} personas",
-                "locked": "Los públicos concretos son de Pro y Business."
+                "locked": "Los públicos concretos son del plan Business."
             }
         },
         "documents": {
@@ -1561,7 +1566,10 @@
             "body": "Por {{price}} € sale el primero en inicio y en el mapa de la app, con la etiqueta «Destacado», hasta que termine la fiesta. Es un pago único.",
             "pay": "Pagar {{price}} €",
             "paid": "Evento destacado",
-            "paidBody": "Ya sale el primero en la app. Gracias."
+            "paidBody": "Ya sale el primero en la app. Gracias.",
+            "useIncluded": "Usar el destacado del mes",
+            "includedBody": "Tu plan Business incluye un destacado al mes y este todavía no lo has usado: no se cobra nada.",
+            "includedLeft": "Destacar (incluido)"
         },
         "followers": {
             "title": "Seguidores del negocio",
@@ -2103,7 +2111,7 @@
             "expiringTitle_one": "¿Avisar a {{count}} suscripción que caduca?",
             "expiringTitle_other": "¿Avisar a {{count}} suscripciones que caducan?",
             "expiringBodyUsers": "Premium mensual que termina en 7 días y no se renueva sola (cancelada o dada por administración). Les llega un aviso y un correo. A quien renueva sola no se le envía nada, y nadie recibe dos veces el aviso de la misma fecha.",
-            "expiringBodyVenues": "Planes Pro o Business que terminan en 7 días y no se renuevan solos (cancelados, en prueba o dados por administración). Les llega un correo. A quien renueva solo no se le envía nada.",
+            "expiringBodyVenues": "Planes Business que terminan en 7 días y no se renuevan solos (cancelados, en prueba o dados por administración). Les llega un correo. A quien renueva solo no se le envía nada.",
             "send": "Enviar",
             "update": "Enviar novedad",
             "updateUsers": "Novedad para todos los usuarios",
@@ -2760,7 +2768,7 @@
         "plans": {
             "eyebrow": "Planes para negocios",
             "title": "Empieza gratis y crece cuando lo necesites",
-            "body": "Da de alta tu negocio y estrena Pro gratis el primer mes. Sin permanencia: cambia de plan desde el panel.",
+            "body": "Da de alta tu negocio y estrena Business gratis el primer mes. Sin permanencia: cambia de plan desde el panel.",
             "free": "0 €",
             "custom": "Consúltanos",
             "recommended": "Recomendado",
@@ -2769,9 +2777,9 @@
             "base": "Acceso con QR y geocerca, aforo en directo y panel de puerta en todos los planes.",
             "perMonth": "/mes",
             "trial": "Primer mes gratis",
-            "ctaTrial": "Probar Pro gratis",
+            "ctaTrial": "Probar Business gratis",
             "boostTitle": "Destacar un evento: {{price}} € por noche",
-            "boostBody": "En cualquier plan. Tu fiesta sale la primera en inicio y en el mapa de la app hasta que termina.",
+            "boostBody": "En cualquier plan, y con Business uno al mes incluido. Tu fiesta sale la primera en inicio y en el mapa de la app hasta que termina.",
             "vat": "Precios sin IVA. Pago mensual, sin permanencia."
         },
         "faq": {
@@ -2780,7 +2788,7 @@
             "items": {
                 "price": {
                     "q": "¿Cuánto cuesta Fiestea?",
-                    "a": "Para salir de fiesta es gratis. Fiestea Premium añade extras como ver a quién le gustas o destacar tu perfil una hora. Los negocios tienen un plan Gratis y los planes Pro (49 €/mes, el primer mes gratis) y Business (129 €/mes), sin IVA y sin permanencia."
+                    "a": "Para salir de fiesta es gratis. Fiestea Premium añade extras como ver a quién le gustas o destacar tu perfil una hora. Los negocios tienen un plan Gratis y el plan Business (69,99 €/mes, el primer mes gratis), sin IVA y sin permanencia."
                 },
                 "location": {
                     "q": "¿Por qué me pide la ubicación?",
@@ -3257,7 +3265,7 @@
         },
         "venue": {
             "title": "Valoraciones",
-            "locked": "Mira qué nota os ponen los clientes, por noche, y lee sus comentarios. Disponible en Pro y Business.",
+            "locked": "Mira qué nota os ponen los clientes, por noche, y lee sus comentarios. Disponible en Business.",
             "upgrade": "Mejorar plan",
             "empty": "Todavía no hay valoraciones. Se piden al salir de la fiesta.",
             "count_one": "{{count}} valoración",

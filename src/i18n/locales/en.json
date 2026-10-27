@@ -31,7 +31,8 @@
         "boundaryTitle": "Something went wrong",
         "boundaryBody": "An unexpected error occurred. You can retry or go back to the start.",
         "network": "You're offline. Check your connection.",
-        "rateLimited": "You're going too fast. Please wait a moment."
+        "rateLimited": "You're going too fast. Please wait a moment.",
+        "NO_INCLUDED_BOOST": "You've already used this month's included boost."
     },
     "index": {
         "question": "How would you like to continue?",
@@ -1078,7 +1079,7 @@
         "codes": {
             "title": "Codes and who brings people",
             "subtitle": "Give each promoter their own code and you'll know how many people they really brought.",
-            "needsPlan": "Per-person codes are on the Pro plan",
+            "needsPlan": "Per-person codes are on the Business plan",
             "kind": "Type",
             "kinds": {
                 "promoter": "Promoter",
@@ -1116,7 +1117,7 @@
             "alreadyUsed": "This voucher was already used",
             "title": "Offers",
             "subtitle": "Only people who checked in can see them. Good for moving drinks in the quiet hours.",
-            "needsPlan": "Offers are on the Pro plan",
+            "needsPlan": "Offers are on the Business plan",
             "name": "What you offer",
             "namePlaceholder": "2-for-1 drinks until 1am",
             "details": "Details",
@@ -1183,7 +1184,7 @@
             "privacyNote": "Audience figures are always grouped. Groups with very few people are hidden, because they would point at individuals.",
             "headcountTitle": "Real capacity vs Fiestea",
             "headcountSubtitle": "What the door counts, slot by slot, and how much of that crowd uses Fiestea.",
-            "headcountNeedsPlan": "The capacity curve is part of Pro and Business",
+            "headcountNeedsPlan": "The capacity curve is part of Business",
             "headcountEmpty": "Nothing has been counted at the door tonight.",
             "headcountPeak": "Peak of {{count}} people at {{time}}.",
             "headcountShare": "On average, {{percent}}% were on Fiestea."
@@ -1192,7 +1193,6 @@
             "current": "Your plan",
             "names": {
                 "free": "Free",
-                "pro": "Pro",
                 "business": "Business"
             },
             "endsOn": "Ends on {{date}}",
@@ -1215,7 +1215,10 @@
                 "ratings": "Customer ratings",
                 "audiences": "Notifications to specific audiences",
                 "ticketSales": "Ticket and table sales",
-                "commissions": "Automatic promoter commissions"
+                "commissions": "Automatic promoter commissions",
+                "doorTools": "Door: capacity, counter, scanner and SOS",
+                "guestLists": "Guest lists",
+                "includedBoost": "One boost a month included"
             },
             "yourPlan": "Your current plan",
             "choose": "Choose",
@@ -1230,9 +1233,8 @@
             "checkoutFailed": "Could not open the payment page.",
             "statusActive": "Active",
             "taglines": {
-                "free": "For small bars or one-off events",
-                "pro": "For clubs and venues with weekly activity",
-                "business": "For hospitality groups and festivals"
+                "free": "To run every night: door, tickets and lists",
+                "business": "To grow: promoters, offers, data and visibility"
             },
             "included": "Your current plan",
             "basic": "Basic plan included",
@@ -1243,9 +1245,12 @@
             "trialEnds": "Your free trial ends on {{date}}. After that you move to the Free plan unless you subscribe.",
             "free": "Free",
             "perMonth": "€{{price}}/month",
-            "trialNote": "The first month is free: {{count}} days of Pro once your venue is approved.",
+            "trialNote": "The first month is free: {{count}} days of Business once your venue is approved.",
             "keepPlan": "Keep {{plan}}",
-            "boostNote": "Featuring an event costs €{{price}} per night on any plan: it shows first in the app until it ends."
+            "boostNote": "Boosting an event costs €{{price}} per night on any plan: it shows first in the app until it ends. Business includes one a month.",
+            "unlimited": "unlimited",
+            "eventsUnlimited": "Unlimited events",
+            "teamUnlimited": "Unlimited team"
         },
         "safety": {
             "needsHelp": "{{name}} asked for help",
@@ -1315,7 +1320,7 @@
                 "never_cameHelp": "Follow the venue but have never come.",
                 "reach_one": "will reach {{count}} person",
                 "reach_other": "will reach {{count}} people",
-                "locked": "Specific audiences are on Pro and Business."
+                "locked": "Specific audiences are on the Business plan."
             }
         },
         "documents": {
@@ -1561,7 +1566,10 @@
             "body": "For €{{price}} it shows first on the home screen and the map of the app, labelled \"Featured\", until the party ends. One-off payment.",
             "pay": "Pay €{{price}}",
             "paid": "Event featured",
-            "paidBody": "It now shows first in the app. Thanks."
+            "paidBody": "It now shows first in the app. Thanks.",
+            "useIncluded": "Use this month's boost",
+            "includedBody": "Your Business plan includes one boost a month and you haven't used it yet: nothing will be charged.",
+            "includedLeft": "Boost (included)"
         },
         "followers": {
             "title": "Venue followers",
@@ -2103,7 +2111,7 @@
             "expiringTitle_one": "Notify {{count}} expiring subscription?",
             "expiringTitle_other": "Notify {{count}} expiring subscriptions?",
             "expiringBodyUsers": "Monthly Premium ending within 7 days that won't renew on its own (cancelled or granted by admin). They get a notification and an email. Auto-renewing ones get nothing, and nobody gets the same date twice.",
-            "expiringBodyVenues": "Pro or Business plans ending within 7 days that won't renew on their own (cancelled, on trial or granted by admin). They get an email. Auto-renewing ones get nothing.",
+            "expiringBodyVenues": "Business plans ending within 7 days that won't renew on their own (cancelled, on trial or granted by admin). They get an email. Auto-renewing ones get nothing.",
             "send": "Send",
             "update": "Send update",
             "updateUsers": "Update for all users",
@@ -2760,7 +2768,7 @@
         "plans": {
             "eyebrow": "Plans for venues",
             "title": "Start free and grow when you need to",
-            "body": "Register your venue and get Pro free for the first month. No commitment: change plans from the dashboard.",
+            "body": "Register your venue and get Business free for the first month. No commitment: change plans from the dashboard.",
             "free": "€0",
             "custom": "Contact us",
             "recommended": "Recommended",
@@ -2769,9 +2777,9 @@
             "base": "QR access and geofence, live capacity and door dashboard on every plan.",
             "perMonth": "/month",
             "trial": "First month free",
-            "ctaTrial": "Try Pro for free",
+            "ctaTrial": "Try Business for free",
             "boostTitle": "Feature an event: €{{price}} per night",
-            "boostBody": "On any plan. Your party shows first on the home screen and the map of the app until it ends.",
+            "boostBody": "On any plan, and one a month included with Business. Your party shows first on the app home and map until it ends.",
             "vat": "Prices exclude VAT. Monthly payment, no commitment."
         },
         "faq": {
@@ -2780,7 +2788,7 @@
             "items": {
                 "price": {
                     "q": "How much does Fiestea cost?",
-                    "a": "Going out with Fiestea is free. Fiestea Premium adds extras like seeing who likes you or boosting your profile for an hour. Venues have a Free plan plus Pro (€49/month, first month free) and Business (€129/month), excluding VAT and with no commitment."
+                    "a": "Going out with Fiestea is free. Fiestea Premium adds extras like seeing who likes you or boosting your profile for an hour. Venues have a Free plan and the Business plan (€69.99/month, first month free), excluding VAT and with no commitment."
                 },
                 "location": {
                     "q": "Why does it ask for my location?",
@@ -3257,7 +3265,7 @@
         },
         "venue": {
             "title": "Ratings",
-            "locked": "See the score customers give you, night by night, and read their comments. Available on Pro and Business.",
+            "locked": "See the score customers give you, night by night, and read their comments. Available on Business.",
             "upgrade": "Upgrade",
             "empty": "No ratings yet. People are asked when they leave the party.",
             "count_one": "{{count}} rating",

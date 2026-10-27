@@ -146,7 +146,7 @@ serve(async (req: Request): Promise<Response> => {
           ]);
           ok = p || m;
         } else if (row.email) {
-          const plan = row.plan === 'business' ? 'Business' : 'Pro';
+          const plan = 'Business';
           const titulo = 'Tu suscripción está a punto de caducar';
           const cuerpo = `Hola ${row.name ?? ''}.\n\nTu plan ${plan} termina el ${fecha(row.expires_at, 'es')} y no se renovará solo. Si no lo renuevas, el panel volverá al plan gratuito y dejarás de tener sus funciones.\n\nPuedes renovarlo desde el panel del negocio, en Plan.`;
           ok = await correo(row.email, titulo, correoHtml(titulo, cuerpo, { texto: 'Renovar mi plan', url: `${appUrl}/venue/dashboard?seccion=plan` }), cuerpo);

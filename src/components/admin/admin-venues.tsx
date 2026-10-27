@@ -232,7 +232,6 @@ const AdminVenues = () => {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="free">{t('venue.plan.names.free')}</SelectItem>
-                          <SelectItem value="pro">{t('venue.plan.names.pro')}</SelectItem>
                           <SelectItem value="business">{t('venue.plan.names.business')}</SelectItem>
                         </SelectContent>
                       </Select>

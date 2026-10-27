@@ -25,22 +25,22 @@ import { stripeSecretKey, stripeVar } from '../_shared/stripe-env.ts';
  *   · event       4,99 €, Premium sólo en el evento en el que estás dentro.
  *   · supercrush  1 € cada uno, se compran de 1 en adelante y valen en
  *                 cualquier evento.
- *   · venue_pro / venue_business  plan mensual del local.
+ *   · venue_business  plan mensual del local (el único de pago desde la
+ *                     migración 126: Pro ya no existe).
  *
  * Variables: STRIPE_SECRET_KEY, STRIPE_PRICE_MONTHLY_USER (o
  *            STRIPE_PRICE_MONTHLY), STRIPE_PRICE_EVENT, STRIPE_PRICE_SUPERLIKE,
- *            STRIPE_PRICE_VENUE_PRO, STRIPE_PRICE_VENUE_BUSINESS
+ *            STRIPE_PRICE_VENUE_BUSINESS
  */
 
 type UserPlan = 'monthly' | 'event' | 'supercrush';
-type VenuePlan = 'venue_pro' | 'venue_business';
+type VenuePlan = 'venue_business';
 type Plan = UserPlan | VenuePlan | 'event_boost' | 'tickets';
 
 const PRICE_ENV: Record<Exclude<Plan, 'event_boost' | 'tickets'>, string[]> = {
   monthly: ['STRIPE_PRICE_MONTHLY_USER', 'STRIPE_PRICE_MONTHLY'],
   event: ['STRIPE_PRICE_EVENT'],
   supercrush: ['STRIPE_PRICE_SUPERLIKE'],
-  venue_pro: ['STRIPE_PRICE_VENUE_PRO'],
   venue_business: ['STRIPE_PRICE_VENUE_BUSINESS'],
 };
 
@@ -56,7 +56,7 @@ const MAX_SUPERCRUSH = 100;
  * Son los de la landing y `src/lib/venue-plans.ts`: si cambias uno, cambia los
  * otros.
  */
-const VENUE_PRICE_CENTS: Record<VenuePlan, number> = { venue_pro: 4900, venue_business: 6999 };
+const VENUE_PRICE_CENTS: Record<VenuePlan, number> = { venue_business: 6999 };
 const BOOST_PRICE_CENTS = 1900;
 
 /**
@@ -363,7 +363,7 @@ serve(async (req: Request): Promise<Response> => {
       params.set('line_items[0][price_data][recurring][interval]', 'month');
       params.set(
         'line_items[0][price_data][product_data][name]',
-        plan === 'venue_pro' ? 'Fiestea Pro para negocios' : 'Fiestea Business para negocios',
+        'Fiestea Business para negocios',
       );
     }
 

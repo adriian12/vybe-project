@@ -31,7 +31,8 @@
         "boundaryTitle": "Alguna cosa ha anat malament",
         "boundaryBody": "Hi ha hagut un error inesperat. Pots tornar-ho a provar o anar a l'inici.",
         "network": "No hi ha connexió. Comprova la xarxa.",
-        "rateLimited": "Vas massa de pressa. Espera un moment."
+        "rateLimited": "Vas massa de pressa. Espera un moment.",
+        "NO_INCLUDED_BOOST": "Ja has fet servir el destacat inclòs d'aquest mes."
     },
     "index": {
         "question": "Com vols continuar?",
@@ -1078,7 +1079,7 @@
         "codes": {
             "title": "Codis i qui porta gent",
             "subtitle": "Dona un codi a cada relacions públiques i sabràs quanta gent ha portat de veritat.",
-            "needsPlan": "Els codis per persona són del pla Pro",
+            "needsPlan": "Els codis per persona són del pla Business",
             "kind": "Tipus",
             "kinds": {
                 "promoter": "Relacions públiques",
@@ -1116,7 +1117,7 @@
             "alreadyUsed": "Aquest val ja s'ha fet servir",
             "title": "Promocions",
             "subtitle": "Només les veu qui ha entrat a l'esdeveniment. Serveixen per moure consum a les hores fluixes.",
-            "needsPlan": "Les promocions són del pla Pro",
+            "needsPlan": "Les promocions són del pla Business",
             "name": "Què ofereixes",
             "namePlaceholder": "Copa 2x1 fins a la 1:00",
             "details": "Detall",
@@ -1183,7 +1184,7 @@
             "privacyNote": "Les dades de públic van sempre agrupades. Els grups amb molt poca gent no es mostren, perquè assenyalarien persones concretes.",
             "headcountTitle": "Aforament real davant de Fiestea",
             "headcountSubtitle": "El que compta la porta, tram a tram, i quant d'aquest públic fa servir Fiestea.",
-            "headcountNeedsPlan": "La corba d'aforament és dels plans Pro i Business",
+            "headcountNeedsPlan": "La corba d'aforament és del pla Business",
             "headcountEmpty": "Aquesta nit encara no s'ha comptat a la porta.",
             "headcountPeak": "Pic de {{count}} persones a les {{time}}.",
             "headcountShare": "De mitjana, el {{percent}} % feia servir Fiestea."
@@ -1192,7 +1193,6 @@
             "current": "El teu pla",
             "names": {
                 "free": "Gratis",
-                "pro": "Pro",
                 "business": "Business"
             },
             "endsOn": "Acaba el {{date}}",
@@ -1215,7 +1215,10 @@
                 "ratings": "Valoracions de clients",
                 "audiences": "Avisos a públics concrets",
                 "ticketSales": "Venda d'entrades i taules",
-                "commissions": "Comissions de RRPP automàtiques"
+                "commissions": "Comissions de RRPP automàtiques",
+                "doorTools": "Porta: aforament, comptador, escàner i SOS",
+                "guestLists": "Llistes de convidats",
+                "includedBoost": "Un destacat al mes inclòs"
             },
             "yourPlan": "El teu pla actual",
             "choose": "Triar",
@@ -1230,9 +1233,8 @@
             "checkoutFailed": "No s'ha pogut obrir la passarel·la de pagament.",
             "statusActive": "Actiu",
             "taglines": {
-                "free": "Per a bars petits o esdeveniments puntuals",
-                "pro": "Per a discoteques i sales amb activitat setmanal",
-                "business": "Per a grups d'oci i festivals"
+                "free": "Per treballar cada nit: porta, entrades i llistes",
+                "business": "Per créixer: RRPP, promocions, dades i visibilitat"
             },
             "included": "El teu pla actual",
             "basic": "Pla bàsic inclòs",
@@ -1243,9 +1245,12 @@
             "trialEnds": "La prova gratuïta acaba el {{date}}. Després passes al pla Gratis si no contractes.",
             "free": "Gratis",
             "perMonth": "{{price}} €/mes",
-            "trialNote": "El primer mes és gratis: {{count}} dies de Pro en aprovar el teu negoci.",
+            "trialNote": "El primer mes és gratis: {{count}} dies de Business en aprovar el teu negoci.",
             "keepPlan": "Continuar amb {{plan}}",
-            "boostNote": "Destacar un esdeveniment costa {{price}} € per nit en qualsevol pla: surt el primer a l'app fins que acaba."
+            "boostNote": "Destacar un esdeveniment costa {{price}} € per nit a qualsevol pla: surt primer a l'app fins que acaba. Business n'inclou un al mes.",
+            "unlimited": "sense límit",
+            "eventsUnlimited": "Esdeveniments sense límit",
+            "teamUnlimited": "Equip sense límit"
         },
         "safety": {
             "needsHelp": "{{name}} ha demanat ajuda",
@@ -1315,7 +1320,7 @@
                 "never_cameHelp": "Segueixen el negoci però mai no hi han vingut.",
                 "reach_one": "arribarà a {{count}} persona",
                 "reach_other": "arribarà a {{count}} persones",
-                "locked": "Els públics concrets són de Pro i Business."
+                "locked": "Els públics concrets són del pla Business."
             }
         },
         "documents": {
@@ -1561,7 +1566,10 @@
             "body": "Per {{price}} € surt el primer a l'inici i al mapa de l'app, amb l'etiqueta «Destacat», fins que acabi la festa. És un pagament únic.",
             "pay": "Pagar {{price}} €",
             "paid": "Esdeveniment destacat",
-            "paidBody": "Ja surt el primer a l'app. Gràcies."
+            "paidBody": "Ja surt el primer a l'app. Gràcies.",
+            "useIncluded": "Fer servir el destacat del mes",
+            "includedBody": "El teu pla Business inclou un destacat al mes i encara no l'has fet servir: no es cobra res.",
+            "includedLeft": "Destacar (inclòs)"
         },
         "followers": {
             "title": "Seguidors del negoci",
@@ -2103,7 +2111,7 @@
             "expiringTitle_one": "Avisar {{count}} subscripció que caduca?",
             "expiringTitle_other": "Avisar {{count}} subscripcions que caduquen?",
             "expiringBodyUsers": "Premium mensual que acaba en 7 dies i no es renova sol (cancel·lat o donat per administració). Els arriba un avís i un correu. A qui renova sol no se li envia res, i ningú no rep dues vegades l'avís de la mateixa data.",
-            "expiringBodyVenues": "Plans Pro o Business que acaben en 7 dies i no es renoven sols (cancel·lats, en prova o donats per administració). Els arriba un correu. A qui renova sol no se li envia res.",
+            "expiringBodyVenues": "Plans Business que acaben en 7 dies i no es renoven sols (cancel·lats, en prova o donats per administració). Els arriba un correu. A qui renova sol no se li envia res.",
             "send": "Enviar",
             "update": "Enviar novetat",
             "updateUsers": "Novetat per a tots els usuaris",
@@ -2760,7 +2768,7 @@
         "plans": {
             "eyebrow": "Plans per a negocis",
             "title": "Comença gratis i creix quan ho necessitis",
-            "body": "Dona d'alta el teu negoci i estrena Pro gratis el primer mes. Sense permanència: canvia de pla des del tauler.",
+            "body": "Dona d'alta el teu negoci i estrena Business gratis el primer mes. Sense permanència: canvia de pla des del tauler.",
             "free": "0 €",
             "custom": "Consulta'ns",
             "recommended": "Recomanat",
@@ -2769,9 +2777,9 @@
             "base": "Accés amb QR i geotanca, aforament en directe i tauler de porta a tots els plans.",
             "perMonth": "/mes",
             "trial": "Primer mes gratis",
-            "ctaTrial": "Provar Pro gratis",
+            "ctaTrial": "Provar Business gratis",
             "boostTitle": "Destacar un esdeveniment: {{price}} € per nit",
-            "boostBody": "En qualsevol pla. La teva festa surt la primera a l'inici i al mapa de l'app fins que acaba.",
+            "boostBody": "A qualsevol pla, i amb Business un al mes inclòs. La teva festa surt la primera a l'inici i al mapa de l'app fins que acaba.",
             "vat": "Preus sense IVA. Pagament mensual, sense permanència."
         },
         "faq": {
@@ -2780,7 +2788,7 @@
             "items": {
                 "price": {
                     "q": "Quant costa Fiestea?",
-                    "a": "Per sortir de festa és gratis. Fiestea Premium afegeix extres com veure a qui li agrades o destacar el teu perfil una hora. Els negocis tenen un pla Gratis i els plans Pro (49 €/mes, el primer mes gratis) i Business (129 €/mes), sense IVA i sense permanència."
+                    "a": "Per sortir de festa és gratis. Fiestea Premium afegeix extres com veure a qui li agrades o destacar el teu perfil una hora. Els negocis tenen un pla Gratis i el pla Business (69,99 €/mes, el primer mes gratis), sense IVA i sense permanència."
                 },
                 "location": {
                     "q": "Per què em demana la ubicació?",
@@ -3257,7 +3265,7 @@
         },
         "venue": {
             "title": "Valoracions",
-            "locked": "Mira quina nota us posen els clients, per nit, i llegeix els seus comentaris. Disponible a Pro i Business.",
+            "locked": "Mira quina nota us posen els clients, per nit, i llegeix els seus comentaris. Disponible a Business.",
             "upgrade": "Millorar pla",
             "empty": "Encara no hi ha valoracions. Es demanen en sortir de la festa.",
             "count_one": "{{count}} valoració",

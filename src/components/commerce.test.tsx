@@ -163,8 +163,9 @@ describe('valorar la fiesta', () => {
 });
 
 describe('ventas del local', () => {
-  it('fuera de Business no se enseña', () => {
-    const { container } = render(<VenueSales events={[]} plan={{ plan: 'pro' } as never} />);
-    expect(container.innerHTML).toBe('');
+  // Migración 126: la venta de entradas está en todos los planes.
+  it('en el plan Gratis también se enseña', () => {
+    const { container } = render(<VenueSales events={[]} plan={{ plan: 'free' } as never} />);
+    expect(container.innerHTML).not.toBe('');
   });
 });

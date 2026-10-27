@@ -219,14 +219,15 @@ export interface EventForecast {
 }
 
 export interface VenuePlanStatus {
-  plan: 'free' | 'pro' | 'business';
+  plan: 'free' | 'business';
   status: string;
   expiresAt: string | null;
   cancelAtPeriodEnd: boolean;
   activeEvents: number;
-  maxActiveEvents: number;
+  /** `null`: sin límite (Business). */
+  maxActiveEvents: number | null;
   teamMembers: number;
-  maxTeamMembers: number;
+  maxTeamMembers: number | null;
   promoterCodes: boolean;
   demographics: boolean;
   promotions: boolean;
@@ -932,7 +933,7 @@ export const venueService = {
    * Devuelve `null` si Stripe no está configurado todavía, para que la interfaz
    * pueda decirlo en lugar de quedarse esperando.
    */
-  startPlanCheckout: async (plan: 'pro' | 'business'): Promise<string | null> => {
+  startPlanCheckout: async (plan: 'business'): Promise<string | null> => {
     const { data, error } = await supabase.functions.invoke<{ url?: string; error?: string }>(
       'stripe-checkout',
       {
