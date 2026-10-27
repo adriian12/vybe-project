@@ -236,12 +236,13 @@ const HomePage = () => {
                       <img src={event.posterUrl} alt="" className="h-full w-full rounded-full object-cover" />
                     ) : (
                       <span className="flex h-full w-full items-center justify-center rounded-full bg-surface-high font-display text-lg font-black text-party-primary">
-                        {(event.venueName ?? event.name).charAt(0)}
+                        {(event.placeName ?? event.venueName ?? event.name).charAt(0)}
                       </span>
                     )}
                   </span>
+                  {/* La sala y no el negocio: las de Funout y el escáner son todas de «Fiestea». */}
                   <span className="w-16 truncate text-center text-[10px] text-party-gray group-hover:text-foreground">
-                    {event.venueName ?? event.name}
+                    {event.placeName ?? event.venueName ?? event.name}
                   </span>
                 </button>
               ))}

@@ -80,7 +80,9 @@ verify_jwt = true
 verify_jwt = true
 
 [functions.stripe-checkout]
-verify_jwt = true
+# Sin JWT: las entradas se compran también sin cuenta desde la web (125). El
+# código exige sesión para todo lo demás.
+verify_jwt = false
 
 [functions.delete-account]
 verify_jwt = true

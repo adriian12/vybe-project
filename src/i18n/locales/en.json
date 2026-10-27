@@ -2471,6 +2471,7 @@
             "summary": "Summary",
             "total": "Total",
             "freeNote": "Free ticket: you will get the QR in the app and by email.",
+            "freeNoteGuest": "Free ticket: you will get the QR by email.",
             "paidNote": "Secure payment with Stripe. Sold by {{venue}}; your PDF ticket will be emailed to you.",
             "getFree": "Buy ticket",
             "pay": "Pay {{amount}}",
@@ -3750,5 +3751,26 @@
         "notFound": "No parties at this venue",
         "kind": "Venue",
         "noUpcoming": "No upcoming parties at this venue."
+    },
+    "publicEvent": {
+        "notFound": "This party is no longer here",
+        "notFoundBody": "It may have ended or the link may be wrong.",
+        "minAge": "Minimum age: {{age}}",
+        "lineup": "Line-up",
+        "tickets": "Tickets",
+        "buyOutside": "Buy tickets",
+        "noTickets": "This party doesn't sell tickets on Fiestea.",
+        "guestNote": "No account needed: your tickets go to the email you enter when buying.",
+        "appTitle": "Get Fiestea",
+        "appBody": "Every party, your tickets and who is inside, on your phone."
+    },
+    "guestOrder": {
+        "title": "Purchase complete!",
+        "body": "Your tickets are on their way to the email you entered.",
+        "bodyTo": "Your tickets are on their way to {{email}}.",
+        "spam": "If you don't see them in a few minutes, check your spam folder.",
+        "cancelledTitle": "Payment cancelled",
+        "cancelledBody": "Nothing has been charged. You can try again from the party.",
+        "appBody": "With the app your tickets are always at hand and you get in with the QR."
     }
 }

@@ -5,7 +5,7 @@ import { BrowserRouter, Navigate, Routes, Route, useNavigate } from 'react-route
 import { Toaster } from '@/components/ui/toaster';
 import { Toaster as Sonner } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { AppProvider } from '@/context/app-context';
+import { AppProvider, useAppContext } from '@/context/app-context';
 import { PremiumProvider } from '@/context/premium-context';
 import ProtectedRoute from '@/components/protected-route';
 import PremiumFeatures from '@/components/premium-features';
@@ -50,6 +50,8 @@ const EventDetailPage = lazy(() => import('./pages/EventDetailPage'));
 const VenuePage = lazy(() => import('./pages/VenuePage'));
 const VenueDayPage = lazy(() => import('./pages/VenueDayPage'));
 const PlacePage = lazy(() => import('./pages/PlacePage'));
+const PublicEventPage = lazy(() => import('./pages/PublicEventPage'));
+const GuestOrderDonePage = lazy(() => import('./pages/GuestOrderDonePage'));
 // El mapa arrastra Leaflet (unos 150 KB con sus estilos): sólo se descarga al abrirlo.
 const MapPage = lazy(() => import('./pages/MapPage'));
 const TicketsPage = lazy(() => import('./pages/TicketsPage'));
@@ -128,6 +130,20 @@ const guarded = (
  */
 const clubber = (element: React.ReactNode, options: { requireEvent?: boolean } = {}) =>
   MODE === 'app' ? <MobileOnlyPage /> : guarded(element, { allow: ['user', 'admin'], ...options });
+
+/**
+ * La ficha de una fiesta y la compra de su entrada se abren también sin cuenta
+ * (migración 125): un enlace abierto en el ordenador vendía, y antes llevaba a
+ * «Fiestea se vive desde el móvil». En la web siempre la versión sin cuenta; en
+ * la app y en local, la de siempre si hay sesión de fiester@ y si no, ésta.
+ */
+const SinCuenta = ({ conCuenta, sinCuenta }: { conCuenta: React.ReactNode; sinCuenta: React.ReactNode }) => {
+  const { isLoading, isLoggedIn, userType } = useAppContext();
+  const publica = <ErrorBoundary area="route">{sinCuenta}</ErrorBoundary>;
+  if (MODE !== 'all') return publica;
+  if (isLoading) return <PantallaCargando />;
+  return isLoggedIn && (userType === 'user' || userType === 'admin') ? <>{conCuenta}</> : publica;
+};
 
 /**
  * Escucha los enlaces que abren la aplicación instalada y navega a su pantalla.
@@ -230,7 +246,11 @@ const App = () => (
                     <Route path="/location" element={clubber(<LocationPage />)} />
                     <Route path="/map" element={clubber(<MapPage />)} />
                     <Route path="/tickets" element={clubber(<TicketsPage />)} />
-                    <Route path="/tickets/buy/:typeId" element={clubber(<TicketCheckoutPage />)} />
+                    <Route
+                      path="/tickets/buy/:typeId"
+                      element={<SinCuenta conCuenta={clubber(<TicketCheckoutPage />)} sinCuenta={<TicketCheckoutPage />} />}
+                    />
+                    <Route path="/compra-hecha" element={<GuestOrderDonePage />} />
                     <Route path="/tickets/order/:orderId" element={clubber(<TicketOrderPage />)} />
                     <Route path="/matches" element={clubber(<MatchesPage />)} />
                     <Route path="/likes" element={clubber(<LikesPage />)} />
@@ -240,7 +260,10 @@ const App = () => (
                     <Route path="/sala/:nombre" element={clubber(<PlacePage />)} />
                     <Route path="/chat/:userId" element={clubber(<ChatPage />)} />
                     <Route path="/profile" element={clubber(<ProfilePage />)} />
-                    <Route path="/event/:eventId" element={clubber(<EventDetailPage />)} />
+                    <Route
+                      path="/event/:eventId"
+                      element={<SinCuenta conCuenta={clubber(<EventDetailPage />)} sinCuenta={<PublicEventPage />} />}
+                    />
                     <Route path="/event/:eventId/access" element={clubber(<EventAccessPage />)} />
                     <Route path="/event/:eventId/live" element={clubber(<EventSwipingPage />, { requireEvent: true })} />
 

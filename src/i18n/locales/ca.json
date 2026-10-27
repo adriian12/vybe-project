@@ -2471,6 +2471,7 @@
             "summary": "Resum",
             "total": "Total",
             "freeNote": "Entrada gratuïta: rebràs el QR a l'app i al teu correu.",
+            "freeNoteGuest": "Entrada gratuïta: rebràs el QR al teu correu.",
             "paidNote": "Pagament segur amb Stripe. Ven {{venue}}; t'arribarà l'entrada en PDF al correu.",
             "getFree": "Comprar entrada",
             "pay": "Pagar {{amount}}",
@@ -3750,5 +3751,26 @@
         "notFound": "No hi ha festes en aquesta sala",
         "kind": "Sala",
         "noUpcoming": "No hi ha festes properes en aquesta sala."
+    },
+    "publicEvent": {
+        "notFound": "Aquesta festa ja no hi és",
+        "notFoundBody": "Potser ja ha acabat o l'enllaç no és correcte.",
+        "minAge": "Edat mínima: {{age}} anys",
+        "lineup": "Line-up",
+        "tickets": "Entrades",
+        "buyOutside": "Comprar entrades",
+        "noTickets": "Aquesta festa no ven entrades a Fiestea.",
+        "guestNote": "No cal compte: les teves entrades arriben al correu que posis en comprar.",
+        "appTitle": "Descarrega Fiestea",
+        "appBody": "Totes les festes, les teves entrades i la gent que hi ha dins, al teu mòbil."
+    },
+    "guestOrder": {
+        "title": "Compra feta!",
+        "body": "Les teves entrades van cap al correu que vas posar en comprar.",
+        "bodyTo": "Les teves entrades van cap a {{email}}.",
+        "spam": "Si no les veus d'aquí a uns minuts, mira a la carpeta de correu brossa.",
+        "cancelledTitle": "Pagament cancel·lat",
+        "cancelledBody": "No s'ha cobrat res. Pots tornar-ho a provar des de la festa.",
+        "appBody": "Amb l'app tens les entrades sempre a mà i entres amb el QR."
     }
 }

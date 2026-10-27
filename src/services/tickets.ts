@@ -98,6 +98,31 @@ export interface CheckoutRequest {
   addToAccount: boolean;
   marketing: boolean;
   acceptTerms: boolean;
+  /** Sin cuenta, desde la web (migración 125): al pagar vuelve a «Compra hecha». */
+  guest?: boolean;
+}
+
+/** Lo que se enseña de una fiesta sin cuenta, en la web (migración 125). */
+export interface PublicEvent {
+  id: string;
+  name: string;
+  description: string | null;
+  startDate: string;
+  endDate: string;
+  posterUrl: string | null;
+  placeName: string | null;
+  address: string | null;
+  city: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  lineup: { name: string }[];
+  theme: string | null;
+  minAge: number | null;
+  dressCode: string | null;
+  bookingUrl: string | null;
+  venueName: string;
+  venueLogo: string | null;
+  venueIsPlatform: boolean;
 }
 
 /** Pasarela de Stripe (`url`) o, si era gratis, el pedido ya emitido. */
@@ -384,13 +409,18 @@ export const ticketsService = {
    * Reserva las plazas y abre la pasarela. Si la entrada es gratis no hay
    * pasarela: el pedido sale ya emitido y con el correo enviado.
    */
-  startCheckout: async (input: CheckoutRequest): Promise<CheckoutResult> => {
+  startCheckout: async ({ guest, ...input }: CheckoutRequest): Promise<CheckoutResult> => {
     const { data, error } = await supabase.functions.invoke('stripe-checkout', {
       body: {
         plan: 'tickets',
         ...input,
-        // En la app instalada vuelve por `/pago.html`, que reabre «Entradas».
-        returnUrl: isNative() ? `${APP_URL}/pago.html` : `${window.location.origin}/tickets`,
+        // En la app instalada vuelve por `/pago.html`, que reabre «Entradas»;
+        // sin cuenta, a «Compra hecha» (sus entradas van al correo).
+        returnUrl: isNative()
+          ? `${APP_URL}/pago.html`
+          : guest
+            ? `${window.location.origin}/compra-hecha`
+            : `${window.location.origin}/tickets`,
       },
     });
     let code = (data as { error?: string } | null)?.error;
@@ -408,6 +438,35 @@ export const ticketsService = {
       throw new ApiError(code ?? 'CHECKOUT_FAILED', key);
     }
     return { orderId: res.orderId, url: res.url ?? null, free: Boolean(res.free) };
+  },
+
+  /** La ficha pública de una fiesta (sin cuenta); `null` si no existe o ya pasó. */
+  getPublicEvent: async (eventId: string): Promise<PublicEvent | null> => {
+    const { data, error } = await supabase.rpc('get_public_event' as never, { p_event_id: eventId } as never);
+    const row = error ? undefined : ((data as Record<string, unknown>[] | null) ?? [])[0];
+    if (!row) return null;
+    const lineup = Array.isArray(row.lineup) ? (row.lineup as { name?: string }[]) : [];
+    return {
+      id: String(row.id),
+      name: String(row.name ?? ''),
+      description: (row.description as string | null) ?? null,
+      startDate: String(row.start_date),
+      endDate: String(row.end_date),
+      posterUrl: (row.poster_url as string | null) ?? null,
+      placeName: (row.place_name as string | null) ?? null,
+      address: (row.address as string | null) ?? null,
+      city: (row.city as string | null) ?? null,
+      latitude: (row.latitude as number | null) ?? null,
+      longitude: (row.longitude as number | null) ?? null,
+      lineup: lineup.filter((a) => a?.name).map((a) => ({ name: String(a.name) })),
+      theme: (row.theme as string | null) ?? null,
+      minAge: (row.min_age as number | null) ?? null,
+      dressCode: (row.dress_code as string | null) ?? null,
+      bookingUrl: (row.booking_url as string | null) ?? null,
+      venueName: String(row.venue_name ?? ''),
+      venueLogo: (row.venue_logo as string | null) ?? null,
+      venueIsPlatform: Boolean(row.venue_is_platform),
+    };
   },
 
   getOrder: async (orderId: string): Promise<TicketOrderResult | null> => {

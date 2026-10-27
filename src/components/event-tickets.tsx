@@ -20,9 +20,11 @@ interface EventTicketsProps {
   onCount?: (n: number) => void;
   /** Sin título: va dentro de un desplegable que ya lo lleva. */
   bare?: boolean;
+  /** Sin cuenta (la ficha pública): las entradas no van a «Entradas», sino al correo. */
+  guest?: boolean;
 }
 
-const EventTickets = ({ eventId, kinds, onCount, bare = false }: EventTicketsProps) => {
+const EventTickets = ({ eventId, kinds, onCount, bare = false, guest = false }: EventTicketsProps) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [types, setTypes] = useState<TicketType[]>([]);
@@ -152,7 +154,7 @@ const EventTickets = ({ eventId, kinds, onCount, bare = false }: EventTicketsPro
           );
         })}
       </ul>
-      <p className="text-caption text-party-gray">{t('tickets.buy.note')}</p>
+      {!guest && <p className="text-caption text-party-gray">{t('tickets.buy.note')}</p>}
     </section>
   );
 };

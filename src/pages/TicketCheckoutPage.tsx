@@ -44,6 +44,8 @@ const TicketCheckoutPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { currentUser: user } = useAppContext();
+  // Sin cuenta (la web, migración 125): las entradas sólo van al correo.
+  const invitado = !user;
   const { typeId = '' } = useParams();
   const [searchParams] = useSearchParams();
 
@@ -171,13 +173,16 @@ const TicketCheckoutPage = () => {
           birthdate,
         })),
         buyerEmail: asistentes[0].email.trim().toLowerCase(),
-        addToAccount: aMiCuenta,
+        addToAccount: !invitado && aMiCuenta,
         marketing: publicidad,
         acceptTerms: true,
+        guest: invitado,
       });
       track('tickets_checkout', { kind: info.kind, quantity: unidades, free: resultado.free });
       if (resultado.free || !resultado.url) {
-        navigate(`/tickets/order/${resultado.orderId}`, { replace: true });
+        // Sin cuenta no hay «Entradas»: «Compra hecha» y el correo.
+        if (invitado) navigate('/compra-hecha', { replace: true, state: { email: asistentes[0].email.trim() } });
+        else navigate(`/tickets/order/${resultado.orderId}`, { replace: true });
         return;
       }
       // En el navegador, Stripe vuelve a esta misma pestaña; en la app, al
@@ -414,9 +419,11 @@ const TicketCheckoutPage = () => {
               <Casilla id="publicidad" checked={publicidad} onChange={setPublicidad}>
                 {t('tickets.checkout.marketing', { venue: info.venueName })}
               </Casilla>
-              <Casilla id="a-mi-cuenta" checked={aMiCuenta} onChange={setAMiCuenta}>
-                {t('tickets.checkout.addToAccount')}
-              </Casilla>
+              {!invitado && (
+                <Casilla id="a-mi-cuenta" checked={aMiCuenta} onChange={setAMiCuenta}>
+                  {t('tickets.checkout.addToAccount')}
+                </Casilla>
+              )}
               {/* Información previa a la compra: quién vende y qué derechos hay. */}
               <p className="border-t border-white/10 pt-3 text-caption leading-relaxed text-party-gray">
                 {t('tickets.checkout.seller', {
@@ -443,7 +450,7 @@ const TicketCheckoutPage = () => {
               </dl>
               <p className="mt-3 flex items-start gap-1.5 text-caption text-party-gray">
                 <ShieldCheck size={14} className="mt-0.5 shrink-0" />
-                {gratis ? t('tickets.checkout.freeNote') : t('tickets.checkout.paidNote', { venue: info.venueName })}
+                {gratis ? t(invitado ? 'tickets.checkout.freeNoteGuest' : 'tickets.checkout.freeNote') : t('tickets.checkout.paidNote', { venue: info.venueName })}
               </p>
             </section>
           </>

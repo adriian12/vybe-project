@@ -2471,6 +2471,7 @@
             "summary": "Übersicht",
             "total": "Gesamt",
             "freeNote": "Gratis-Ticket: Den QR-Code bekommst du in der App und per E-Mail.",
+            "freeNoteGuest": "Gratis-Ticket: Den QR-Code bekommst du per E-Mail.",
             "paidNote": "Sichere Zahlung mit Stripe. Verkäufer ist {{venue}}; dein PDF-Ticket kommt per E-Mail.",
             "getFree": "Ticket kaufen",
             "pay": "{{amount}} bezahlen",
@@ -3750,5 +3751,26 @@
         "notFound": "Keine Partys in dieser Location",
         "kind": "Location",
         "noUpcoming": "Keine kommenden Partys in dieser Location."
+    },
+    "publicEvent": {
+        "notFound": "Diese Party gibt es nicht mehr",
+        "notFoundBody": "Sie ist vielleicht vorbei oder der Link ist falsch.",
+        "minAge": "Mindestalter: {{age}} Jahre",
+        "lineup": "Line-up",
+        "tickets": "Tickets",
+        "buyOutside": "Tickets kaufen",
+        "noTickets": "Diese Party verkauft keine Tickets über Fiestea.",
+        "guestNote": "Kein Konto nötig: Deine Tickets gehen an die E-Mail, die du beim Kauf angibst.",
+        "appTitle": "Hol dir Fiestea",
+        "appBody": "Alle Partys, deine Tickets und wer drin ist, auf deinem Handy."
+    },
+    "guestOrder": {
+        "title": "Kauf abgeschlossen!",
+        "body": "Deine Tickets sind unterwegs an die E-Mail, die du angegeben hast.",
+        "bodyTo": "Deine Tickets sind unterwegs an {{email}}.",
+        "spam": "Wenn du sie in ein paar Minuten nicht siehst, schau im Spam-Ordner nach.",
+        "cancelledTitle": "Zahlung abgebrochen",
+        "cancelledBody": "Es wurde nichts abgebucht. Du kannst es bei der Party erneut versuchen.",
+        "appBody": "Mit der App hast du deine Tickets immer dabei und kommst mit dem QR rein."
     }
 }

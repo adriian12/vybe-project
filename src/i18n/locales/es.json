@@ -2471,6 +2471,7 @@
             "summary": "Resumen",
             "total": "Total",
             "freeNote": "Entrada gratuita: recibirás el QR en la app y en tu correo.",
+            "freeNoteGuest": "Entrada gratuita: recibirás el QR en tu correo.",
             "paidNote": "Pago seguro con Stripe. Vende {{venue}}; te llegará la entrada en PDF a tu correo.",
             "getFree": "Comprar entrada",
             "pay": "Pagar {{amount}}",
@@ -3750,5 +3751,26 @@
         "notFound": "No hay fiestas en esta sala",
         "kind": "Sala",
         "noUpcoming": "No hay fiestas próximas en esta sala."
+    },
+    "publicEvent": {
+        "notFound": "Esta fiesta ya no está",
+        "notFoundBody": "Puede que haya terminado o que el enlace esté mal.",
+        "minAge": "Edad mínima: {{age}} años",
+        "lineup": "Line-up",
+        "tickets": "Entradas",
+        "buyOutside": "Comprar entradas",
+        "noTickets": "Esta fiesta no vende entradas en Fiestea.",
+        "guestNote": "No hace falta cuenta: tus entradas llegan al correo que pongas al comprar.",
+        "appTitle": "Descarga Fiestea",
+        "appBody": "Todas las fiestas, tus entradas y la gente que hay dentro, en tu móvil."
+    },
+    "guestOrder": {
+        "title": "¡Compra hecha!",
+        "body": "Tus entradas están en camino al correo que pusiste al comprar.",
+        "bodyTo": "Tus entradas están en camino a {{email}}.",
+        "spam": "Si no las ves en unos minutos, mira en la carpeta de spam.",
+        "cancelledTitle": "Pago cancelado",
+        "cancelledBody": "No se ha cobrado nada. Puedes volver a intentarlo desde la fiesta.",
+        "appBody": "Con la app tienes tus entradas siempre a mano y entras con el QR."
     }
 }

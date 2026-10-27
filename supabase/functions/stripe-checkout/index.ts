@@ -109,8 +109,8 @@ serve(async (req: Request): Promise<Response> => {
 
   try {
     const user = await getUser(req, supabase);
-    if (!user) return json({ error: 'No autenticado' }, 401);
-    if (await overLimit(supabase, req, 'stripe-checkout', 10, { userId: user.id })) return tooManyRequests();
+    // Sin cuenta, por IP y con menos margen (migración 125).
+    if (await overLimit(supabase, req, 'stripe-checkout', user ? 10 : 6, { userId: user?.id })) return tooManyRequests();
 
     const { plan, eventId, returnUrl, quantity, action, ticketTypeId, holders, buyerEmail, addToAccount, marketing, acceptTerms } =
       (await req.json()) as {
@@ -130,9 +130,13 @@ serve(async (req: Request): Promise<Response> => {
 
     const base = returnUrl ?? Deno.env.get('APP_URL') ?? '';
 
+    // Sin cuenta sólo se compran entradas (desde la web, migración 125): lo
+    // demás (Premium, destacar…) es de una cuenta.
+    if (!user && plan !== 'tickets') return json({ error: 'No autenticado' }, 401);
+
     // Cancelar la mensual: se para la renovación en Stripe y se conserva lo
     // pagado hasta el final del mes (el webhook la da de baja entonces).
-    if (action === 'cancel') {
+    if (action === 'cancel' && user) {
       const profileId = await getProfileId(supabase, user.id);
       if (!profileId) return json({ error: 'Perfil no encontrado' }, 404);
       const { data: sub } = await supabase
@@ -161,7 +165,7 @@ serve(async (req: Request): Promise<Response> => {
 
     // Destacar un evento: pago único por noche. El evento tiene que ser del
     // local de quien paga y no haber terminado.
-    if (plan === 'event_boost') {
+    if (plan === 'event_boost' && user) {
       if (!eventId) return json({ error: 'Falta el evento' }, 400);
       const venue = await localDe(supabase, user.id);
       if (!venue) return json({ error: 'No es una cuenta de local' }, 403);
@@ -210,8 +214,12 @@ serve(async (req: Request): Promise<Response> => {
     // `ticket_type_taken()` tarda en liberarlas.
     if (plan === 'tickets') {
       if (!ticketTypeId) return json({ error: 'Falta el tipo de entrada' }, 400);
-      const profileId = await getProfileId(supabase, user.id);
-      if (!profileId) return json({ error: 'Perfil no encontrado' }, 404);
+      // Sin cuenta (la web): el pedido va sin perfil y las entradas sólo al
+      // correo del formulario, que entonces es obligatorio.
+      const profileId = user ? await getProfileId(supabase, user.id) : null;
+      if (user && !profileId) return json({ error: 'Perfil no encontrado' }, 404);
+      const correoInvitado = (buyerEmail ?? '').trim().toLowerCase();
+      if (!user && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correoInvitado)) return json({ error: 'BAD_HOLDERS' }, 400);
 
       if (!acceptTerms) return json({ error: 'TERMS_REQUIRED' }, 400);
       const unidadesPedidas = Math.floor(Number(quantity ?? 1));
@@ -232,8 +240,8 @@ serve(async (req: Request): Promise<Response> => {
         p_type_id: ticketTypeId,
         p_quantity: unidadesPedidas,
         p_holders: asistentes,
-        p_buyer_email: (buyerEmail ?? user.email ?? '').trim().toLowerCase() || null,
-        p_add_to_account: addToAccount !== false,
+        p_buyer_email: (buyerEmail ?? user?.email ?? '').trim().toLowerCase() || null,
+        p_add_to_account: Boolean(user) && addToAccount !== false,
         p_marketing: marketing === true,
       });
       if (errorPedido) {
@@ -292,16 +300,18 @@ serve(async (req: Request): Promise<Response> => {
         'line_items[0][price_data][product_data][name]': `${pedido.type_name} · ${pedido.event_name}`,
         success_url: `${base}${separador}tickets=success&order=${pedido.order_id}`,
         cancel_url: `${base}${separador}tickets=cancelled`,
-        client_reference_id: profileId,
         'metadata[kind]': 'tickets',
         'metadata[order_id]': pedido.order_id,
-        'metadata[profile_id]': profileId,
         expires_at: String(Math.floor(Date.now() / 1000) + 30 * 60 + 30),
         locale: 'auto',
         'payment_intent_data[metadata][order_id]': pedido.order_id,
       });
+      if (profileId) {
+        entradas.set('client_reference_id', profileId);
+        entradas.set('metadata[profile_id]', profileId);
+      }
       if (comision > 0) entradas.set('payment_intent_data[application_fee_amount]', String(comision));
-      const correoComprador = (buyerEmail ?? user.email ?? '').trim().toLowerCase();
+      const correoComprador = (buyerEmail ?? user?.email ?? '').trim().toLowerCase();
       if (correoComprador) entradas.set('customer_email', correoComprador);
 
       // Cargo directo: la sesión se crea en la cuenta de Stripe del negocio
@@ -356,6 +366,9 @@ serve(async (req: Request): Promise<Response> => {
         plan === 'venue_pro' ? 'Fiestea Pro para negocios' : 'Fiestea Business para negocios',
       );
     }
+
+    // De aquí en adelante, todo es de una cuenta.
+    if (!user) return json({ error: 'No autenticado' }, 401);
 
     if (esPlanDeLocal(plan)) {
       // El plan lo paga el local, así que el cobro va contra su fila y no

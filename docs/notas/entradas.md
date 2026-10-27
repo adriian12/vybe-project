@@ -217,3 +217,17 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
     (`matchEvent`) para enseñar el cartel y la ficha.
   - pdf.js pinta con `intent: 'print'`: con `display` usa requestAnimationFrame
     y se para si la app pasa a segundo plano.
+- **Ficha pública y compra sin cuenta** (migración 125, `PublicEventPage`,
+  `GuestOrderDonePage`).
+  - `/event/:id` y `/tickets/buy/:typeId` se abren sin sesión: en la web
+    (`MODE` landing o app) siempre la versión pública; en la app y en local, la
+    de siempre si hay sesión de fiester@ (`SinCuenta` en `App.tsx`).
+  - `get_public_event` sólo devuelve fiestas sin terminar de locales
+    verificados o de la plataforma; `get_event_ticket_types` y
+    `get_ticket_checkout` están concedidas a `anon`.
+  - `stripe-checkout` va con `verify_jwt = false`: sin usuario sólo admite
+    `plan: 'tickets'`, exige un correo válido, limita por IP y nunca añade las
+    entradas a una cuenta (`p_add_to_account` falso, sin `profile_id`). Vuelve a
+    `/compra-hecha`; las entradas llegan sólo al correo.
+  - En la ficha pública `EventTickets` va con `guest` (sin la nota de
+    «Entradas») y el resumen de compra usa `freeNoteGuest`.
