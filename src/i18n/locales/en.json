@@ -375,7 +375,7 @@
             "today": "Today",
             "tomorrow": "Tomorrow",
             "weekend": "This weekend",
-            "week": "This week",
+            "week": "Next week",
             "date": "Date"
         },
         "schedule": "Time",
@@ -1844,7 +1844,9 @@
             "colDocs": "Documents",
             "colRequested": "Requested",
             "colActions": "Actions",
-            "document": "Document {{n}}"
+            "document": "Document {{n}}",
+            "rejectConfirm": "Reject \"{{name}}\"? The business is deleted and, if the account was only for it, the account too: the email, phone and tax ID become free. This cannot be undone.",
+            "trial": "trial"
         },
         "events": {
             "title": "Events",
@@ -2862,7 +2864,8 @@
             "soon": "Coming soon"
         },
         "meta": {
-            "description": "Discover the parties near you, buy your ticket and get in with the QR. For businesses: ticket sales, guest lists, live capacity and alerts."
+            "description": "Discover the parties near you, buy your ticket and get in with the QR. For businesses: ticket sales, guest lists, live capacity and alerts.",
+            "title": "Every party on your phone"
         },
         "whatsapp": {
             "label": "Message us on WhatsApp",

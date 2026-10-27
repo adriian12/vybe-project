@@ -42,7 +42,6 @@ const plantilla = (tipo: 'user' | 'venue', nombre: string, link: string) => {
     heading: c.title,
     paragraphs: [`Hola ${nombre || ''}.`, c.body],
     buttons: [{ text: c.cta, url: link }],
-    showLink: link,
     note: 'Si no esperabas este correo, puedes ignorarlo.',
   });
   return { html, text, subject: c.subject };

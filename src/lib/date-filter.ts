@@ -51,8 +51,12 @@ export const nightsOf = (sel: DateSelection): string[] => {
       return [hoy];
     case 'tomorrow':
       return [addNights(hoy, 1)];
-    case 'week':
-      return Array.from({ length: 7 }, (_, i) => addNights(hoy, i));
+    case 'week': {
+      // «Próxima semana»: de lunes a domingo de la semana que viene.
+      const dia = aFecha(hoy).getDay(); // 0 domingo … 6 sábado
+      const hastaLunes = dia === 0 ? 1 : 8 - dia;
+      return Array.from({ length: 7 }, (_, i) => addNights(hoy, hastaLunes + i));
+    }
     case 'weekend': {
       // Viernes, sábado y domingo de esta semana (desde hoy si ya es finde).
       const dia = aFecha(hoy).getDay(); // 0 domingo … 6 sábado

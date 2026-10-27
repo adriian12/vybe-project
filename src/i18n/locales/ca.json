@@ -375,7 +375,7 @@
             "today": "Avui",
             "tomorrow": "Demà",
             "weekend": "Aquest cap de setmana",
-            "week": "Aquesta setmana",
+            "week": "Setmana vinent",
             "date": "Data"
         },
         "schedule": "Horari",
@@ -1844,7 +1844,9 @@
             "colDocs": "Documents",
             "colRequested": "Sol·licitat",
             "colActions": "Accions",
-            "document": "Document {{n}}"
+            "document": "Document {{n}}",
+            "rejectConfirm": "Denegar «{{name}}»? S'esborra el negoci i, si el compte només era seu, també el compte: el correu, el telèfon i el NIF queden lliures. No es pot desfer.",
+            "trial": "prova"
         },
         "events": {
             "title": "Esdeveniments",
@@ -2862,7 +2864,8 @@
             "soon": "Aviat"
         },
         "meta": {
-            "description": "Descobreix les festes a prop teu, compra la teva entrada i entra amb el QR. Per a negocis: venda d’entrades, llistes, aforament en directe i avisos."
+            "description": "Descobreix les festes a prop teu, compra la teva entrada i entra amb el QR. Per a negocis: venda d’entrades, llistes, aforament en directe i avisos.",
+            "title": "Totes les festes al teu mòbil"
         },
         "whatsapp": {
             "label": "Escriu-nos per WhatsApp",

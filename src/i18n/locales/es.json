@@ -375,7 +375,7 @@
             "today": "Hoy",
             "tomorrow": "Mañana",
             "weekend": "Este finde",
-            "week": "Esta semana",
+            "week": "Próxima semana",
             "date": "Fecha"
         },
         "schedule": "Horario",
@@ -1844,7 +1844,9 @@
             "colDocs": "Documentos",
             "colRequested": "Solicitado",
             "colActions": "Acciones",
-            "document": "Documento {{n}}"
+            "document": "Documento {{n}}",
+            "rejectConfirm": "¿Denegar «{{name}}»? Se borra el negocio y, si la cuenta sólo era suya, también la cuenta: el correo, el teléfono y el NIF quedan libres. No se puede deshacer.",
+            "trial": "prueba"
         },
         "events": {
             "title": "Eventos",
@@ -2862,7 +2864,8 @@
             "soon": "Próximamente"
         },
         "meta": {
-            "description": "Descubre las fiestas cerca de ti, compra tu entrada y entra con el QR. Para negocios: venta de entradas, listas, aforo en directo y avisos."
+            "description": "Descubre las fiestas cerca de ti, compra tu entrada y entra con el QR. Para negocios: venta de entradas, listas, aforo en directo y avisos.",
+            "title": "Todas las fiestas en tu móvil"
         },
         "whatsapp": {
             "label": "Escríbenos por WhatsApp",

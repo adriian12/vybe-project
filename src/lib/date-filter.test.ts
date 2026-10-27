@@ -35,6 +35,18 @@ describe('filtro de fecha', () => {
     expect(nightsOf({ mode: 'weekend' })).toEqual(['2026-09-26', '2026-09-27']);
   });
 
+  it('la próxima semana va del lunes que viene al domingo', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-10-28T12:00:00')); // miércoles
+    expect(nightsOf({ mode: 'week' })).toEqual([
+      '2026-11-02', '2026-11-03', '2026-11-04', '2026-11-05', '2026-11-06', '2026-11-07', '2026-11-08',
+    ]);
+    vi.setSystemTime(new Date('2026-11-01T12:00:00')); // domingo
+    expect(nightsOf({ mode: 'week' })[0]).toBe('2026-11-02');
+    vi.setSystemTime(new Date('2026-11-02T12:00:00')); // lunes: la siguiente, no ésta
+    expect(nightsOf({ mode: 'week' })[0]).toBe('2026-11-09');
+  });
+
   it('«cerca de esa fecha» son dos noches antes o después, nunca pasadas', () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date('2026-09-25T12:00:00'));

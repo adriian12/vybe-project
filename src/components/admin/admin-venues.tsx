@@ -129,6 +129,8 @@ const AdminVenues = () => {
                       )}
                     >
                       {t(`venue.plan.names.${venue.plan}`)}
+                      {/* La prueba gratis de Pro de los negocios nuevos: que no parezca de pago. */}
+                      {venue.planStatus === 'trialing' ? ` · ${t('admin.venues.trial')}` : ''}
                     </span>
                     <span className="flex items-center gap-0.5 rounded-full bg-black/[0.06] px-1.5 py-0.5 text-[10px] font-bold text-ink/60">
                       <CalendarDays size={10} />

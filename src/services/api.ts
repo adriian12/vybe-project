@@ -1600,6 +1600,15 @@ export const api = {
   },
 
   reviewVenue: async (venueId: string, approve: boolean): Promise<void> => {
+    // Denegar borra el negocio (y su cuenta, si sólo era suya): el correo, el
+    // teléfono y el NIF quedan libres para volver a darse de alta.
+    if (!approve) {
+      const { data, error } = await supabase.functions.invoke('admin-reject-venue', { body: { venueId } });
+      if (error || (data as { error?: string } | null)?.error) {
+        throw new ApiError('REVIEW_FAILED', 'No se pudo denegar el local');
+      }
+      return;
+    }
     const { error } = await supabase
       .from('venues')
       .update({

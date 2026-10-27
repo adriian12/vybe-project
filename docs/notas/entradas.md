@@ -15,6 +15,9 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
     (`ticket-validator.tsx`, `validate_event_ticket`) o en el validador de
     vales.
   - **Stripe Connect** (migración 069, Edge Function `stripe-connect`).
+    - **Web del negocio en Stripe:** la suya (`venues.website`) o, si no tiene,
+      `https://fiestea.es`. Antes era su ficha en `app.fiestea.es/local/…`, que
+      en el navegador sólo dice que Fiestea se usa desde el móvil.
     - **Cuentas:** cada negocio cobra en su propia cuenta, **sin panel de
       Stripe** (`dashboard: 'none'`): no se crea usuario ni contraseña de
       Stripe. Sus cobros, transferencias, contracargos y datos bancarios los

@@ -301,7 +301,6 @@ serve(async (req: Request): Promise<Response> => {
         heading: copy.heading,
         paragraphs: [copy.body],
         buttons: [{ text: copy.cta, url: link }],
-        showLink: link,
         note: copy.ignore,
       });
       try {

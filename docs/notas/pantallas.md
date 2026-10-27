@@ -72,6 +72,11 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
 - **Hoja de filtros del mapa** en columna: la lista se desplaza y el pie
   («Quitar filtros», «Ver N fiestas») queda abajo; con el pie `sticky` y la
   atribución detrás, el pie se quedaba a media hoja.
+- **Última ubicación** (`fiestea_last_position`, 30 días): inicio y mapa la
+  usan al abrir mientras llega la de ahora; antes, hasta tenerla, se veían
+  fiestas de toda España.
+- **«Próxima semana»** (antes «Esta semana»): de lunes a domingo de la semana
+  que viene (`nightsOf`, con test).
 - **Inicio, sólo tu zona**: con ubicación, las fiestas a menos de 80 km
   (`RADIO_ZONA_M`): Mallorca entera desde Palma, sin Ibiza ni la península;
   Madrid con sus alrededores. Destacadas y calendario, igual. Sin ubicación o

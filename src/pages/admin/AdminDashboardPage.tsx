@@ -301,7 +301,9 @@ const AdminDashboardPage = () => {
       approve ? 'admin.photos.approved' : 'admin.photos.rejected',
     );
 
-  const revisarLocal = (venue: Venue, approve: boolean) =>
+  const revisarLocal = (venue: Venue, approve: boolean) => {
+    // Denegar lo borra entero (Edge Function admin-reject-venue): se pregunta antes.
+    if (!approve && !window.confirm(t('admin.venues.rejectConfirm', { name: venue.name }))) return;
     void run(
       venue.id,
       async () => {
@@ -310,6 +312,7 @@ const AdminDashboardPage = () => {
       },
       approve ? 'admin.venues.approved' : 'admin.venues.rejected',
     );
+  };
 
   const cerrarReporte = (report: Report, status: 'resolved' | 'dismissed') =>
     void run(

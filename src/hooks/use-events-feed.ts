@@ -32,6 +32,32 @@ export const isEventTonight = (event: Event, now = Date.now()): boolean =>
  * mapa, las entradas y el detalle de un evento, y cada una lo habría pedido a
  * su manera, con contadores distintos para el mismo evento.
  */
+const ULTIMA_POSICION_KEY = 'fiestea_last_position';
+
+/** La última posición guardada; `null` si no hay o es de hace más de 30 días. */
+const leerUltimaPosicion = (): Coordinates | null => {
+  try {
+    const guardada = JSON.parse(localStorage.getItem(ULTIMA_POSICION_KEY) ?? 'null') as
+      | { latitude: number; longitude: number; at: number }
+      | null;
+    if (!guardada || Date.now() - guardada.at > 30 * 86_400_000) return null;
+    return { latitude: guardada.latitude, longitude: guardada.longitude };
+  } catch {
+    return null;
+  }
+};
+
+const guardarUltimaPosicion = (coords: Coordinates) => {
+  try {
+    localStorage.setItem(
+      ULTIMA_POSICION_KEY,
+      JSON.stringify({ latitude: coords.latitude, longitude: coords.longitude, at: Date.now() }),
+    );
+  } catch {
+    // Sin almacenamiento sólo se pierde el recuerdo.
+  }
+};
+
 export const useEventsFeed = () => {
   const { events, refreshEvents, currentUser } = useAppContext();
   const invitado = currentUser?.accountType === 'guest';
@@ -39,7 +65,13 @@ export const useEventsFeed = () => {
   const { toast } = useToast();
 
   const [isLoading, setIsLoading] = useState(true);
-  const [position, setPosition] = useState<Coordinates | null>(null);
+  // La última posición conocida se usa al abrir, mientras llega la de ahora:
+  // sin ella, inicio enseñaba fiestas de toda España hasta tener ubicación.
+  const [position, setPositionEstado] = useState<Coordinates | null>(leerUltimaPosicion);
+  const setPosition = useCallback((coords: Coordinates) => {
+    setPositionEstado(coords);
+    guardarUltimaPosicion(coords);
+  }, []);
   const [locationDenied, setLocationDenied] = useState(false);
   const [activity, setActivity] = useState<Activity>({});
   const [intents, setIntents] = useState<string[]>([]);
@@ -71,7 +103,7 @@ export const useEventsFeed = () => {
     return () => {
       cancelled = true;
     };
-  }, [refreshEvents]);
+  }, [refreshEvents, setPosition]);
 
   // Contadores de actividad, refrescados cada minuto: es lo que rompe el
   // problema de la sala vacía.
@@ -166,7 +198,7 @@ export const useEventsFeed = () => {
       setLocationDenied(true);
       return null;
     }
-  }, []);
+  }, [setPosition]);
 
   return {
     events,

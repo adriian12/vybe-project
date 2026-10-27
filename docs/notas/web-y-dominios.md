@@ -40,6 +40,10 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
   (Organization, WebSite, MobileApplication, sin valoraciones inventadas).
   Cada página pública cambia título, descripción y canonical con `setSeo()`
   (`src/lib/seo.ts`). `public/sitemap.xml` y `robots.txt` están en `public/`.
+  Título: «Fiestea · Todas las fiestas en tu móvil» (`landing.meta.title`).
+  Google sólo enseña el icono si hay uno de un tamaño múltiplo de 48 px: los
+  PNG de 48, 96 y 144 (`public/icons/`) van antes que el SVG. Google tarda en
+  volver a leerlos; en Search Console se puede pedir que indexe la portada.
   Las visitas se cuentan con la analítica propia (`page_view`,
   `page-view-tracker.tsx`), sin cookies. El botón de WhatsApp de la landing
   sólo sale con `VITE_WHATSAPP_NUMBER`.

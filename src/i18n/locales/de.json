@@ -375,7 +375,7 @@
             "today": "Heute",
             "tomorrow": "Morgen",
             "weekend": "Dieses Wochenende",
-            "week": "Diese Woche",
+            "week": "Nächste Woche",
             "date": "Datum"
         },
         "schedule": "Uhrzeit",
@@ -1844,7 +1844,9 @@
             "colDocs": "Dokumente",
             "colRequested": "Beantragt",
             "colActions": "Aktionen",
-            "document": "Dokument {{n}}"
+            "document": "Dokument {{n}}",
+            "rejectConfirm": "„{{name}}“ ablehnen? Das Lokal wird gelöscht und, wenn das Konto nur dafür war, auch das Konto: E-Mail, Telefon und Steuernummer werden frei. Das kann nicht rückgängig gemacht werden.",
+            "trial": "Test"
         },
         "events": {
             "title": "Events",
@@ -2862,7 +2864,8 @@
             "soon": "Demnächst"
         },
         "meta": {
-            "description": "Entdecke die Partys in deiner Nähe, kauf dein Ticket und komm mit dem QR-Code rein. Für Betriebe: Ticketverkauf, Gästelisten, Live-Auslastung und Hinweise."
+            "description": "Entdecke die Partys in deiner Nähe, kauf dein Ticket und komm mit dem QR-Code rein. Für Betriebe: Ticketverkauf, Gästelisten, Live-Auslastung und Hinweise.",
+            "title": "Alle Partys auf deinem Handy"
         },
         "whatsapp": {
             "label": "Schreib uns auf WhatsApp",

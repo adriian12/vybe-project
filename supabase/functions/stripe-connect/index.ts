@@ -106,6 +106,13 @@ const guardarEstado = async (
   };
 };
 
+/** Una web válida para Stripe: la del negocio (con https) o la de Fiestea. */
+const webDelNegocio = (web: string | null | undefined): string => {
+  const limpia = (web ?? '').trim();
+  if (!limpia) return 'https://fiestea.es';
+  return /^https?:\/\//i.test(limpia) ? limpia : `https://${limpia}`;
+};
+
 serve(async (req: Request): Promise<Response> => {
   const early = preflight(req);
   if (early) return early;
@@ -131,7 +138,7 @@ serve(async (req: Request): Promise<Response> => {
     // miembro con papel de propietario.
     let { data: venue } = await supabase
       .from('venues')
-      .select('id, name, email, stripe_account_id, stripe_charges_enabled')
+      .select('id, name, email, website, stripe_account_id, stripe_charges_enabled')
       .eq('venue_id', user.id)
       .maybeSingle();
     if (!venue) {
@@ -191,7 +198,10 @@ serve(async (req: Request): Promise<Response> => {
             // negocio (y Stripe si su saldo no llega), no la plataforma.
             responsibilities: { fees_collector: 'stripe', losses_collector: 'stripe' },
             profile: {
-              business_url: `${appUrl}/local/${venue.id}`,
+              // La web del negocio; si no tiene, la de Fiestea. Antes era su
+              // ficha en app.fiestea.es, que en el navegador sólo dice que
+              // Fiestea se usa desde el móvil.
+              business_url: webDelNegocio(venue.website),
               product_description: 'Venta de entradas y reservas de mesa para sus fiestas.',
             },
           },

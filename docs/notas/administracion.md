@@ -50,6 +50,13 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
   corrigieron 21, todas pasadas. Fourvenues está detrás de Cloudflare y el
   usuario no quiere que se use su Chrome para esto. `funout_upsert_event`
   ya no pisa un enlace de Fourvenues corregido si apunta al mismo evento.
+- **Denegar un negocio lo borra** (Edge Function `admin-reject-venue`, con
+  confirmación): logo, documentos y la fila de `venues` (lo que cuelga va en
+  cascada) y, si la cuenta sólo era del negocio (sin perfil de fiester@ o con
+  `staff_only`, y sin otros negocios), también la cuenta de acceso. Así el
+  correo, el teléfono y el NIF quedan libres. Sólo con negocios sin aprobar.
+- **Plan de un negocio nuevo**: al aprobarlo tiene 30 días de Pro de prueba
+  (`venues_start_trial`); administración lo enseña como «Pro · prueba».
 - **Activar funciones en bloque** (migración 121): en Eventos se marcan
   fiestas y «Activar funciones» enciende, apaga o deja igual (`NULL`) Entrar al
   evento, Flechazo, Recuento, % hombres y mujeres y Lista Fiestea, con

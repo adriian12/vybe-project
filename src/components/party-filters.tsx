@@ -15,7 +15,7 @@ const pill = (activa: boolean) =>
   );
 
 // «Mañana» ya no sale (está en el calendario): así caben en una fila sin
-// desplazarse. «week» se lee «Esta semana» (los próximos 7 días).
+// desplazarse. «week» es «Próxima semana» (de lunes a domingo).
 const ATAJOS: Exclude<DateMode, 'date'>[] = ['today', 'weekend', 'week'];
 
 /** «Hoy», «Mañana», «Este finde», «Próximos 7 días» o «sáb. 27 sept.». */

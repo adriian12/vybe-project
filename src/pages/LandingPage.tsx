@@ -113,7 +113,7 @@ const LandingPage = () => {
   const appHome = userType === 'venue' ? '/venue/dashboard' : userType === 'admin' ? '/admin/dashboard' : '/home';
 
   useEffect(() => {
-    setSeo({ title: `Fiestea · ${t('landing.hero.pill')}`, description: t('landing.meta.description'), path: '/' });
+    setSeo({ title: `Fiestea · ${t('landing.meta.title')}`, description: t('landing.meta.description'), path: '/' });
   }, [t]);
 
   useEffect(() => {
