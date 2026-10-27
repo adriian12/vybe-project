@@ -9,7 +9,7 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
   dentro de la app salía la hoja en blanco.
 - **Avisos del local** (migración 053). `queue_broadcast()` acepta
   `scheduled_at`: sin hora sale en la siguiente pasada de `notify-events`, con
-  hora espera a esa hora. Programados a la vez: 1 en Gratis y 20 en Pro y
+  hora espera a esa hora. Programados a la vez: 1 en Gratis y 20 en
   Business (`venue_scheduled_broadcast_limit`). Se anulan con
   `cancel_broadcast()`. No se puede programar después del final del evento.
 - **Aforo real y contador de puerta** (migración 040). La app sólo sabía de
@@ -24,7 +24,7 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
   aforo) y sólo si el local actualizó hace menos de 45 min con el evento en
   marcha (`fresh_headcount()`). Sin aforo no se puede contar. Los cortes viven
   en `vibe_level_for()` y en `src/lib/vibe.ts`: si cambias uno, cambia el otro.
-  La curva de la noche (`get_headcount_curve`) es de Pro y Business.
+  La curva de la noche (`get_headcount_curve`) es de Business.
 - **Alertas de ayuda (SOS)** (migraciones 066 y 067).
   - Se atienden en **Puerta**: `venue-sos-alerts.tsx` va encima del recuento.
     Fuera de Puerta, una franja roja lleva allí.
@@ -239,9 +239,24 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
     `VENUE_PRICE_CENTS` (`stripe-checkout`). Si cambias uno, cambia el otro. Sin
     `STRIPE_PRICE_VENUE_*`, el cobro usa `price_data` en línea.
   - **Prueba gratis:** al aprobar un local, `venues_start_trial` le da 30 días de
-    Pro con `status 'trialing'`, y `venue_plan()` la acepta.
+    Business con `status 'trialing'`, y `venue_plan()` la acepta.
   - **Informe semanal:** calcula `brought_people` (vinieron con «voy a ir», con
     código de RRPP o porque siguen al local) y
     `estimated_revenue = personas × (avg_spend + entrada)`. El gasto medio no
     lo ve nadie más y se guarda con `set_venue_avg_spend()`, que vuelve a
     calcular el informe de la semana pasada.
+- **Dos planes: Gratis y Business** (migración 126; Pro ya no existe).
+  - **Gratis:** 3 eventos activos a la vez, equipo de 3, puerta (aforo,
+    contador, escáner y SOS), venta de entradas, listas y previsión.
+  - **Business (69,99 €/mes):** eventos y equipo sin límite, RRPP con códigos
+    y comisiones, promociones, valoraciones, públicos, curva de aforo,
+    demografía, exportar y un destacado al mes incluido.
+  - Sin límite es `NULL` en `venue_plan_limits()`: `v_current >= NULL` no es
+    cierto y los disparadores dejan pasar. En la interfaz, `events`/`team`
+    `null` en `PLANS` y `maxActiveEvents` `null` en el estado del plan.
+  - `venue_subscriptions.plan` sólo admite `free` y `business`; las 22
+    pruebas de Pro pasaron a Business con la misma fecha de fin.
+  - **Destacado incluido:** `get_included_boosts_left()` (uno por mes natural,
+    hora de Madrid) y `use_included_boost(evento)`, sólo el dueño; deja una
+    fila en `event_boosts` con `included` y 0 €. El diálogo de destacar del
+    panel lo ofrece antes que el pago.
