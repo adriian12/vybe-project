@@ -1247,7 +1247,7 @@
             "perMonth": "{{price}} €/Monat",
             "trialNote": "Der erste Monat ist gratis: {{count}} Tage Business nach Freigabe deiner Location.",
             "keepPlan": "Bei {{plan}} bleiben",
-            "boostNote": "Ein Event hervorheben kostet {{price}} € pro Nacht in jedem Tarif: Es erscheint zuerst in der App, bis es endet. Business enthält eins pro Monat.",
+            "boostNote": "Ein Event hervorheben kostet {{price}} € pro Nacht; mit Business {{business}} € und eins pro Monat inklusive.",
             "unlimited": "unbegrenzt",
             "eventsUnlimited": "Unbegrenzt Events",
             "teamUnlimited": "Unbegrenztes Team"
@@ -1561,15 +1561,16 @@
         "planChipTrial": "{{plan}} · Test",
         "boost": {
             "badge": "Hervorgehoben",
-            "action": "Hervorheben ({{price}} €)",
+            "action": "Hervorheben",
             "title": "„{{name}}“ hervorheben",
-            "body": "Für {{price}} € steht es auf der Startseite und der Karte der App ganz oben, mit dem Label „Hervorgehoben“, bis die Party endet. Einmalzahlung.",
+            "body": "Es steht auf der Startseite und der Karte der App ganz oben, mit dem Label „Hervorgehoben“, bis die Party endet. Einmalzahlung.",
             "pay": "{{price}} € bezahlen",
             "paid": "Event hervorgehoben",
             "paidBody": "Es steht jetzt in der App ganz oben. Danke.",
             "useIncluded": "Highlight des Monats nutzen",
             "includedBody": "Dein Business-Tarif enthält ein Highlight pro Monat, und du hast es noch nicht genutzt: Es wird nichts berechnet.",
-            "includedLeft": "Hervorheben (inklusive)"
+            "includedLeft": "Hervorheben (inklusive)",
+            "businessPrice": "Business-Preis"
         },
         "followers": {
             "title": "Follower der Location",
@@ -2661,13 +2662,32 @@
                     "map": {
                         "title": "Karte der Nacht",
                         "body": "Sieh vor dem Ausgehen, welche Partys in der Nähe sind und wie viel los ist, ohne einzelne Personen zu sehen."
+                    },
+                    "tickets": {
+                        "title": "Tickets auf dem Handy",
+                        "body": "Kauf dein Ticket in der App, komm mit dem QR-Code rein und speicher es in Apple Wallet oder Google Wallet."
+                    },
+                    "explore": {
+                        "title": "Partys in ganz Spanien",
+                        "body": "Such nach Stadt und filtere nach Datum und Musikstil, um deinen Plan zu finden."
+                    },
+                    "lineup": {
+                        "title": "Alles über jede Party",
+                        "body": "Line-up, Uhrzeit, Preis und Anfahrt, bevor du das Haus verlässt."
+                    },
+                    "follow": {
+                        "title": "Folge deinen Locations",
+                        "body": "Wir benachrichtigen dich auf dem Handy, sobald sie eine neue Party veröffentlichen."
+                    },
+                    "rating": {
+                        "title": "Bewerte die Nacht",
+                        "body": "Bewerte Musik, Stimmung und Preis und hilf anderen bei der Wahl."
                     }
                 }
             },
             "venues": {
                 "eyebrow": "Für Locations",
                 "title": "Deine Location live im Griff",
-                "cta": "Demo anfragen",
                 "ctaSecondary": "Location registrieren",
                 "items": {
                     "access": {
@@ -2778,8 +2798,6 @@
             "perMonth": "/Monat",
             "trial": "Erster Monat gratis",
             "ctaTrial": "Business gratis testen",
-            "boostTitle": "Event hervorheben: {{price}} € pro Nacht",
-            "boostBody": "In jedem Tarif, mit Business einmal im Monat inklusive. Deine Party erscheint ganz oben auf der Startseite und der Karte der App, bis sie endet.",
             "vat": "Preise zzgl. MwSt. Monatliche Zahlung, ohne Mindestlaufzeit."
         },
         "faq": {
@@ -2804,7 +2822,7 @@
                 },
                 "where": {
                     "q": "Wo funktioniert Fiestea?",
-                    "a": "Wir starten auf Mallorca. Wenn deine Location woanders ist, schreib uns und wir melden uns, sobald wir dort sind."
+                    "a": "Wir starten auf Mallorca, in Madrid, Barcelona und Alicante. Wenn deine Location woanders ist, schreib uns und wir melden uns, sobald wir dort sind."
                 },
                 "apps": {
                     "q": "Wo lade ich Fiestea herunter?",
@@ -2819,7 +2837,7 @@
         },
         "form": {
             "title": "Hast du einen Club, eine Bar oder ein Festival?",
-            "body": "Hinterlass deine Daten und wir zeigen dir Fiestea in einem 15-minütigen Anruf.",
+            "body": "Hinterlass deine Daten und wir erzählen dir, wie Fiestea für deine Location funktioniert.",
             "venueName": "Name der Location",
             "city": "Stadt oder Gegend (z. B. Palma, Magaluf)",
             "type": "Art der Location",
@@ -2834,10 +2852,10 @@
             "contact": "E-Mail oder Telefon",
             "message": "Sollten wir noch etwas wissen? (optional)",
             "consent": "Ich bin einverstanden, dass Fiestea diese Daten nutzt, um mich wegen meiner Location zu kontaktieren, gemäß der <privacy>Datenschutzerklärung</privacy>.",
-            "submit": "Demo anfragen",
+            "submit": "Kontakt aufnehmen",
             "sending": "Wird gesendet…",
             "successTitle": "Angekommen!",
-            "successBody": "Wir melden uns sehr bald, um die Demo zu vereinbaren.",
+            "successBody": "Wir melden uns sehr bald.",
             "again": "Weitere Anfrage senden",
             "orEmail": "Lieber per E-Mail? Schreib uns an {{email}}",
             "errors": {
@@ -2856,12 +2874,11 @@
             "signup": "App herunterladen",
             "registerVenue": "Location registrieren",
             "venueLogin": "Login für Locations",
-            "demo": "Demo anfragen",
+            "demo": "Kontakt",
             "privacy": "Datenschutz",
             "terms": "AGB",
             "contact": "Kontakt",
             "rights": "© {{year}} Fiestea. Alle Rechte vorbehalten.",
-            "made": "Gemacht in Palma de Mallorca",
             "cookies": "Cookies",
             "notice": "Impressum",
             "allLegal": "Alle rechtlichen Hinweise"

@@ -1247,7 +1247,7 @@
             "perMonth": "{{price}} €/mes",
             "trialNote": "El primer mes es gratis: {{count}} días de Business al aprobar tu negocio.",
             "keepPlan": "Seguir con {{plan}}",
-            "boostNote": "Destacar un evento cuesta {{price}} € por noche en cualquier plan: sale primero en la app hasta que termina. Business incluye uno al mes.",
+            "boostNote": "Destacar un evento cuesta {{price}} € por noche; con Business, {{business}} € y uno al mes incluido.",
             "unlimited": "sin límite",
             "eventsUnlimited": "Eventos sin límite",
             "teamUnlimited": "Equipo sin límite"
@@ -1561,15 +1561,16 @@
         "planChipTrial": "{{plan}} · prueba",
         "boost": {
             "badge": "Destacado",
-            "action": "Destacar ({{price}} €)",
+            "action": "Destacar",
             "title": "Destacar «{{name}}»",
-            "body": "Por {{price}} € sale el primero en inicio y en el mapa de la app, con la etiqueta «Destacado», hasta que termine la fiesta. Es un pago único.",
+            "body": "Sale el primero en inicio y en el mapa de la app, con la etiqueta «Destacado», hasta que termine la fiesta. Es un pago único.",
             "pay": "Pagar {{price}} €",
             "paid": "Evento destacado",
             "paidBody": "Ya sale el primero en la app. Gracias.",
             "useIncluded": "Usar el destacado del mes",
             "includedBody": "Tu plan Business incluye un destacado al mes y este todavía no lo has usado: no se cobra nada.",
-            "includedLeft": "Destacar (incluido)"
+            "includedLeft": "Destacar (incluido)",
+            "businessPrice": "Precio Business"
         },
         "followers": {
             "title": "Seguidores del negocio",
@@ -2661,13 +2662,32 @@
                     "map": {
                         "title": "Mapa de la noche",
                         "body": "Mira qué fiestas hay cerca y cuánta actividad tienen antes de salir, sin ver a nadie en concreto."
+                    },
+                    "tickets": {
+                        "title": "Entradas en el móvil",
+                        "body": "Compra tu entrada en la app, entra con el QR y guárdala en Apple Wallet o Google Wallet."
+                    },
+                    "explore": {
+                        "title": "Fiestas de toda España",
+                        "body": "Busca por ciudad y filtra por fecha y estilo de música para encontrar tu plan."
+                    },
+                    "lineup": {
+                        "title": "Todo sobre cada fiesta",
+                        "body": "Line-up, horario, precio y cómo llegar, antes de salir de casa."
+                    },
+                    "follow": {
+                        "title": "Sigue a tus salas",
+                        "body": "Te avisamos en el móvil cada vez que publican una fiesta nueva."
+                    },
+                    "rating": {
+                        "title": "Valora la noche",
+                        "body": "Puntúa la música, el ambiente y el precio, y ayuda a otros a elegir."
                     }
                 }
             },
             "venues": {
                 "eyebrow": "Para negocios",
                 "title": "El control de tu sala, en directo",
-                "cta": "Solicitar una demo",
                 "ctaSecondary": "Registrar mi negocio",
                 "items": {
                     "access": {
@@ -2778,8 +2798,6 @@
             "perMonth": "/mes",
             "trial": "Primer mes gratis",
             "ctaTrial": "Probar Business gratis",
-            "boostTitle": "Destacar un evento: {{price}} € por noche",
-            "boostBody": "En cualquier plan, y con Business uno al mes incluido. Tu fiesta sale la primera en inicio y en el mapa de la app hasta que termina.",
             "vat": "Precios sin IVA. Pago mensual, sin permanencia."
         },
         "faq": {
@@ -2804,7 +2822,7 @@
                 },
                 "where": {
                     "q": "¿Dónde funciona?",
-                    "a": "Empezamos en Mallorca. Si tu negocio está en otra zona, escríbenos y te avisamos cuando lleguemos."
+                    "a": "Empezamos en Mallorca, Madrid, Barcelona y Alicante. Si tu negocio está en otra zona, escríbenos y te avisamos cuando lleguemos."
                 },
                 "apps": {
                     "q": "¿Dónde descargo Fiestea?",
@@ -2819,7 +2837,7 @@
         },
         "form": {
             "title": "¿Tienes una discoteca, bar o festival?",
-            "body": "Déjanos tus datos y te enseñamos Fiestea en una llamada de 15 minutos.",
+            "body": "Déjanos tus datos y te contamos cómo funciona Fiestea para tu negocio.",
             "venueName": "Nombre del negocio",
             "city": "Ciudad o zona (ej. Palma, Magaluf)",
             "type": "Tipo de negocio",
@@ -2834,10 +2852,10 @@
             "contact": "Email o teléfono",
             "message": "¿Algo que debamos saber? (opcional)",
             "consent": "Acepto que Fiestea use estos datos para contactarme sobre mi negocio, según la <privacy>política de privacidad</privacy>.",
-            "submit": "Solicitar demo",
+            "submit": "Contáctanos",
             "sending": "Enviando…",
             "successTitle": "¡Recibido!",
-            "successBody": "Te contactaremos muy pronto para organizar la demo.",
+            "successBody": "Te contactaremos muy pronto.",
             "again": "Enviar otra solicitud",
             "orEmail": "¿Prefieres correo? Escríbenos a {{email}}",
             "errors": {
@@ -2856,12 +2874,11 @@
             "signup": "Descargar la app",
             "registerVenue": "Registrar mi negocio",
             "venueLogin": "Acceso para negocios",
-            "demo": "Solicitar demo",
+            "demo": "Contáctanos",
             "privacy": "Privacidad",
             "terms": "Términos",
             "contact": "Contacto",
             "rights": "© {{year}} Fiestea. Todos los derechos reservados.",
-            "made": "Hecho en Palma de Mallorca",
             "cookies": "Cookies",
             "notice": "Aviso legal",
             "allLegal": "Todos los textos legales"

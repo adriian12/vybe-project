@@ -50,7 +50,7 @@ import PanelTabs from '@/components/venue/panel-tabs';
 import EventLiveSettings from '@/components/venue/event-live-settings';
 import { nightService } from '@/services/night';
 import { ApiError } from '@/services/api';
-import { BOOST_PRICE, planHas } from '@/lib/venue-plans';
+import { BOOST_BUSINESS_PRICE, BOOST_PRICE, formatEuros, planHas } from '@/lib/venue-plans';
 import VenueSosAlerts, { VenueSosStrip } from '@/components/venue/venue-sos-alerts';
 import VenueSosAlarm from '@/components/venue/venue-sos-alarm';
 import { useVenueSos } from '@/hooks/use-venue-sos';
@@ -375,6 +375,14 @@ const VenueDashboardPage = () => {
   // Exportar: CSV y PDF son de Business. En los demás planes el botón lleva
   // a la comparativa de planes.
   const puedeExportar = plan?.plan === 'business';
+  // Business paga el destacado a mitad de precio; se enseña tachando el normal.
+  const boostRebajado = plan !== null && planHas(plan.plan, 'includedBoost');
+  const precioBoost = (
+    <>
+      {boostRebajado && <span className="mr-1 font-normal line-through opacity-60">{formatEuros(BOOST_PRICE)} €</span>}
+      {formatEuros(boostRebajado ? BOOST_BUSINESS_PRICE : BOOST_PRICE)} €
+    </>
+  );
 
   const cabecerasResumen = () => ({
     eventId: 'id',
@@ -928,7 +936,13 @@ const VenueDashboardPage = () => {
                                 {puedeDifundir && !event.featured && (
                                   <DropdownMenuItem onClick={() => setToBoost({ id: event.id, name: event.name })}>
                                     <Sparkles size={15} className="mr-2" />
-                                    {boostsIncluidos > 0 ? t('venue.boost.includedLeft') : t('venue.boost.action', { price: BOOST_PRICE })}
+                                    {boostsIncluidos > 0 ? (
+                                      t('venue.boost.includedLeft')
+                                    ) : (
+                                      <>
+                                        {t('venue.boost.action')}&nbsp;({precioBoost})
+                                      </>
+                                    )}
                                   </DropdownMenuItem>
                                 )}
                                 <DropdownMenuItem onClick={() => goTo('stats')}>
@@ -1349,8 +1363,18 @@ const VenueDashboardPage = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>{t('venue.boost.title', { name: toBoost?.name ?? '' })}</AlertDialogTitle>
             <AlertDialogDescription>
-              {boostsIncluidos > 0 ? t('venue.boost.includedBody') : t('venue.boost.body', { price: BOOST_PRICE })}
+              {boostsIncluidos > 0 ? t('venue.boost.includedBody') : t('venue.boost.body')}
             </AlertDialogDescription>
+            {boostsIncluidos === 0 && (
+              <p className="flex items-baseline gap-2 font-display text-headline-md">
+                {precioBoost}
+                {boostRebajado && (
+                  <span className="rounded-full bg-party-primary px-2 py-0.5 text-label-pill uppercase text-ink">
+                    {t('venue.boost.businessPrice')}
+                  </span>
+                )}
+              </p>
+            )}
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={boosting}>{t('common.cancel')}</AlertDialogCancel>
@@ -1365,7 +1389,7 @@ const VenueDashboardPage = () => {
                 ? t('venue.plan.opening')
                 : boostsIncluidos > 0
                   ? t('venue.boost.useIncluded')
-                  : t('venue.boost.pay', { price: BOOST_PRICE })}
+                  : t('venue.boost.pay', { price: formatEuros(boostRebajado ? BOOST_BUSINESS_PRICE : BOOST_PRICE) })}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -231,7 +231,10 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
   - **Columnas protegidas:** `featured_until` y `followers_notified_at` las
     protege `protect_event_fields()`. El sistema las escribe con el indicador de
     transacción `vybe.event_system`.
-  - **Destacar un evento** cuesta 19 € por noche (`BOOST_PRICE`). Es un pago
+  - **Destacar un evento** cuesta 19,99 € por noche (`BOOST_PRICE`) y 9,99 €
+    con Business (`BOOST_BUSINESS_PRICE`; el panel enseña el 19,99 € tachado).
+    `stripe-checkout` elige el precio con `venue_has_feature('included_boost')`.
+    La landing ya no lo anuncia: se enseña dentro del panel. Es un pago
     único de Stripe (`plan: 'event_boost'` en `stripe-checkout`), y el webhook
     rellena `event_boosts` y `featured_until = end_date`. Los destacados salen
     primero en inicio, en el mapa y en `get_next_parties`.

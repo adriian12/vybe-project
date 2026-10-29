@@ -1247,7 +1247,7 @@
             "perMonth": "€{{price}}/month",
             "trialNote": "The first month is free: {{count}} days of Business once your venue is approved.",
             "keepPlan": "Keep {{plan}}",
-            "boostNote": "Boosting an event costs €{{price}} per night on any plan: it shows first in the app until it ends. Business includes one a month.",
+            "boostNote": "Featuring an event costs €{{price}} per night; with Business, €{{business}} and one a month included.",
             "unlimited": "unlimited",
             "eventsUnlimited": "Unlimited events",
             "teamUnlimited": "Unlimited team"
@@ -1561,15 +1561,16 @@
         "planChipTrial": "{{plan}} · trial",
         "boost": {
             "badge": "Featured",
-            "action": "Feature (€{{price}})",
+            "action": "Feature",
             "title": "Feature \"{{name}}\"",
-            "body": "For €{{price}} it shows first on the home screen and the map of the app, labelled \"Featured\", until the party ends. One-off payment.",
+            "body": "It shows first on the home screen and the map of the app, labelled \"Featured\", until the party ends. One-off payment.",
             "pay": "Pay €{{price}}",
             "paid": "Event featured",
             "paidBody": "It now shows first in the app. Thanks.",
             "useIncluded": "Use this month's boost",
             "includedBody": "Your Business plan includes one boost a month and you haven't used it yet: nothing will be charged.",
-            "includedLeft": "Boost (included)"
+            "includedLeft": "Boost (included)",
+            "businessPrice": "Business price"
         },
         "followers": {
             "title": "Venue followers",
@@ -2661,13 +2662,32 @@
                     "map": {
                         "title": "Night map",
                         "body": "See which parties are nearby and how busy they are before you go out, without seeing anyone in particular."
+                    },
+                    "tickets": {
+                        "title": "Tickets on your phone",
+                        "body": "Buy your ticket in the app, get in with the QR code and save it to Apple Wallet or Google Wallet."
+                    },
+                    "explore": {
+                        "title": "Parties all over Spain",
+                        "body": "Search by city and filter by date and music style to find your plan."
+                    },
+                    "lineup": {
+                        "title": "Everything about each party",
+                        "body": "Line-up, times, price and how to get there, before you leave home."
+                    },
+                    "follow": {
+                        "title": "Follow your venues",
+                        "body": "We notify you on your phone every time they post a new party."
+                    },
+                    "rating": {
+                        "title": "Rate the night",
+                        "body": "Score the music, the atmosphere and the price, and help others choose."
                     }
                 }
             },
             "venues": {
                 "eyebrow": "For venues",
                 "title": "Your venue under control, live",
-                "cta": "Request a demo",
                 "ctaSecondary": "Register my venue",
                 "items": {
                     "access": {
@@ -2778,8 +2798,6 @@
             "perMonth": "/month",
             "trial": "First month free",
             "ctaTrial": "Try Business for free",
-            "boostTitle": "Feature an event: €{{price}} per night",
-            "boostBody": "On any plan, and one a month included with Business. Your party shows first on the app home and map until it ends.",
             "vat": "Prices exclude VAT. Monthly payment, no commitment."
         },
         "faq": {
@@ -2804,7 +2822,7 @@
                 },
                 "where": {
                     "q": "Where does it work?",
-                    "a": "We're starting in Mallorca. If your venue is somewhere else, get in touch and we'll let you know when we arrive."
+                    "a": "We're starting in Mallorca, Madrid, Barcelona and Alicante. If your venue is somewhere else, get in touch and we'll let you know when we arrive."
                 },
                 "apps": {
                     "q": "Where can I download Fiestea?",
@@ -2819,7 +2837,7 @@
         },
         "form": {
             "title": "Do you run a club, bar or festival?",
-            "body": "Leave your details and we'll show you Fiestea in a 15-minute call.",
+            "body": "Leave your details and we'll tell you how Fiestea works for your venue.",
             "venueName": "Venue name",
             "city": "City or area (e.g. Palma, Magaluf)",
             "type": "Type of venue",
@@ -2834,10 +2852,10 @@
             "contact": "Email or phone",
             "message": "Anything we should know? (optional)",
             "consent": "I agree that Fiestea may use these details to contact me about my venue, as described in the <privacy>privacy policy</privacy>.",
-            "submit": "Request a demo",
+            "submit": "Contact us",
             "sending": "Sending…",
             "successTitle": "Got it!",
-            "successBody": "We'll be in touch very soon to set up the demo.",
+            "successBody": "We'll be in touch very soon.",
             "again": "Send another request",
             "orEmail": "Prefer email? Write to us at {{email}}",
             "errors": {
@@ -2856,12 +2874,11 @@
             "signup": "Get the app",
             "registerVenue": "Register my venue",
             "venueLogin": "Venue login",
-            "demo": "Request a demo",
+            "demo": "Contact us",
             "privacy": "Privacy",
             "terms": "Terms",
             "contact": "Contact",
             "rights": "© {{year}} Fiestea. All rights reserved.",
-            "made": "Made in Palma de Mallorca",
             "cookies": "Cookies",
             "notice": "Legal notice",
             "allLegal": "All legal documents"

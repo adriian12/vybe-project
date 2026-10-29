@@ -5,6 +5,8 @@ import {
   ArrowRight,
   BadgeCheck,
   BarChart3,
+  BellRing,
+  CalendarDays,
   Check,
   Clock3,
   Map as MapIcon,
@@ -16,7 +18,9 @@ import {
   ShieldAlert,
   ShieldCheck,
   Smartphone,
+  Search,
   Sparkles,
+  Star,
   Store,
   Ticket,
   TrendingUp,
@@ -45,7 +49,7 @@ import WhatsAppButton from '@/components/whatsapp-button';
 import { COMPANY } from '@/lib/company';
 import { appHref, isExternalHref } from '@/lib/hosts';
 import { cn } from '@/lib/utils';
-import { BOOST_PRICE, PLAN_FEATURES, PLAN_IDS, PLAN_PRICES, PLANS, TRIAL_DAYS } from '@/lib/venue-plans';
+import { PLAN_FEATURES, PLAN_IDS, PLAN_PRICES, PLANS, TRIAL_DAYS } from '@/lib/venue-plans';
 
 /**
  * Landing pública de Vybe, según «Landing Page Oficial Vybes» de Stitch
@@ -143,6 +147,11 @@ const LandingPage = () => {
     { key: 'offers', icon: Ticket },
     { key: 'sos', icon: ShieldAlert },
     { key: 'map', icon: MapIcon },
+    { key: 'tickets', icon: QrCode },
+    { key: 'explore', icon: Search },
+    { key: 'lineup', icon: CalendarDays },
+    { key: 'follow', icon: BellRing },
+    { key: 'rating', icon: Star },
   ];
 
   const venueItems: { key: string; icon: LucideIcon }[] = [
@@ -219,21 +228,13 @@ const LandingPage = () => {
           />
         ))}
       </ul>
-      <div className="mt-5 grid gap-2 sm:grid-cols-2">
-        <a
-          href="#contacto"
-          className="press flex h-12 items-center justify-center gap-2 rounded-xl bg-white font-display text-title-card text-ink hover:bg-white/90"
-        >
-          {t('landing.eco.venues.cta')}
-          <ArrowRight size={17} />
-        </a>
-        <AppLink
-          to={VENUE_SIGNUP}
-          className="press flex h-12 items-center justify-center rounded-xl bg-surface-high font-display text-title-card hover:bg-surface-highest"
-        >
-          {t('landing.eco.venues.ctaSecondary')}
-        </AppLink>
-      </div>
+      <AppLink
+        to={VENUE_SIGNUP}
+        className="press mt-5 flex h-12 items-center justify-center gap-2 rounded-xl bg-white font-display text-title-card text-ink hover:bg-white/90"
+      >
+        {t('landing.eco.venues.ctaSecondary')}
+        <ArrowRight size={17} />
+      </AppLink>
     </div>
   );
 
@@ -606,15 +607,6 @@ const LandingPage = () => {
                 );
               })}
             </div>
-            <div className="mx-auto mt-6 flex max-w-4xl flex-col items-center gap-3 rounded-2xl bg-surface-low p-5 text-center md:flex-row md:text-left">
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-party-accent text-white">
-                <Sparkles size={20} />
-              </span>
-              <div className="flex-1">
-                <p className="font-display text-title-card">{t('landing.plans.boostTitle', { price: BOOST_PRICE })}</p>
-                <p className="text-body-sm text-party-gray">{t('landing.plans.boostBody')}</p>
-              </div>
-            </div>
             <p className="mt-6 text-center text-body-sm text-party-gray">{t('landing.plans.base')}</p>
             <p className="mt-1 text-center text-caption text-party-gray">{t('landing.plans.vat')}</p>
           </div>
@@ -641,7 +633,7 @@ const LandingPage = () => {
 
         {/* ------------------------------------------------ llamada y contacto */}
         {/* `#descargar` y `#contacto` llevan aquí: la app para clubbers a la izquierda,
-            la solicitud de demo para locales a la derecha. */}
+            el formulario de contacto para locales a la derecha. */}
         <section id="contacto" className="scroll-mt-20 px-margin pb-16 lg:px-8 lg:pb-24">
           <span id="descargar" className="block scroll-mt-20" aria-hidden="true" />
           <div className="mx-auto grid max-w-7xl items-center gap-8 rounded-[28px] bg-surface-container p-5 sm:p-8 lg:grid-cols-[1fr_minmax(0,460px)] lg:gap-12 lg:p-14">
@@ -720,12 +712,8 @@ const LandingPage = () => {
             </div>
           ))}
         </div>
-        <div className="mx-auto flex max-w-7xl flex-col gap-2 border-t border-white/[0.06] px-margin py-5 text-caption font-normal text-party-gray sm:flex-row sm:items-center sm:justify-between lg:px-8">
+        <div className="mx-auto max-w-7xl border-t border-white/[0.06] px-margin py-5 text-caption font-normal text-party-gray lg:px-8">
           <p>{t('landing.footer.rights', { year: new Date().getFullYear() })}</p>
-          <p className="flex items-center gap-2">
-            <span className="h-1.5 w-1.5 rounded-full bg-party-primary" />
-            {t('landing.footer.made')}
-          </p>
         </div>
       </footer>
       <WhatsAppButton />

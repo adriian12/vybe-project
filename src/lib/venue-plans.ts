@@ -39,8 +39,17 @@ export const PLAN_PRICES: Record<PlanId, number> = { free: 0, business: 69.99 };
 /** Días de Business gratis que recibe un local al ser aprobado. */
 export const TRIAL_DAYS = 30;
 
-/** Destacar un evento: euros por noche, en cualquier plan (Business lleva uno al mes). */
-export const BOOST_PRICE = 19;
+/**
+ * Destacar un evento: euros por noche. Business lo paga a `BOOST_BUSINESS_PRICE`
+ * (y lleva uno al mes incluido). Lo cobra `stripe-checkout`: si cambias uno,
+ * cambia el otro.
+ */
+export const BOOST_PRICE = 19.99;
+export const BOOST_BUSINESS_PRICE = 9.99;
+
+/** Precio con coma decimal («19,99»), sea cual sea el idioma de la interfaz. */
+export const formatEuros = (value: number): string =>
+  value.toLocaleString('es-ES', { minimumFractionDigits: value % 1 ? 2 : 0, maximumFractionDigits: 2 });
 export type PlanFeature = (typeof PLAN_FEATURES)[number];
 
 /** ¿Tiene el plan esta función? Lo mismo que `venue_has_feature()` en la base de datos. */

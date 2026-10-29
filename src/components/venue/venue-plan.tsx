@@ -7,7 +7,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { venueService, VenuePlanStatus } from '@/services/venue-service';
 import { ApiError } from '@/services/api';
 import { isNative, openExternal } from '@/services/native';
-import { BOOST_PRICE, PLAN_FEATURES, PLAN_IDS, PLAN_PRICES, PLANS, TRIAL_DAYS } from '@/lib/venue-plans';
+import { BOOST_BUSINESS_PRICE, BOOST_PRICE, formatEuros, PLAN_FEATURES, PLAN_IDS, PLAN_PRICES, PLANS, TRIAL_DAYS } from '@/lib/venue-plans';
 
 interface VenuePlanProps {
   plan: VenuePlanStatus | null;
@@ -248,7 +248,7 @@ const VenuePlan = ({ plan, onUpgrade }: VenuePlanProps) => {
       </div>
 
       <p className="px-1 text-caption text-party-gray">{t('venue.plan.billingNote')}</p>
-      <p className="px-1 text-caption text-party-gray">{t('venue.plan.boostNote', { price: BOOST_PRICE })}</p>
+      <p className="px-1 text-caption text-party-gray">{t('venue.plan.boostNote', { price: formatEuros(BOOST_PRICE), business: formatEuros(BOOST_BUSINESS_PRICE) })}</p>
     </div>
   );
 };

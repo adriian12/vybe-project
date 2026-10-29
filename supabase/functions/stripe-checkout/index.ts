@@ -57,7 +57,9 @@ const MAX_SUPERCRUSH = 100;
  * otros.
  */
 const VENUE_PRICE_CENTS: Record<VenuePlan, number> = { venue_business: 6999 };
-const BOOST_PRICE_CENTS = 1900;
+/** Destacar un evento: 19,99 €, y 9,99 € con Business (`BOOST_PRICE` en el cliente). */
+const BOOST_PRICE_CENTS = 1999;
+const BOOST_BUSINESS_PRICE_CENTS = 999;
 
 /**
  * Lo que se queda la plataforma de cada venta de entradas (Connect).
@@ -178,11 +180,17 @@ serve(async (req: Request): Promise<Response> => {
       if (!evento || evento.venue_id !== venue.id) return json({ error: 'Evento no válido' }, 403);
       if (new Date(evento.end_date).getTime() <= Date.now()) return json({ error: 'EVENT_ENDED' }, 400);
 
+      // Business paga el destacado a mitad de precio (la misma función que le da uno al mes).
+      const { data: business } = await supabase.rpc('venue_has_feature', {
+        p_feature: 'included_boost',
+        p_venue_id: venue.id,
+      });
+
       const boost = new URLSearchParams({
         mode: 'payment',
         'line_items[0][quantity]': '1',
         'line_items[0][price_data][currency]': 'eur',
-        'line_items[0][price_data][unit_amount]': String(BOOST_PRICE_CENTS),
+        'line_items[0][price_data][unit_amount]': String(business === true ? BOOST_BUSINESS_PRICE_CENTS : BOOST_PRICE_CENTS),
         'line_items[0][price_data][product_data][name]': `Destacar «${evento.name}» en Fiestea`,
         success_url: `${base}?boost=success`,
         cancel_url: `${base}?boost=cancelled`,

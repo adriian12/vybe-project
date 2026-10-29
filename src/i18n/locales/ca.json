@@ -1247,7 +1247,7 @@
             "perMonth": "{{price}} €/mes",
             "trialNote": "El primer mes és gratis: {{count}} dies de Business en aprovar el teu negoci.",
             "keepPlan": "Continuar amb {{plan}}",
-            "boostNote": "Destacar un esdeveniment costa {{price}} € per nit a qualsevol pla: surt primer a l'app fins que acaba. Business n'inclou un al mes.",
+            "boostNote": "Destacar un esdeveniment costa {{price}} € per nit; amb Business, {{business}} € i un al mes inclòs.",
             "unlimited": "sense límit",
             "eventsUnlimited": "Esdeveniments sense límit",
             "teamUnlimited": "Equip sense límit"
@@ -1561,15 +1561,16 @@
         "planChipTrial": "{{plan}} · prova",
         "boost": {
             "badge": "Destacat",
-            "action": "Destacar ({{price}} €)",
+            "action": "Destacar",
             "title": "Destacar «{{name}}»",
-            "body": "Per {{price}} € surt el primer a l'inici i al mapa de l'app, amb l'etiqueta «Destacat», fins que acabi la festa. És un pagament únic.",
+            "body": "Surt el primer a l'inici i al mapa de l'app, amb l'etiqueta «Destacat», fins que acabi la festa. És un pagament únic.",
             "pay": "Pagar {{price}} €",
             "paid": "Esdeveniment destacat",
             "paidBody": "Ja surt el primer a l'app. Gràcies.",
             "useIncluded": "Fer servir el destacat del mes",
             "includedBody": "El teu pla Business inclou un destacat al mes i encara no l'has fet servir: no es cobra res.",
-            "includedLeft": "Destacar (inclòs)"
+            "includedLeft": "Destacar (inclòs)",
+            "businessPrice": "Preu Business"
         },
         "followers": {
             "title": "Seguidors del negoci",
@@ -2661,13 +2662,32 @@
                     "map": {
                         "title": "Mapa de la nit",
                         "body": "Mira quines festes hi ha a prop i quanta activitat tenen abans de sortir, sense veure ningú en concret."
+                    },
+                    "tickets": {
+                        "title": "Entrades al mòbil",
+                        "body": "Compra l'entrada a l'app, entra amb el QR i desa-la a Apple Wallet o Google Wallet."
+                    },
+                    "explore": {
+                        "title": "Festes de tot Espanya",
+                        "body": "Cerca per ciutat i filtra per data i estil de música per trobar el teu pla."
+                    },
+                    "lineup": {
+                        "title": "Tot sobre cada festa",
+                        "body": "Line-up, horari, preu i com arribar-hi, abans de sortir de casa."
+                    },
+                    "follow": {
+                        "title": "Segueix les teves sales",
+                        "body": "T'avisem al mòbil cada vegada que publiquen una festa nova."
+                    },
+                    "rating": {
+                        "title": "Valora la nit",
+                        "body": "Puntua la música, l'ambient i el preu, i ajuda els altres a triar."
                     }
                 }
             },
             "venues": {
                 "eyebrow": "Per a negocis",
                 "title": "El control de la teva sala, en directe",
-                "cta": "Sol·licitar una demo",
                 "ctaSecondary": "Registrar el meu negoci",
                 "items": {
                     "access": {
@@ -2778,8 +2798,6 @@
             "perMonth": "/mes",
             "trial": "Primer mes gratis",
             "ctaTrial": "Provar Business gratis",
-            "boostTitle": "Destacar un esdeveniment: {{price}} € per nit",
-            "boostBody": "A qualsevol pla, i amb Business un al mes inclòs. La teva festa surt la primera a l'inici i al mapa de l'app fins que acaba.",
             "vat": "Preus sense IVA. Pagament mensual, sense permanència."
         },
         "faq": {
@@ -2804,7 +2822,7 @@
                 },
                 "where": {
                     "q": "On funciona?",
-                    "a": "Comencem a Mallorca. Si el teu negoci és en una altra zona, escriu-nos i t'avisarem quan hi arribem."
+                    "a": "Comencem a Mallorca, Madrid, Barcelona i Alacant. Si el teu negoci és en una altra zona, escriu-nos i t'avisarem quan hi arribem."
                 },
                 "apps": {
                     "q": "On descarrego Fiestea?",
@@ -2819,7 +2837,7 @@
         },
         "form": {
             "title": "Tens una discoteca, un bar o un festival?",
-            "body": "Deixa'ns les teves dades i t'ensenyem Fiestea en una trucada de 15 minuts.",
+            "body": "Deixa'ns les teves dades i t'expliquem com funciona Fiestea per al teu negoci.",
             "venueName": "Nom del negoci",
             "city": "Ciutat o zona (p. ex. Palma, Magaluf)",
             "type": "Tipus de negoci",
@@ -2834,10 +2852,10 @@
             "contact": "Correu o telèfon",
             "message": "Hi ha res que hàgim de saber? (opcional)",
             "consent": "Accepto que Fiestea utilitzi aquestes dades per contactar-me sobre el meu negoci, segons la <privacy>política de privadesa</privacy>.",
-            "submit": "Sol·licitar demo",
+            "submit": "Contacta'ns",
             "sending": "Enviant…",
             "successTitle": "Rebut!",
-            "successBody": "Et contactarem molt aviat per organitzar la demo.",
+            "successBody": "Et contactarem molt aviat.",
             "again": "Enviar una altra sol·licitud",
             "orEmail": "Prefereixes correu? Escriu-nos a {{email}}",
             "errors": {
@@ -2856,12 +2874,11 @@
             "signup": "Descarregar l'app",
             "registerVenue": "Registrar el meu negoci",
             "venueLogin": "Accés per a negocis",
-            "demo": "Sol·licitar demo",
+            "demo": "Contacta'ns",
             "privacy": "Privadesa",
             "terms": "Termes",
             "contact": "Contacte",
             "rights": "© {{year}} Fiestea. Tots els drets reservats.",
-            "made": "Fet a Palma de Mallorca",
             "cookies": "Galetes",
             "notice": "Avís legal",
             "allLegal": "Tots els textos legals"
