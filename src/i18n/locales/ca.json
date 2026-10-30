@@ -827,7 +827,8 @@
                 "white": "Blanc (menys tinta)",
                 "dark": "Fosc (pantalles)"
             },
-            "showPoster": "Mostrar a la pantalla"
+            "showPoster": "Mostrar a la pantalla",
+            "posterFooterLink": "Escaneja el codi per veure la festa i aconseguir la teva entrada"
         },
         "stats": {
             "title": "Estadístiques",
@@ -1899,7 +1900,10 @@
                 "apply": "Aplicar a {{count}} festes",
                 "done_one": "{{count}} festa actualitzada",
                 "done_other": "{{count}} festes actualitzades"
-            }
+            },
+            "poster": "Cartell",
+            "tickets": "Entrades",
+            "posterHelp": "Per imprimir-lo o mostrar-lo en una pantalla. El QR obre la fitxa de la festa, amb les entrades."
         },
         "reports": {
             "title": "Reports d'usuaris",
@@ -2189,6 +2193,26 @@
             "more": "Veure més ({{count}})",
             "note": "Festes de Barcelona, Madrid i Alacant a Xceed i Resident Advisor. «Repetida»: ja hi ha una festa amb aquest nom aquella nit. Fourvenues no s'escaneja: bloqueja els robots.",
             "importing": "Afegint {{done}}/{{total}}"
+        },
+        "tickets": {
+            "defaultName": "Entrada gratuïta",
+            "current": "Entrades de la festa",
+            "none": "Aquesta festa encara no té entrades.",
+            "free": "Gratis",
+            "soldOf": "{{sold}} de {{capacity}} reservades",
+            "sold": "{{count}} reservades",
+            "remove": "Retirar",
+            "removed": "Entrada esborrada",
+            "archived": "Entrada retirada de la venda (ja tenia reserves)",
+            "freeTitle": "Entrada gratuïta",
+            "freeHelp": "La gent la reserva gratis des de l'app i li arriba amb el QR per a la porta.",
+            "name": "Nom",
+            "capacity": "Aforament",
+            "unlimited": "Sense límit",
+            "perOrder": "Màxim per persona",
+            "create": "Crear entrada gratuïta",
+            "created": "Entrada gratuïta creada",
+            "resent": "Correu reenviat"
         }
     },
     "pwa": {

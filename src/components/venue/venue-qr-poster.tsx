@@ -7,8 +7,13 @@ import { PartyButton } from "@/components/ui-custom/party-button";
 import { cn } from "@/lib/utils";
 
 interface VenueQRPosterProps {
-  /** Código de acceso que se imprime como QR. */
-  code: string;
+  /** Código de acceso que se imprime como QR (el del negocio). */
+  code?: string;
+  /**
+   * O un enlace (la ficha pública de la fiesta): lo que usa administración,
+   * sobre todo en las fiestas de Fiestea, que no tienen código de acceso.
+   */
+  link?: string;
   eventName?: string;
   venueName?: string;
 }
@@ -30,7 +35,7 @@ type Color = "yellow" | "white" | "dark";
  * salvo el cartel, así que el cartel **tiene** que colgar de `body`: por eso va
  * en un portal. Dentro de la app se ocultaba con ella y salía la hoja en blanco.
  */
-const VenueQRPoster = ({ code, eventName, venueName }: VenueQRPosterProps) => {
+const VenueQRPoster = ({ code, link, eventName, venueName }: VenueQRPosterProps) => {
   const { t } = useTranslation();
   const [orientacion, setOrientacion] = useState<Orientacion>("portrait");
   const [color, setColor] = useState<Color>("yellow");
@@ -132,9 +137,9 @@ const VenueQRPoster = ({ code, eventName, venueName }: VenueQRPosterProps) => {
               <div className="print-poster-qr">
                 {/* Nivel H de corrección de errores: el cartel acabará con marcas
                   de vasos y luz de discoteca, y aun así tiene que leerse. */}
-                <QRCode value={code} size={520} level="H" includeMargin renderAs="svg" />
+                <QRCode value={link ?? code ?? ''} size={520} level="H" includeMargin renderAs="svg" />
               </div>
-              <div className="print-poster-code">{code}</div>
+              {!link && code && <div className="print-poster-code">{code}</div>}
             </div>
 
             <div className="print-poster-bottom">
@@ -142,7 +147,9 @@ const VenueQRPoster = ({ code, eventName, venueName }: VenueQRPosterProps) => {
                 {eventName && <div className="print-poster-event-name">{eventName}</div>}
                 {venueName && <div className="print-poster-venue">{venueName}</div>}
               </div>
-              <div className="print-poster-footer">{t("venue.qr.posterFooter")}</div>
+              <div className="print-poster-footer">
+                {t(link ? "venue.qr.posterFooterLink" : "venue.qr.posterFooter")}
+              </div>
             </div>
           </div>
         </div>,

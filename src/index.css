@@ -586,6 +586,9 @@
 }
 
 .print-poster--screen {
+  /* Abierto desde un diálogo (administración), el resto de la página tiene
+     los clics bloqueados: el cartel los necesita para el botón de cerrar. */
+  pointer-events: auto;
   display: flex;
   position: fixed;
   inset: 0;

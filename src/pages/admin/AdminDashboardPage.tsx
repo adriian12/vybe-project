@@ -22,6 +22,8 @@ import {
   Menu,
   Paperclip,
   Pencil,
+  Printer,
+  Ticket,
   Phone,
   RefreshCw,
   Search,
@@ -54,6 +56,9 @@ import { Checkbox } from '@/components/ui/checkbox';
 import AdminUsers from '@/components/admin/admin-users';
 import AdminCreate from '@/components/admin/admin-create';
 import AdminEventForm from '@/components/admin/admin-event-form';
+import AdminEventTickets from '@/components/admin/admin-event-tickets';
+import VenueQRPoster from '@/components/venue/venue-qr-poster';
+import { publicLink } from '@/lib/share';
 import AdminFunout from '@/components/admin/admin-funout';
 import AdminScanner from '@/components/admin/admin-scanner';
 import AdminVenues from '@/components/admin/admin-venues';
@@ -170,6 +175,8 @@ const AdminDashboardPage = () => {
   // Orden de la lista: por defecto, lo más cercano a hoy primero.
   const [ordenEventos, setOrdenEventos] = useState<'nearest' | 'newest' | 'oldest'>('nearest');
   const [editandoEvento, setEditandoEvento] = useState<Event | null>(null);
+  const [cartelEvento, setCartelEvento] = useState<Event | null>(null);
+  const [entradasEvento, setEntradasEvento] = useState<Event | null>(null);
   // Fiestas marcadas para «Activar funciones» en bloque (migración 121).
   const [marcadosEventos, setMarcadosEventos] = useState<Set<string>>(new Set());
   const [funcionesAbiertas, setFuncionesAbiertas] = useState(false);
@@ -1225,6 +1232,24 @@ const AdminDashboardPage = () => {
                             <td className="whitespace-nowrap px-4 py-3 text-right">
                               <button
                                 type="button"
+                                onClick={() => setCartelEvento(event)}
+                                aria-label={t('admin.events.poster')}
+                                title={t('admin.events.poster')}
+                                className="press mr-2 inline-flex h-8 w-8 items-center justify-center rounded-lg border border-black/15 align-middle"
+                              >
+                                <Printer size={14} />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setEntradasEvento(event)}
+                                aria-label={t('admin.events.tickets')}
+                                title={t('admin.events.tickets')}
+                                className="press mr-2 inline-flex h-8 w-8 items-center justify-center rounded-lg border border-black/15 align-middle"
+                              >
+                                <Ticket size={14} />
+                              </button>
+                              <button
+                                type="button"
                                 onClick={() => setEditandoEvento(event)}
                                 aria-label={t('admin.events.edit')}
                                 className="press mr-2 inline-flex h-8 w-8 items-center justify-center rounded-lg border border-black/15 align-middle"
@@ -1391,6 +1416,35 @@ const AdminDashboardPage = () => {
           )}
         </button>
       )}
+
+      {/* Cartel de una fiesta: el QR lleva a su ficha pública. Sirve también
+          para las de Fiestea, que no tienen código de acceso. */}
+      <Dialog open={cartelEvento !== null} onOpenChange={(open) => !open && setCartelEvento(null)}>
+        <DialogContent className="surface-light !bg-white max-h-[88vh] overflow-y-auto text-ink sm:max-w-md">
+          <DialogHeader className="text-left">
+            <DialogTitle>{t('admin.events.poster')}</DialogTitle>
+            <DialogDescription>{t('admin.events.posterHelp')}</DialogDescription>
+          </DialogHeader>
+          {cartelEvento && (
+            <VenueQRPoster
+              key={cartelEvento.id}
+              link={publicLink(`/event/${cartelEvento.id}`)}
+              eventName={cartelEvento.name}
+              venueName={cartelEvento.placeName ?? (cartelEvento.byPlatform ? undefined : cartelEvento.venueName)}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={entradasEvento !== null} onOpenChange={(open) => !open && setEntradasEvento(null)}>
+        <DialogContent className="surface-light !bg-white max-h-[88vh] overflow-y-auto text-ink sm:max-w-lg">
+          <DialogHeader className="text-left">
+            <DialogTitle>{t('admin.events.tickets')}</DialogTitle>
+            <DialogDescription>{entradasEvento?.name}</DialogDescription>
+          </DialogHeader>
+          {entradasEvento && <AdminEventTickets key={entradasEvento.id} event={entradasEvento} />}
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={editandoEvento !== null} onOpenChange={(open) => !open && setEditandoEvento(null)}>
         <DialogContent className="surface-light !bg-white max-h-[88vh] overflow-y-auto text-ink sm:max-w-lg">

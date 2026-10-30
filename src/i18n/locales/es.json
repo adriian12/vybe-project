@@ -827,7 +827,8 @@
                 "white": "Blanco (menos tinta)",
                 "dark": "Oscuro (pantallas)"
             },
-            "showPoster": "Mostrar en pantalla"
+            "showPoster": "Mostrar en pantalla",
+            "posterFooterLink": "Escanea el código para ver la fiesta y conseguir tu entrada"
         },
         "stats": {
             "title": "Estadísticas",
@@ -1899,7 +1900,10 @@
                 "apply": "Aplicar a {{count}} fiestas",
                 "done_one": "{{count}} fiesta actualizada",
                 "done_other": "{{count}} fiestas actualizadas"
-            }
+            },
+            "poster": "Cartel",
+            "tickets": "Entradas",
+            "posterHelp": "Para imprimirlo o mostrarlo en una pantalla. El QR abre la ficha de la fiesta, con sus entradas."
         },
         "reports": {
             "title": "Reportes de usuarios",
@@ -2189,6 +2193,26 @@
             "more": "Ver más ({{count}})",
             "note": "Fiestas de Barcelona, Madrid y Alicante en Xceed y Resident Advisor. «Repetida»: ya hay una fiesta con ese nombre esa noche. Fourvenues no se escanea: bloquea a los robots.",
             "importing": "Añadiendo {{done}}/{{total}}"
+        },
+        "tickets": {
+            "defaultName": "Entrada gratuita",
+            "current": "Entradas de la fiesta",
+            "none": "Esta fiesta aún no tiene entradas.",
+            "free": "Gratis",
+            "soldOf": "{{sold}} de {{capacity}} reservadas",
+            "sold": "{{count}} reservadas",
+            "remove": "Retirar",
+            "removed": "Entrada borrada",
+            "archived": "Entrada retirada de la venta (ya tenía reservas)",
+            "freeTitle": "Entrada gratuita",
+            "freeHelp": "La gente la reserva gratis desde la app y le llega con su QR para la puerta.",
+            "name": "Nombre",
+            "capacity": "Aforo",
+            "unlimited": "Sin límite",
+            "perOrder": "Máximo por persona",
+            "create": "Crear entrada gratuita",
+            "created": "Entrada gratuita creada",
+            "resent": "Correo reenviado"
         }
     },
     "pwa": {

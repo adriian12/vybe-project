@@ -827,7 +827,8 @@
                 "white": "White (less ink)",
                 "dark": "Dark (screens)"
             },
-            "showPoster": "Show on screen"
+            "showPoster": "Show on screen",
+            "posterFooterLink": "Scan the code to see the party and get your ticket"
         },
         "stats": {
             "title": "Analytics",
@@ -1899,7 +1900,10 @@
                 "apply": "Apply to {{count}} parties",
                 "done_one": "{{count}} party updated",
                 "done_other": "{{count}} parties updated"
-            }
+            },
+            "poster": "Poster",
+            "tickets": "Tickets",
+            "posterHelp": "Print it or show it on a screen. The QR opens the party page with its tickets."
         },
         "reports": {
             "title": "User reports",
@@ -2189,6 +2193,26 @@
             "more": "Show more ({{count}})",
             "note": "Parties in Barcelona, Madrid and Alicante on Xceed and Resident Advisor. “Duplicate”: there is already a party with that name that night. Fourvenues is not scanned: it blocks bots.",
             "importing": "Adding {{done}}/{{total}}"
+        },
+        "tickets": {
+            "defaultName": "Free ticket",
+            "current": "Tickets for this party",
+            "none": "This party has no tickets yet.",
+            "free": "Free",
+            "soldOf": "{{sold}} of {{capacity}} booked",
+            "sold": "{{count}} booked",
+            "remove": "Remove",
+            "removed": "Ticket deleted",
+            "archived": "Ticket taken off sale (it already had bookings)",
+            "freeTitle": "Free ticket",
+            "freeHelp": "People book it for free in the app and get a QR code for the door.",
+            "name": "Name",
+            "capacity": "Capacity",
+            "unlimited": "No limit",
+            "perOrder": "Max per person",
+            "create": "Create free ticket",
+            "created": "Free ticket created",
+            "resent": "Email sent again"
         }
     },
     "pwa": {

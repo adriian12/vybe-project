@@ -827,7 +827,8 @@
                 "white": "Weiß (weniger Tinte)",
                 "dark": "Dunkel (Bildschirme)"
             },
-            "showPoster": "Auf dem Bildschirm zeigen"
+            "showPoster": "Auf dem Bildschirm zeigen",
+            "posterFooterLink": "Scanne den Code, um die Party zu sehen und dein Ticket zu holen"
         },
         "stats": {
             "title": "Statistiken",
@@ -1899,7 +1900,10 @@
                 "apply": "Auf {{count}} Partys anwenden",
                 "done_one": "{{count}} Party aktualisiert",
                 "done_other": "{{count}} Partys aktualisiert"
-            }
+            },
+            "poster": "Plakat",
+            "tickets": "Tickets",
+            "posterHelp": "Zum Drucken oder für einen Bildschirm. Der QR-Code öffnet die Partyseite mit den Tickets."
         },
         "reports": {
             "title": "Nutzermeldungen",
@@ -2189,6 +2193,26 @@
             "more": "Mehr anzeigen ({{count}})",
             "note": "Partys in Barcelona, Madrid und Alicante auf Xceed und Resident Advisor. „Doppelt“: An diesem Abend gibt es schon eine Party mit diesem Namen. Fourvenues wird nicht gescannt: Es blockiert Bots.",
             "importing": "Wird hinzugefügt {{done}}/{{total}}"
+        },
+        "tickets": {
+            "defaultName": "Gratis-Ticket",
+            "current": "Tickets dieser Party",
+            "none": "Diese Party hat noch keine Tickets.",
+            "free": "Gratis",
+            "soldOf": "{{sold}} von {{capacity}} reserviert",
+            "sold": "{{count}} reserviert",
+            "remove": "Entfernen",
+            "removed": "Ticket gelöscht",
+            "archived": "Ticket aus dem Verkauf genommen (es gab schon Reservierungen)",
+            "freeTitle": "Gratis-Ticket",
+            "freeHelp": "Die Leute reservieren es kostenlos in der App und bekommen einen QR-Code für den Einlass.",
+            "name": "Name",
+            "capacity": "Kapazität",
+            "unlimited": "Unbegrenzt",
+            "perOrder": "Max. pro Person",
+            "create": "Gratis-Ticket erstellen",
+            "created": "Gratis-Ticket erstellt",
+            "resent": "E-Mail erneut gesendet"
         }
     },
     "pwa": {
