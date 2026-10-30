@@ -817,7 +817,17 @@
             "posterFooter": "Escaneja el codi amb l'app Fiestea",
             "manualCodeLabel": "Codi manual",
             "expiresInShort": "Caduca d'aquí a {{hours}} h {{minutes}} min",
-            "rotationInterval": "Interval de canvi"
+            "rotationInterval": "Interval de canvi",
+            "posterOrientation": "Orientació",
+            "posterPortrait": "Vertical",
+            "posterLandscape": "Horitzontal",
+            "posterColor": "Color",
+            "posterColors": {
+                "yellow": "Groc",
+                "white": "Blanc (menys tinta)",
+                "dark": "Fosc (pantalles)"
+            },
+            "showPoster": "Mostrar a la pantalla"
         },
         "stats": {
             "title": "Estadístiques",
@@ -956,7 +966,11 @@
             "repeatHelp": "Mateixa configuració: dades, cartell, ajustos de la festa i tipus d’entrada. Tria la data d’aquesta edició.",
             "repeatDate": "Nova data",
             "pastDate": "Aquesta data ja ha passat. Tria una data futura.",
-            "repeatPartial": "La festa s’ha creat, però no s’han pogut copiar tots els ajustos o entrades. Revisa-ho."
+            "repeatPartial": "La festa s’ha creat, però no s’han pogut copiar tots els ajustos o entrades. Revisa-ho.",
+            "posterUrlPlaceholder": "O enganxa l'enllaç de la imatge (https://…)",
+            "posterUrlUse": "Fer servir",
+            "posterUrlInvalid": "L'enllaç ha de començar per https://",
+            "musicPick": "Tria la música"
         },
         "team": {
             "title": "Equip",

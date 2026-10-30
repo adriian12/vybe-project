@@ -817,7 +817,17 @@
             "posterFooter": "Escanea el código con la app Fiestea",
             "manualCodeLabel": "Código manual",
             "expiresInShort": "Caduca en {{hours}} h {{minutes}} min",
-            "rotationInterval": "Intervalo de cambio"
+            "rotationInterval": "Intervalo de cambio",
+            "posterOrientation": "Orientación",
+            "posterPortrait": "Vertical",
+            "posterLandscape": "Horizontal",
+            "posterColor": "Color",
+            "posterColors": {
+                "yellow": "Amarillo",
+                "white": "Blanco (menos tinta)",
+                "dark": "Oscuro (pantallas)"
+            },
+            "showPoster": "Mostrar en pantalla"
         },
         "stats": {
             "title": "Estadísticas",
@@ -956,7 +966,11 @@
             "repeatHelp": "Misma configuración: datos, cartel, ajustes de la fiesta y tipos de entrada. Elige la fecha de esta edición.",
             "repeatDate": "Nueva fecha",
             "pastDate": "Esa fecha ya ha pasado. Elige una fecha futura.",
-            "repeatPartial": "La fiesta se ha creado, pero no se han podido copiar todos sus ajustes o entradas. Revísalos."
+            "repeatPartial": "La fiesta se ha creado, pero no se han podido copiar todos sus ajustes o entradas. Revísalos.",
+            "posterUrlPlaceholder": "O pega el enlace de la imagen (https://…)",
+            "posterUrlUse": "Usar",
+            "posterUrlInvalid": "El enlace tiene que empezar por https://",
+            "musicPick": "Elige la música"
         },
         "team": {
             "title": "Equipo",

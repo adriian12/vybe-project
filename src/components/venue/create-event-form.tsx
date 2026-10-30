@@ -3,7 +3,7 @@ import LineupEditor from '@/components/lineup-editor';
 import { LineupArtist } from '@/lib/lineup';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { CopyPlus, ImagePlus, X } from 'lucide-react';
+import { CopyPlus, X } from 'lucide-react';
 import { useAppContext } from '@/context/app-context';
 import { useToast } from '@/components/ui/use-toast';
 import { api } from '@/services/api';
@@ -20,12 +20,8 @@ import LocationPicker, { PickedLocation } from '@/components/venue/location-pick
 import { track } from '@/lib/observability';
 import { cn } from '@/lib/utils';
 import { Event } from '@/types/venue';
-
-/** El mismo límite que el resto de imágenes de la aplicación. */
-const MAX_POSTER_BYTES = 10 * 1024 * 1024;
-
-/** Géneros sugeridos. Se puede escribir cualquier otro. */
-const GENEROS = ['Techno', 'House', 'Tech House', 'Reggaeton', 'Latin', 'Pop', 'Hip Hop', 'Live', 'Open format'];
+import MusicSelect from '@/components/music-select';
+import PosterPicker from '@/components/poster-picker';
 
 interface EventFormData {
   name: string;
@@ -176,6 +172,8 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onCreated, onClose, e
     handleSubmit,
     formState: { errors },
     reset,
+    watch,
+    setValue,
   } = useForm<EventFormData>({
     defaultValues: base
       ? {
@@ -201,19 +199,6 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onCreated, onClose, e
     'placeholder:text-ink/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink ' +
     'disabled:opacity-50';
   const etiqueta = 'mb-1 block text-caption font-extrabold uppercase tracking-wide text-ink';
-
-  /**
-   * Enseña el cartel elegido sin subirlo todavía: subirlo aquí dejaría ficheros
-   * huérfanos cada vez que alguien abre el formulario y no llega a crear nada.
-   */
-  const pickPoster = (file: File) => {
-    if (file.size > MAX_POSTER_BYTES) {
-      toast({ title: t('auth.errors.fileTooBig'), variant: 'destructive' });
-      return;
-    }
-    setPosterFile(file);
-    setPosterPreview(URL.createObjectURL(file));
-  };
 
   const onSubmit = async (data: EventFormData) => {
     const { inicio, fin } = combinar(data.date, data.startTime, data.endTime);
@@ -446,18 +431,12 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onCreated, onClose, e
           <label htmlFor="ev-theme" className={etiqueta}>
             {t('venue.events.genre')}
           </label>
-          <input
+          <MusicSelect
             id="ev-theme"
-            list="ev-genres"
-            {...register('theme')}
+            value={watch('theme') ?? ''}
+            onChange={(v) => setValue('theme', v, { shouldDirty: true })}
             className={campo}
-            placeholder={t('venue.events.themePlaceholder')}
           />
-          <datalist id="ev-genres">
-            {GENEROS.map((g) => (
-              <option key={g} value={g} />
-            ))}
-          </datalist>
         </div>
 
         <div>
@@ -478,48 +457,21 @@ const CreateEventForm: React.FC<CreateEventFormProps> = ({ onCreated, onClose, e
             había forma de rellenarla. */}
         <div>
           <span className={etiqueta}>{t('venue.events.poster')}</span>
-          <input
-            id="event-poster"
-            type="file"
-            accept="image/jpeg,image/png,image/webp"
-            className="sr-only"
-            onChange={(event) => {
-              const file = event.target.files?.[0];
-              event.target.value = '';
-              if (file) pickPoster(file);
+          <PosterPicker
+            preview={posterPreview}
+            onFile={(file, vista) => {
+              setPosterFile(file);
+              setPosterPreview(vista);
+            }}
+            onUrl={(url) => {
+              setPosterFile(null);
+              setPosterPreview(url);
+            }}
+            onClear={() => {
+              setPosterPreview(null);
+              setPosterFile(null);
             }}
           />
-
-          {posterPreview ? (
-            <div className="relative overflow-hidden rounded-xl">
-              <img src={posterPreview} alt="" className="aspect-[16/10] w-full object-cover" />
-              <button
-                type="button"
-                onClick={() => {
-                  setPosterPreview(null);
-                  setPosterFile(null);
-                }}
-                aria-label={t('common.delete')}
-                className="press absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-ink/80 text-white"
-              >
-                <X size={15} />
-              </button>
-            </div>
-          ) : (
-            <div className="flex flex-col items-center gap-2 rounded-xl border-2 border-dashed border-ink/20 bg-[#F5F5F7] px-4 py-5 text-center">
-              <ImagePlus size={24} />
-              <p className="text-body-sm">{t('venue.events.posterDrop')}</p>
-              {/* El disparador es un `label`: dentro de un formulario un botón
-                  lo enviaría. Tiene forma de botón de verdad a propósito. */}
-              <label
-                htmlFor="event-poster"
-                className="press inline-flex h-9 cursor-pointer items-center rounded-xl bg-ink px-4 text-sm font-bold text-white"
-              >
-                {t('venue.events.selectFile')}
-              </label>
-              <p className="text-caption text-ink/60">{t('venue.events.posterHelp')}</p>
-            </div>
-          )}
         </div>
 
         {!editando && (

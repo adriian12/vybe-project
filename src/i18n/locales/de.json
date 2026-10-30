@@ -817,7 +817,17 @@
             "posterFooter": "Scanne den Code mit der Fiestea-App",
             "manualCodeLabel": "Manueller Code",
             "expiresInShort": "Läuft ab in {{hours}} Std. {{minutes}} Min.",
-            "rotationInterval": "Wechselintervall"
+            "rotationInterval": "Wechselintervall",
+            "posterOrientation": "Ausrichtung",
+            "posterPortrait": "Hochformat",
+            "posterLandscape": "Querformat",
+            "posterColor": "Farbe",
+            "posterColors": {
+                "yellow": "Gelb",
+                "white": "Weiß (weniger Tinte)",
+                "dark": "Dunkel (Bildschirme)"
+            },
+            "showPoster": "Auf dem Bildschirm zeigen"
         },
         "stats": {
             "title": "Statistiken",
@@ -956,7 +966,11 @@
             "repeatHelp": "Gleiche Einstellungen: Angaben, Plakat, Party-Einstellungen und Ticketarten. Wähle das Datum dieser Ausgabe.",
             "repeatDate": "Neues Datum",
             "pastDate": "Dieses Datum liegt in der Vergangenheit. Wähle ein zukünftiges Datum.",
-            "repeatPartial": "Die Party wurde erstellt, aber nicht alle Einstellungen oder Tickets konnten kopiert werden. Bitte prüfe sie."
+            "repeatPartial": "Die Party wurde erstellt, aber nicht alle Einstellungen oder Tickets konnten kopiert werden. Bitte prüfe sie.",
+            "posterUrlPlaceholder": "Oder füge den Bildlink ein (https://…)",
+            "posterUrlUse": "Übernehmen",
+            "posterUrlInvalid": "Der Link muss mit https:// beginnen",
+            "musicPick": "Musik wählen"
         },
         "team": {
             "title": "Team",

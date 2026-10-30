@@ -3,6 +3,9 @@ import LineupEditor from '@/components/lineup-editor';
 import { LineupArtist } from '@/lib/lineup';
 import { useTranslation } from 'react-i18next';
 import { CalendarPlus, Check, ChevronsUpDown, Loader2, Save } from 'lucide-react';
+import MusicSelect from '@/components/music-select';
+import PosterPicker from '@/components/poster-picker';
+import { api } from '@/services/api';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -67,7 +70,9 @@ const AdminEventForm = ({
   const [address, setAddress] = useState(event?.location?.address ?? '');
   const [dressCode, setDressCode] = useState(event?.dressCode ?? '');
   const [bookingUrl, setBookingUrl] = useState(event?.bookingUrl ?? '');
-  const [posterUrl, setPosterUrl] = useState(event?.posterUrl ?? '');
+  // Lo que se ve: el cartel guardado o el fichero elegido (sin subir aún).
+  const [posterPreview, setPosterPreview] = useState<string | null>(event?.posterUrl ?? null);
+  const [posterFile, setPosterFile] = useState<File | null>(null);
   const [description, setDescription] = useState(event?.description ?? '');
   const [lineup, setLineup] = useState<LineupArtist[]>(event?.lineup ?? []);
   const [lugar, setLugar] = useState<PickedLocation | null>(
@@ -91,6 +96,19 @@ const AdminEventForm = ({
     const fin = new Date(`${date}T${endTime}`);
     if (fin <= inicio) fin.setDate(fin.getDate() + 1);
 
+    setEnviando(true);
+
+    // El cartel se sube ahora, para no dejar ficheros sueltos si no se guarda.
+    let posterUrl: string | null = posterFile ? null : posterPreview;
+    if (posterFile) {
+      try {
+        posterUrl = (await api.uploadFile('event-posters', posterFile, posterFile.name)).url;
+      } catch {
+        toast({ title: t('venue.events.posterFailed'), variant: 'destructive' });
+        posterUrl = event?.posterUrl ?? null;
+      }
+    }
+
     const datos: AdminEventInput = {
       name: name.trim(),
       start: inicio.toISOString(),
@@ -106,12 +124,11 @@ const AdminEventForm = ({
       address: address.trim() || null,
       dressCode: dressCode.trim() || null,
       bookingUrl: bookingUrl.trim() || null,
-      posterUrl: posterUrl.trim() || null,
+      posterUrl,
       description: description.trim() || null,
       lineup,
     };
 
-    setEnviando(true);
     try {
       if (event) {
         await adminService.updateEvent(event.id, datos);
@@ -136,7 +153,8 @@ const AdminEventForm = ({
         setAddress('');
         setDressCode('');
         setBookingUrl('');
-        setPosterUrl('');
+        setPosterPreview(null);
+        setPosterFile(null);
         setDescription('');
         setLineup([]);
         setLugar(null);
@@ -233,21 +251,25 @@ const AdminEventForm = ({
         ))}
       </div>
 
+      {/* La dirección sale del punto que se elige en el mapa (abajo): pedirla
+          también aquí era rellenar lo mismo dos veces. */}
       <div className="grid gap-2 sm:grid-cols-2">
         {campo('ae-place', t('admin.newEvent.placeName'), (
           <Input id="ae-place" value={placeName} maxLength={120} onChange={(e) => setPlaceName(e.target.value)} />
         ))}
-        {campo('ae-address', t('admin.newEvent.address'), (
-          <Input id="ae-address" value={address} maxLength={240} onChange={(e) => setAddress(e.target.value)} />
-        ))}
-      </div>
-
-      <div className="grid gap-2 sm:grid-cols-4">
         {campo('ae-city', t('admin.newEvent.city'), (
           <Input id="ae-city" value={city} maxLength={60} onChange={(e) => setCity(e.target.value)} />
         ))}
+      </div>
+
+      <div className="grid gap-2 sm:grid-cols-3">
         {campo('ae-theme', t('admin.newEvent.theme'), (
-          <Input id="ae-theme" value={theme} maxLength={40} onChange={(e) => setTheme(e.target.value)} />
+          <MusicSelect
+            id="ae-theme"
+            value={theme}
+            onChange={setTheme}
+            className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+          />
         ))}
         {campo('ae-price', t('admin.newEvent.price'), (
           <Input id="ae-price" type="number" min={0} value={price} onChange={(e) => setPrice(e.target.value)} />
@@ -257,16 +279,33 @@ const AdminEventForm = ({
         ))}
       </div>
 
-      <div className="grid gap-2 sm:grid-cols-3">
+      <div className="grid gap-2 sm:grid-cols-2">
         {campo('ae-dress', t('admin.newEvent.dressCode'), (
           <Input id="ae-dress" value={dressCode} maxLength={40} onChange={(e) => setDressCode(e.target.value)} />
         ))}
         {campo('ae-booking', t('admin.newEvent.bookingUrl'), (
           <Input id="ae-booking" type="url" inputMode="url" placeholder="https://" value={bookingUrl} onChange={(e) => setBookingUrl(e.target.value)} />
         ))}
-        {campo('ae-poster', t('admin.newEvent.posterUrl'), (
-          <Input id="ae-poster" type="url" inputMode="url" placeholder="https://" value={posterUrl} onChange={(e) => setPosterUrl(e.target.value)} />
-        ))}
+      </div>
+
+      {/* El cartel se elige del ordenador o del móvil y se sube al guardar. */}
+      <div className="space-y-1">
+        <span className="text-caption font-medium">{t('venue.events.poster')}</span>
+        <PosterPicker
+          preview={posterPreview}
+          onFile={(file, vista) => {
+            setPosterFile(file);
+            setPosterPreview(vista);
+          }}
+          onUrl={(url) => {
+            setPosterFile(null);
+            setPosterPreview(url);
+          }}
+          onClear={() => {
+            setPosterPreview(null);
+            setPosterFile(null);
+          }}
+        />
       </div>
 
       {campo('ae-desc', t('admin.newEvent.description'), (
@@ -293,7 +332,7 @@ const AdminEventForm = ({
           value={lugar}
           onChange={(l) => {
             setLugar(l);
-            if (l.label && !address.trim()) setAddress(l.label);
+            if (l.label) setAddress(l.label);
           }}
         />
       </div>

@@ -1621,15 +1621,39 @@ export const api = {
   },
 
   getAllEventsForAdmin: async (): Promise<Event[]> => {
-    const { data, error } = await supabase
+    // Antes eran las 500 con el inicio más lejano: con cientos de fiestas
+    // importadas para las semanas siguientes, las de hoy y mañana se quedaban
+    // fuera (ni en la lista ni en el buscador, y «Más cercanos» empezaba días
+    // después). Ahora, todas las que no han terminado, por páginas como en
+    // `getEvents`, y las 500 pasadas más recientes para «Pasados».
+    const PAGINA = 1000;
+    const ahora = new Date().toISOString();
+    const filas: unknown[] = [];
+    for (let pagina = 0; pagina < 10; pagina++) {
+      const { data, error } = await supabase
+        .from('events')
+        .select(`*, venues(${VENUE_PUBLICO})`)
+        .gt('end_date', ahora)
+        .order('start_date', { ascending: true })
+        .order('id', { ascending: true })
+        .range(pagina * PAGINA, pagina * PAGINA + PAGINA - 1);
+      if (error) {
+        if (pagina === 0) return [];
+        break;
+      }
+      filas.push(...(data ?? []));
+      if (!data || data.length < PAGINA) break;
+    }
+
+    const { data: pasadas } = await supabase
       .from('events')
       .select(`*, venues(${VENUE_PUBLICO})`)
+      .lte('end_date', ahora)
       .order('start_date', { ascending: false })
       .limit(500);
+    filas.push(...(pasadas ?? []));
 
-    if (error || !data) return [];
-
-    return data.map((row) => {
+    return filas.map((row) => {
       const { venues, ...eventRow } = row as EventRow & { venues: VenueRow | null };
       return dbEventToEvent(eventRow as EventRow, venues ?? undefined);
     });

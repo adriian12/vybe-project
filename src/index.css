@@ -563,8 +563,192 @@
    la propia regla para que la impresora no lo convierta en blanco. La tinta va
    oscura: sobre este amarillo, el texto blanco no se lee. */
 
+/* Todas las medidas van en `--u`: 1 mm al imprimir (hoja A4) y, en modo
+   pantalla, lo que haga falta para que la misma hoja llene la tele sin
+   recortarse. Así el cartel es idéntico en papel y en pantalla. */
 .print-poster {
   display: none;
+  --u: 1mm;
+  --tinta: #141414;
+  --fondo: #F8D000;
+  --marca: #141414;
+}
+
+.print-poster--white {
+  --fondo: #ffffff;
+}
+
+/* Oscuro, pensado para pantallas: la marca en amarillo sobre negro. */
+.print-poster--dark {
+  --fondo: #141414;
+  --tinta: #ffffff;
+  --marca: #F8D000;
+}
+
+.print-poster--screen {
+  display: flex;
+  position: fixed;
+  inset: 0;
+  z-index: 1300;
+  align-items: center;
+  justify-content: center;
+  background: var(--fondo);
+}
+
+.print-poster--screen.print-poster--portrait {
+  --u: min(100vw / 210, 100vh / 297);
+}
+
+.print-poster--screen.print-poster--landscape {
+  --u: min(100vw / 297, 100vh / 210);
+}
+
+.print-poster-close {
+  position: absolute;
+  top: max(12px, env(safe-area-inset-top));
+  right: 12px;
+  z-index: 1;
+  display: flex;
+  height: 44px;
+  width: 44px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: rgba(0, 0, 0, 0.55);
+  color: #ffffff;
+}
+
+.print-poster-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  flex-shrink: 0;
+  width: calc(210 * var(--u));
+  height: calc(297 * var(--u));
+  padding: calc(14 * var(--u)) calc(12 * var(--u));
+  color: var(--tinta);
+  font-family: ui-sans-serif, system-ui, sans-serif;
+}
+
+.print-poster-top,
+.print-poster-scan,
+.print-poster-bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.print-poster-bottom {
+  flex: 1;
+}
+
+.print-poster-brand {
+  color: var(--marca);
+  font-size: calc(22 * var(--u));
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.print-poster-headline {
+  margin-top: calc(6 * var(--u));
+  font-size: calc(7 * var(--u));
+  font-weight: 600;
+  line-height: 1.25;
+  max-width: calc(150 * var(--u));
+  text-wrap: balance;
+}
+
+/* El QR ocupa cerca de la mitad del alto: es lo único que hay que escanear
+   desde lejos y con gente delante. Siempre sobre blanco, también en oscuro. */
+.print-poster-qr {
+  margin-top: calc(8 * var(--u));
+  background: #ffffff;
+  padding: calc(6 * var(--u));
+  border-radius: calc(6 * var(--u));
+  line-height: 0;
+}
+
+.print-poster--white .print-poster-qr {
+  border: calc(0.6 * var(--u)) solid #141414;
+}
+
+.print-poster-qr svg {
+  width: calc(110 * var(--u));
+  height: calc(110 * var(--u));
+}
+
+.print-poster-code {
+  margin-top: calc(5 * var(--u));
+  font-size: calc(9 * var(--u));
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  font-variant-numeric: tabular-nums;
+}
+
+.print-poster-event {
+  margin-top: calc(6 * var(--u));
+}
+
+.print-poster-event-name {
+  font-size: calc(8 * var(--u));
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.print-poster-venue {
+  margin-top: calc(1.5 * var(--u));
+  font-size: calc(5.5 * var(--u));
+  opacity: 0.85;
+}
+
+.print-poster-footer {
+  margin-top: auto;
+  font-size: calc(4.5 * var(--u));
+  opacity: 0.8;
+}
+
+/* Apaisado: el texto a la izquierda y el QR a la derecha, a toda altura. */
+.print-poster--landscape .print-poster-inner {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto 1fr;
+  column-gap: calc(14 * var(--u));
+  width: calc(297 * var(--u));
+  height: calc(210 * var(--u));
+  padding: calc(14 * var(--u)) calc(16 * var(--u));
+  text-align: left;
+}
+
+.print-poster--landscape .print-poster-top,
+.print-poster--landscape .print-poster-bottom {
+  grid-column: 1;
+  align-items: flex-start;
+}
+
+.print-poster--landscape .print-poster-scan {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: center;
+}
+
+.print-poster--landscape .print-poster-qr {
+  margin-top: 0;
+}
+
+.print-poster--landscape .print-poster-qr svg {
+  width: calc(130 * var(--u));
+  height: calc(130 * var(--u));
+}
+
+.print-poster--landscape .print-poster-headline {
+  font-size: calc(9 * var(--u));
+}
+
+.print-poster--landscape .print-poster-event {
+  margin-top: calc(10 * var(--u));
 }
 
 @media print {
@@ -579,87 +763,18 @@
   }
 
   .print-poster {
+    --u: 1mm !important;
     display: flex !important;
     position: fixed;
     inset: 0;
     align-items: center;
     justify-content: center;
-    background: #F8D000;
+    background: var(--fondo);
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
 
-  .print-poster-inner {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    width: 100%;
-    height: 100%;
-    padding: 14mm 12mm;
-    color: #141414;
-    font-family: ui-sans-serif, system-ui, sans-serif;
-  }
-
-  .print-poster-brand {
-    font-size: 22mm;
-    font-weight: 800;
-    letter-spacing: -0.02em;
-    line-height: 1;
-  }
-
-  .print-poster-headline {
-    margin-top: 6mm;
-    font-size: 7mm;
-    font-weight: 600;
-    line-height: 1.25;
-    max-width: 150mm;
-    text-wrap: balance;
-  }
-
-  /* El QR ocupa cerca de la mitad del alto: es lo único que hay que escanear
-     desde lejos y con gente delante. */
-  .print-poster-qr {
-    margin-top: 8mm;
-    background: #ffffff;
-    padding: 6mm;
-    border-radius: 6mm;
-    line-height: 0;
-  }
-
-  .print-poster-qr svg {
-    width: 110mm;
-    height: 110mm;
-  }
-
-  .print-poster-code {
-    margin-top: 5mm;
-    font-size: 9mm;
-    font-weight: 700;
-    letter-spacing: 0.25em;
-    font-variant-numeric: tabular-nums;
-  }
-
-  .print-poster-event {
-    margin-top: 6mm;
-  }
-
-  .print-poster-event-name {
-    font-size: 8mm;
-    font-weight: 700;
-    line-height: 1.15;
-  }
-
-  .print-poster-venue {
-    margin-top: 1.5mm;
-    font-size: 5.5mm;
-    opacity: 0.85;
-  }
-
-  .print-poster-footer {
-    margin-top: auto;
-    font-size: 4.5mm;
-    opacity: 0.8;
+  .print-poster-close {
+    display: none;
   }
 }
