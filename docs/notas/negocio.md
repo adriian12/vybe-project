@@ -263,3 +263,10 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
     hora de Madrid) y `use_included_boost(evento)`, sólo el dueño; deja una
     fila en `event_boosts` con `included` y 0 €. El diálogo de destacar del
     panel lo ofrece antes que el pago.
+- **Navegación del panel** (03-11-2026): en escritorio, pestañas con todas las
+  secciones y un menú de la cuenta al pulsar el correo (documentos, informe
+  semanal, ayuda, salir; y «Plan y facturación» cuando ya se paga Business,
+  que entonces sale de las pestañas). En el móvil no hay pestañas: un botón con
+  la sección en curso abre el desplegable lateral con todas y lo de la cuenta.
+  Con Business pagado, «Plan» es un resumen pequeño con el destacado a
+  ~~19,99 €~~ 9,99 € y la comparativa de planes plegada.

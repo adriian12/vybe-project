@@ -1265,7 +1265,14 @@
             "boostNote": "Ein Event hervorheben kostet {{price}} € pro Nacht; mit Business {{business}} € und eins pro Monat inklusive.",
             "unlimited": "unbegrenzt",
             "eventsUnlimited": "Unbegrenzt Events",
-            "teamUnlimited": "Unbegrenztes Team"
+            "teamUnlimited": "Unbegrenztes Team",
+            "boostLabel": "Event hervorheben",
+            "boostsLeft_one": "Diesen Monat noch {{count}} Hervorhebung inklusive",
+            "boostsLeft_other": "Diesen Monat noch {{count}} Hervorhebungen inklusive",
+            "boostsLeft": "Diesen Monat noch {{count}} Hervorhebungen inklusive",
+            "boostsUsed": "Die inklusive Hervorhebung dieses Monats ist schon genutzt",
+            "compareShow": "Leistungen ansehen und Tarife vergleichen",
+            "compareHide": "Tarife ausblenden"
         },
         "safety": {
             "needsHelp": "{{name}} hat um Hilfe gebeten",

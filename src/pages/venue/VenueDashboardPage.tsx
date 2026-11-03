@@ -69,6 +69,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {
@@ -113,10 +114,9 @@ type Section = 'qr' | 'door' | 'events' | 'stats' | 'promos' | 'sales' | 'busine
 type PestanaNegocio = 'profile' | 'socials' | 'page';
 type Period = 'total' | 'year' | 'month' | 'week';
 type EventFilter = 'live' | 'scheduled' | 'past';
-type Drawer = null | 'menu' | 'venue' | 'documents' | 'broadcast';
+type Drawer = null | 'menu' | 'documents' | 'broadcast';
 
 const PERIODS: Period[] = ['total', 'year', 'month', 'week'];
-const PROFILE_SECTIONS: Section[] = ['stats', 'promos', 'sales', 'business', 'team', 'settings', 'plan'];
 
 /**
  * Lo que ve cada cuenta del equipo (migración 072). El propietario, todo;
@@ -460,30 +460,10 @@ const VenueDashboardPage = () => {
     null;
   const workingEvent = myEvents.find((event) => event.id === workingEventId) ?? null;
   const picker = <EventPicker events={eventosAbiertos} value={workingEventId} onChange={setEventoPanel} />;
-  const esPerfil = PROFILE_SECTIONS.includes(section);
   const nombrePlan = plan ? t(`venue.plan.names.${plan.plan}`) : null;
-  const primeraDePerfil = PROFILE_SECTIONS.find(puede);
 
-  const mobileTabs = [
-    { key: 'qr', label: t('venue.tabs.qr'), active: section === 'qr', go: () => goTo('qr'), show: puede('qr') },
-    { key: 'door', label: t('venue.tabs.door'), active: section === 'door', go: () => goTo('door'), show: puede('door') },
-    {
-      key: 'events',
-      label: t('venue.tabs.events'),
-      active: section === 'events',
-      go: () => goTo('events'),
-      show: puede('events'),
-    },
-    {
-      key: 'profile',
-      label: t('venue.tabs.profile'),
-      active: esPerfil,
-      go: () => goTo(esPerfil ? section : (primeraDePerfil ?? 'stats')),
-      show: Boolean(primeraDePerfil),
-    },
-  ].filter((tab) => tab.show);
-
-  const desktopTabs = (
+  // Todas las secciones: pestañas en escritorio y lista del desplegable en el móvil.
+  const secciones = (
     [
       { section: 'qr', label: t('venue.nav.qr'), icon: QrCode },
       { section: 'door', label: t('venue.nav.door'), icon: DoorOpen },
@@ -495,20 +475,34 @@ const VenueDashboardPage = () => {
       { section: 'team', label: t('venue.tabs.team'), icon: Users },
       { section: 'settings', label: t('venue.nav.settings'), icon: SlidersHorizontal },
       { section: 'plan', label: t('venue.nav.plan'), icon: CreditCard },
-    ] as { section: Section; label: string; icon: typeof QrCode; also?: Section[] }[]
+    ] as { section: Section; label: string; icon: typeof QrCode }[]
   ).filter((tab) => puede(tab.section));
+  const seccionActual = secciones.find((tab) => tab.section === section) ?? null;
 
-  const profileTabs = (
-    [
-      { section: 'stats', label: t('venue.tabs.stats') },
-      { section: 'promos', label: t('venue.tabs.promos') },
-      { section: 'sales', label: t('venue.tabs.sales') },
-      { section: 'business', label: t('venue.tabs.business') },
-      { section: 'team', label: t('venue.tabs.team') },
-      { section: 'settings', label: t('venue.tabs.settings') },
-      { section: 'plan', label: t('venue.tabs.plan') },
-    ] as { section: Section; label: string }[]
-  ).filter((tab) => puede(tab.section));
+  // Con Business ya pagado, el plan no hace falta a la vista: pasa al menú de la cuenta.
+  const planEnMenu = plan?.plan === 'business' && plan.status !== 'trialing';
+  const desktopTabs = secciones.filter((tab) => tab.section !== 'plan' || !planEnMenu);
+
+  /** Lo que no es una sección: menú de la cuenta en escritorio, final del desplegable en el móvil. */
+  const extrasCuenta = [
+    { icon: FileText, label: t('venue.drawer.documents'), onClick: () => setDrawer('documents'), show: esPropietario },
+    {
+      icon: FileText,
+      label: t('venue.report.title'),
+      onClick: () => {
+        setDrawer(null);
+        setReportOpen(true);
+      },
+      show: puedeDifundir,
+    },
+    {
+      icon: HelpCircle,
+      label: t('venue.drawer.help'),
+      onClick: () =>
+        void openExternal(`mailto:${COMPANY.email}?subject=${encodeURIComponent(`Fiestea · ${currentVenue.name}`)}`),
+      show: true,
+    },
+  ].filter((item) => item.show);
 
   // ---------------------------------------------------------------- eventos
   const ahora = Date.now();
@@ -628,14 +622,6 @@ const VenueDashboardPage = () => {
                 <Megaphone size={17} />
               </button>
             )}
-            <button
-              type="button"
-              onClick={() => setDrawer('menu')}
-              aria-label={t('venue.menu')}
-              className="press flex h-9 w-9 items-center justify-center rounded-full bg-surface-high"
-            >
-              <Menu size={18} />
-            </button>
           </div>
         </div>
 
@@ -680,43 +666,60 @@ const VenueDashboardPage = () => {
                 {t('venue.broadcastShort')}
               </button>
             )}
-            <div className="text-right leading-tight">
-              <p className="font-display text-title-card">{currentVenue.email}</p>
-              <p className="text-caption text-party-gray">
-                {role ? t(`venue.team.roles.${role}`) : t('venue.myVenue')}
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={() => setDrawer('menu')}
-              aria-label={t('venue.menu')}
-              className="press flex h-10 w-10 items-center justify-center rounded-full bg-party-primary text-ink"
-            >
-              <Menu size={18} />
-            </button>
+            <LanguageSwitcher />
+            {/* La cuenta: lo que no es una sección del panel. */}
+            <DropdownMenu>
+              <DropdownMenuTrigger className="press flex items-center gap-3 rounded-full py-1 pl-3 pr-1 hover:bg-white/[0.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                <span className="text-right leading-tight">
+                  <span className="block font-display text-title-card">{currentVenue.email}</span>
+                  <span className="block text-caption text-party-gray">
+                    {role ? t(`venue.team.roles.${role}`) : t('venue.myVenue')}
+                  </span>
+                </span>
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-party-primary font-display text-sm font-black text-ink">
+                  {iniciales(currentVenue.name)}
+                </span>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-60">
+                {planEnMenu && esPropietario && (
+                  <DropdownMenuItem onClick={() => goTo('plan')}>
+                    <CreditCard size={15} className="mr-2" />
+                    {t('venue.nav.plan')}
+                  </DropdownMenuItem>
+                )}
+                {extrasCuenta.map((item) => (
+                  <DropdownMenuItem key={item.label} onClick={item.onClick}>
+                    <item.icon size={15} className="mr-2" />
+                    {item.label}
+                  </DropdownMenuItem>
+                ))}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => void handleLogout()} className="text-destructive focus:text-destructive">
+                  <LogOut size={15} className="mr-2" />
+                  {t('venue.exit')}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
 
-        {/* ---- pestañas ---- */}
-        <nav className="grid auto-cols-fr grid-flow-col gap-1 px-3 pb-2 lg:hidden">
-          {mobileTabs.map((tab) => (
-            <button
-              key={tab.key}
-              type="button"
-              onClick={tab.go}
-              aria-current={tab.active ? 'page' : undefined}
-              className={cn(
-                'press h-9 rounded-lg text-caption font-bold',
-                tab.active ? 'bg-party-primary text-ink' : 'text-party-gray',
-              )}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </nav>
+        {/* ---- móvil: la sección en curso abre el desplegable con todas ---- */}
+        <div className="px-3 pb-2 lg:hidden">
+          <button
+            type="button"
+            onClick={() => setDrawer('menu')}
+            aria-label={t('venue.menu')}
+            aria-haspopup="dialog"
+            className="press flex h-11 w-full items-center gap-2.5 rounded-xl bg-surface-high px-3 text-left"
+          >
+            {seccionActual && <seccionActual.icon size={17} className="shrink-0 text-party-primary" />}
+            <span className="flex-1 truncate font-display text-title-card">{seccionActual?.label}</span>
+            <Menu size={18} className="shrink-0 text-party-gray" />
+          </button>
+        </div>
         <nav className="no-scrollbar hidden gap-1 overflow-x-auto px-6 py-2 lg:flex">
           {desktopTabs.map((tab) => {
-            const activa = section === tab.section || tab.also?.includes(section);
+            const activa = section === tab.section;
             return (
               <button
                 key={tab.section}
@@ -736,25 +739,6 @@ const VenueDashboardPage = () => {
         </nav>
 
         <div className="border-t border-white/[0.06] px-4 py-2 lg:hidden">{franjaDirecto}</div>
-
-        {esPerfil && (
-          <nav className="grid auto-cols-fr grid-flow-col border-t border-white/[0.06] lg:hidden">
-            {profileTabs.map((tab) => (
-              <button
-                key={tab.section}
-                type="button"
-                onClick={() => goTo(tab.section)}
-                aria-current={section === tab.section ? 'page' : undefined}
-                className={cn(
-                  'press h-10 border-b-2 text-caption font-bold',
-                  section === tab.section ? 'border-party-primary text-foreground' : 'border-transparent text-party-gray',
-                )}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </nav>
-        )}
       </header>
 
       {/* ======================================================= contenido */}
@@ -1192,48 +1176,33 @@ const VenueDashboardPage = () => {
             </div>
           </SheetHeader>
 
-          <nav className="flex-1 space-y-1 p-3">
-            {[
-              { icon: Building2, label: t('venue.myVenue'), onClick: () => setDrawer('venue'), show: esPropietario },
-              {
-                icon: FileText,
-                label: t('venue.drawer.documents'),
-                onClick: () => setDrawer('documents'),
-                show: esPropietario,
-              },
-              { icon: CreditCard, label: t('venue.drawer.billing'), onClick: () => goTo('plan'), show: esPropietario },
-              {
-                icon: FileText,
-                label: t('venue.report.title'),
-                onClick: () => {
-                  setDrawer(null);
-                  setReportOpen(true);
-                },
-                show: puedeDifundir,
-              },
-              {
-                icon: Megaphone,
-                label: t('venue.drawer.broadcast'),
-                onClick: () => setDrawer('broadcast'),
-                show: puedeDifundir,
-              },
-              {
-                icon: HelpCircle,
-                label: t('venue.drawer.help'),
-                onClick: () =>
-                  void openExternal(
-                    `mailto:${COMPANY.email}?subject=${encodeURIComponent(`Fiestea · ${currentVenue.name}`)}`,
-                  ),
-                show: true,
-              },
-            ]
-              .filter((item) => item.show)
-              .map((item) => (
+          {/* Sólo en el móvil: en escritorio están las pestañas y el menú de la cuenta. */}
+          <nav className="flex-1 space-y-0.5 overflow-y-auto p-3">
+            {secciones.map((tab) => {
+              const activa = section === tab.section;
+              return (
+                <button
+                  key={tab.section}
+                  type="button"
+                  onClick={() => goTo(tab.section)}
+                  aria-current={activa ? 'page' : undefined}
+                  className={cn(
+                    'press flex h-11 w-full items-center gap-3 rounded-xl px-3 text-left text-body-md',
+                    activa ? 'bg-party-primary font-semibold text-ink' : 'text-[#C8C6C5] hover:bg-surface-high hover:text-foreground',
+                  )}
+                >
+                  <tab.icon size={18} />
+                  {tab.label}
+                </button>
+              );
+            })}
+            <div className="my-2 h-px bg-white/[0.06]" />
+            {extrasCuenta.map((item) => (
               <button
                 key={item.label}
                 type="button"
                 onClick={item.onClick}
-                className="press flex h-12 w-full items-center gap-3 rounded-xl px-3 text-left text-body-md text-[#C8C6C5] hover:bg-surface-high hover:text-foreground"
+                className="press flex h-11 w-full items-center gap-3 rounded-xl px-3 text-left text-body-md text-[#C8C6C5] hover:bg-surface-high hover:text-foreground"
               >
                 <item.icon size={18} />
                 {item.label}
@@ -1259,25 +1228,15 @@ const VenueDashboardPage = () => {
       </Sheet>
 
       <Sheet
-        open={drawer === 'venue' || drawer === 'documents' || drawer === 'broadcast'}
+        open={drawer === 'documents' || drawer === 'broadcast'}
         onOpenChange={(open) => !open && setDrawer(null)}
       >
         <SheetContent side="bottom" className="cards-light max-h-[88vh] overflow-y-auto lg:inset-x-auto lg:bottom-auto lg:right-4 lg:top-4 lg:w-[440px] lg:rounded-3xl">
           <SheetHeader className="mb-4 text-left">
             <SheetTitle>
-              {drawer === 'venue'
-                ? t('venue.config.title')
-                : drawer === 'documents'
-                  ? t('venue.drawer.documents')
-                  : t('venue.broadcast.title')}
+              {drawer === 'documents' ? t('venue.drawer.documents') : t('venue.broadcast.title')}
             </SheetTitle>
           </SheetHeader>
-          {drawer === 'venue' && (
-            <div className="space-y-4">
-              <ConfigCard />
-              <VenueProfileForm venueId={currentVenue.id} />
-            </div>
-          )}
           {drawer === 'documents' && <VenueDocuments />}
           {/* Sin evento el aviso sería global, que sólo puede enviar
               administración: se usa el evento con el que se está trabajando. */}

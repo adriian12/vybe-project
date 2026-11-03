@@ -1265,7 +1265,14 @@
             "boostNote": "Destacar un esdeveniment costa {{price}} € per nit; amb Business, {{business}} € i un al mes inclòs.",
             "unlimited": "sense límit",
             "eventsUnlimited": "Esdeveniments sense límit",
-            "teamUnlimited": "Equip sense límit"
+            "teamUnlimited": "Equip sense límit",
+            "boostLabel": "Destacar un esdeveniment",
+            "boostsLeft_one": "Et queda {{count}} destacat inclòs aquest mes",
+            "boostsLeft_other": "Et queden {{count}} destacats inclosos aquest mes",
+            "boostsLeft": "Et queden {{count}} destacats inclosos aquest mes",
+            "boostsUsed": "Ja has fet servir el destacat inclòs d’aquest mes",
+            "compareShow": "Veure què inclou i comparar plans",
+            "compareHide": "Amagar plans"
         },
         "safety": {
             "needsHelp": "{{name}} ha demanat ajuda",

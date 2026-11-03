@@ -1265,7 +1265,14 @@
             "boostNote": "Featuring an event costs €{{price}} per night; with Business, €{{business}} and one a month included.",
             "unlimited": "unlimited",
             "eventsUnlimited": "Unlimited events",
-            "teamUnlimited": "Unlimited team"
+            "teamUnlimited": "Unlimited team",
+            "boostLabel": "Feature an event",
+            "boostsLeft_one": "{{count}} included feature left this month",
+            "boostsLeft_other": "{{count}} included features left this month",
+            "boostsLeft": "{{count}} included features left this month",
+            "boostsUsed": "You've used this month's included feature",
+            "compareShow": "See what's included and compare plans",
+            "compareHide": "Hide plans"
         },
         "safety": {
             "needsHelp": "{{name}} asked for help",

@@ -1265,7 +1265,14 @@
             "boostNote": "Destacar un evento cuesta {{price}} € por noche; con Business, {{business}} € y uno al mes incluido.",
             "unlimited": "sin límite",
             "eventsUnlimited": "Eventos sin límite",
-            "teamUnlimited": "Equipo sin límite"
+            "teamUnlimited": "Equipo sin límite",
+            "boostLabel": "Destacar un evento",
+            "boostsLeft_one": "Te queda {{count}} destacado incluido este mes",
+            "boostsLeft_other": "Te quedan {{count}} destacados incluidos este mes",
+            "boostsLeft": "Te quedan {{count}} destacados incluidos este mes",
+            "boostsUsed": "Ya has usado el destacado incluido de este mes",
+            "compareShow": "Ver qué incluye y comparar planes",
+            "compareHide": "Ocultar planes"
         },
         "safety": {
             "needsHelp": "{{name}} ha pedido ayuda",
