@@ -26,10 +26,10 @@ import { adminClient, getUser } from '../_shared/supabase.ts';
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36';
 const PHOTON = 'https://photon.komoot.io/api/';
 
-const CIUDADES: Record<string, { nombre: string; ra: number; bbox: string }> = {
-  barcelona: { nombre: 'Barcelona', ra: 20, bbox: '1.90,41.25,2.35,41.55' },
-  madrid: { nombre: 'Madrid', ra: 41, bbox: '-3.90,40.25,-3.50,40.60' },
-  alicante: { nombre: 'Alicante', ra: 613, bbox: '-0.75,38.20,-0.30,38.60' },
+const CIUDADES: Record<string, { nombre: string; ra: number; bbox: string; alias: string[] }> = {
+  barcelona: { nombre: 'Barcelona', ra: 20, bbox: '1.90,41.25,2.35,41.55', alias: ['barcelona'] },
+  madrid: { nombre: 'Madrid', ra: 41, bbox: '-3.90,40.25,-3.50,40.60', alias: ['madrid'] },
+  alicante: { nombre: 'Alicante', ra: 613, bbox: '-0.75,38.20,-0.30,38.60', alias: ['alicante', 'alacant'] },
 };
 
 interface Fila {
@@ -188,10 +188,15 @@ const residentAdvisor = async (ciudad: string): Promise<Fila[]> => {
       // cae lejos de la ciudad se descarta y se busca por el nombre o la calle.
       const lat = venue.location?.latitude;
       const lng = venue.location?.longitude;
+      // A muchas salas RA les pone grados enteros o dos decimales, (41, 2) o
+      // (40, -4): caen a decenas de kilómetros, en el mar o en Toledo, y «Cómo
+      // llegar» llevaba a callejones. Sin precisión de calle, se busca.
       const conPunto =
         typeof lat === 'number' &&
         typeof lng === 'number' &&
         !(lat === 0 && lng === 0) &&
+        preciso(lat) &&
+        preciso(lng) &&
         cercaDe(ciudad, lat, lng);
       const imagenes = Array.isArray(e.images) ? (e.images as { filename?: string }[]) : [];
       const url = texto(e.contentUrl);
@@ -237,17 +242,106 @@ const cercaDe = (ciudad: string, lat: number, lng: number): boolean => {
   return 2 * 6371 * Math.asin(Math.sqrt(h)) <= RADIO_CIUDAD_KM;
 };
 
-/** Coordenadas y dirección de una sala por su nombre, dentro de la ciudad. */
-const buscarSala = async (nombre: string, ciudad: string): Promise<{ lat: number; lng: number; address: string | null } | null> => {
+const NOMINATIM = 'https://nominatim.openstreetmap.org/search';
+
+/**
+ * Una dirección con número, en Nominatim (OpenStreetMap): acierta el portal
+ * mejor que Photon («Avinguda Diagonal 547» es la sala Bikini). Sólo dentro de
+ * la ciudad y sólo si el número coincide; si no, `null` y se prueba Photon.
+ * Nominatim pide como mucho una petición por segundo.
+ */
+const buscarPortal = async (texto: string, ciudad: string): Promise<Lugar | null> => {
+  const numero = texto.match(/\b(\d{1,4})[a-z]?\b(?!\d)/i)?.[1];
+  if (!numero || claves(texto).length === 0) return null;
+  await new Promise((r) => setTimeout(r, 1100));
   try {
-    const r = await fetch(`${PHOTON}?limit=1&bbox=${CIUDADES[ciudad].bbox}&q=${encodeURIComponent(`${nombre} ${CIUDADES[ciudad].nombre}`)}`, {
+    const [o, s, e, n] = CIUDADES[ciudad].bbox.split(',');
+    const url = `${NOMINATIM}?format=jsonv2&limit=3&addressdetails=1&countrycodes=es&bounded=1&viewbox=${o},${n},${e},${s}&q=${encodeURIComponent(`${texto}, ${CIUDADES[ciudad].nombre}`)}`;
+    const r = await fetch(url, { headers: { 'User-Agent': 'Fiestea/1.0 (fiesttea@gmail.com)' } });
+    if (!r.ok) return null;
+    const lista = (await r.json()) as { lat: string; lon: string; address?: Record<string, string> }[];
+    const f = lista.find((x) => x.address?.house_number?.split(/[^0-9]/).includes(numero));
+    if (!f) return null;
+    const a = f.address ?? {};
+    const address = [[a.road, a.house_number].filter(Boolean).join(', ') || null, [a.postcode, a.city ?? a.town].filter(Boolean).join(' ') || null]
+      .filter(Boolean)
+      .join(', ');
+    return { lat: Number(f.lat), lng: Number(f.lon), address: address || null };
+  } catch {
+    return null;
+  }
+};
+
+/** Más de dos decimales: precisión de calle (dos decimales son ~1 km). */
+const preciso = (n: number): boolean => Math.abs(n * 100 - Math.round(n * 100)) > 1e-6;
+
+/** Minúsculas y sin tildes, para comparar nombres. */
+const plano = (s: string): string =>
+  s
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase();
+
+/** Palabras que no distinguen nada: tipos de local, vías y la propia ciudad. */
+const VACIAS = new Set([
+  'club', 'sala', 'bar', 'pub', 'disco', 'discoteca', 'hotel', 'the', 'and', 'los', 'las', 'del', 'de', 'la', 'el',
+  'calle', 'carrer', 'avenida', 'avinguda', 'avda', 'plaza', 'placa', 'paseo', 'passeig', 'camino', 'cami',
+  'barcelona', 'madrid', 'alicante', 'alacant', 'spain', 'espana', 'espanya',
+]);
+
+/** Las palabras que identifican un nombre o una calle («Sonido», «Gamonal»…). */
+const claves = (s: string): string[] =>
+  plano(s)
+    .split(/[^a-z0-9]+/)
+    .filter((w) => w.length >= 4 && !VACIAS.has(w) && !/^\d+$/.test(w));
+
+type Lugar = { lat: number; lng: number; address: string | null };
+
+/**
+ * Coordenadas y dirección de una sala, por su nombre o por su calle, dentro de
+ * la ciudad. Antes se tomaba el primer resultado de Photon tal cual: para
+ * «Sonido Alicante» era el aeropuerto, porque sólo coincidía «Alicante». Ahora
+ * el resultado tiene que compartir alguna palabra propia con lo buscado (su
+ * nombre o su calle), y por calle se prefiere el que tiene número.
+ */
+const buscarSala = async (texto: string, ciudad: string, porCalle = false): Promise<Lugar | null> => {
+  const buscadas = claves(texto);
+  if (buscadas.length === 0) return null;
+  // Photon corta si se le pregunta muy seguido y devolvía vacío a media lista.
+  await new Promise((r) => setTimeout(r, 350));
+  try {
+    const r = await fetch(`${PHOTON}?limit=8&bbox=${CIUDADES[ciudad].bbox}&q=${encodeURIComponent(`${texto} ${CIUDADES[ciudad].nombre}`)}`, {
       headers: { 'User-Agent': 'Fiestea/1.0 (fiesttea@gmail.com)' },
     });
     if (!r.ok) return null;
     const j = (await r.json()) as { features?: { geometry?: { coordinates?: [number, number] }; properties?: Record<string, string> }[] };
-    const f = j.features?.[0];
+    const ciudades = CIUDADES[ciudad].alias;
+    const buscado = plano(texto);
+    const casa = (j.features ?? []).filter((f) => {
+      const p = f.properties ?? {};
+      const encontrado = plano([p.name, p.street].filter(Boolean).join(' '));
+      // En la ciudad, o en el pueblo que nombra la propia dirección: mejor sin
+      // punto que en la calle del mismo nombre de otro municipio.
+      const lugar = plano(`${p.city ?? ''} ${p.county ?? ''}`);
+      const pueblo = plano(p.city ?? '');
+      const sitioBueno = ciudades.some((n) => lugar.includes(n)) || (pueblo.length >= 3 && buscado.includes(pueblo));
+      return f.geometry?.coordinates && sitioBueno && buscadas.some((w) => encontrado.includes(w));
+    });
+    // Entre los que coinciden: mejor en la propia ciudad («Calle Mayor 16» de
+    // Alicante, no la de Elche) y, por calle, con el mismo número de portal.
+    const numero = porCalle ? (texto.match(/\b(\d{1,4})[a-z]?\b/i)?.[1] ?? null) : null;
+    const puntos = (x: (typeof casa)[number]) => {
+      const p = x.properties ?? {};
+      const enCiudad = ciudades.some((n) => plano(`${p.city ?? ''} ${p.county ?? ''}`).includes(n));
+      return (enCiudad ? 4 : 0) + (numero && p.housenumber?.replace(/\D/g, '') === numero ? 2 : 0) + (porCalle && p.housenumber ? 1 : 0);
+    };
+    // Con número y sin ese portal, la calle sola puede quedar a un kilómetro
+    // («Rosellón 217» salía en el 390): mejor probar por el nombre de la sala.
+    const conPortal = casa.filter((x) => !numero || x.properties?.housenumber?.replace(/\D/g, '') === numero);
+    if (porCalle && numero && conPortal.length === 0) return null;
+    const f = conPortal.reduce<(typeof casa)[number] | undefined>((mejor, x) => (!mejor || puntos(x) > puntos(mejor) ? x : mejor), undefined);
     const c = f?.geometry?.coordinates;
-    if (!c) return null;
+    if (!f || !c || !cercaDe(ciudad, c[1], c[0])) return null;
     const p = f.properties ?? {};
     const calle = [p.street, p.housenumber].filter(Boolean).join(', ');
     const address = [calle || null, [p.postcode, p.city].filter(Boolean).join(' ') || null].filter(Boolean).join(', ') || null;
@@ -292,7 +386,7 @@ serve(async (req: Request): Promise<Response> => {
 
     // Las salas sin ubicación (las de Xceed y las de RA mal puestas):
     // primero, la que ya se conozca por el mismo nombre; si no, Photon (una
-    // vez por sala), por el nombre y, si no, por la dirección.
+    // vez por sala), por la dirección (lo más preciso) y, si no, por el nombre.
     const conocidas = new Map<string, { lat: number; lng: number; address: string | null }>();
     for (const f of filas) {
       if (f.place_name && f.latitude !== null && f.longitude !== null) {
@@ -304,8 +398,9 @@ serve(async (req: Request): Promise<Response> => {
       const clave = f.place_name.toLowerCase();
       if (!conocidas.has(clave)) {
         const sala =
-          (await buscarSala(f.place_name.replace(/^TBA\s*-\s*/i, ''), ciudad)) ??
-          (f.address ? await buscarSala(f.address, ciudad) : null);
+          (f.address ? await buscarPortal(f.address, ciudad) : null) ??
+          (f.address ? await buscarSala(f.address, ciudad, true) : null) ??
+          (await buscarSala(f.place_name.replace(/^TBA\s*-\s*/i, ''), ciudad));
         if (sala) conocidas.set(clave, sala);
         else conocidas.set(clave, { lat: NaN, lng: NaN, address: null });
       }

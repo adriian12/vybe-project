@@ -11,6 +11,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { useAppContext } from '@/context/app-context';
 import { ApiError } from '@/services/api';
 import { isNative, openExternal } from '@/services/native';
+import { siteMode } from '@/lib/hosts';
 import { euros, TicketCheckoutInfo, TicketHolder, ticketsService } from '@/services/tickets';
 import { track } from '@/lib/observability';
 import { cn } from '@/lib/utils';
@@ -46,6 +47,11 @@ const TicketCheckoutPage = () => {
   const { currentUser: user } = useAppContext();
   // Sin cuenta (la web, migración 125): las entradas sólo van al correo.
   const invitado = !user;
+  // En la web (`app.fiestea.es`, la landing) «Entradas» y «Proceso
+  // completado» son pantallas de la app del móvil y enseñan «Descarga la
+  // app»: con sesión o sin ella, al acabar se va a «Compra hecha». Antes quien
+  // tenía cuenta compraba y se quedaba en esa pantalla sin ver su entrada.
+  const alAcabarCompraHecha = invitado || siteMode() !== 'all';
   const { typeId = '' } = useParams();
   const [searchParams] = useSearchParams();
 
@@ -176,12 +182,12 @@ const TicketCheckoutPage = () => {
         addToAccount: !invitado && aMiCuenta,
         marketing: publicidad,
         acceptTerms: true,
-        guest: invitado,
+        guest: alAcabarCompraHecha,
       });
       track('tickets_checkout', { kind: info.kind, quantity: unidades, free: resultado.free });
       if (resultado.free || !resultado.url) {
         // Sin cuenta no hay «Entradas»: «Compra hecha» y el correo.
-        if (invitado) navigate('/compra-hecha', { replace: true, state: { email: asistentes[0].email.trim() } });
+        if (alAcabarCompraHecha) navigate('/compra-hecha', { replace: true, state: { email: asistentes[0].email.trim() } });
         else navigate(`/tickets/order/${resultado.orderId}`, { replace: true });
         return;
       }

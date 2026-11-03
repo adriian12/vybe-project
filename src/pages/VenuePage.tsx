@@ -27,6 +27,7 @@ import VenueEventCard from '@/components/venue-event-card';
 import { useToast } from '@/components/ui/use-toast';
 import { ApiError } from '@/services/api';
 import { openExternal } from '@/services/native';
+import { rutaHasta } from '@/lib/maps';
 import { nightService, OpeningDay, VenueEventSummary, VenueProfile } from '@/services/night';
 import { SOCIAL_NAME, socialUrl, SocialNetwork } from '@/lib/socials';
 import { cn } from '@/lib/utils';
@@ -271,11 +272,16 @@ const VenuePage = () => {
               </p>
               <button
                 type="button"
-                onClick={() =>
-                  void openExternal(
-                    `https://www.google.com/maps/dir/?api=1&destination=${venue.latitude},${venue.longitude}`,
-                  )
-                }
+                onClick={() => {
+                  const ruta = rutaHasta({
+                    name: venue.name,
+                    address: venue.address,
+                    city: venue.city,
+                    latitude: venue.latitude,
+                    longitude: venue.longitude,
+                  });
+                  if (ruta) void openExternal(ruta);
+                }}
                 className="press mt-2 flex items-center gap-1.5 rounded-lg bg-party-primary px-3 py-1.5 text-caption font-bold text-ink"
               >
                 <Navigation size={14} />

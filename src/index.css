@@ -251,6 +251,21 @@
     }
   }
 
+  /* La tarjeta del tablón sube desde donde asomaba en la baraja (8 px más
+     abajo y al 96 %), sin desvanecerse: la foto ya estaba pintada debajo. */
+  .card-up {
+    animation: vybe-card-up 200ms var(--ease-out) backwards;
+  }
+
+  @keyframes vybe-card-up {
+    from {
+      transform: translateY(10px) scale(0.96);
+    }
+    to {
+      transform: translateY(0) scale(1);
+    }
+  }
+
   /* Escalonado para rejillas y listas que sólo se ven de vez en cuando.
      El índice lo pone el componente con `style={{ '--i': n }}`. */
   .stagger > * {
@@ -281,6 +296,10 @@
 @media (prefers-reduced-motion: reduce) {
   .press:active {
     transform: none;
+  }
+
+  .card-up {
+    animation: none;
   }
 
   .enter,

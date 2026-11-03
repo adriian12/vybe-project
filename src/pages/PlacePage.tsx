@@ -13,6 +13,7 @@ import { isFeatured } from '@/lib/featured';
 import { nightOf } from '@/lib/date-filter';
 import { clave } from '@/lib/scan-groups';
 import { openExternal } from '@/services/native';
+import { rutaHasta } from '@/lib/maps';
 import type { VenueEventSummary } from '@/services/night';
 import { cn } from '@/lib/utils';
 
@@ -179,11 +180,16 @@ const PlacePage = () => {
               </p>
               <button
                 type="button"
-                onClick={() =>
-                  void openExternal(
-                    `https://www.google.com/maps/dir/?api=1&destination=${conSitio.location!.latitude},${conSitio.location!.longitude}`,
-                  )
-                }
+                onClick={() => {
+                  const ruta = rutaHasta({
+                    name: titulo,
+                    address: conSitio.location?.address,
+                    city: conSitio.city,
+                    latitude: conSitio.location?.latitude,
+                    longitude: conSitio.location?.longitude,
+                  });
+                  if (ruta) void openExternal(ruta);
+                }}
                 className="press mt-2 flex items-center gap-1.5 rounded-lg bg-party-primary px-3 py-1.5 text-caption font-bold text-ink"
               >
                 <Navigation size={14} />

@@ -476,22 +476,36 @@ const EventSwipingPage = () => {
         <main className="relative mx-margin flex-1">
           {currentProfile ? (
             <>
-              {/* Las dos siguientes asoman por abajo como tarjetas lisas, para
-                  que se lea que hay más gente. Sin su foto: girada y
-                  transparente se veía difuminada detrás de la principal. */}
+              {/* Las dos siguientes asoman por abajo. La primera ya lleva su
+                  foto (recta y opaca, no girada ni transparente, que se veía
+                  difuminada): al soltar la de arriba la siguiente ya está
+                  pintada y sólo crece hasta su sitio. */}
               {siguientes
                 .map((perfil, i) => (
                   <div
                     key={perfil.id}
                     aria-hidden
                     className={cn(
-                      'absolute inset-0 rounded-[20px] border border-white/[0.06]',
+                      'absolute inset-0 overflow-hidden rounded-[20px] border border-white/[0.06]',
                       i === 0 ? 'translate-y-2.5 scale-[0.96] bg-surface-high' : 'translate-y-5 scale-[0.92] bg-surface-container',
                     )}
-                  />
+                  >
+                    {i === 0 && (perfil.photos[0] ?? perfil.avatar) && (
+                      <img
+                        src={perfil.photos[0] ?? perfil.avatar}
+                        alt=""
+                        draggable={false}
+                        decoding="async"
+                        className="h-full w-full object-cover"
+                      />
+                    )}
+                  </div>
                 ))
                 .reverse()}
+              {/* Una tarjeta por persona: con la misma para todas, la siguiente
+                  volvía volando desde el lado por el que salió la anterior. */}
               <ProfileCard
+                key={currentProfile.id}
                 ref={tarjeta}
                 user={currentProfile}
                 onSwipe={(direction, userId) => void onSwipe(direction, userId)}

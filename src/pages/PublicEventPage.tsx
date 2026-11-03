@@ -8,6 +8,7 @@ import EventTickets from '@/components/event-tickets';
 import { formatHourRange } from '@/components/event-bits';
 import { PublicEvent, ticketsService } from '@/services/tickets';
 import { openExternal } from '@/services/native';
+import { rutaHasta } from '@/lib/maps';
 import { DOWNLOAD_PATH, landingHref } from '@/lib/hosts';
 import { setSeo } from '@/lib/seo';
 
@@ -115,14 +116,19 @@ const PublicEventPage = () => {
               <li className="flex items-center gap-2 rounded-2xl bg-surface-low p-3 text-body-sm font-semibold sm:col-span-2">
                 <MapPin size={18} className="shrink-0 text-party-primary" />
                 <span className="min-w-0 flex-1">{[evento.address, evento.city].filter(Boolean).join(' · ')}</span>
-                {evento.latitude !== null && evento.longitude !== null && (
+                {(evento.address || (evento.latitude !== null && evento.longitude !== null)) && (
                   <button
                     type="button"
-                    onClick={() =>
-                      void openExternal(
-                        `https://www.google.com/maps/dir/?api=1&destination=${evento.latitude},${evento.longitude}`,
-                      )
-                    }
+                    onClick={() => {
+                      const ruta = rutaHasta({
+                        name: sala,
+                        address: evento.address,
+                        city: evento.city,
+                        latitude: evento.latitude,
+                        longitude: evento.longitude,
+                      });
+                      if (ruta) void openExternal(ruta);
+                    }}
                     className="press flex shrink-0 items-center gap-1 rounded-lg bg-party-primary px-2.5 py-1 text-caption font-bold text-ink"
                   >
                     <Navigation size={13} />

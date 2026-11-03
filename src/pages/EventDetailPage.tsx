@@ -42,6 +42,7 @@ import { api } from '@/services/api';
 import { calculateDistance, Coordinates, formatDistance, getCurrentPosition } from '@/services/geo';
 import { franjaDe, sePuedeEntrar } from '@/lib/party-filters';
 import { openExternal } from '@/services/native';
+import { rutaHasta } from '@/lib/maps';
 import { EMPTY_ACTIVITY, socialService } from '@/services/social';
 import { publicLink } from '@/lib/share';
 import { useShareSheet } from '@/components/share-sheet';
@@ -222,11 +223,14 @@ const EventDetailPage = () => {
   const franja = franjaDe(event);
 
   const verRuta = () => {
-    if (!event.location) return;
-    const { latitude, longitude } = event.location;
-    void openExternal(
-      `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`,
-    );
+    const ruta = rutaHasta({
+      name: event.placeName ?? (event.byPlatform ? null : event.venueName),
+      address: event.location?.address,
+      city: event.city,
+      latitude: event.location?.latitude,
+      longitude: event.location?.longitude,
+    });
+    if (ruta) void openExternal(ruta);
   };
 
   return (

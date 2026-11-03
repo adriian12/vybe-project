@@ -194,7 +194,8 @@ const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(({ user, onS
           : `transform ${salida ? EXIT_MS : 220}ms var(--ease-out), opacity ${EXIT_MS}ms var(--ease-out)`,
       }}
     >
-      <div className="relative h-full w-full overflow-hidden rounded-[20px] bg-surface-high shadow-2xl">
+      {/* Entra desde donde asomaba en la baraja (`card-up`, index.css). */}
+      <div className="card-up relative h-full w-full overflow-hidden rounded-[20px] bg-surface-high shadow-2xl">
         <img src={foto} alt="" draggable={false} className="h-full w-full object-cover" />
 
         {/* Sellos de decisión: dicen qué va a pasar antes de soltar. */}
@@ -216,7 +217,10 @@ const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(({ user, onS
         <button
           type="button"
           onClick={() => setShowReport(true)}
-          className="press absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-[#0E0E11]/60 text-white/90 backdrop-blur-sm"
+          // Sin `backdrop-blur`: en una tarjeta que se mueve y gira, el
+          // desenfoque se recalcula en cada fotograma y el WebView de
+          // Android iba a tirones.
+          className="press absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-[#0E0E11]/75 text-white/90"
           aria-label={t('report.title', { name: user.name })}
         >
           <Flag size={15} />
@@ -247,7 +251,7 @@ const ProfileCard = forwardRef<ProfileCardHandle, ProfileCardProps>(({ user, onS
               {user.interests.slice(0, 3).map((slug) => (
                 <span
                   key={slug}
-                  className="rounded-full bg-[#2A2A2D]/85 px-3 py-1 text-label-pill text-white backdrop-blur-sm"
+                  className="rounded-full bg-[#2A2A2D]/90 px-3 py-1 text-label-pill text-white"
                 >
                   {interestLabel(slug)}
                 </span>
