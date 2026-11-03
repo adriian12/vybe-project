@@ -3842,5 +3842,74 @@
         "cancelledTitle": "Zahlung abgebrochen",
         "cancelledBody": "Es wurde nichts abgebucht. Du kannst es bei der Party erneut versuchen.",
         "appBody": "Mit der App hast du deine Tickets immer dabei und kommst mit dem QR rein."
+    },
+    "tour": {
+        "start": "So funktioniert's",
+        "next": "Weiter",
+        "finish": "Auf zur Party!",
+        "skip": "Einführung überspringen",
+        "back": "Zurück",
+        "replay": "Einführung ansehen",
+        "progress": "Schritt {{current}} von {{total}}",
+        "steps": {
+            "intro": {
+                "label": "Fiestea · Ganz Spanien",
+                "title": "Erlebe die Party zu 100 %",
+                "body": "Partys, Tickets und die Leute auf derselben Party wie du, in einer einzigen App. Wir zeigen dir alles in einer Minute."
+            },
+            "discover": {
+                "label": "Entdecken",
+                "title": "Alle Partys auf einen Blick",
+                "body": "Unter Start findest du die Partys in deiner Nähe und auf der Karte die in ganz Spanien. Filtere nach Tag, Uhrzeit, Musik oder «Mit Flechazo» und öffne die Party für Line-up, Zeiten und Preise."
+            },
+            "tickets": {
+                "label": "Tickets",
+                "title": "Dein Ticket in der Tasche",
+                "body": "Kauf in der App und zeig den QR-Code am Eingang. Alle Tickets und Gästelisten findest du im Tab Tickets."
+            },
+            "enter": {
+                "label": "Auf der Party",
+                "title": "Einchecken mit dem Code der Location",
+                "body": "Wenn du ankommst, scanne den QR-Code der Location oder gib ihren Code ein. Fiestea prüft mit deinem Standort, dass du dort bist. Solange unter Start «Du bist drin» steht, bist du auf der Party."
+            },
+            "swipe": {
+                "label": "Flechazo",
+                "title": "Swipen, matchen, chatten",
+                "body": "Drinnen siehst du die Pinnwand mit den Leuten auf der Party. Wenn ihr euch beide gefallt, gibt es ein Match und der Chat öffnet sich. Das Gespräch läuft am nächsten Tag ab, wenn ihr es nicht speichert."
+            },
+            "venue": {
+                "label": "Solange du drin bist",
+                "title": "Angebote, Gewinnspiele und News",
+                "body": "Die Location schickt dir ihre Angebote, Gewinnspiele und was heute Nacht passiert. Du bekommst sie nur, solange du auf der Party bist."
+            },
+            "safety": {
+                "label": "Sicherheit",
+                "title": "Sicher feiern, wie du willst",
+                "body": "Fiestea ist nur für Volljährige ab 18. Du kannst jede Person mit einem Tipp melden oder blockieren, und der Hilfe-Button alarmiert die Security der Location. Premium ist optional: sehen, wem du gefällst, Chats behalten und mehr."
+            }
+        },
+        "art": {
+            "today": "Heute",
+            "techno": "Techno",
+            "flechazo": "Mit Flechazo",
+            "ticket": "Ticket",
+            "ticketEvent": "Samstagnacht",
+            "ticketWhen": "Sa · 23:30 · 1 Person",
+            "here": "Du bist hier",
+            "like": "Gefällt mir",
+            "swipeName": "Alex, 24",
+            "match": "It's a Match!",
+            "now": "jetzt",
+            "offerTitle": "🍸 2 für 1 bis 1:00 Uhr",
+            "offerBody": "Zeig den Gutschein an der Bar.",
+            "raffleTitle": "🎁 Gewinnspiel: Tisch für vier",
+            "raffleBody": "Mit einem Tipp mitmachen.",
+            "raffleAction": "Mitmachen",
+            "noticeTitle": "📣 Gast-DJ ab 2:00 Uhr",
+            "block": "Blockieren",
+            "report": "Melden",
+            "help": "Hilfe",
+            "premium": "Premium · optional"
+        }
     }
 }

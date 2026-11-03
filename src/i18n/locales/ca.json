@@ -3842,5 +3842,74 @@
         "cancelledTitle": "Pagament cancel·lat",
         "cancelledBody": "No s'ha cobrat res. Pots tornar-ho a provar des de la festa.",
         "appBody": "Amb l'app tens les entrades sempre a mà i entres amb el QR."
+    },
+    "tour": {
+        "start": "Mira com funciona",
+        "next": "Següent",
+        "finish": "A la festa!",
+        "skip": "Salta la introducció",
+        "back": "Enrere",
+        "replay": "Veure la introducció",
+        "progress": "Pas {{current}} de {{total}}",
+        "steps": {
+            "intro": {
+                "label": "Fiestea · Tota Espanya",
+                "title": "Viu la festa al 100%",
+                "body": "Les festes, les entrades i la gent que és a la mateixa festa que tu, en una sola app. T'ho ensenyam en un minut."
+            },
+            "discover": {
+                "label": "Descobreix",
+                "title": "Totes les festes, d'un cop d'ull",
+                "body": "A Inici tens les festes de la teva zona i al Mapa, les de tota Espanya. Filtra per dia, hora, música o «Amb Flechazo» i obre la fitxa per veure el line-up, l'horari i els preus."
+            },
+            "tickets": {
+                "label": "Entrades",
+                "title": "La teva entrada, a la butxaca",
+                "body": "Compra a l'app i ensenya el QR a la porta. Totes les teves entrades i llistes t'esperen a la pestanya Entrades."
+            },
+            "enter": {
+                "label": "Dins la festa",
+                "title": "Entra amb el codi del local",
+                "body": "Quan arribis, escaneja el QR del local o escriu-ne el codi. Fiestea comprova amb la teva ubicació que hi ets. Mentre a Inici vegis «Hi ets a dins», continues a la festa."
+            },
+            "swipe": {
+                "label": "Flechazo",
+                "title": "Llisca, fes match i parla",
+                "body": "A dins tens el tauler amb la gent que és a la festa. Si us agradau tots dos, hi ha match i s'obre el xat. La conversa caduca l'endemà si no la guardau."
+            },
+            "venue": {
+                "label": "Mentre ets dins",
+                "title": "Ofertes, sorteigs i avisos",
+                "body": "El local t'envia les seves ofertes, els sorteigs i el que passarà aquesta nit. Només t'arriben mentre ets dins la festa."
+            },
+            "safety": {
+                "label": "Seguretat",
+                "title": "Festa segura i a la teva manera",
+                "body": "Fiestea és només per a majors de 18 anys. Pots denunciar o bloquejar qualsevol persona amb un toc, i el botó d'ajuda avisa la seguretat del local. Premium és opcional: veure a qui agrades, guardar xats i més."
+            }
+        },
+        "art": {
+            "today": "Avui",
+            "techno": "Techno",
+            "flechazo": "Amb Flechazo",
+            "ticket": "Entrada",
+            "ticketEvent": "Nit de dissabte",
+            "ticketWhen": "Ds · 23:30 · 1 persona",
+            "here": "Ets aquí",
+            "like": "M'agrada",
+            "swipeName": "Alex, 24",
+            "match": "Match!",
+            "now": "ara",
+            "offerTitle": "🍸 2x1 en copes fins a la 1:00",
+            "offerBody": "Ensenya el val a la barra.",
+            "raffleTitle": "🎁 Sorteig: reservat per a quatre",
+            "raffleBody": "Participa amb un toc.",
+            "raffleAction": "Participar",
+            "noticeTitle": "📣 El DJ convidat surt a les 2:00",
+            "block": "Bloquejar",
+            "report": "Denunciar",
+            "help": "Ajuda",
+            "premium": "Premium · opcional"
+        }
     }
 }

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -18,6 +18,7 @@ import {
   Loader2,
   LockKeyhole,
   LogOut,
+  PlayCircle,
   Trash2,
   Pencil,
   Plus,
@@ -79,6 +80,9 @@ const campoClaro =
   'w-full rounded-xl border-[1.5px] border-black/10 bg-black/[0.04] px-3 py-2.5 text-body-md text-ink outline-none placeholder:text-ink/40 focus:border-party-primary';
 
 /** Una fila del bloque de ajustes: icono en círculo, texto y lo que vaya a la derecha. */
+// El tutorial de bienvenida, para volver a verlo.
+const WelcomeTour = lazy(() => import('@/components/welcome-tour/welcome-tour'));
+
 const Fila: React.FC<{
   icon: typeof Bell;
   title: React.ReactNode;
@@ -155,6 +159,7 @@ const ProfilePage = () => {
   const [captureTarget, setCaptureTarget] = useState<'avatar' | 'photo' | null>(null);
   const [showFaceVerification, setShowFaceVerification] = useState(false);
   const [showSafety, setShowSafety] = useState(false);
+  const [showTour, setShowTour] = useState(false);
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [confirmCancel, setConfirmCancel] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -946,6 +951,8 @@ const ProfilePage = () => {
               onClick={() => setShowSafety(true)}
             />
 
+            <Fila icon={PlayCircle} title={t('tour.replay')} onClick={() => setShowTour(true)} />
+
             {/* La cuenta de administración usa la misma pantalla de perfil que
                 cualquiera: sin esto no había forma de llegar al panel desde aquí. */}
             {userType === 'admin' && (
@@ -985,6 +992,11 @@ const ProfilePage = () => {
       </main>
 
       <SafetySheet open={showSafety} onOpenChange={setShowSafety} />
+      {showTour && (
+        <Suspense fallback={null}>
+          <WelcomeTour loggedIn onClose={() => setShowTour(false)} />
+        </Suspense>
+      )}
       <PrivacySheet open={showPrivacy} onOpenChange={setShowPrivacy} />
 
       <AlertDialog open={confirmCancel} onOpenChange={setConfirmCancel}>

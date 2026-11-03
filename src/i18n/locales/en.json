@@ -3842,5 +3842,74 @@
         "cancelledTitle": "Payment cancelled",
         "cancelledBody": "Nothing has been charged. You can try again from the party.",
         "appBody": "With the app your tickets are always at hand and you get in with the QR."
+    },
+    "tour": {
+        "start": "See how it works",
+        "next": "Next",
+        "finish": "Let's party!",
+        "skip": "Skip the intro",
+        "back": "Back",
+        "replay": "Watch the intro",
+        "progress": "Step {{current}} of {{total}}",
+        "steps": {
+            "intro": {
+                "label": "Fiestea · All of Spain",
+                "title": "Live the party to the full",
+                "body": "Parties, tickets and the people at the same party as you, all in one app. We will show you how in a minute."
+            },
+            "discover": {
+                "label": "Discover",
+                "title": "Every party at a glance",
+                "body": "Home shows the parties near you and the Map shows them all over Spain. Filter by day, time, music or «With Flechazo», and open a party to see the line-up, times and prices."
+            },
+            "tickets": {
+                "label": "Tickets",
+                "title": "Your ticket, in your pocket",
+                "body": "Buy in the app and show the QR at the door. All your tickets and guest lists are waiting in the Tickets tab."
+            },
+            "enter": {
+                "label": "At the party",
+                "title": "Check in with the venue's code",
+                "body": "When you arrive, scan the venue's QR or type its code. Fiestea uses your location to check you are there. While Home shows «You're in», you are still at the party."
+            },
+            "swipe": {
+                "label": "Flechazo",
+                "title": "Swipe, match and chat",
+                "body": "Once inside you get the board with the people at the party. If you both like each other, it's a match and the chat opens. The conversation expires the next day unless you save it."
+            },
+            "venue": {
+                "label": "While you are in",
+                "title": "Offers, raffles and updates",
+                "body": "The venue sends you its offers, raffles and what is happening tonight. You only get them while you are at the party."
+            },
+            "safety": {
+                "label": "Safety",
+                "title": "Party safe, your way",
+                "body": "Fiestea is for over-18s only. You can report or block anyone with one tap, and the help button alerts the venue security. Premium is optional: see who likes you, keep chats and more."
+            }
+        },
+        "art": {
+            "today": "Today",
+            "techno": "Techno",
+            "flechazo": "With Flechazo",
+            "ticket": "Ticket",
+            "ticketEvent": "Saturday night",
+            "ticketWhen": "Sat · 23:30 · 1 person",
+            "here": "You are here",
+            "like": "Like",
+            "swipeName": "Alex, 24",
+            "match": "It's a match!",
+            "now": "now",
+            "offerTitle": "🍸 2-for-1 drinks until 1:00",
+            "offerBody": "Show the voucher at the bar.",
+            "raffleTitle": "🎁 Raffle: a table for four",
+            "raffleBody": "Enter with one tap.",
+            "raffleAction": "Enter",
+            "noticeTitle": "📣 The guest DJ is on at 2:00",
+            "block": "Block",
+            "report": "Report",
+            "help": "Help",
+            "premium": "Premium · optional"
+        }
     }
 }

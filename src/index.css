@@ -800,3 +800,23 @@
     display: none;
   }
 }
+
+/* La línea que recorre el QR en el tutorial de bienvenida. */
+.tour-scan {
+  animation: tour-scan 2.4s ease-in-out infinite alternate;
+}
+
+@keyframes tour-scan {
+  from {
+    transform: translateY(-46px);
+  }
+  to {
+    transform: translateY(46px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tour-scan {
+    animation: none;
+  }
+}

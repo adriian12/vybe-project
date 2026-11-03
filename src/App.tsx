@@ -20,6 +20,7 @@ import RedirectIfLoggedIn from '@/components/redirect-if-logged-in';
 import NativePushBridge from '@/components/native-push-bridge';
 import StaffOnlyWeb from '@/components/staff-only-web';
 import WhereNextPrompt from '@/components/where-next-prompt';
+import WelcomeTourGate from '@/components/welcome-tour/welcome-tour-gate';
 import Index from './pages/Index';
 import NotFound from './pages/NotFound';
 import PageViewTracker from '@/components/page-view-tracker';
@@ -198,6 +199,9 @@ const App = () => (
                     <Route path="*" element={<GoToApp />} />
                   </Routes>
                 ) : (
+                  <>
+                  {/* El tutorial de bienvenida, tras el consentimiento. */}
+                  <WelcomeTourGate />
                   <Routes>
                     {/* Públicas */}
                     <Route path="/" element={<RootPage />} />
@@ -281,6 +285,7 @@ const App = () => (
 
                     <Route path="*" element={<NotFound />} />
                   </Routes>
+                  </>
                 )}
               </ConsentGate>
             </Suspense>

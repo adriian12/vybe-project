@@ -3842,5 +3842,74 @@
         "cancelledTitle": "Pago cancelado",
         "cancelledBody": "No se ha cobrado nada. Puedes volver a intentarlo desde la fiesta.",
         "appBody": "Con la app tienes tus entradas siempre a mano y entras con el QR."
+    },
+    "tour": {
+        "start": "Ver cómo funciona",
+        "next": "Siguiente",
+        "finish": "¡A la fiesta!",
+        "skip": "Saltar la introducción",
+        "back": "Atrás",
+        "replay": "Ver la introducción",
+        "progress": "Paso {{current}} de {{total}}",
+        "steps": {
+            "intro": {
+                "label": "Fiestea · Toda España",
+                "title": "Vive la fiesta al 100%",
+                "body": "Las fiestas, las entradas y la gente que está en la misma fiesta que tú, en una sola app. Te lo enseñamos en un minuto."
+            },
+            "discover": {
+                "label": "Descubre",
+                "title": "Todas las fiestas, de un vistazo",
+                "body": "En Inicio tienes las fiestas de tu zona y en el Mapa, las de toda España. Filtra por día, hora, música o «Con Flechazo» y abre la ficha para ver el line-up, el horario y los precios."
+            },
+            "tickets": {
+                "label": "Entradas",
+                "title": "Tu entrada, en el bolsillo",
+                "body": "Compra en la app y enseña el QR en la puerta. Todas tus entradas y listas te esperan en la pestaña Entradas."
+            },
+            "enter": {
+                "label": "Dentro de la fiesta",
+                "title": "Entra con el código del local",
+                "body": "Al llegar, escanea el QR del local o escribe su código. Fiestea comprueba con tu ubicación que estás allí. Mientras en Inicio veas «Estás dentro», sigues en la fiesta."
+            },
+            "swipe": {
+                "label": "Flechazo",
+                "title": "Desliza, haz match y habla",
+                "body": "Dentro tienes el tablón con la gente que está en la fiesta. Si os gustáis los dos, hay match y se abre el chat. La conversación caduca al día siguiente si no la guardáis."
+            },
+            "venue": {
+                "label": "Mientras estás dentro",
+                "title": "Ofertas, sorteos y avisos",
+                "body": "El local te manda sus ofertas, sus sorteos y lo que va a pasar esta noche. Sólo te llegan mientras estás dentro de la fiesta."
+            },
+            "safety": {
+                "label": "Seguridad",
+                "title": "Fiesta segura y a tu manera",
+                "body": "Fiestea es sólo para mayores de 18. Puedes denunciar o bloquear a cualquiera con un toque, y el botón de ayuda avisa a la seguridad del local. Premium es opcional: ver a quién le gustas, guardar chats y más."
+            }
+        },
+        "art": {
+            "today": "Hoy",
+            "techno": "Techno",
+            "flechazo": "Con Flechazo",
+            "ticket": "Entrada",
+            "ticketEvent": "Noche de sábado",
+            "ticketWhen": "Sáb · 23:30 · 1 persona",
+            "here": "Estás aquí",
+            "like": "Me gusta",
+            "swipeName": "Alex, 24",
+            "match": "¡Match!",
+            "now": "ahora",
+            "offerTitle": "🍸 2x1 en copas hasta la 1:00",
+            "offerBody": "Enseña el vale en la barra.",
+            "raffleTitle": "🎁 Sorteo: reservado para cuatro",
+            "raffleBody": "Participa con un toque.",
+            "raffleAction": "Participar",
+            "noticeTitle": "📣 El DJ invitado sale a las 2:00",
+            "block": "Bloquear",
+            "report": "Denunciar",
+            "help": "Ayuda",
+            "premium": "Premium · opcional"
+        }
     }
 }

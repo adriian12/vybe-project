@@ -173,3 +173,13 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
 - **Inicio:** ya no tiene el selector de zona ni «cerca de mí» (para eso está
   el mapa), ni la etiqueta naranja de destacado en las tarjetas: los
   destacados tienen su carrusel.
+- **Tutorial de bienvenida** (`components/welcome-tour/`, textos en `tour.*`):
+  siete pantallas a página completa (estilo de la intro de Appark con los
+  colores de Fiestea; ilustraciones propias, sin fotos). Sale una vez por
+  persona: sin cuenta, sobre la bienvenida de la app instalada
+  (`fiestea_welcome_tour_seen` en el móvil); con cuenta, al primer inicio o
+  registro, cuando ya completó el perfil (`user_metadata.welcome_tour_seen_at`,
+  viaja entre móviles). Si el móvil lo vio hace menos de un día, la cuenta que
+  entra lo hereda sin enseñarlo. No sale en `/auth`, `/legal`, enlaces del
+  equipo ni en la compra. Se vuelve a ver desde Perfil → «Ver la introducción».
+  Si cambia algo que cuenta (Flechazo, entradas, Premium), cambia su paso.

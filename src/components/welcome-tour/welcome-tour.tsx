@@ -1,0 +1,203 @@
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { ChevronLeft } from 'lucide-react';
+import { SUPPORTED_LANGUAGES, changeLanguage } from '@/i18n';
+import { api } from '@/services/api';
+import { cn } from '@/lib/utils';
+import { DiscoverArt, EnterArt, IntroArt, SafetyArt, SwipeArt, TicketsArt, VenueArt } from './tour-art';
+
+/** Los pasos, en orden. Los textos están en `tour.steps.<id>`. */
+const PASOS = [
+  { id: 'intro', Art: IntroArt },
+  { id: 'discover', Art: DiscoverArt },
+  { id: 'tickets', Art: TicketsArt },
+  { id: 'enter', Art: EnterArt },
+  { id: 'swipe', Art: SwipeArt },
+  { id: 'venue', Art: VenueArt },
+  { id: 'safety', Art: SafetyArt },
+] as const;
+
+/** El orden de la referencia: primero las lenguas de aquí. */
+const IDIOMAS = ['es', 'ca', 'en', 'de'] as const;
+
+interface WelcomeTourProps {
+  /** Se llama al terminar o al saltarlo; quien lo abre decide si lo recuerda. */
+  onClose: () => void;
+  /** Con sesión, el idioma elegido se guarda también en el perfil. */
+  loggedIn?: boolean;
+}
+
+/**
+ * El tutorial de bienvenida: siete pantallas a página completa con barra de
+ * progreso, «Atrás», idioma, un dibujo, la etiqueta, el titular y el texto.
+ * Se pasa con el botón, deslizando de lado o con las flechas del teclado.
+ */
+const WelcomeTour: React.FC<WelcomeTourProps> = ({ onClose, loggedIn = false }) => {
+  const { t, i18n } = useTranslation();
+  const [paso, setPaso] = useState(0);
+  const toque = useRef<{ x: number; y: number } | null>(null);
+
+  const ultimo = paso === PASOS.length - 1;
+  const { id, Art } = PASOS[paso];
+
+  const siguiente = useCallback(() => {
+    if (ultimo) onClose();
+    else setPaso((p) => p + 1);
+  }, [ultimo, onClose]);
+
+  const atras = useCallback(() => setPaso((p) => Math.max(0, p - 1)), []);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowRight') siguiente();
+      else if (e.key === 'ArrowLeft') atras();
+      else if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [siguiente, atras, onClose]);
+
+  // Que no se desplace lo de debajo mientras está abierto.
+  useEffect(() => {
+    const antes = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = antes;
+    };
+  }, []);
+
+  const cambiarIdioma = async (code: string) => {
+    await changeLanguage(code);
+    if (!loggedIn) return;
+    try {
+      await api.updateProfile({ locale: code });
+    } catch {
+      // Se queda en este móvil; no hace falta avisar.
+    }
+  };
+
+  const activo = IDIOMAS.find((c) => i18n.resolvedLanguage === c) ?? 'es';
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="tour-title"
+      className="pt-safe pb-safe fixed inset-0 z-[1000] flex flex-col bg-background"
+      onTouchStart={(e) => {
+        const p = e.touches[0];
+        toque.current = { x: p.clientX, y: p.clientY };
+      }}
+      onTouchEnd={(e) => {
+        const inicio = toque.current;
+        toque.current = null;
+        if (!inicio) return;
+        const p = e.changedTouches[0];
+        const dx = p.clientX - inicio.x;
+        if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(p.clientY - inicio.y) * 1.5) {
+          if (dx < 0) siguiente();
+          else atras();
+        }
+      }}
+    >
+      <div className="mx-auto flex w-full max-w-md flex-1 flex-col overflow-hidden px-margin">
+        {/* Progreso: un tramo por paso, encendidos hasta el actual. */}
+        <div
+          className="flex gap-1.5 pt-4"
+          role="progressbar"
+          aria-valuemin={1}
+          aria-valuemax={PASOS.length}
+          aria-valuenow={paso + 1}
+          aria-label={t('tour.progress', { current: paso + 1, total: PASOS.length })}
+        >
+          {PASOS.map((p, i) => (
+            <span
+              key={p.id}
+              className={cn(
+                'h-1 flex-1 rounded-full transition-colors duration-300',
+                i <= paso ? 'bg-party-primary' : 'bg-white/15',
+              )}
+            />
+          ))}
+        </div>
+
+        <div className="flex h-14 items-center justify-between">
+          {paso > 0 ? (
+            <button
+              type="button"
+              onClick={atras}
+              className="press -ml-1 flex items-center gap-0.5 rounded-lg py-2 pr-2 font-display text-title-card text-party-gray hover:text-foreground"
+            >
+              <ChevronLeft size={20} />
+              {t('tour.back')}
+            </button>
+          ) : (
+            <span />
+          )}
+
+          <div className="flex rounded-full border border-white/10 bg-card p-0.5" role="group" aria-label={t('common.language')}>
+            {IDIOMAS.map((code) => (
+              <button
+                key={code}
+                type="button"
+                onClick={() => void cambiarIdioma(code)}
+                aria-pressed={activo === code}
+                aria-label={SUPPORTED_LANGUAGES.find((l) => l.code === code)?.label}
+                className={cn(
+                  'press h-8 min-w-[42px] rounded-full px-2 text-caption font-bold uppercase',
+                  activo === code ? 'bg-party-primary text-ink' : 'text-party-gray hover:text-foreground',
+                )}
+              >
+                {code}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* El contenido cambia de clave en cada paso para repetir la entrada. */}
+        <div key={id} className="flex min-h-0 flex-1 flex-col overflow-y-auto pb-2 pt-2">
+          <div className="enter">
+            <Art />
+          </div>
+          <div className="stagger mt-7">
+            <p style={{ '--i': 1 } as React.CSSProperties} className="text-label-pill font-extrabold uppercase tracking-[0.16em] text-party-primary">
+              {t(`tour.steps.${id}.label`)}
+            </p>
+            <h1
+              id="tour-title"
+              style={{ '--i': 2 } as React.CSSProperties}
+              className="mt-2 font-display text-[32px] font-extrabold leading-[1.05] tracking-tight"
+            >
+              {t(`tour.steps.${id}.title`)}
+            </h1>
+            <p style={{ '--i': 3 } as React.CSSProperties} className="mt-3 text-body-md text-party-gray">
+              {t(`tour.steps.${id}.body`)}
+            </p>
+          </div>
+        </div>
+
+        <div className="space-y-1 pb-4 pt-3">
+          <button
+            type="button"
+            onClick={siguiente}
+            className="press flex h-14 w-full items-center justify-center rounded-2xl bg-party-primary font-display text-title-card text-ink shadow-[0_10px_30px_rgba(248,208,0,0.18)] hover:bg-[#E0BC00]"
+          >
+            {paso === 0 ? t('tour.start') : ultimo ? t('tour.finish') : t('tour.next')}
+          </button>
+          <button
+            type="button"
+            onClick={onClose}
+            className={cn(
+              'press h-11 w-full rounded-xl text-body-sm font-semibold text-party-gray hover:text-foreground',
+              ultimo && 'invisible',
+            )}
+          >
+            {t('tour.skip')}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default WelcomeTour;

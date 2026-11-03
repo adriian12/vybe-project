@@ -1,8 +1,12 @@
+import { Suspense, lazy, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Trans, useTranslation } from 'react-i18next';
 import { Building, User } from 'lucide-react';
 import LanguageSwitcher from '@/components/language-switcher';
 import { VybeMark } from '@/components/brand/vybe-logo';
+import { deviceSeenAt, markDeviceSeen } from '@/lib/welcome-tour';
+
+const WelcomeTour = lazy(() => import('@/components/welcome-tour/welcome-tour'));
 
 /**
  * La bienvenida, según «Welcome» de Stitch: el símbolo, el nombre y la frase
@@ -14,6 +18,8 @@ import { VybeMark } from '@/components/brand/vybe-logo';
 const Index = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  // La primera vez que se abre la app, antes de elegir cómo entrar.
+  const [tour, setTour] = useState(() => deviceSeenAt() === null);
 
   return (
     <div className="pt-safe pb-safe relative flex min-h-[100dvh] flex-col overflow-hidden">
@@ -67,6 +73,17 @@ const Index = () => {
           />
         </p>
       </div>
+
+      {tour && (
+        <Suspense fallback={null}>
+          <WelcomeTour
+            onClose={() => {
+              markDeviceSeen();
+              setTour(false);
+            }}
+          />
+        </Suspense>
+      )}
     </div>
   );
 };
