@@ -33,7 +33,7 @@ claves de i18n, mensajes de error, nombres de columnas.
 - Tras cambios grandes sin commit, o si `explain` no encuentra algo nuevo:
   `cd vybe-project && graphify update .`. Es sólo AST y no gasta tokens.
 - **Nunca** ejecutes `graphify update .` ni `graphify extract .` desde la raíz
-  `D:\Webs\Vybe App`: indexaría los mockups y diseños en el mismo grafo.
+  `D:\Webs\Fiestea`: indexaría los mockups y diseños en el mismo grafo.
 - Reconstruirlo desde cero:
   `cd vybe-project && rm -rf graphify-out && graphify extract . --code-only --no-label && graphify cluster-only . --no-label`.
 - Para indexar las 68 migraciones SQL hace falta el extra `sql`

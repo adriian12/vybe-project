@@ -179,7 +179,7 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
   - **Apple Wallet** (`_shared/wallet-pass.ts`): desde el 21-10-2026 firma con
     `pass.es.fiestea.ios.tickets` de la cuenta de Adrián (Team `Q5S3R29R93`;
     certificado «Fiestea entradas Wallet», caduca el 20-11-2027). Clave,
-    solicitud y certificado en `D:\Webs\Vybe App\firma-apple-wallet\`, fuera de
+    solicitud y certificado en `D:\Webs\Fiestea\firma-apple-wallet\`, fuera de
     git. Antes usaba `pass.es.fiestea.tickets` de la cuenta de Iván.
   - **Google Wallet** (`_shared/google-wallet.ts`, integrado el 1 de octubre
     de 2026). Emisor `3388000000023210201`, proyecto de Google Cloud
@@ -188,7 +188,7 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
     - Cuenta de servicio `fiestea@fiestea-509713.iam.gserviceaccount.com`,
       Desarrollador en la consola de Wallet. Su clave va en
       `GOOGLE_WALLET_SERVICE_ACCOUNT_JSON` (el fichero, fuera de git, en
-      `D:\Webs\Vybe App\firma-google\`) y el emisor en
+      `D:\Webs\Fiestea\firma-google\`) y el emisor en
       `GOOGLE_WALLET_ISSUER_ID`.
     - Cada fiesta es una clase (`<emisor>.fiesta_<event_id>`) y cada entrada
       un pase (`<emisor>.<código>`). Se crean o se ponen al día por REST al

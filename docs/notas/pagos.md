@@ -53,7 +53,7 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
     (`FCM_CLIENT_EMAIL`). Necesita permisos en Play Console.
   - **Renovaciones y devoluciones:** llegan por Pub/Sub a
     `google-play-notifications?token=<GOOGLE_RTDN_TOKEN>` (sin JWT). La URL
-    completa está en `D:\Webs\Vybe App\google-rtdn-url.txt`, fuera de git.
+    completa está en `D:\Webs\Fiestea\google-rtdn-url.txt`, fuera de git.
   - `my_premium_status().store` puede ser `google`: se cancela en Google Play.
 - **Borrar la cuenta** (`delete-account`) cancela el Premium mensual que
   siga renovándose: Stripe al momento y Google Play con la Play Developer API

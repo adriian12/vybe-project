@@ -8,7 +8,7 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
   Aurora, código `394410`), con las 50 personas del seed dentro con su foto y
   likes ya dados a ambas. Se ven entre sí. Los clubbers de verdad desaparecen
   del tablón de los demás a las 12 h sin abrir la app (`last_seen_at`).
-- **Capturas del App Store** (20-10-2026, `D:WebsVybe Appcapturas-app-store`):
+- **Capturas del App Store** (20-10-2026, `D:\Webs\Fiestea\capturas-app-store`):
   se hacen en local con la cuenta del seed `alex.martorell@seed.vybe.test`
   (contraseña `SEED_PASSWORD`), que está dentro de «Fiestea Test Night». Tiene
   un match de prueba con `julia.roig@seed.vybe.test` y cinco mensajes, creados

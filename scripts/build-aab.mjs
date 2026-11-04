@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 /**
  * Compila el Android App Bundle (AAB) firmado con la clave de subida, que es
- * lo que acepta Google Play, y lo deja en `D:\Webs\Vybe App\Fiestea.aab`.
+ * lo que acepta Google Play, y lo deja en `D:\Webs\Fiestea\Fiestea.aab`.
  *
  *   · La clave y sus contraseñas están fuera del repositorio, en
- *     `D:\Webs\Vybe App\firma-android\keystore.properties` (véase
+ *     `D:\Webs\Fiestea\firma-android\keystore.properties` (véase
  *     `android/app/build.gradle`). Sin ellas no se compila: un AAB sin firmar
  *     no sirve para Play.
  *   · Google Play exige un `versionCode` mayor en cada subida: se usa el
