@@ -36,8 +36,8 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
   `python scripts/generate-icons.py`.
 - La barra de abajo es **Inicio · Mapa · Entradas · Crushes · Perfil**. La
   pestaña «Buscar» del diseño no existe: el buscador está en el mapa.
-- Rutas nuevas: `/event/:id` (ficha), `/map` (Leaflet con teselas oscuras de
-  CARTO, carga perezosa), `/tickets` (pase de la fiesta, vales con QR y
+- Rutas nuevas: `/event/:id` (ficha), `/map` (Leaflet con el fondo oscuro de
+  OpenFreeMap, carga perezosa), `/tickets` (pase de la fiesta, vales con QR y
   pasadas), `/u/:id` (perfil de una conexión). `/matches` y `/likes` son la
   misma pantalla con dos pestañas.
 - El formulario de evento ya escribe `recurrence` (`weekly`/`biweekly`) y el

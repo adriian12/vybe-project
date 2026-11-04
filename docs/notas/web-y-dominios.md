@@ -27,12 +27,14 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
 - **`/` no es lo mismo en todas partes.** En `fiestea.es` es la landing; en
   `app.fiestea.es`, el acceso de negocios; dentro de la app instalada (Capacitor o
   PWA standalone), la bienvenida (`Index`). Lo decide `RootPage` en `App.tsx`.
-- **CARTO exige clave** desde 2026 (`VITE_CARTO_API_KEY`, gratis en
-  carto.com/basemaps/apikey). Sin ella cada tesela es una marca de agua «API KEY
-  REQUIRED», así que `map-thumb.tsx` no pide teselas si falta. **No confundir con
-  el API Access Token del Workspace** (`eyJ…`, en `CARTO_API_TOKEN`, lo usa el
-  MCP): da acceso a los datos de la cuenta y con prefijo `VITE_` acabaría en el
-  bundle. `vite.config.ts` para la compilación si lo detecta.
+- **Mapas: OpenFreeMap** (estilo `dark`, desde el 04-11-2026). Gratis también
+  para uso comercial, sin clave ni límite; sólo pide la atribución. Leaflet sigue
+  llevando alfileres y gestos y el fondo es una capa de MapLibre
+  (`lib/base-map.ts`, `@maplibre/maplibre-gl-leaflet`); la miniatura de las
+  fichas es un MapLibre quieto que se carga aparte (`map-thumb.tsx`). Se dejó
+  CARTO porque su plan gratuito es «Non-commercial» y el comercial cuesta
+  500 $/mes. `VITE_CARTO_API_KEY` ya no se usa; la comprobación de
+  `vite.config.ts` contra el token `eyJ…` del Workspace (privado) sigue ahí.
 - **Publicar:** la lista completa (Vercel, DNS, Supabase, Resend, Stripe,
   tiendas, legal) está en `vybe-project/PUBLICAR.md`.
 - **SEO de la web** (`fiestea.es`): `index.html` lleva título, descripción,

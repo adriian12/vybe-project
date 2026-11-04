@@ -1,50 +1,37 @@
-import { useMemo } from 'react';
+import { useEffect, useRef } from 'react';
 import { MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 /**
- * Teselas oscuras de CARTO sobre datos de OpenStreetMap. Son las mismas que usa
- * la pantalla del mapa, así que la miniatura y el mapa grande se parecen.
+ * El estilo oscuro de OpenFreeMap sobre datos de OpenStreetMap. Es el mismo que
+ * usa la pantalla del mapa (`lib/base-map.ts`), así que la miniatura y el mapa
+ * grande se parecen.
  *
- * CARTO exige clave desde 2026: sin ella cada tesela es una imagen con «API KEY
- * REQUIRED». La clave es gratuita (5 millones de teselas al mes, uso comercial
- * permitido) y se pide en https://carto.com/basemaps/apikey. Va en
- * `VITE_CARTO_API_KEY`; si falta, no se piden teselas y el mapa queda en su
- * fondo oscuro con los alfileres, en vez de llenarse de marcas de agua.
+ * OpenFreeMap es gratuito también para uso comercial, sin clave ni límite de
+ * visitas; sólo pide que se vea la atribución. Sustituye a CARTO, cuyo plan
+ * gratuito es sólo para uso no comercial.
  */
-const CARTO_KEY = (import.meta.env.VITE_CARTO_API_KEY as string | undefined) || '';
-
-export const HAS_MAP_TILES = CARTO_KEY !== '';
-
-if (!HAS_MAP_TILES && import.meta.env.DEV) {
-  console.warn('[mapa] Falta VITE_CARTO_API_KEY: el mapa se pinta sin teselas.');
-}
-
-const withKey = (url: string): string => (HAS_MAP_TILES ? `${url}?key=${encodeURIComponent(CARTO_KEY)}` : url);
-
-// eslint-disable-next-line react-refresh/only-export-components
-export const DARK_TILES = withKey('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png');
+export const MAP_STYLE = 'https://tiles.openfreemap.org/styles/dark';
 export const TILES_ATTRIBUTION =
-  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>';
-
-const TILE = 256;
+  '<a href="https://openfreemap.org">OpenFreeMap</a> &copy; <a href="https://www.openmaptiles.org/">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
 
 interface MapThumbProps {
   latitude: number;
   longitude: number;
   /** Lado en píxeles de la miniatura. */
   size?: number;
+  /** Zoom de Leaflet (teselas de 256 px). */
   zoom?: number;
   className?: string;
 }
 
 /**
- * Un recorte de mapa con el local en el centro, sin cargar Leaflet.
+ * Un recorte de mapa con el local en el centro, sin Leaflet ni gestos.
  *
- * La tarjeta de «Cómo llegar» sólo necesita enseñar dónde está; montar un mapa
- * interactivo para 80 píxeles descargaba la librería entera y hasta dieciséis
- * teselas. Aquí se calculan las dos o cuatro teselas que tocan el recuadro y se
- * colocan a mano.
+ * La tarjeta de «Cómo llegar» sólo necesita enseñar dónde está. OpenFreeMap no
+ * sirve imágenes sueltas, así que se pinta un mapa de MapLibre quieto; la
+ * librería se descarga aparte, cuando la miniatura aparece, para no cargar la
+ * ficha.
  */
 const MapThumb: React.FC<MapThumbProps> = ({
   latitude,
@@ -53,31 +40,30 @@ const MapThumb: React.FC<MapThumbProps> = ({
   zoom = 15,
   className,
 }) => {
-  const tiles = useMemo(() => {
-    const n = 2 ** zoom;
-    const latRad = (latitude * Math.PI) / 180;
-    // Proyección de Mercator a píxeles globales del nivel de zoom.
-    const gx = ((longitude + 180) / 360) * n * TILE;
-    const gy = ((1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2) * n * TILE;
+  const contenedor = useRef<HTMLDivElement | null>(null);
 
-    const left = gx - size / 2;
-    const top = gy - size / 2;
-    const lista: { key: string; src: string; x: number; y: number }[] = [];
+  useEffect(() => {
+    let mapa: { remove: () => void } | null = null;
+    let cancelado = false;
 
-    for (let tx = Math.floor(left / TILE); tx <= Math.floor((left + size) / TILE); tx++) {
-      for (let ty = Math.floor(top / TILE); ty <= Math.floor((top + size) / TILE); ty++) {
-        const wrapped = ((tx % n) + n) % n;
-        lista.push({
-          key: `${tx}-${ty}`,
-          src: withKey(`https://a.basemaps.cartocdn.com/dark_all/${zoom}/${wrapped}/${ty}@2x.png`),
-          x: tx * TILE - left,
-          y: ty * TILE - top,
-        });
-      }
-    }
+    void import('maplibre-gl').then(({ Map }) => {
+      if (cancelado || !contenedor.current) return;
+      mapa = new Map({
+        container: contenedor.current,
+        style: MAP_STYLE,
+        center: [longitude, latitude],
+        // MapLibre cuenta el zoom con teselas de 512 px: uno menos que Leaflet.
+        zoom: zoom - 1,
+        interactive: false,
+        attributionControl: false,
+      });
+    });
 
-    return HAS_MAP_TILES ? lista : [];
-  }, [latitude, longitude, size, zoom]);
+    return () => {
+      cancelado = true;
+      mapa?.remove();
+    };
+  }, [latitude, longitude, zoom]);
 
   return (
     <div
@@ -85,28 +71,16 @@ const MapThumb: React.FC<MapThumbProps> = ({
       style={{ width: size, height: size }}
       aria-hidden
     >
-      {tiles.map((tile) => (
-        <img
-          key={tile.key}
-          src={tile.src}
-          alt=""
-          loading="lazy"
-          draggable={false}
-          className="absolute max-w-none"
-          style={{ left: tile.x, top: tile.y, width: TILE, height: TILE }}
-        />
-      ))}
+      <div ref={contenedor} className="absolute inset-0" />
       <span className="absolute inset-0 flex items-center justify-center">
         <span className="flex h-6 w-6 items-center justify-center rounded-full bg-party-primary text-ink shadow">
           <MapPin size={14} />
         </span>
       </span>
-      {/* CARTO y OpenStreetMap piden que la atribución se vea. */}
-      {HAS_MAP_TILES && (
-        <span className="absolute inset-x-0 bottom-0 bg-black/55 px-1 text-center text-[7px] leading-[10px] text-white/80">
-          © OSM · CARTO
-        </span>
-      )}
+      {/* OpenFreeMap y OpenStreetMap piden que la atribución se vea. */}
+      <span className="absolute inset-x-0 bottom-0 bg-black/55 px-1 text-center text-[7px] leading-[10px] text-white/80">
+        © OSM · OpenFreeMap
+      </span>
     </div>
   );
 };

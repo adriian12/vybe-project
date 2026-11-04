@@ -6,7 +6,7 @@ import 'leaflet/dist/leaflet.css';
 import { ChevronRight, LocateFixed, MapPin, Music, Navigation, Search, SlidersHorizontal, X } from 'lucide-react';
 import Header from '@/components/header';
 import Footer from '@/components/footer';
-import { DARK_TILES, HAS_MAP_TILES, TILES_ATTRIBUTION } from '@/components/map-thumb';
+import { addBaseMap } from '@/lib/base-map';
 import { dayAndMonth } from '@/components/event-bits';
 import { vibeKey } from '@/lib/vibe';
 import {
@@ -270,14 +270,7 @@ const MapPage = () => {
       attributionControl: false,
     }).setView(PALMA, 12);
 
-    // Sin clave de CARTO cada tesela sería una marca de agua: mejor el fondo solo.
-    if (HAS_MAP_TILES) {
-      L.tileLayer(DARK_TILES, {
-        subdomains: 'abcd',
-        maxZoom: 19,
-        detectRetina: true,
-      }).addTo(m);
-    }
+    addBaseMap(m);
 
     capa.current = L.layerGroup().addTo(m);
     mapa.current = m;

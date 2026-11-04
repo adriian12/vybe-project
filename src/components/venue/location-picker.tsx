@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Loader2, LocateFixed, MapPin, Search } from 'lucide-react';
-import { DARK_TILES, HAS_MAP_TILES, TILES_ATTRIBUTION } from '@/components/map-thumb';
+import { addBaseMap } from '@/lib/base-map';
 import { getCurrentPosition } from '@/services/geo';
 
 export interface PickedLocation {
@@ -54,11 +54,8 @@ const LocationPicker = ({
   useEffect(() => {
     if (!contenedor.current || mapa.current) return;
     const inicio: [number, number] = value ? [value.latitude, value.longitude] : MALLORCA;
-    const m = L.map(contenedor.current, { zoomControl: true, attributionControl: HAS_MAP_TILES }).setView(
-      inicio,
-      value ? 16 : 9,
-    );
-    if (HAS_MAP_TILES) L.tileLayer(DARK_TILES, { attribution: TILES_ATTRIBUTION, maxZoom: 19 }).addTo(m);
+    const m = L.map(contenedor.current, { zoomControl: true }).setView(inicio, value ? 16 : 9);
+    addBaseMap(m);
 
     const icono = L.divIcon({
       className: '',
