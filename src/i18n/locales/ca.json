@@ -247,7 +247,8 @@
             "cards": "Targetes",
             "grid": "Quadrícula",
             "list": "Llista"
-        }
+        },
+        "goingShort": "Hi vas"
     },
     "eventAccess": {
         "verifyTitle": "Verificar proximitat",
@@ -3996,13 +3997,12 @@
         "otherAddress": "Una altra adreça només per aquesta nit",
         "homePrivacy": "Només es desa en aquest mòbil. La pots canviar o esborrar quan vulguis.",
         "changeHome": "Canviar l'adreça",
-        "taxi": "Taxi",
         "home": "Casa",
         "price": "{{min}}–{{max}} € aproximat",
         "minutes_one": "{{count}} min de trajecte",
         "minutes_other": "{{count}} min de trajecte",
         "openApp": "Obrir l'app",
-        "approx": "Aproximat · el preu final te'l dona l'app o el taxímetre.",
+        "approx": "Aproximat · el preu final te'l dona l'app.",
         "noPrice": "Ara no podem calcular el preu, però pots demanar el cotxe igualment.",
         "tellSomeone": "Avisar algú que torno",
         "searchPlaceholder": "Carrer, número i ciutat",

@@ -247,7 +247,8 @@
             "cards": "Tarjetas",
             "grid": "Cuadrícula",
             "list": "Lista"
-        }
+        },
+        "goingShort": "Vas a ir"
     },
     "eventAccess": {
         "verifyTitle": "Verificar proximidad",
@@ -3996,13 +3997,12 @@
         "otherAddress": "Otra dirección solo para esta noche",
         "homePrivacy": "Se guarda solo en este móvil. Puedes cambiarla o borrarla cuando quieras.",
         "changeHome": "Cambiar la dirección",
-        "taxi": "Taxi",
         "home": "Casa",
         "price": "{{min}}–{{max}} € aproximado",
         "minutes_one": "{{count}} min de trayecto",
         "minutes_other": "{{count}} min de trayecto",
         "openApp": "Abrir la app",
-        "approx": "Aproximado · el precio final te lo da la app o el taxímetro.",
+        "approx": "Aproximado · el precio final te lo da la app.",
         "noPrice": "Ahora no podemos calcular el precio, pero puedes pedir el coche igual.",
         "tellSomeone": "Avisar a alguien de que vuelvo",
         "searchPlaceholder": "Calle, número y ciudad",

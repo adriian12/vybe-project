@@ -156,6 +156,10 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
   `pg_net` (secretos de Vault `push_hook_secret` y `functions_url`). Evento que
   empieza (a quien marcó «voy a ir»), que se llena y que termina en 30 min (a
   quien está dentro): `pending_event_pushes()` cada 5 min vía `notify-events`.
+  **«Quién va» en la ficha** (132): con Premium, las miniaturas salen primero
+  las de tus matches (conexión guardada o «me gusta» mutuo que aún exista) y
+  el resto al azar. No se pulsa y el diseño no cambia: es para intuir que va
+  alguien conocido. Los matches caducados sin guardar ya no existen.
   **Volver a casa** (`components/go-home/`): en la tarjeta «Estás dentro» de
   Inicio, en Seguridad y en «¿Dónde seguimos?». Edge Function `ride-estimate`
   (Mapbox Geocoding v6 + Directions `driving-traffic`, secreto `MAPBOX_TOKEN`;
@@ -163,10 +167,10 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
   día de cada una en total). En el móvil sólo se guarda el TEXTO de casa
   (`fiestea_home_address`): Mapbox no deja guardar sus resultados, así que cada
   ruta lo vuelve a buscar; la app recuerda el último trayecto 10 min. Precio en
-  `lib/ride-fares.ts` (taxi: Mallorca y Barcelona con tarifa propia, el resto
-  media; Uber y Cabify, horquilla). Cabify no tiene enlace con destino
-  comprobado y el taxi abre «taxi» en Google Maps: no hay teléfonos de radio
-  taxi verificados.
+  `lib/ride-fares.ts` (horquilla de Uber y Cabify). Sin taxi (04-11-2026: se
+  para en la calle). Cabify no tiene enlace con destino comprobado. El origen
+  es el sitio de la fiesta en la que estás y, si no, el GPS con 8 s como mucho;
+  mientras tanto la hoja dice «calculando», no «sin precio».
   **Últimas entradas** (130, tipo `last_tickets`): corazón «Avisarme» en la
   ficha si el local vende entradas en la app (`event_watchers`,
   `toggle_event_watch()`); avisa a esos y a los seguidores del local, sin

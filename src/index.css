@@ -820,3 +820,9 @@
     animation: none;
   }
 }
+
+/* App instalada: sin pellizcar para hacer zoom ni doble toque (native.ts). */
+html.no-zoom,
+html.no-zoom body {
+  touch-action: pan-x pan-y;
+}

@@ -247,7 +247,8 @@
             "cards": "Cards",
             "grid": "Grid",
             "list": "List"
-        }
+        },
+        "goingShort": "You're going"
     },
     "eventAccess": {
         "verifyTitle": "Verify you're nearby",
@@ -3996,13 +3997,12 @@
         "otherAddress": "Another address just for tonight",
         "homePrivacy": "Saved only on this phone. You can change or delete it whenever you like.",
         "changeHome": "Change the address",
-        "taxi": "Taxi",
         "home": "Home",
         "price": "approx. €{{min}}–{{max}}",
         "minutes_one": "{{count}} min ride",
         "minutes_other": "{{count}} min ride",
         "openApp": "Open the app",
-        "approx": "Approximate · the final price comes from the app or the meter.",
+        "approx": "Approximate · the final price comes from the app.",
         "noPrice": "We can't work out the price right now, but you can still book the ride.",
         "tellSomeone": "Let someone know I'm heading home",
         "searchPlaceholder": "Street, number and city",

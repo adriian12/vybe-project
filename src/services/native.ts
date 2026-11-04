@@ -26,10 +26,27 @@ export const platform = (): string => Capacitor.getPlatform();
  * Se importa de forma perezosa para que el navegador no cargue código nativo
  * que no va a usar nunca.
  */
+/**
+ * En la app instalada no se hace zoom: ni pellizcando, ni con doble toque, ni
+ * al enfocar un campo en el iPhone. En la web sí se deja (accesibilidad).
+ */
+const blockZoom = () => {
+  const meta = document.querySelector<HTMLMetaElement>('meta[name="viewport"]');
+  if (meta) {
+    meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover';
+  }
+  document.documentElement.classList.add('no-zoom');
+  // Safari en iOS ignora `user-scalable` en algunos casos: se corta el gesto.
+  const parar = (e: Event) => e.preventDefault();
+  document.addEventListener('gesturestart', parar, { passive: false });
+  document.addEventListener('gesturechange', parar, { passive: false });
+};
+
 export const setupNativeShell = async (): Promise<void> => {
   if (!isNative()) return;
 
   void removeServiceWorkers();
+  blockZoom();
 
   try {
     // SystemBars viene en el núcleo de Capacitor 8. Sustituye al plugin

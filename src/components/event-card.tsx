@@ -111,6 +111,10 @@ const EventCard: React.FC<EventCardProps> = ({
 
   // Vista de lista: una fila con el cartel pequeño a la izquierda.
   if (variant === 'row') {
+    // Lo mismo que el pie de la tarjeta grande: «Entradas» si vende en la app
+    // (a la ficha) o en otra web (a esa web); si no, «Voy a ir».
+    const venta = activity?.hasTickets ? 'app' : event.bookingUrl ? 'web' : null;
+    const boton = 'press absolute bottom-2 right-2 inline-flex h-8 items-center gap-1 rounded-lg px-3 text-xs font-bold';
     return (
       <article
         onClick={onOpen}
@@ -139,9 +143,9 @@ const EventCard: React.FC<EventCardProps> = ({
             {anfitrion}
             {event.city ? ` · ${event.city}` : ''}
           </p>
-          <div className="mt-1 flex items-center gap-1.5">
+          <div className="mt-1 flex min-w-0 items-center gap-1.5 pr-14">
             {precio && (
-              <span className="rounded-full bg-party-primary px-2 py-0.5 text-[11px] font-black text-ink">{precio}</span>
+              <span className="shrink-0 rounded-full bg-party-primary px-2 py-0.5 text-[11px] font-black text-ink">{precio}</span>
             )}
             {distance !== null && (
               <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#66666E]">
@@ -151,6 +155,8 @@ const EventCard: React.FC<EventCardProps> = ({
             )}
           </div>
         </div>
+        {/* Con «Voy a ir» abajo, el marcador de arriba sobra. */}
+        {venta && (
         <button
           type="button"
           aria-label={going ? t('home.notGoing') : t('home.imGoing')}
@@ -167,6 +173,46 @@ const EventCard: React.FC<EventCardProps> = ({
         >
           {going ? <BookmarkCheck size={16} /> : <Bookmark size={16} />}
         </button>
+        )}
+        {venta === 'app' ? (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onOpen();
+            }}
+            className={cn(boton, 'bg-ink text-party-primary')}
+          >
+            {t('home.buy')}
+            <Ticket size={13} />
+          </button>
+        ) : venta === 'web' ? (
+          <a
+            href={event.bookingUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => {
+              e.stopPropagation();
+              void socialService.trackBookingClick(event.id).catch(() => undefined);
+            }}
+            className={cn(boton, 'bg-ink text-party-primary')}
+          >
+            {t('home.buy')}
+            <Ticket size={13} />
+          </a>
+        ) : (
+          <button
+            type="button"
+            disabled={busy}
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleIntent();
+            }}
+            className={cn(boton, 'disabled:opacity-50', going ? 'bg-party-primary text-ink' : 'bg-ink text-party-primary')}
+          >
+            {going ? t('home.goingShort') : t('home.imGoing')}
+          </button>
+        )}
       </article>
     );
   }
@@ -220,7 +266,8 @@ const EventCard: React.FC<EventCardProps> = ({
             <TimePill>{formatHourRange(event.startDate, event.endDate)}</TimePill>
           )}
 
-          {distance !== null && (
+          {/* En la cuadrícula no cabe junto a la hora: va debajo del local. */}
+          {distance !== null && !grid && (
             <span className="ml-auto inline-flex items-center gap-1 rounded-full bg-[#0E0E11]/80 px-2 py-1 text-[11px] font-semibold text-white">
               <MapPin size={11} />
               {formatDistance(distance)}
@@ -238,6 +285,12 @@ const EventCard: React.FC<EventCardProps> = ({
               {anfitrion}
               {event.city ? ` · ${event.city}` : ''}
             </p>
+            {grid && distance !== null && (
+              <p className="mt-0.5 inline-flex items-center gap-1 text-[11px] font-semibold text-[#66666E]">
+                <MapPin size={11} className="shrink-0" />
+                {formatDistance(distance)}
+              </p>
+            )}
           </>
         ) : (
           <div className="flex items-start justify-between gap-2">

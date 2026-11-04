@@ -247,7 +247,8 @@
             "cards": "Karten",
             "grid": "Raster",
             "list": "Liste"
-        }
+        },
+        "goingShort": "Du kommst"
     },
     "eventAccess": {
         "verifyTitle": "Nähe bestätigen",
@@ -3996,13 +3997,12 @@
         "otherAddress": "Andere Adresse nur für heute Nacht",
         "homePrivacy": "Nur auf diesem Handy gespeichert. Du kannst sie jederzeit ändern oder löschen.",
         "changeHome": "Adresse ändern",
-        "taxi": "Taxi",
         "home": "Zuhause",
         "price": "ca. {{min}}–{{max}} € (ungefähr)",
         "minutes_one": "{{count}} Min. Fahrt",
         "minutes_other": "{{count}} Min. Fahrt",
         "openApp": "App öffnen",
-        "approx": "Ungefähr · den Endpreis zeigt die App oder das Taxameter.",
+        "approx": "Ungefähr · den Endpreis zeigt dir die App.",
         "noPrice": "Den Preis können wir gerade nicht berechnen, aber du kannst trotzdem ein Auto rufen.",
         "tellSomeone": "Jemandem sagen, dass ich heimfahre",
         "searchPlaceholder": "Straße, Hausnummer und Stadt",

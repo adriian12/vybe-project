@@ -220,7 +220,7 @@ export const legalDocs = (app: string, web: string, panel: string, miembro: stri
         },
         {
           title: 'Terceros',
-          body: 'Al pagar, se abre la página de Stripe, que usa sus propias cookies para prevenir el fraude (stripe.com/cookies-policy). El mapa carga imágenes de CARTO, que recibe tu dirección IP como cualquier servidor web. Al buscar una ciudad en el mapa, lo que escribes se envía a Photon (komoot), el buscador de lugares de OpenStreetMap, sin ningún otro dato tuyo. En «Volver a casa», la dirección de casa se guarda sólo en tu móvil; al usarlo, esa dirección y tu ubicación aproximada (redondeada a unos 100 m) pasan por nuestro servidor a Mapbox para calcular la distancia y el tiempo del trayecto, y no se guardan. Al elegir Taxi, Uber o Cabify se abre su app o su web, que tratan tus datos con su propia política.',
+          body: 'Al pagar, se abre la página de Stripe, que usa sus propias cookies para prevenir el fraude (stripe.com/cookies-policy). El mapa carga imágenes de CARTO, que recibe tu dirección IP como cualquier servidor web. Al buscar una ciudad en el mapa, lo que escribes se envía a Photon (komoot), el buscador de lugares de OpenStreetMap, sin ningún otro dato tuyo. En «Volver a casa», la dirección de casa se guarda sólo en tu móvil; al usarlo, esa dirección y tu ubicación aproximada (redondeada a unos 100 m) pasan por nuestro servidor a Mapbox para calcular la distancia y el tiempo del trayecto, y no se guardan. Al elegir Uber o Cabify se abre su app o su web, que tratan tus datos con su propia política.',
         },
         {
           title: 'Consentimiento',

@@ -24,7 +24,7 @@ const fiesta = {
   price: 12,
 } as unknown as Event;
 
-const pintar = (variant: 'full' | 'grid' | 'row') => {
+const pintar = (variant: 'full' | 'grid' | 'row', hasTickets = false) => {
   const onOpen = vi.fn();
   const onToggleIntent = vi.fn();
   render(
@@ -32,6 +32,7 @@ const pintar = (variant: 'full' | 'grid' | 'row') => {
       variant={variant}
       event={fiesta}
       distance={1200}
+      activity={hasTickets ? ({ hasTickets: true } as never) : undefined}
       going={false}
       busy={false}
       live={false}
@@ -48,9 +49,18 @@ describe('vistas de la lista de Inicio', () => {
     expect(screen.getByText('Aurora Sessions')).toBeTruthy();
     fireEvent.click(screen.getByText('Aurora Sessions'));
     expect(onOpen).toHaveBeenCalled();
-    // «Voy a ir» no abre la ficha.
-    fireEvent.click(screen.getAllByLabelText('home.imGoing')[0]);
+    // «Voy a ir» no abre la ficha (en la lista es el botón de abajo).
+    fireEvent.click(variant === 'row' ? screen.getByText('home.imGoing') : screen.getAllByLabelText('home.imGoing')[0]);
     expect(onToggleIntent).toHaveBeenCalledTimes(1);
     expect(onOpen).toHaveBeenCalledTimes(1);
+  });
+
+  it('en la lista, con entradas a la venta, el botón es «Entradas» y lleva a la ficha', () => {
+    const { onOpen, onToggleIntent } = pintar('row', true);
+    fireEvent.click(screen.getByText('home.buy'));
+    expect(onOpen).toHaveBeenCalledTimes(1);
+    // «Voy a ir» sigue en el marcador de arriba.
+    fireEvent.click(screen.getByLabelText('home.imGoing'));
+    expect(onToggleIntent).toHaveBeenCalledTimes(1);
   });
 });

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Car, ChevronRight, Home, Loader2, MapPin, Pencil, Search, Send, Trash2 } from 'lucide-react';
+import { ChevronRight, Home, Loader2, MapPin, Pencil, Search, Send, Trash2 } from 'lucide-react';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
@@ -8,7 +8,8 @@ import { FAST_POSITION, getCurrentPosition } from '@/services/geo';
 import { openExternal } from '@/services/native';
 import { ticketsService } from '@/services/tickets';
 import { AddressSuggestion, RouteHome, getHome, routeHome, searchAddress, setHome } from '@/services/ride';
-import { CABIFY_LINK, Punto, Rango, precioTaxi, precioVtc, taxiLink, uberLink } from '@/lib/ride-fares';
+import { CABIFY_LINK, Punto, Rango, precioVtc, uberLink } from '@/lib/ride-fares';
+import { CabifyLogo, UberLogo } from './ride-logos';
 import { shareOrCopy } from '@/lib/share';
 import { track } from '@/lib/observability';
 
@@ -23,9 +24,10 @@ interface Props {
 type Paso = 'opciones' | 'casa' | 'otra';
 
 /**
- * «Volver a casa»: Taxi · Uber · Cabify con precio aproximado y tiempo, y
- * «Avisar a alguien de que vuelvo». Cada opción abre su app con el destino
- * puesto cuando se puede; el precio final lo da esa app o el taxímetro.
+ * «Volver a casa»: Uber o Cabify con precio aproximado y tiempo, y «Avisar a
+ * alguien de que vuelvo». El taxi no sale: se para en la calle. Cada opción
+ * abre su app con el destino puesto cuando se puede; el precio final lo da
+ * esa app.
  */
 const GoHomeSheet: React.FC<Props> = ({ open, onOpenChange, eventId, venueName }) => {
   const { t } = useTranslation();
@@ -36,6 +38,8 @@ const GoHomeSheet: React.FC<Props> = ({ open, onOpenChange, eventId, venueName }
   /** «Otra dirección»: sólo para esta vez, no se guarda. */
   const [destino, setDestino] = useState<string | null>(null);
   const [origen, setOrigen] = useState<Punto | null>(null);
+  /** Mientras se busca de dónde sales: la hoja dice «calculando», no «sin precio». */
+  const [buscandoOrigen, setBuscandoOrigen] = useState(true);
   const [ruta, setRuta] = useState<RouteHome | null>(null);
   const [calculando, setCalculando] = useState(false);
 
@@ -55,20 +59,32 @@ const GoHomeSheet: React.FC<Props> = ({ open, onOpenChange, eventId, venueName }
     setSugerencias([]);
   }, [open]);
 
-  // El origen: la ubicación y, si no hay permiso, el sitio de la fiesta.
+  // El origen. Dentro de una fiesta vale su sitio, que llega al momento; si
+  // no, la ubicación, con 8 s como mucho (en un local cerrado el GPS puede no
+  // contestar nunca).
   useEffect(() => {
     if (!open || origen) return;
     let vivo = true;
+    setBuscandoOrigen(true);
     void (async () => {
-      try {
-        const p = await getCurrentPosition(FAST_POSITION);
-        if (vivo) setOrigen({ lat: p.latitude, lng: p.longitude });
-      } catch {
-        if (!eventId) return;
+      if (eventId) {
         const evento = await ticketsService.getPublicEvent(eventId).catch(() => null);
         if (vivo && evento?.latitude != null && evento.longitude != null) {
           setOrigen({ lat: evento.latitude, lng: evento.longitude });
+          setBuscandoOrigen(false);
+          return;
         }
+      }
+      try {
+        const p = await Promise.race([
+          getCurrentPosition(FAST_POSITION),
+          new Promise<never>((_, reject) => window.setTimeout(() => reject(new Error('timeout')), 8000)),
+        ]);
+        if (vivo) setOrigen({ lat: p.latitude, lng: p.longitude });
+      } catch {
+        // Sin ubicación: los botones abren la app igual, sin precio.
+      } finally {
+        if (vivo) setBuscandoOrigen(false);
       }
     })();
     return () => {
@@ -127,7 +143,7 @@ const GoHomeSheet: React.FC<Props> = ({ open, onOpenChange, eventId, venueName }
     setPaso('casa');
   };
 
-  const abrir = (app: 'taxi' | 'uber' | 'cabify', url: string) => {
+  const abrir = (app: 'uber' | 'cabify', url: string) => {
     track('go_home_opened', { app, priced: Boolean(ruta) });
     void openExternal(url, { system: true });
   };
@@ -146,15 +162,11 @@ const GoHomeSheet: React.FC<Props> = ({ open, onOpenChange, eventId, venueName }
 
   const ahora = new Date();
   const euros = (r: Rango) => t('goHome.price', { min: r.min, max: r.max });
-  const opciones: { id: 'taxi' | 'uber' | 'cabify'; nombre: string; precio: Rango | null; url: string }[] = [
-    {
-      id: 'taxi',
-      nombre: t('goHome.taxi'),
-      precio: ruta && origen ? precioTaxi(ruta.km, origen, ruta.to, ahora) : null,
-      url: origen ? taxiLink(origen) : 'https://www.google.com/maps/search/taxi',
-    },
+  const esperando = calculando || (buscandoOrigen && !origen);
+  const opciones: { id: 'uber' | 'cabify'; nombre: string; Logo: () => JSX.Element; precio: Rango | null; url: string }[] = [
     {
       id: 'uber',
+      Logo: UberLogo,
       nombre: 'Uber',
       precio: ruta ? precioVtc('uber', ruta.km, ruta.minutes, ahora) : null,
       url: ruta
@@ -164,6 +176,7 @@ const GoHomeSheet: React.FC<Props> = ({ open, onOpenChange, eventId, venueName }
     {
       id: 'cabify',
       nombre: 'Cabify',
+      Logo: CabifyLogo,
       precio: ruta ? precioVtc('cabify', ruta.km, ruta.minutes, ahora) : null,
       url: CABIFY_LINK,
     },
@@ -205,13 +218,11 @@ const GoHomeSheet: React.FC<Props> = ({ open, onOpenChange, eventId, venueName }
                     onClick={() => abrir(o.id, o.url)}
                     className="press flex w-full items-center gap-3 rounded-2xl bg-surface-container p-4 text-left hover:bg-surface-high"
                   >
-                    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-surface-high">
-                      <Car size={20} />
-                    </span>
+                    <o.Logo />
                     <span className="min-w-0 flex-1">
                       <span className="block font-display text-title-card">{o.nombre}</span>
                       <span className="block text-body-sm text-party-gray">
-                        {calculando ? (
+                        {esperando ? (
                           <Loader2 size={13} className="inline animate-spin" />
                         ) : o.precio && ruta ? (
                           <>
@@ -231,7 +242,7 @@ const GoHomeSheet: React.FC<Props> = ({ open, onOpenChange, eventId, venueName }
             </ul>
 
             <p className="text-caption text-party-gray">
-              {ruta ? t('goHome.approx') : !calculando ? t('goHome.noPrice') : null}
+              {ruta ? t('goHome.approx') : !esperando ? t('goHome.noPrice') : null}
             </p>
 
             <button
