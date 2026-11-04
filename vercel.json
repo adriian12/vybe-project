@@ -22,6 +22,10 @@
       "destination": "/api/share-event?id=:id"
     },
     {
+      "source": "/openfreemap",
+      "destination": "/openfreemap/index.html"
+    },
+    {
       "source": "/((?!.well-known/|api/).*)",
       "destination": "/index.html"
     }
