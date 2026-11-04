@@ -30,7 +30,7 @@ const destino = resolve(root, '..', NOMBRE);
 //   · La ruta va entera y entre comillas. Con sólo `gradlew.bat` no lo
 //     encuentra: si el comando sale de Git Bash, hereda
 //     `NoDefaultCurrentDirectoryInExePath`, que le dice a cmd que no busque en
-//     el directorio actual. Y la ruta lleva un espacio («Vybe App»), así que
+//     el directorio actual. Y la ruta puede llevar espacios, así que
 //     sin comillas cmd la partiría en dos.
 const wrapper = resolve(android, 'gradlew.bat');
 

@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 // Clave de subida a Google Play, fuera del repositorio
-// (`D:\Webs\Vybe App\firma-android\keystore.properties`, o la ruta de
+// (`D:\Webs\Fiestea\firma-android\keystore.properties`, o la ruta de
 // FIESTEA_KEYSTORE_PROPERTIES). Sin ella, la versión de publicación sale sin firmar.
 def firmaProps = new Properties()
 def firmaFichero = file(System.getenv('FIESTEA_KEYSTORE_PROPERTIES') ?: '../../../firma-android/keystore.properties')
