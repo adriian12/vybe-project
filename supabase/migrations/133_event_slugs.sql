@@ -92,8 +92,10 @@ CREATE TRIGGER events_set_slug
 
 -- Las que ya existen, de la más antigua a la más nueva (la primera se queda el
 -- nombre limpio). Sin disparadores: no es un cambio de la fiesta, no debe
--- tocar `updated_at` ni mandar avisos.
-SET LOCAL session_replication_role = replica;
+-- tocar `updated_at` ni mandar avisos (`push_on_event_published`). Supabase no
+-- deja cambiar `session_replication_role`, así que se apagan los de la tabla
+-- dentro de esta misma transacción y se vuelven a encender al acabar.
+ALTER TABLE public.events DISABLE TRIGGER USER;
 DO $$
 DECLARE
     r RECORD;
@@ -113,7 +115,7 @@ BEGIN
     END LOOP;
 END;
 $$;
-SET LOCAL session_replication_role = origin;
+ALTER TABLE public.events ENABLE TRIGGER USER;
 
 CREATE UNIQUE INDEX IF NOT EXISTS events_place_slug_slug_key ON public.events (place_slug, slug);
 
