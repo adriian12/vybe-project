@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useState } from 'react';
+import { Suspense, lazy, useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { BadgeCheck, Loader2, MapPin, Moon, PartyPopper } from 'lucide-react';
+import { BadgeCheck, Home, Loader2, MapPin, Moon, PartyPopper } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -14,6 +14,9 @@ import { useAppContext } from '@/context/app-context';
 import { formatDistance, getCurrentPosition } from '@/services/geo';
 import { nightService, NextParty } from '@/services/night';
 import { vibeKey } from '@/lib/vibe';
+
+// «Volver a casa»: sólo se carga si se pulsa.
+const GoHomeSheet = lazy(() => import('@/components/go-home/go-home-sheet'));
 
 /** Se ofrece media hora antes del final. */
 const ANTES_MS = 30 * 60_000;
@@ -55,6 +58,7 @@ const WhereNextPrompt = () => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [parties, setParties] = useState<NextParty[] | null>(null);
+  const [aCasa, setACasa] = useState(false);
 
   const clubber = userType === 'user' || userType === 'admin';
   const eventId = activeEvent?.eventId ?? null;
@@ -107,6 +111,18 @@ const WhereNextPrompt = () => {
   const after = horaFin >= 3 && horaFin <= 8;
 
   return (
+    <>
+    {/* La hoja va fuera del diálogo: se cierra éste y se abre ella encima. */}
+    {aCasa && (
+      <Suspense fallback={null}>
+        <GoHomeSheet
+          open={aCasa}
+          onOpenChange={setACasa}
+          eventId={eventId}
+          venueName={activeEvent?.venueName}
+        />
+      </Suspense>
+    )}
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="max-h-[85vh] overflow-y-auto">
         <DialogHeader className="text-left">
@@ -180,6 +196,17 @@ const WhereNextPrompt = () => {
               {loading ? <Loader2 size={16} className="animate-spin" /> : <MapPin size={16} />}
               {t('whereNext.seeParties')}
             </PartyButton>
+            <PartyButton
+              variant="outline"
+              className="w-full gap-2"
+              onClick={() => {
+                setOpen(false);
+                setACasa(true);
+              }}
+            >
+              <Home size={16} />
+              {t('goHome.button')}
+            </PartyButton>
             <button
               type="button"
               onClick={() => setOpen(false)}
@@ -191,6 +218,7 @@ const WhereNextPrompt = () => {
         )}
       </DialogContent>
     </Dialog>
+    </>
   );
 };
 

@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { CalendarDays, Clock, ExternalLink, Loader2, MapPin, Music, Navigation, Smartphone } from 'lucide-react';
+import { CalendarDays, CalendarPlus, Clock, ExternalLink, Loader2, MapPin, Music, Navigation, Smartphone } from 'lucide-react';
 import LanguageSwitcher from '@/components/language-switcher';
 import { VybeMark } from '@/components/brand/vybe-logo';
 import EventTickets from '@/components/event-tickets';
 import { formatHourRange } from '@/components/event-bits';
 import { PublicEvent, ticketsService } from '@/services/tickets';
-import { openExternal } from '@/services/native';
+import { isNative, openExternal } from '@/services/native';
 import { rutaHasta } from '@/lib/maps';
+import { eventCalendarUrl } from '@/lib/event-calendar';
 import { DOWNLOAD_PATH, landingHref } from '@/lib/hosts';
 import { setSeo } from '@/lib/seo';
 
@@ -138,6 +139,22 @@ const PublicEventPage = () => {
               </li>
             )}
           </ul>
+
+          {/* Sin cuenta también: el fichero lo descarga el navegador y lo abre
+              el calendario. */}
+          <a
+            href={eventCalendarUrl(evento.id)}
+            onClick={(e) => {
+              // En la app, al navegador del sistema: la vista web no abre .ics.
+              if (!isNative()) return;
+              e.preventDefault();
+              void openExternal(eventCalendarUrl(evento.id), { system: true });
+            }}
+            className="press flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-white/15 font-bold text-white sm:w-auto sm:px-5"
+          >
+            <CalendarPlus size={17} />
+            {t('eventDetail.addToCalendar')}
+          </a>
 
           {evento.minAge ? <p className="text-body-sm text-party-gray">{t('publicEvent.minAge', { age: evento.minAge })}</p> : null}
 

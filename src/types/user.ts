@@ -31,6 +31,10 @@ export interface User {
   profileCompleted?: boolean;
   status?: 'active' | 'suspended' | 'pending_deletion' | 'deleted';
   notifyMatches?: boolean;
+  /** Minutos antes de abrir para el recordatorio de la fiesta; 0, apagado (129). */
+  eventReminderMinutes?: number;
+  /** Avisos de «últimas entradas» (130). */
+  notifyTickets?: boolean;
   notifyMessages?: boolean;
   isVerified: boolean;
   isInvisible?: boolean;

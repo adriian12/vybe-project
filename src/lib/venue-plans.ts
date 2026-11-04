@@ -23,6 +23,9 @@ export const PLAN_FEATURES = [
   'csvExport',
   'pdfExport',
   'includedBoost',
+  // 131: Ventas → Resumen y tramos de precio.
+  'salesDashboard',
+  'priceTiers',
 ] as const;
 
 export type PlanId = 'free' | 'business';
@@ -76,6 +79,8 @@ export const PLANS: Record<PlanId, { events: number | null; team: number | null;
       csvExport: false,
       pdfExport: false,
       includedBoost: false,
+      salesDashboard: false,
+      priceTiers: false,
     },
   },
   business: {
@@ -96,6 +101,8 @@ export const PLANS: Record<PlanId, { events: number | null; team: number | null;
       csvExport: true,
       pdfExport: true,
       includedBoost: true,
+      salesDashboard: true,
+      priceTiers: true,
     },
   },
 };

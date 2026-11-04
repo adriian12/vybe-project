@@ -1,7 +1,7 @@
 import { serve } from 'https://deno.land/std@0.193.0/http/server.ts';
 import { json, preflight } from '../_shared/cors.ts';
 import { adminClient } from '../_shared/supabase.ts';
-import { pushTexts, VibeLevel } from '../_shared/push-texts.ts';
+import { pushTexts, ReminderPass, VibeLevel } from '../_shared/push-texts.ts';
 
 /**
  * Manda los avisos de evento y vacía la cola de avisos generales.
@@ -14,6 +14,9 @@ import { pushTexts, VibeLevel } from '../_shared/push-texts.ts';
  *   2. A quien está dentro, media hora antes del cierre: que escriba a sus vybes
  *      y los conserve, porque las conversaciones caducan.
  *   3. Los avisos que hayan encolado administración o un local.
+ *   4. «Últimas entradas» (130), a quien pulsó «Avisarme» o sigue el local.
+ *   5. El recordatorio antes de abrir (129), a quien tiene entrada, está en una
+ *      lista o dijo «voy a ir», con el margen que eligió en Perfil.
  *
  * Se autentica con `x-push-secret`, el mismo secreto que usa `send-push`: la
  * llama un programador, no una persona, así que no hay JWT que comprobar.
@@ -24,7 +27,7 @@ import { pushTexts, VibeLevel } from '../_shared/push-texts.ts';
 interface PendingPush {
   profile_id: string;
   event_id: string;
-  kind: 'doors_open' | 'filling_up' | 'ending_soon' | 'likes_expiring';
+  kind: 'doors_open' | 'filling_up' | 'ending_soon' | 'likes_expiring' | 'reminder' | 'last_tickets';
   event_name: string;
   venue_name: string;
   inside: number;
@@ -34,6 +37,8 @@ interface PendingPush {
   vibe_level: VibeLevel | null;
   /** Si se entra con la app; sin entrada el aviso abre la ficha (111). */
   entry_enabled: boolean;
+  /** En el recordatorio: si tiene entrada o está en una lista (129). */
+  pass?: ReminderPass;
 }
 
 /** Texto y destino de cada aviso, en el idioma de quien lo recibe. */
@@ -45,6 +50,18 @@ const compose = (push: PendingPush): { title: string; body: string; url: string 
 
   if (push.kind === 'doors_open') {
     return { ...texts.doorsOpen(push.event_name, push.venue_name), url: entrar };
+  }
+
+  if (push.kind === 'last_tickets') {
+    // `inside` lleva cuántas quedan. A la ficha, donde se compran.
+    return { ...texts.lastTickets(push.event_name, Number(push.inside) || 0), url: `/event/${push.event_id}` };
+  }
+
+  if (push.kind === 'reminder') {
+    // `inside` lleva los minutos que faltan. Con entrada, a Entradas, donde
+    // está el QR; si no, a la ficha.
+    const texto = texts.reminder(push.event_name, push.venue_name, Number(push.inside) || 0, push.pass ?? null);
+    return { ...texto, url: push.pass === 'ticket' ? '/tickets' : `/event/${push.event_id}` };
   }
 
   if (push.kind === 'likes_expiring') {

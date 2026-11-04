@@ -240,7 +240,14 @@
         "byPlatform": "Event by {{app}}",
         "noPartiesThatDay": "No parties for {{day}}: here are the next ones.",
         "nearDate": "Around that date",
-        "fromPrice": "From {{price}}"
+        "fromPrice": "From {{price}}",
+        "addToCalendarShort": "Add to calendar",
+        "view": {
+            "label": "View",
+            "cards": "Cards",
+            "grid": "Grid",
+            "list": "List"
+        }
     },
     "eventAccess": {
         "verifyTitle": "Verify you're nearby",
@@ -554,7 +561,17 @@
             "underage": "Fiestea is only for people over 18.",
             "age_one": "{{count}} year old",
             "age_other": "{{count}} years old"
-        }
+        },
+        "reminder": "Party reminder",
+        "reminderHelp": "Before a party you're going to opens: with a ticket, on the guest list or “I'm going”.",
+        "reminderOptions": {
+            "0": "Never",
+            "60": "1 h before",
+            "120": "2 h before",
+            "240": "4 h before"
+        },
+        "ticketAlerts": "Tickets and prices",
+        "ticketAlertsHelp": "Last tickets for parties you mark with the heart and for venues you follow."
     },
     "faceVerification": {
         "title": "Identity verification",
@@ -1233,7 +1250,9 @@
                 "commissions": "Automatic promoter commissions",
                 "doorTools": "Door: capacity, counter, scanner and SOS",
                 "guestLists": "Guest lists",
-                "includedBoost": "One boost a month included"
+                "includedBoost": "One boost a month included",
+                "salesDashboard": "Sales summary for the whole venue",
+                "priceTiers": "Price steps by quantity or date"
             },
             "yourPlan": "Your current plan",
             "choose": "Choose",
@@ -2345,7 +2364,12 @@
         "viewPoster": "View poster",
         "locationOff": "No location",
         "locationOffBody": "Turn on the app's location in your phone settings to see how far it is.",
-        "imHere": "Enter the party"
+        "imHere": "Enter the party",
+        "addToCalendar": "Add to calendar",
+        "watchOn": "Let me know if tickets run low",
+        "watchOff": "Stop notifying me",
+        "watchOnDone": "We'll let you know when tickets run low.",
+        "watchOffDone": "We won't notify you about this party anymore."
     },
     "venueTypes": {
         "discoteca": "Club",
@@ -2564,6 +2588,12 @@
             "walletCode": "Apple Wallet · {{code}}",
             "googleWallet": "Add to Google Wallet",
             "googleWalletCode": "Google Wallet · {{code}}"
+        },
+        "tier": {
+            "left_one": "{{count}} left at this price",
+            "left_other": "{{count}} left at this price",
+            "untilDate": "This price until {{date}}",
+            "next": "Then {{price}}"
         }
     },
     "vybes": {
@@ -3345,7 +3375,8 @@
         "tabs": {
             "tickets": "Tickets and tables",
             "promoters": "Promoter commissions",
-            "manage": "Ticket management"
+            "manage": "Ticket management",
+            "summary": "Summary"
         },
         "sold": "Sold",
         "revenue": "Revenue",
@@ -3601,6 +3632,51 @@
                 "email": "The email isn’t valid.",
                 "noEmail": "This order has no email to send to."
             }
+        },
+        "summary": {
+            "period": {
+                "d7": "7 days",
+                "d30": "30 days",
+                "d90": "90 days",
+                "year": "12 months"
+            },
+            "onlyEvent": "This party only",
+            "revenue": "Revenue",
+            "tickets": "Tickets sold",
+            "orders_one": "{{count}} order",
+            "orders_other": "{{count}} orders",
+            "avg": "Average order",
+            "refunds": "Refunds",
+            "noRefunds": "None",
+            "comps": "Guest passes",
+            "entered": "Checked in",
+            "enteredHint": "{{pct}} % of sold",
+            "byDay": "Revenue by date",
+            "entry": "General",
+            "vip": "VIP",
+            "table": "Tables",
+            "topDays": "Best days",
+            "events": "By party",
+            "eventCol": "Party",
+            "capacityCol": "Sold / capacity",
+            "empty": "No sales in this period.",
+            "csv": "Export CSV",
+            "error": "Couldn't load the summary."
+        },
+        "tiers": {
+            "title": "Price steps",
+            "help": "The price changes on its own: for the first tickets sold or until a date. After that, the ticket price applies.",
+            "add": "Add step",
+            "price": "Price (€)",
+            "upTo": "Up to (tickets)",
+            "until": "Until (date)",
+            "save": "Save steps",
+            "saved": "Steps saved",
+            "remove": "Remove step",
+            "needLimit": "Each step needs a quantity or a date.",
+            "invalid": "Check the steps: quantities go from lower to higher and stay within capacity.",
+            "afterwards": "Then: {{price}}",
+            "saveFirst": "Save the ticket to add steps."
         }
     },
     "forecast": {
@@ -3911,5 +3987,30 @@
             "help": "Help",
             "premium": "Premium · optional"
         }
+    },
+    "goHome": {
+        "button": "Go home",
+        "title": "Go home",
+        "subtitle": "Pick one: the app opens with your home as the destination.",
+        "setHome": "Where is home?",
+        "otherAddress": "Another address just for tonight",
+        "homePrivacy": "Saved only on this phone. You can change or delete it whenever you like.",
+        "changeHome": "Change the address",
+        "taxi": "Taxi",
+        "home": "Home",
+        "price": "approx. €{{min}}–{{max}}",
+        "minutes_one": "{{count}} min ride",
+        "minutes_other": "{{count}} min ride",
+        "openApp": "Open the app",
+        "approx": "Approximate · the final price comes from the app or the meter.",
+        "noPrice": "We can't work out the price right now, but you can still book the ride.",
+        "tellSomeone": "Let someone know I'm heading home",
+        "searchPlaceholder": "Street, number and city",
+        "back": "Back",
+        "deleteHome": "Delete my home",
+        "shareText": "I'm heading home from {{venue}}. I'll text you when I'm back.",
+        "shareTextEta": "I'm heading home from {{venue}}, home around {{time}}. I'll text you when I'm back.",
+        "theParty": "the party",
+        "copied": "Message copied: paste it wherever you like."
     }
 }

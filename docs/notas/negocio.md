@@ -132,6 +132,18 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
   - **Lista Fiestea** (`guest_list_enabled`): formulario en la ficha, encima
     de las entradas (`guest-list-join.tsx`). Al marcar «voy a ir», la ficha
     baja hasta ella.
+- **Ventas → Resumen y saltos de precio** (migración 131, Business:
+  `sales_dashboard` y `price_tiers`). `get_sales_dashboard(desde, hasta,
+  evento)` agrega por fecha de pago en hora de España, sin invitaciones en la
+  facturación; sólo el propietario. Tramos en `ticket_price_tiers` (hasta 5,
+  columna `step`, por cantidad `up_to` y/o fecha `until_at`; vale el primero
+  que cumple y después el precio del tipo). El precio lo calcula
+  `ticket_type_price()` dentro de `create_ticket_order` con el tipo bloqueado;
+  `get_event_ticket_types` y `get_ticket_checkout` devuelven ya ese precio con
+  la misma forma de siempre (las apps publicadas no notan nada). Un pedido que
+  cruza el final de un tramo paga todo al precio del tramo. Sin el plan, los
+  tramos guardados no cuentan. Pendiente del plan: complementos, conversión de
+  visitas y ritmo frente a la edición anterior.
 - **Equipos y ranking de RRPP** (migración 106, `src/services/promoters.ts`).
   - **Equipos:** los crea el propietario en Equipo (`promoter-teams.tsx`),
     con nombre único por negocio y un color, hasta 30. Un RRPP (su enlace

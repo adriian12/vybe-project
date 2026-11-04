@@ -105,6 +105,8 @@ const profileToUser = (profile: ProfileRow, distance?: number): User => ({
   status: profile.status as User['status'],
   notifyMatches: profile.notify_matches,
   notifyMessages: profile.notify_messages,
+  eventReminderMinutes: (profile as { event_reminder_minutes?: number }).event_reminder_minutes ?? 120,
+  notifyTickets: (profile as { notify_tickets?: boolean }).notify_tickets ?? true,
   phone: profile.phone || undefined,
   phoneVerified: profile.phone_verified,
   faceVerified: profile.face_verified,
@@ -862,6 +864,9 @@ export const api = {
     locale?: string;
     /** `gender` no está aquí a propósito: la base de datos impide cambiarlo. */
     wants?: 'men' | 'women' | 'all';
+    /** 0, 60, 120 o 240 (la base de datos no admite otros). */
+    eventReminderMinutes?: number;
+    notifyTickets?: boolean;
   }): Promise<User | null> => {
     const profileId = await requireProfileId();
 
@@ -879,6 +884,13 @@ export const api = {
     if (updates.wants !== undefined) payload.wants = updates.wants;
     if (updates.planTonight !== undefined) payload.plan_tonight = updates.planTonight;
     if (updates.locale !== undefined) payload.locale = updates.locale;
+    if (updates.eventReminderMinutes !== undefined) {
+      // Columna de la migración 129, aún no está en los tipos generados.
+      (payload as Record<string, unknown>).event_reminder_minutes = updates.eventReminderMinutes;
+    }
+    if (updates.notifyTickets !== undefined) {
+      (payload as Record<string, unknown>).notify_tickets = updates.notifyTickets;
+    }
 
     const { error } = await supabase.from('profiles').update(payload).eq('id', profileId);
 

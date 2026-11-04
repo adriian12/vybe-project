@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next';
 import {
   BadgeCheck,
   Bell,
+  CalendarClock,
+  Ticket,
   Camera,
   Check,
   ChevronRight,
@@ -82,6 +84,9 @@ const campoClaro =
 /** Una fila del bloque de ajustes: icono en círculo, texto y lo que vaya a la derecha. */
 // El tutorial de bienvenida, para volver a verlo.
 const WelcomeTour = lazy(() => import('@/components/welcome-tour/welcome-tour'));
+
+/** Cuánto antes de abrir avisa el recordatorio de la fiesta (129); 0, nunca. */
+const RECORDATORIOS = [60, 120, 240, 0] as const;
 
 const Fila: React.FC<{
   icon: typeof Bell;
@@ -174,6 +179,9 @@ const ProfilePage = () => {
   // La fecha de nacimiento (migración 122); la edad sale de ella.
   const [nacimiento, setNacimiento] = useState('');
   const [menuIdioma, setMenuIdioma] = useState(false);
+  const [menuRecordatorio, setMenuRecordatorio] = useState(false);
+  const [recordatorio, setRecordatorio] = useState(120);
+  const [avisoEntradas, setAvisoEntradas] = useState(true);
   const [bio, setBio] = useState('');
   const [planTonight, setPlanTonight] = useState('');
   const [isInvisible, setIsInvisible] = useState(false);
@@ -198,6 +206,8 @@ const ProfilePage = () => {
     setPlanTonight(currentUser.planTonight ?? '');
     setIsInvisible(Boolean(currentUser.isInvisible));
     setWants(currentUser.wants ?? 'all');
+    setRecordatorio(currentUser.eventReminderMinutes ?? 120);
+    setAvisoEntradas(currentUser.notifyTickets ?? true);
   }, [currentUser]);
 
   useEffect(() => {
@@ -371,6 +381,35 @@ const ProfilePage = () => {
       }
     },
     [wants, refreshProfile, fail],
+  );
+
+  const changeReminder = useCallback(
+    async (value: number) => {
+      const previous = recordatorio;
+      setRecordatorio(value);
+      try {
+        await api.updateProfile({ eventReminderMinutes: value });
+        await refreshProfile();
+      } catch {
+        setRecordatorio(previous);
+        fail();
+      }
+    },
+    [recordatorio, refreshProfile, fail],
+  );
+
+  const toggleTicketAlerts = useCallback(
+    async (value: boolean) => {
+      setAvisoEntradas(value);
+      try {
+        await api.updateProfile({ notifyTickets: value });
+        await refreshProfile();
+      } catch {
+        setAvisoEntradas(!value);
+        fail();
+      }
+    },
+    [refreshProfile, fail],
   );
 
   const togglePush = useCallback(async () => {
@@ -878,6 +917,52 @@ const ProfilePage = () => {
                   disabled={pushStatus === 'unsupported' || pushStatus === 'denied'}
                   onCheckedChange={() => void togglePush()}
                   aria-label={t('profile.notifications')}
+                />
+              }
+            />
+
+            {/* Recordatorio de la fiesta: a quien tiene entrada, está en una
+                lista o dijo «voy a ir». Para todos, Premium o no. Se abre como
+                el idioma: sólo con el valor de la derecha. */}
+            <DropdownMenu open={menuRecordatorio} onOpenChange={setMenuRecordatorio}>
+              <div className="flex w-full items-center gap-3 px-4 py-4 text-left">
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-surface-high">
+                  <CalendarClock size={20} />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block font-display text-title-card">{t('profile.reminder')}</span>
+                  <span className="block text-body-sm text-party-gray">{t('profile.reminderHelp')}</span>
+                </span>
+                <DropdownMenuTrigger
+                  onPointerDown={(e) => e.preventDefault()}
+                  onClick={() => setMenuRecordatorio((v) => !v)}
+                  className="press flex shrink-0 items-center gap-1 rounded-lg py-1 pl-2 text-body-md text-[#C8C6C5]"
+                >
+                  {t(`profile.reminderOptions.${recordatorio}`)}
+                  <ChevronRight size={18} className="text-party-gray" />
+                </DropdownMenuTrigger>
+              </div>
+              <DropdownMenuContent align="end">
+                {RECORDATORIOS.map((minutos) => (
+                  <DropdownMenuItem key={minutos} onClick={() => void changeReminder(minutos)}>
+                    <span className="flex-1">{t(`profile.reminderOptions.${minutos}`)}</span>
+                    {minutos === recordatorio && <Check size={14} className="ml-2 text-party-primary" />}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* «Últimas entradas» de las fiestas con «Avisarme» y de los
+                locales que sigues (130). */}
+            <Fila
+              icon={Ticket}
+              title={t('profile.ticketAlerts')}
+              subtitle={t('profile.ticketAlertsHelp')}
+              right={
+                <Switch
+                  checked={avisoEntradas}
+                  onCheckedChange={(v) => void toggleTicketAlerts(v)}
+                  aria-label={t('profile.ticketAlerts')}
                 />
               }
             />

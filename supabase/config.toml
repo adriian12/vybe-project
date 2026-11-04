@@ -147,6 +147,14 @@ verify_jwt = false
 [functions.ticket-download]
 verify_jwt = false
 
+# «Volver a casa»: Mapbox, con sesión y topes por persona.
+[functions.ride-estimate]
+verify_jwt = true
+
+# «Añadir al calendario»: también sin cuenta (129).
+[functions.event-calendar]
+verify_jwt = false
+
 [functions.funout-sync]
 verify_jwt = false
 

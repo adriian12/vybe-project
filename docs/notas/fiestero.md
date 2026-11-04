@@ -156,6 +156,33 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
   `pg_net` (secretos de Vault `push_hook_secret` y `functions_url`). Evento que
   empieza (a quien marcó «voy a ir»), que se llena y que termina en 30 min (a
   quien está dentro): `pending_event_pushes()` cada 5 min vía `notify-events`.
+  **Volver a casa** (`components/go-home/`): en la tarjeta «Estás dentro» de
+  Inicio, en Seguridad y en «¿Dónde seguimos?». Edge Function `ride-estimate`
+  (Mapbox Geocoding v6 + Directions `driving-traffic`, secreto `MAPBOX_TOKEN`;
+  topes con `overLimit`: 40 búsquedas y 20 rutas por hora y persona, 3000 al
+  día de cada una en total). En el móvil sólo se guarda el TEXTO de casa
+  (`fiestea_home_address`): Mapbox no deja guardar sus resultados, así que cada
+  ruta lo vuelve a buscar; la app recuerda el último trayecto 10 min. Precio en
+  `lib/ride-fares.ts` (taxi: Mallorca y Barcelona con tarifa propia, el resto
+  media; Uber y Cabify, horquilla). Cabify no tiene enlace con destino
+  comprobado y el taxi abre «taxi» en Google Maps: no hay teléfonos de radio
+  taxi verificados.
+  **Últimas entradas** (130, tipo `last_tickets`): corazón «Avisarme» en la
+  ficha si el local vende entradas en la app (`event_watchers`,
+  `toggle_event_watch()`); avisa a esos y a los seguidores del local, sin
+  entrada ya, cuando a un tipo de entrada (capacidad ≥ 20, a la venta) le
+  queda el 15 % o menos; máximo 500 por pasada; sin fiestas `test_lab`.
+  Interruptor «Entradas y precios» en Perfil (`profiles.notify_tickets`,
+  privada). La bajada de precio espera a los tramos del plan del negocio.
+  **Recordatorio** (129, tipo `reminder`): antes de abrir, a quien tiene
+  entrada válida, está en una lista con su cuenta o marcó «voy a ir», sin
+  mirar Premium; el margen es `profiles.event_reminder_minutes` (60, 120 por
+  defecto, 240 o 0 = nunca; columna privada, fuera del `GRANT SELECT`), se
+  elige en Perfil. `pending_event_pushes` devuelve `pass` y con entrada el
+  aviso abre `/tickets`. «Añadir al calendario» en la ficha: Edge Function
+  `event-calendar` (sin JWT, `get_public_event`, `_shared/ics.ts` probado
+  desde `src/lib/event-ics.test.ts`), abierta con `openExternal(…, { system:
+  true })` para que el navegador se la pase al calendario; vale sin cuenta.
   Los textos van en `_shared/push-texts.ts` según `profiles.locale`. En la app,
   `native-push-bridge.tsx` pide permiso la primera vez que hay sesión, abre la
   pantalla al tocar el aviso y, con la app delante, lo enseña como aviso propio

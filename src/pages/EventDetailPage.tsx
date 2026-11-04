@@ -7,7 +7,9 @@ import {
   AtSign,
   Bookmark,
   BookmarkCheck,
+  CalendarPlus,
   CheckCircle2,
+  Heart,
   ChevronDown,
   ClipboardList,
   Crown,
@@ -42,6 +44,8 @@ import { api } from '@/services/api';
 import { calculateDistance, Coordinates, formatDistance, getCurrentPosition } from '@/services/geo';
 import { franjaDe, sePuedeEntrar } from '@/lib/party-filters';
 import { openExternal } from '@/services/native';
+import { eventCalendarUrl } from '@/lib/event-calendar';
+import { eventWatchService } from '@/services/event-watch';
 import { rutaHasta } from '@/lib/maps';
 import { EMPTY_ACTIVITY, socialService } from '@/services/social';
 import { publicLink } from '@/lib/share';
@@ -128,6 +132,9 @@ const EventDetailPage = () => {
   const [hayEntradas, setHayEntradas] = useState(0);
   const [hayMesas, setHayMesas] = useState(0);
   const [hayLista, setHayLista] = useState(false);
+  // «Avisarme» si quedan pocas entradas (130).
+  const [avisarme, setAvisarme] = useState(false);
+  const [cambiandoAviso, setCambiandoAviso] = useState(false);
   const [descAbierta, setDescAbierta] = useState(false);
   const [todosGeneros, setTodosGeneros] = useState(false);
   const alternar = (k: 'tickets' | 'lists' | 'vip') => setAbierto((a) => (a === k ? null : k));
@@ -147,6 +154,15 @@ const EventDetailPage = () => {
 
     return () => {
       cancelled = true;
+    };
+  }, [eventId]);
+
+  useEffect(() => {
+    if (!eventId) return;
+    let vivo = true;
+    void eventWatchService.isWatching(eventId).then((v) => vivo && setAvisarme(v));
+    return () => {
+      vivo = false;
     };
   }, [eventId]);
 
@@ -174,6 +190,19 @@ const EventDetailPage = () => {
   const going = intents.includes(event.id);
 
   // Al marcar «voy a ir» se pregunta por la lista de invitados, si la hay.
+  const alternarAviso = async () => {
+    setCambiandoAviso(true);
+    try {
+      const ahora = await eventWatchService.toggle(event.id);
+      setAvisarme(ahora);
+      toast({ title: t(ahora ? 'eventDetail.watchOnDone' : 'eventDetail.watchOffDone') });
+    } catch {
+      toast({ title: t('common.error'), variant: 'destructive' });
+    } finally {
+      setCambiandoAviso(false);
+    }
+  };
+
   const marcarVoy = async () => {
     const iba = going;
     await toggleIntent(event.id);
@@ -271,6 +300,22 @@ const EventDetailPage = () => {
               <ArrowLeft size={20} />
             </button>
             {!terminado && (
+              <div className="flex items-center gap-2">
+              {hayEntradas > 0 && (
+                <button
+                  type="button"
+                  onClick={() => void alternarAviso()}
+                  disabled={cambiandoAviso}
+                  aria-pressed={avisarme}
+                  aria-label={t(avisarme ? 'eventDetail.watchOff' : 'eventDetail.watchOn')}
+                  className={cn(
+                    'press flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-md disabled:opacity-60',
+                    avisarme ? 'bg-party-primary text-ink' : 'bg-[#0E0E11]/80 text-foreground',
+                  )}
+                >
+                  <Heart size={20} fill={avisarme ? 'currentColor' : 'none'} />
+                </button>
+              )}
               <button
                 type="button"
                 onClick={() => void marcarVoy()}
@@ -284,6 +329,7 @@ const EventDetailPage = () => {
               >
                 {going ? <BookmarkCheck size={20} /> : <Bookmark size={20} />}
               </button>
+              </div>
             )}
           </div>
 
@@ -505,6 +551,22 @@ const EventDetailPage = () => {
               donde se decide marcarlo. */}
           {!terminado && !live && (
             <p className="text-caption text-party-gray">{t('eventDetail.intentNote')}</p>
+          )}
+
+          {/* Para todo el mundo, con cuenta o sin ella: el calendario del móvil
+              recuerda la fiesta aunque los avisos de la app estén apagados. */}
+          {!terminado && !live && (
+            <button
+              type="button"
+              onClick={() => {
+                track('event_calendar_added', { eventId: event.id });
+                void openExternal(eventCalendarUrl(event.id), { system: true });
+              }}
+              className="press flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-white/15 font-bold text-white"
+            >
+              <CalendarPlus size={17} />
+              {t('eventDetail.addToCalendar')}
+            </button>
           )}
 
           {/* ----------------------------------------------------- organiza */}

@@ -1,7 +1,10 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { createElement, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppContext } from '@/context/app-context';
 import { useToast } from '@/components/ui/use-toast';
+import { ToastAction, type ToastActionElement } from '@/components/ui/toast';
+import { eventCalendarUrl } from '@/lib/event-calendar';
+import { openExternal } from '@/services/native';
 import { calculateDistance, Coordinates, FAST_POSITION, getCurrentPosition } from '@/services/geo';
 import { EMPTY_ACTIVITY, EventActivity, socialService } from '@/services/social';
 import { track } from '@/lib/observability';
@@ -153,7 +156,22 @@ export const useEventsFeed = () => {
 
         if (going) {
           track('event_viewed', { eventId, intent: true });
-          toast({ title: t('home.goingConfirmed') });
+          // Y, de paso, al calendario del móvil: abre el .ics y la persona sólo
+          // pulsa «Guardar». Sin permisos de calendario ni nada nativo.
+          toast({
+            title: t('home.goingConfirmed'),
+            action: createElement(
+              ToastAction,
+              {
+                altText: t('eventDetail.addToCalendar'),
+                onClick: () => {
+                  track('event_calendar_added', { eventId, from: 'intent' });
+                  void openExternal(eventCalendarUrl(eventId), { system: true });
+                },
+              },
+              t('home.addToCalendarShort'),
+            ) as unknown as ToastActionElement,
+          });
         }
       } catch {
         toast({ title: t('common.error'), variant: 'destructive' });

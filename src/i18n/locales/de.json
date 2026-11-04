@@ -240,7 +240,14 @@
         "byPlatform": "Event von {{app}}",
         "noPartiesThatDay": "Keine Partys für {{day}}: Hier sind die nächsten.",
         "nearDate": "Rund um dieses Datum",
-        "fromPrice": "Ab {{price}}"
+        "fromPrice": "Ab {{price}}",
+        "addToCalendarShort": "In den Kalender",
+        "view": {
+            "label": "Ansicht",
+            "cards": "Karten",
+            "grid": "Raster",
+            "list": "Liste"
+        }
     },
     "eventAccess": {
         "verifyTitle": "Nähe bestätigen",
@@ -554,7 +561,17 @@
             "underage": "Fiestea ist nur für Personen ab 18.",
             "age_one": "{{count}} Jahr",
             "age_other": "{{count}} Jahre"
-        }
+        },
+        "reminder": "Party-Erinnerung",
+        "reminderHelp": "Bevor eine Party öffnet, zu der du gehst: mit Ticket, auf der Gästeliste oder mit „Ich komme“.",
+        "reminderOptions": {
+            "0": "Nie",
+            "60": "1 Std. vorher",
+            "120": "2 Std. vorher",
+            "240": "4 Std. vorher"
+        },
+        "ticketAlerts": "Tickets und Preise",
+        "ticketAlertsHelp": "Letzte Tickets für Partys, die du mit dem Herz markierst, und für Locations, denen du folgst."
     },
     "faceVerification": {
         "title": "Identitätsprüfung",
@@ -1233,7 +1250,9 @@
                 "commissions": "Automatische Promoter-Provisionen",
                 "doorTools": "Einlass: Kapazität, Zähler, Scanner und SOS",
                 "guestLists": "Gästelisten",
-                "includedBoost": "Ein Highlight pro Monat inklusive"
+                "includedBoost": "Ein Highlight pro Monat inklusive",
+                "salesDashboard": "Verkaufsübersicht für die ganze Location",
+                "priceTiers": "Preisstufen nach Menge oder Datum"
             },
             "yourPlan": "Dein aktueller Tarif",
             "choose": "Wählen",
@@ -2345,7 +2364,12 @@
         "viewPoster": "Plakat ansehen",
         "locationOff": "Kein Standort",
         "locationOffBody": "Aktiviere den Standort der App in den Handy-Einstellungen, um die Entfernung zu sehen.",
-        "imHere": "Zur Party"
+        "imHere": "Zur Party",
+        "addToCalendar": "Zum Kalender hinzufügen",
+        "watchOn": "Benachrichtigen, wenn Tickets knapp werden",
+        "watchOff": "Nicht mehr benachrichtigen",
+        "watchOnDone": "Wir sagen dir Bescheid, wenn die Tickets knapp werden.",
+        "watchOffDone": "Wir benachrichtigen dich nicht mehr zu dieser Party."
     },
     "venueTypes": {
         "discoteca": "Club",
@@ -2564,6 +2588,12 @@
             "walletCode": "Apple Wallet · {{code}}",
             "googleWallet": "Zu Google Wallet hinzufügen",
             "googleWalletCode": "Google Wallet · {{code}}"
+        },
+        "tier": {
+            "left_one": "Noch {{count}} zu diesem Preis",
+            "left_other": "Noch {{count}} zu diesem Preis",
+            "untilDate": "Dieser Preis bis {{date}}",
+            "next": "Danach {{price}}"
         }
     },
     "vybes": {
@@ -3345,7 +3375,8 @@
         "tabs": {
             "tickets": "Tickets und Tische",
             "promoters": "Promoter-Provisionen",
-            "manage": "Ticketverwaltung"
+            "manage": "Ticketverwaltung",
+            "summary": "Übersicht"
         },
         "sold": "Verkauft",
         "revenue": "Umsatz",
@@ -3601,6 +3632,51 @@
                 "email": "Die E-Mail ist ungültig.",
                 "noEmail": "Diese Bestellung hat keine E-Mail-Adresse."
             }
+        },
+        "summary": {
+            "period": {
+                "d7": "7 Tage",
+                "d30": "30 Tage",
+                "d90": "90 Tage",
+                "year": "12 Monate"
+            },
+            "onlyEvent": "Nur diese Party",
+            "revenue": "Umsatz",
+            "tickets": "Verkaufte Tickets",
+            "orders_one": "{{count}} Bestellung",
+            "orders_other": "{{count}} Bestellungen",
+            "avg": "Ø Bestellung",
+            "refunds": "Erstattungen",
+            "noRefunds": "Keine",
+            "comps": "Freikarten",
+            "entered": "Eingelassen",
+            "enteredHint": "{{pct}} % der verkauften",
+            "byDay": "Umsatz nach Datum",
+            "entry": "Allgemein",
+            "vip": "VIP",
+            "table": "Tische",
+            "topDays": "Beste Tage",
+            "events": "Nach Party",
+            "eventCol": "Party",
+            "capacityCol": "Verkauft / Kapazität",
+            "empty": "Keine Verkäufe in diesem Zeitraum.",
+            "csv": "CSV exportieren",
+            "error": "Die Übersicht konnte nicht geladen werden."
+        },
+        "tiers": {
+            "title": "Preisstufen",
+            "help": "Der Preis ändert sich automatisch: für die ersten verkauften Tickets oder bis zu einem Datum. Danach gilt der Ticketpreis.",
+            "add": "Stufe hinzufügen",
+            "price": "Preis (€)",
+            "upTo": "Bis (Tickets)",
+            "until": "Bis (Datum)",
+            "save": "Stufen speichern",
+            "saved": "Stufen gespeichert",
+            "remove": "Stufe entfernen",
+            "needLimit": "Jede Stufe braucht eine Menge oder ein Datum.",
+            "invalid": "Prüfe die Stufen: Die Mengen steigen an und überschreiten die Kapazität nicht.",
+            "afterwards": "Danach: {{price}}",
+            "saveFirst": "Speichere das Ticket, um Stufen hinzuzufügen."
         }
     },
     "forecast": {
@@ -3911,5 +3987,30 @@
             "help": "Hilfe",
             "premium": "Premium · optional"
         }
+    },
+    "goHome": {
+        "button": "Nach Hause",
+        "title": "Nach Hause",
+        "subtitle": "Wähle aus: Die App öffnet sich mit deinem Zuhause als Ziel.",
+        "setHome": "Wo wohnst du?",
+        "otherAddress": "Andere Adresse nur für heute Nacht",
+        "homePrivacy": "Nur auf diesem Handy gespeichert. Du kannst sie jederzeit ändern oder löschen.",
+        "changeHome": "Adresse ändern",
+        "taxi": "Taxi",
+        "home": "Zuhause",
+        "price": "ca. {{min}}–{{max}} € (ungefähr)",
+        "minutes_one": "{{count}} Min. Fahrt",
+        "minutes_other": "{{count}} Min. Fahrt",
+        "openApp": "App öffnen",
+        "approx": "Ungefähr · den Endpreis zeigt die App oder das Taxameter.",
+        "noPrice": "Den Preis können wir gerade nicht berechnen, aber du kannst trotzdem ein Auto rufen.",
+        "tellSomeone": "Jemandem sagen, dass ich heimfahre",
+        "searchPlaceholder": "Straße, Hausnummer und Stadt",
+        "back": "Zurück",
+        "deleteHome": "Mein Zuhause löschen",
+        "shareText": "Ich fahre von {{venue}} nach Hause. Ich melde mich, wenn ich da bin.",
+        "shareTextEta": "Ich fahre von {{venue}} nach Hause und bin gegen {{time}} da. Ich melde mich.",
+        "theParty": "der Party",
+        "copied": "Nachricht kopiert: Füge sie ein, wo du willst."
     }
 }

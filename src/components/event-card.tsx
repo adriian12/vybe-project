@@ -27,9 +27,10 @@ interface EventCardProps {
   onToggleIntent: () => void;
   /**
    * `featured` es la tarjeta estrecha del carrusel de destacados; `full`, la
-   * de la lista de próximos eventos.
+   * de la lista de próximos eventos; `grid`, la de la cuadrícula de dos
+   * columnas, y `row`, la fila de la vista de lista.
    */
-  variant?: 'featured' | 'full';
+  variant?: 'featured' | 'full' | 'grid' | 'row';
 }
 
 /** Píldora oscura sobre la tarjeta blanca: edad, género, código de vestimenta. */
@@ -63,7 +64,9 @@ const EventCard: React.FC<EventCardProps> = ({
   variant = 'full',
 }) => {
   const { t } = useTranslation();
-  const featured = variant === 'featured';
+  // La cuadrícula usa la tarjeta pequeña de los destacados, a todo el ancho.
+  const grid = variant === 'grid';
+  const featured = variant === 'featured' || grid;
   // Las fiestas que crea administración sin local firman como la app, salvo
   // que lleven su sala (las de Funout, por ejemplo).
   const anfitrion = event.placeName ? (
@@ -106,19 +109,81 @@ const EventCard: React.FC<EventCardProps> = ({
     </button>
   );
 
+  // Vista de lista: una fila con el cartel pequeño a la izquierda.
+  if (variant === 'row') {
+    return (
+      <article
+        onClick={onOpen}
+        className="press relative flex w-full cursor-pointer select-none items-stretch gap-3 overflow-hidden rounded-2xl bg-white p-2 pr-12 shadow-xl"
+      >
+        <div className="relative h-[84px] w-[84px] shrink-0 overflow-hidden rounded-xl bg-surface">
+          {event.posterUrl ? (
+            <img src={event.posterUrl} alt="" loading="lazy" className="h-full w-full object-cover" />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center bg-surface-high">
+              <Music size={26} className="text-party-primary/40" />
+            </div>
+          )}
+          {live && <LivePill className="absolute bottom-1.5 left-1.5 scale-90" />}
+        </div>
+        <div className="flex min-w-0 flex-1 flex-col justify-center gap-0.5 py-0.5">
+          <p className="truncate text-[11px] font-black uppercase tracking-wide text-[#66666E]">
+            {new Date(event.startDate)
+              .toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' })
+              .replace(/\./g, '')}
+            {' · '}
+            {formatHourRange(event.startDate, event.endDate)}
+          </p>
+          <h3 className="truncate font-display text-title-card text-ink">{event.name}</h3>
+          <p className="truncate text-body-sm text-[#66666E]">
+            {anfitrion}
+            {event.city ? ` · ${event.city}` : ''}
+          </p>
+          <div className="mt-1 flex items-center gap-1.5">
+            {precio && (
+              <span className="rounded-full bg-party-primary px-2 py-0.5 text-[11px] font-black text-ink">{precio}</span>
+            )}
+            {distance !== null && (
+              <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#66666E]">
+                <MapPin size={11} />
+                {formatDistance(distance)}
+              </span>
+            )}
+          </div>
+        </div>
+        <button
+          type="button"
+          aria-label={going ? t('home.notGoing') : t('home.imGoing')}
+          aria-pressed={going}
+          disabled={busy}
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleIntent();
+          }}
+          className={cn(
+            'press absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full',
+            going ? 'bg-party-primary text-ink' : 'bg-surface-low text-white',
+          )}
+        >
+          {going ? <BookmarkCheck size={16} /> : <Bookmark size={16} />}
+        </button>
+      </article>
+    );
+  }
+
   return (
     <article
       onClick={onOpen}
       className={cn(
         'press flex cursor-pointer select-none flex-col overflow-hidden rounded-2xl bg-white shadow-xl',
-        featured ? 'w-[215px] shrink-0 p-2' : 'w-full p-3',
+        grid ? 'w-full p-2' : featured ? 'w-[215px] shrink-0 p-2' : 'w-full p-3',
       )}
     >
       {/* ----------------------------------------------------------- cartel */}
       <div
         className={cn(
           'relative w-full overflow-hidden rounded-xl bg-surface',
-          featured ? 'aspect-[16/9]' : 'aspect-[16/10]',
+          grid ? 'aspect-square' : featured ? 'aspect-[16/9]' : 'aspect-[16/10]',
         )}
       >
         {event.posterUrl ? (

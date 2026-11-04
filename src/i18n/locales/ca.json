@@ -240,7 +240,14 @@
         "byPlatform": "Esdeveniment creat per {{app}}",
         "noPartiesThatDay": "No hi ha festes per a {{day}}: aquestes són les properes.",
         "nearDate": "A prop d'aquesta data",
-        "fromPrice": "Des de {{price}}"
+        "fromPrice": "Des de {{price}}",
+        "addToCalendarShort": "Al calendari",
+        "view": {
+            "label": "Vista",
+            "cards": "Targetes",
+            "grid": "Quadrícula",
+            "list": "Llista"
+        }
     },
     "eventAccess": {
         "verifyTitle": "Verificar proximitat",
@@ -554,7 +561,17 @@
             "underage": "Fiestea és només per a majors de 18 anys.",
             "age_one": "{{count}} any",
             "age_other": "{{count}} anys"
-        }
+        },
+        "reminder": "Recordatori de festes",
+        "reminderHelp": "Abans que obri una festa on vas: amb entrada, a la llista o «Hi vaig».",
+        "reminderOptions": {
+            "0": "Mai",
+            "60": "1 h abans",
+            "120": "2 h abans",
+            "240": "4 h abans"
+        },
+        "ticketAlerts": "Entrades i preus",
+        "ticketAlertsHelp": "Últimes entrades de les festes que marques amb el cor i dels locals que segueixes."
     },
     "faceVerification": {
         "title": "Verificació d'identitat",
@@ -1233,7 +1250,9 @@
                 "commissions": "Comissions de RRPP automàtiques",
                 "doorTools": "Porta: aforament, comptador, escàner i SOS",
                 "guestLists": "Llistes de convidats",
-                "includedBoost": "Un destacat al mes inclòs"
+                "includedBoost": "Un destacat al mes inclòs",
+                "salesDashboard": "Resum de vendes de tot el local",
+                "priceTiers": "Salts de preu per quantitat o data"
             },
             "yourPlan": "El teu pla actual",
             "choose": "Triar",
@@ -2345,7 +2364,12 @@
         "viewPoster": "Veure el cartell",
         "locationOff": "Sense ubicació",
         "locationOffBody": "Activa la ubicació de l'app als ajustos del mòbil per veure a quina distància és.",
-        "imHere": "Entrar a l'esdeveniment"
+        "imHere": "Entrar a l'esdeveniment",
+        "addToCalendar": "Afegeix al calendari",
+        "watchOn": "Avisa'm si queden poques entrades",
+        "watchOff": "Deixa d'avisar-me",
+        "watchOnDone": "T'avisarem quan quedin poques entrades.",
+        "watchOffDone": "Ja no t’avisarem d’aquesta festa."
     },
     "venueTypes": {
         "discoteca": "Discoteca",
@@ -2564,6 +2588,12 @@
             "walletCode": "Apple Wallet · {{code}}",
             "googleWallet": "Afegir a Google Wallet",
             "googleWalletCode": "Google Wallet · {{code}}"
+        },
+        "tier": {
+            "left_one": "En queda {{count}} a aquest preu",
+            "left_other": "En queden {{count}} a aquest preu",
+            "untilDate": "A aquest preu fins al {{date}}",
+            "next": "Després, {{price}}"
         }
     },
     "vybes": {
@@ -3345,7 +3375,8 @@
         "tabs": {
             "tickets": "Entrades i taules",
             "promoters": "Comissions RRPP",
-            "manage": "Gestió d’entrades"
+            "manage": "Gestió d’entrades",
+            "summary": "Resum"
         },
         "sold": "Venudes",
         "revenue": "Ingressos",
@@ -3601,6 +3632,51 @@
                 "email": "El correu no és vàlid.",
                 "noEmail": "Aquesta comanda no té cap correu on enviar."
             }
+        },
+        "summary": {
+            "period": {
+                "d7": "7 dies",
+                "d30": "30 dies",
+                "d90": "90 dies",
+                "year": "12 mesos"
+            },
+            "onlyEvent": "Només aquesta festa",
+            "revenue": "Facturació",
+            "tickets": "Entrades venudes",
+            "orders_one": "{{count}} comanda",
+            "orders_other": "{{count}} comandes",
+            "avg": "Comanda mitjana",
+            "refunds": "Devolucions",
+            "noRefunds": "Cap",
+            "comps": "Invitacions",
+            "entered": "Han entrat",
+            "enteredHint": "{{pct}} % del venut",
+            "byDay": "Facturació per data",
+            "entry": "General",
+            "vip": "VIP",
+            "table": "Taules",
+            "topDays": "Millors dies",
+            "events": "Per festa",
+            "eventCol": "Festa",
+            "capacityCol": "Venut / aforament",
+            "empty": "No hi ha vendes en aquest període.",
+            "csv": "Exportar CSV",
+            "error": "No s'ha pogut carregar el resum."
+        },
+        "tiers": {
+            "title": "Salts de preu",
+            "help": "El preu canvia sol: per les primeres entrades venudes o fins a una data. Després val el preu de l'entrada.",
+            "add": "Afegir tram",
+            "price": "Preu (€)",
+            "upTo": "Fins a (entrades)",
+            "until": "Fins a (data)",
+            "save": "Desar trams",
+            "saved": "Trams desats",
+            "remove": "Treure tram",
+            "needLimit": "Cada tram necessita una quantitat o una data.",
+            "invalid": "Revisa els trams: les quantitats van de menor a major i no passen de l'aforament.",
+            "afterwards": "Després: {{price}}",
+            "saveFirst": "Desa l'entrada per afegir trams."
         }
     },
     "forecast": {
@@ -3911,5 +3987,30 @@
             "help": "Ajuda",
             "premium": "Premium · opcional"
         }
+    },
+    "goHome": {
+        "button": "Tornar a casa",
+        "title": "Tornar a casa",
+        "subtitle": "Tria com: s'obre l'app amb casa teva com a destinació.",
+        "setHome": "On és casa teva?",
+        "otherAddress": "Una altra adreça només per aquesta nit",
+        "homePrivacy": "Només es desa en aquest mòbil. La pots canviar o esborrar quan vulguis.",
+        "changeHome": "Canviar l'adreça",
+        "taxi": "Taxi",
+        "home": "Casa",
+        "price": "{{min}}–{{max}} € aproximat",
+        "minutes_one": "{{count}} min de trajecte",
+        "minutes_other": "{{count}} min de trajecte",
+        "openApp": "Obrir l'app",
+        "approx": "Aproximat · el preu final te'l dona l'app o el taxímetre.",
+        "noPrice": "Ara no podem calcular el preu, però pots demanar el cotxe igualment.",
+        "tellSomeone": "Avisar algú que torno",
+        "searchPlaceholder": "Carrer, número i ciutat",
+        "back": "Tornar",
+        "deleteHome": "Esborrar casa meva",
+        "shareText": "Torno a casa des de {{venue}}. T'aviso quan arribi.",
+        "shareTextEta": "Torno a casa des de {{venue}}, arribo cap a les {{time}}. T'aviso quan arribi.",
+        "theParty": "la festa",
+        "copied": "Missatge copiat: enganxa-ho on vulguis."
     }
 }

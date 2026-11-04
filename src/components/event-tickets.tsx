@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { PublicTier, salesDashboardService } from '@/services/sales-dashboard';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Armchair, Crown, Minus, Plus, Ticket } from 'lucide-react';
@@ -29,6 +30,8 @@ const EventTickets = ({ eventId, kinds, onCount, bare = false, guest = false }: 
   const navigate = useNavigate();
   const [types, setTypes] = useState<TicketType[]>([]);
   const [cantidades, setCantidades] = useState<Record<string, number>>({});
+  // Saltos de precio (131): «Quedan 23 a este precio» y el siguiente.
+  const [tramos, setTramos] = useState<Record<string, PublicTier>>({});
 
   useEffect(() => {
     let vivo = true;
@@ -37,6 +40,9 @@ const EventTickets = ({ eventId, kinds, onCount, bare = false, guest = false }: 
       const propios = kinds ? lista.filter((x) => kinds.includes(x.kind)) : lista;
       setTypes(propios);
       onCount?.(propios.length);
+    });
+    void salesDashboardService.publicTiers(eventId).then((lista) => {
+      if (vivo) setTramos(Object.fromEntries(lista.map((x) => [x.type_id, x])));
     });
     return () => {
       vivo = false;
@@ -88,6 +94,20 @@ const EventTickets = ({ eventId, kinds, onCount, bare = false, guest = false }: 
                   {!programada && !agotada && tipo.salesEndAt && (
                     <p className="mt-0.5 text-caption font-bold text-ink/70">
                       {t('tickets.buy.salesUntil', { date: fechaVenta(tipo.salesEndAt) })}
+                    </p>
+                  )}
+                  {tramos[tipo.id] && !agotada && (
+                    <p className="mt-0.5 text-caption font-bold text-ink/70">
+                      {[
+                        tramos[tipo.id].tier_left !== null
+                          ? t('tickets.tier.left', { count: tramos[tipo.id].tier_left ?? 0 })
+                          : tramos[tipo.id].tier_until
+                            ? t('tickets.tier.untilDate', { date: fechaVenta(tramos[tipo.id].tier_until as string) })
+                            : null,
+                        t('tickets.tier.next', { price: euros(tramos[tipo.id].next_price_cents) }),
+                      ]
+                        .filter(Boolean)
+                        .join(' · ')}
                     </p>
                   )}
                   {tipo.remaining !== null && !agotada && tipo.remaining <= 20 && (

@@ -14,6 +14,8 @@ import TicketOrders from '@/components/venue/tickets/ticket-orders';
 import TicketAttendees from '@/components/venue/tickets/ticket-attendees';
 import TicketComps from '@/components/venue/tickets/ticket-comps';
 import PromoterTeamMoney from '@/components/venue/promoter-team-money';
+import SalesSummary from '@/components/venue/tickets/sales-summary';
+import TicketPriceTiers from '@/components/venue/tickets/ticket-price-tiers';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -45,7 +47,7 @@ interface VenueSalesProps {
   plan: VenuePlanStatus | null;
 }
 
-type Pestana = 'manage' | 'promoters';
+type Pestana = 'summary' | 'manage' | 'promoters';
 /** Gestión de entradas: cada parte de una plataforma de venta de entradas. */
 type Vista = 'overview' | 'types' | 'orders' | 'attendees' | 'comps';
 
@@ -155,7 +157,9 @@ const VenueSales = ({ events, plan }: VenueSalesProps) => {
   const evento = lista.find((e) => e.id === actual) ?? null;
   const terminado = evento ? new Date(evento.endDate).getTime() <= Date.now() : false;
 
-  const [pestana, setPestana] = useState<Pestana>('manage');
+  // Resumen de todo el local (131): sólo con el plan que lo incluye.
+  const conResumen = planHas(plan?.plan, 'salesDashboard');
+  const [pestana, setPestana] = useState<Pestana>(conResumen ? 'summary' : 'manage');
   const [vista, setVista] = useState<Vista>('overview');
   /** Sube cuando cambia algo que la lista de asistentes debe recargar. */
   const [version, setVersion] = useState(0);
@@ -394,6 +398,7 @@ const VenueSales = ({ events, plan }: VenueSalesProps) => {
 
       <PanelTabs
         tabs={[
+          ...(conResumen ? [{ id: 'summary', label: t('sales.tabs.summary') }] : []),
           { id: 'manage', label: t('sales.tabs.manage') },
           { id: 'promoters', label: t('sales.tabs.promoters'), count: liquidacion.length },
         ]}
@@ -428,7 +433,11 @@ const VenueSales = ({ events, plan }: VenueSalesProps) => {
         </nav>
       )}
 
-      {cargando && (
+      {pestana === 'summary' && conResumen && (
+        <SalesSummary eventId={actual} eventName={evento?.name} canExport={planHas(plan?.plan, 'csvExport')} />
+      )}
+
+      {cargando && pestana !== 'summary' && (
         <div className="flex justify-center py-6">
           <Loader2 className="h-6 w-6 animate-spin text-party-primary" />
         </div>
@@ -691,6 +700,10 @@ const VenueSales = ({ events, plan }: VenueSalesProps) => {
                     {t('sales.form.onSale')}
                     <Switch checked={borrador.active} onCheckedChange={(v) => setBorrador({ ...borrador, active: v })} />
                   </label>
+                  {/* Saltos de precio (131): entradas y VIP de pago, con el plan. */}
+                  {borrador.kind !== 'table' && planHas(plan?.plan, 'priceTiers') && (
+                    <TicketPriceTiers typeId={borrador.id} />
+                  )}
                   <div className="flex gap-2">
                     <button
                       type="button"

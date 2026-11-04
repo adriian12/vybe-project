@@ -136,6 +136,8 @@ export type AnalyticsEvent =
   | 'signup_completed'
   | 'email_verified'
   | 'event_viewed'
+  | 'event_calendar_added'
+  | 'go_home_opened'
   | 'location_verified'
   | 'code_redeemed'
   | 'code_rejected'

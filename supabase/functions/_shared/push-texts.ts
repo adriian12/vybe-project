@@ -9,6 +9,13 @@
 type Locale = 'es' | 'en' | 'de' | 'ca';
 
 /** Los niveles de `vibe_level_for()` (migración 040). */
+/** Lo que tiene para esa fiesta quien recibe el recordatorio. */
+export type ReminderPass = 'ticket' | 'list' | null;
+
+/** «45 min» o «2 h»: igual en los cuatro idiomas. */
+const enCuanto = (minutes: number): string =>
+  minutes < 50 ? `${Math.max(1, minutes)} min` : `${Math.round(minutes / 60)} h`;
+
 export type VibeLevel = 'quiet' | 'lively' | 'almost_full' | 'full';
 
 export const pickLocale = (value: unknown): Locale => {
@@ -22,6 +29,10 @@ interface Texts {
   /** Te han dado un supercrush y aún no es match (migración 124). */
   supercrush: (name: string) => { title: string; body: string };
   doorsOpen: (event: string, venue: string) => { title: string; body: string };
+  /** Antes de abrir, a quien va (129): con entrada, en lista o «voy a ir». */
+  reminder: (event: string, venue: string, minutes: number, pass: ReminderPass) => { title: string; body: string };
+  /** Le queda poco a un tipo de entrada (130): a quien pulsó «Avisarme» o sigue el local. */
+  lastTickets: (event: string, left: number) => { title: string; body: string };
   fillingUp: (event: string, inside: number) => { title: string; body: string };
   /** Por el ambiente que da el local: nunca su cifra. */
   fillingUpVibe: (event: string, level: VibeLevel) => { title: string; body: string };
@@ -58,6 +69,19 @@ const TEXTS: Record<Locale, Texts> = {
     vybeCheck: (name) => ({
       title: '¡Flechazo!',
       body: `Tú y ${name} os habéis dado un súper like. Di hola.`,
+    }),
+    lastTickets: (event, left) => ({
+      title: `Últimas entradas para ${event}`,
+      body: left === 1 ? 'Queda 1 entrada. Si vas a ir, cógela ya.' : `Quedan ${left} entradas. Si vas a ir, cógela ya.`,
+    }),
+    reminder: (event, venue, minutes, pass) => ({
+      title: `${event} empieza en ${enCuanto(minutes)}`,
+      body:
+        pass === 'ticket'
+          ? `Tu entrada está en Entradas. Nos vemos en ${venue}.`
+          : pass === 'list'
+            ? `Estás en la lista de ${venue}. Di tu nombre en la puerta.`
+            : `Dijiste que ibas a ${venue}. ¡Prepárate!`,
     }),
     doorsOpen: (event, venue) => ({
       title: `${event} ha empezado`,
@@ -143,6 +167,19 @@ const TEXTS: Record<Locale, Texts> = {
       title: 'Flechazo!',
       body: `You and ${name} super-liked each other. Say hi.`,
     }),
+    lastTickets: (event, left) => ({
+      title: `Last tickets for ${event}`,
+      body: left === 1 ? '1 ticket left. If you are going, grab it now.' : `${left} tickets left. If you are going, grab yours now.`,
+    }),
+    reminder: (event, venue, minutes, pass) => ({
+      title: `${event} starts in ${enCuanto(minutes)}`,
+      body:
+        pass === 'ticket'
+          ? `Your ticket is in Tickets. See you at ${venue}.`
+          : pass === 'list'
+            ? `You're on the guest list at ${venue}. Give your name at the door.`
+            : `You said you were going to ${venue}. Get ready!`,
+    }),
     doorsOpen: (event, venue) => ({
       title: `${event} has started`,
       body: `${venue} is open. You said you were going: don't stay home.`,
@@ -224,6 +261,19 @@ const TEXTS: Record<Locale, Texts> = {
     vybeCheck: (name) => ({
       title: 'Flechazo!',
       body: `Du und ${name} habt euch ein Super-Like gegeben. Sag Hallo.`,
+    }),
+    lastTickets: (event, left) => ({
+      title: `Letzte Tickets für ${event}`,
+      body: left === 1 ? 'Nur noch 1 Ticket. Wenn du hingehst, hol es dir jetzt.' : `Nur noch ${left} Tickets. Wenn du hingehst, hol dir jetzt eins.`,
+    }),
+    reminder: (event, venue, minutes, pass) => ({
+      title: `${event} beginnt in ${enCuanto(minutes)}`,
+      body:
+        pass === 'ticket'
+          ? `Dein Ticket findest du unter Tickets. Bis später bei ${venue}.`
+          : pass === 'list'
+            ? `Du stehst auf der Gästeliste von ${venue}. Sag an der Tür deinen Namen.`
+            : `Du wolltest zu ${venue}. Mach dich bereit!`,
     }),
     doorsOpen: (event, venue) => ({
       title: `${event} hat begonnen`,
@@ -308,6 +358,19 @@ const TEXTS: Record<Locale, Texts> = {
     vybeCheck: (name) => ({
       title: 'Flechazo!',
       body: `Tu i ${name} us heu fet un súper like. Digues hola.`,
+    }),
+    lastTickets: (event, left) => ({
+      title: `Últimes entrades per a ${event}`,
+      body: left === 1 ? "Queda 1 entrada. Si hi vas, agafa-la ja." : `Queden ${left} entrades. Si hi vas, agafa-la ja.`,
+    }),
+    reminder: (event, venue, minutes, pass) => ({
+      title: `${event} comença d'aquí a ${enCuanto(minutes)}`,
+      body:
+        pass === 'ticket'
+          ? `La teva entrada és a Entrades. Ens veiem a ${venue}.`
+          : pass === 'list'
+            ? `Ets a la llista de ${venue}. Digues el teu nom a la porta.`
+            : `Vas dir que aniries a ${venue}. Prepara't!`,
     }),
     doorsOpen: (event, venue) => ({
       title: `${event} ha començat`,

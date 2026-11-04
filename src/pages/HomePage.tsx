@@ -1,13 +1,15 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Bell, ChevronRight, Flame, Loader2, PartyPopper, User } from 'lucide-react';
+import { Bell, ChevronRight, Flame, LayoutGrid, List, Loader2, PartyPopper, RectangleVertical, User } from 'lucide-react';
+import GoHomeButton from '@/components/go-home/go-home-button';
 import { useAppContext } from '@/context/app-context';
 import Header from '@/components/header';
 import Footer from '@/components/footer';
 import EventCard from '@/components/event-card';
 import ActivitySheet, { useActivity } from '@/components/activity-sheet';
 import { track } from '@/lib/observability';
+import { cn } from '@/lib/utils';
 import { isEventLive, isEventTonight, useEventsFeed } from '@/hooks/use-events-feed';
 import { Event } from '@/types/venue';
 import { isFeatured } from '@/lib/featured';
@@ -19,6 +21,24 @@ import { MUSICAS, musicaDe } from '@/lib/music';
 
 /** Cuántas tarjetas caben en el carrusel de destacados. */
 const DESTACADOS = 5;
+
+/** Cómo se ven las fiestas de la lista (los destacados no cambian). */
+type Vista = 'cards' | 'grid' | 'list';
+const VISTA_KEY = 'fiestea_home_view';
+const VISTAS: { id: Vista; Icon: typeof List }[] = [
+  { id: 'cards', Icon: RectangleVertical },
+  { id: 'grid', Icon: LayoutGrid },
+  { id: 'list', Icon: List },
+];
+
+const leerVista = (): Vista => {
+  try {
+    const v = window.localStorage.getItem(VISTA_KEY);
+    return v === 'grid' || v === 'list' ? v : 'cards';
+  } catch {
+    return 'cards';
+  }
+};
 
 /** Título de sección en Outfit, con algo opcional a la derecha. */
 const Seccion: React.FC<{ titulo: React.ReactNode; extra?: React.ReactNode }> = ({ titulo, extra }) => (
@@ -43,6 +63,19 @@ const HomePage = () => {
 
   const { withDistance, isLoading, activity, intents, busyIntent, toggleIntent } =
     useEventsFeed();
+
+  // La vista elegida se recuerda en este móvil.
+  const [vista, setVista] = useState<Vista>(leerVista);
+  const cambiarVista = (v: Vista) => {
+    setVista(v);
+    try {
+      window.localStorage.setItem(VISTA_KEY, v);
+    } catch {
+      // Sin almacenamiento vuelve a la de siempre; no es grave.
+    }
+  };
+  const variante = vista === 'grid' ? 'grid' : vista === 'list' ? 'row' : 'full';
+  const contenedor = vista === 'grid' ? 'grid grid-cols-2 gap-3' : vista === 'list' ? 'space-y-2.5' : 'space-y-4';
 
   /**
    * Con tu ubicación, sólo las fiestas de tu zona: a quien está en Palma no le
@@ -198,6 +231,12 @@ const HomePage = () => {
                 <ChevronRight size={16} />
               </span>
             </button>
+            <GoHomeButton
+              eventId={activeEvent.eventId}
+              venueName={activeEvent.venueName}
+              tone="card"
+              className="mt-2"
+            />
           </section>
         )}
 
@@ -294,9 +333,26 @@ const HomePage = () => {
         {/* ------------------------------------------------------------ lista */}
         <section className="space-y-4 px-margin pt-1">
           <div className="flex items-center justify-between gap-3">
-            <h2 className="font-display text-headline-lg first-letter:uppercase">
+            <h2 className="min-w-0 font-display text-headline-lg first-letter:uppercase">
               {sinFiestas ? t('home.upcoming') : etiquetaFecha(fecha)}
             </h2>
+            <div className="flex shrink-0 rounded-xl bg-card p-0.5" role="group" aria-label={t('home.view.label')}>
+              {VISTAS.map(({ id, Icon }) => (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => cambiarVista(id)}
+                  aria-pressed={vista === id}
+                  aria-label={t(`home.view.${id}`)}
+                  className={cn(
+                    'press flex h-9 w-9 items-center justify-center rounded-lg',
+                    vista === id ? 'bg-party-primary text-ink' : 'text-party-gray hover:text-foreground',
+                  )}
+                >
+                  <Icon size={17} />
+                </button>
+              ))}
+            </div>
           </div>
 
           {sinFiestas && filtrados.length > 0 && (
@@ -321,10 +377,11 @@ const HomePage = () => {
           ) : (
             // La lista se ve una vez por sesión, así que se permite una entrada
             // escalonada: ayuda a leer que son elementos separados.
-            <div className="stagger space-y-4">
+            <div className={cn('stagger', contenedor)}>
               {visible.map(({ event, distance }, index) => (
                 <div key={event.id} style={{ '--i': Math.min(index, 8) } as React.CSSProperties}>
                   <EventCard
+                    variant={variante}
                     event={event}
                     distance={distance}
                     activity={activity[event.id]}
@@ -343,9 +400,11 @@ const HomePage = () => {
           {cercaDeLaFecha.length > 0 && (
             <div className="space-y-4 pt-2">
               <h3 className="font-display text-headline-md text-party-gray">{t('home.nearDate')}</h3>
+              <div className={contenedor}>
               {cercaDeLaFecha.map(({ event, distance }) => (
                 <EventCard
                   key={event.id}
+                  variant={variante}
                   event={event}
                   distance={distance}
                   activity={activity[event.id]}
@@ -356,6 +415,7 @@ const HomePage = () => {
                   onToggleIntent={() => void toggleIntent(event.id)}
                 />
               ))}
+              </div>
             </div>
           )}
         </section>

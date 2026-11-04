@@ -25,6 +25,7 @@ import { PartyButton } from '@/components/ui-custom/party-button';
 import { useToast } from '@/components/ui/use-toast';
 import { safetyService, TrustedContact, SosAlert } from '@/services/safety';
 import { useAppContext } from '@/context/app-context';
+import GoHomeButton from '@/components/go-home/go-home-button';
 import { getCurrentPosition } from '@/services/geo';
 import { ApiError } from '@/services/api';
 import { track } from '@/lib/observability';
@@ -219,6 +220,9 @@ const SafetySheet: React.FC<SafetySheetProps> = ({ open, onOpenChange }) => {
                 )}
               </div>
             )}
+
+            {/* Volver a casa: Taxi · Uber · Cabify y avisar a alguien. */}
+            <GoHomeButton eventId={activeEvent?.eventId} venueName={activeEvent?.venueName} />
 
             {/* Contactos de confianza */}
             <div>
