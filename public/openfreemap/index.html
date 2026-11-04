@@ -91,7 +91,7 @@
   const escapar = (t) => String(t ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
   const fecha = new Intl.DateTimeFormat('es-ES', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Madrid' });
 
-  fetch('fiestas.json').then((r) => r.json()).then((fiestas) => {
+  fetch('/openfreemap/fiestas.json').then((r) => r.json()).then((fiestas) => {
     const ahora = Date.now();
     fiestas = fiestas.filter((f) => new Date(f.f).getTime() > ahora);
     const porCiudad = {};
