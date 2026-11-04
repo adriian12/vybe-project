@@ -263,7 +263,12 @@ const VenueQRCode: React.FC<VenueQRCodeProps> = ({ onCodeGenerated, eventId }) =
         // Los dos sacan el código de esta pantalla, así que van a la par y en
         // pequeño: uno encima de otro pesaban más que el propio QR.
         <div className="grid grid-cols-2 gap-2">
-          <VenueQRPoster code={manualCode as string} eventName={currentEvent?.name} venueName={currentVenue?.name} />
+          <VenueQRPoster
+            code={manualCode as string}
+            eventName={currentEvent?.name}
+            venueName={currentVenue?.name}
+            eventDate={currentEvent?.startDate}
+          />
           {currentEvent ? (
             <VenueTvView
               code={manualCode as string}

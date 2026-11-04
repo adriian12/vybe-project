@@ -22,6 +22,17 @@
       "destination": "/api/share-event?id=:id"
     },
     {
+      "source": "/event/:place/:slug",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*(WhatsApp|facebookexternalhit|Facebot|meta-externalagent|Twitterbot|TelegramBot|Slackbot|Discordbot|LinkedInBot|SkypeUriPreview|Pinterestbot|redditbot|vkShare|Viber|Embedly|Iframely).*"
+        }
+      ],
+      "destination": "/api/share-event?place=:place&slug=:slug"
+    },
+    {
       "source": "/((?!.well-known/|api/).*)",
       "destination": "/index.html"
     }

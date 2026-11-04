@@ -12,6 +12,14 @@ import { isNative, openExternal } from '@/services/native';
  */
 export const publicLink = (path: string): string => `${APP_URL}${path}`;
 
+/**
+ * La ruta de una fiesta para compartir: `/event/amok-mallorca/el-tardeo`
+ * (migración 133), que dice algo de la fiesta antes de abrirla. Las que aún no
+ * tienen slug, con el id; las dos rutas llevan a la misma ficha.
+ */
+export const eventPath = (event: { id: string; placeSlug?: string | null; slug?: string | null }): string =>
+  event.placeSlug && event.slug ? `/event/${event.placeSlug}/${event.slug}` : `/event/${event.id}`;
+
 export interface ShareData {
   title: string;
   text: string;

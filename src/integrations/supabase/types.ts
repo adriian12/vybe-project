@@ -1105,6 +1105,7 @@ export type Database = {
           external_id: string | null
           external_source: string | null
           featured_until: string | null
+          place_slug: string | null
           followers_notified_at: string | null
           guest_list_enabled: boolean
           guest_list_message: string | null
@@ -1136,6 +1137,7 @@ export type Database = {
           sponsor_url: string | null
           stamps_enabled: boolean
           start_date: string
+          slug: string | null
           entry_enabled: boolean
           swipe_enabled: boolean
           test_lab: boolean
@@ -1158,6 +1160,7 @@ export type Database = {
           external_id?: string | null
           external_source?: string | null
           featured_until?: string | null
+          place_slug?: string | null
           followers_notified_at?: string | null
           guest_list_enabled?: boolean
           guest_list_message?: string | null
@@ -1189,6 +1192,7 @@ export type Database = {
           sponsor_url?: string | null
           stamps_enabled?: boolean
           start_date: string
+          slug?: string | null
           entry_enabled?: boolean
           swipe_enabled?: boolean
           test_lab?: boolean
@@ -1211,6 +1215,7 @@ export type Database = {
           external_id?: string | null
           external_source?: string | null
           featured_until?: string | null
+          place_slug?: string | null
           followers_notified_at?: string | null
           guest_list_enabled?: boolean
           guest_list_message?: string | null
@@ -1242,6 +1247,7 @@ export type Database = {
           sponsor_url?: string | null
           stamps_enabled?: boolean
           start_date?: string
+          slug?: string | null
           entry_enabled?: boolean
           swipe_enabled?: boolean
           test_lab?: boolean

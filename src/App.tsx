@@ -268,6 +268,12 @@ const App = () => (
                       path="/event/:eventId"
                       element={<SinCuenta conCuenta={clubber(<EventDetailPage />)} sinCuenta={<PublicEventPage />} />}
                     />
+                    {/* URL legible (migración 133). Las rutas fijas de abajo
+                        ganan a esta: ningún slug puede ser «access» ni «live». */}
+                    <Route
+                      path="/event/:placeSlug/:eventSlug"
+                      element={<SinCuenta conCuenta={clubber(<EventDetailPage />)} sinCuenta={<PublicEventPage />} />}
+                    />
                     <Route path="/event/:eventId/access" element={clubber(<EventAccessPage />)} />
                     <Route path="/event/:eventId/live" element={clubber(<EventSwipingPage />, { requireEvent: true })} />
 

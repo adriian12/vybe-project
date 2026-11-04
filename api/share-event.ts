@@ -1,4 +1,4 @@
-import { APP_URL, DEFAULT_IMAGE, eventIdOf, loadEventShare, posterVersion } from './_share.js';
+import { APP_URL, DEFAULT_IMAGE, eventIdFromSlug, eventIdOf, loadEventShare, posterVersion } from './_share.js';
 
 /**
  * `/event/:id` para los robots de vista previa (la regla está en
@@ -56,14 +56,17 @@ const pagina = (meta: { title: string; description: string; url: string; image: 
 };
 
 export async function GET(request: Request): Promise<Response> {
-  const id = eventIdOf(request);
+  const id = eventIdOf(request) ?? (await eventIdFromSlug(request));
   const ev = id ? await loadEventShare(id) : null;
+  // Con la URL legible, la tarjeta enlaza a esa misma URL.
+  const params = new URL(request.url).searchParams;
+  const ruta = params.get('slug') && !eventIdOf(request) ? `/event/${params.get('place')}/${params.get('slug')}` : `/event/${id}`;
 
   const html = ev
     ? pagina({
         title: ev.name,
         description: descripcion(ev.start_date, ev.place, ev.city),
-        url: `${APP_URL}/event/${id}`,
+        url: `${APP_URL}${ruta}`,
         image: ev.poster_url
           ? `${APP_URL}/api/share-image?id=${id}&v=${posterVersion(ev.poster_url)}`
           : DEFAULT_IMAGE,

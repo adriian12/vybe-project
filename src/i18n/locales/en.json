@@ -846,7 +846,19 @@
                 "dark": "Dark (screens)"
             },
             "showPoster": "Show on screen",
-            "posterFooterLink": "Scan the code to see the party and get your ticket"
+            "posterFooterLink": "Scan the code to see the party and get your ticket",
+            "posterScan": "Scan",
+            "posterTicker": "Scan · Get in · Meet people",
+            "posterSteps": {
+                "open": "Open Fiestea",
+                "scan": "Scan this code",
+                "meet": "Swipe and match"
+            },
+            "posterStepsLink": {
+                "camera": "Point your camera",
+                "open": "See the party",
+                "ticket": "Get your ticket"
+            }
         },
         "stats": {
             "title": "Analytics",
@@ -4012,5 +4024,18 @@
         "shareTextEta": "I'm heading home from {{venue}}, home around {{time}}. I'll text you when I'm back.",
         "theParty": "the party",
         "copied": "Message copied: paste it wherever you like."
+    },
+    "notice": {
+        "now": "now",
+        "kind": {
+            "message": "Message",
+            "match": "New match",
+            "supercrush": "Supercrush",
+            "raffle": "Giveaway",
+            "alert": "Important",
+            "event": "Party",
+            "other": "Fiestea",
+            "news": "News"
+        }
     }
 }

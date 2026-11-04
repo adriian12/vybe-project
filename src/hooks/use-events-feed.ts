@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useAppContext } from '@/context/app-context';
 import { useToast } from '@/components/ui/use-toast';
 import { ToastAction, type ToastActionElement } from '@/components/ui/toast';
-import { eventCalendarUrl } from '@/lib/event-calendar';
+import { addEventToCalendar, eventCalendarUrl } from '@/lib/event-calendar';
 import { openExternal } from '@/services/native';
 import { calculateDistance, Coordinates, FAST_POSITION, getCurrentPosition } from '@/services/geo';
 import { EMPTY_ACTIVITY, EventActivity, socialService } from '@/services/social';
@@ -156,8 +156,9 @@ export const useEventsFeed = () => {
 
         if (going) {
           track('event_viewed', { eventId, intent: true });
-          // Y, de paso, al calendario del móvil: abre el .ics y la persona sólo
-          // pulsa «Guardar». Sin permisos de calendario ni nada nativo.
+          // Y, de paso, al calendario del móvil: la persona sólo pulsa
+          // «Guardar». Es el único sitio con este botón (la ficha ya no lo lleva).
+          const evento = events.find((e) => e.id === eventId);
           toast({
             title: t('home.goingConfirmed'),
             action: createElement(
@@ -166,7 +167,9 @@ export const useEventsFeed = () => {
                 altText: t('eventDetail.addToCalendar'),
                 onClick: () => {
                   track('event_calendar_added', { eventId, from: 'intent' });
-                  void openExternal(eventCalendarUrl(eventId), { system: true });
+                  void (evento
+                    ? addEventToCalendar(evento)
+                    : openExternal(eventCalendarUrl(eventId), { system: true }));
                 },
               },
               t('home.addToCalendarShort'),
@@ -179,7 +182,7 @@ export const useEventsFeed = () => {
         setBusyIntent(null);
       }
     },
-    [intents, t, toast],
+    [events, intents, t, toast],
   );
 
   /** Ordenados por cercanía; sin ubicación, por hora de inicio. */

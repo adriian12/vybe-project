@@ -30,6 +30,32 @@ export const eventIdOf = (request: Request): string | null => {
   return isUuid(id) ? id.toLowerCase() : null;
 };
 
+const SLUG = /^[a-z0-9-]{1,80}$/;
+
+/**
+ * El id de la URL legible `/event/<sala>/<fiesta>` (migración 133), que
+ * `vercel.json` manda aquí como `?place=…&slug=…`.
+ */
+export const eventIdFromSlug = async (request: Request): Promise<string | null> => {
+  const params = new URL(request.url).searchParams;
+  const place = (params.get('place') ?? '').toLowerCase();
+  const slug = (params.get('slug') ?? '').toLowerCase();
+  if (!SUPABASE_URL || !ANON_KEY || !SLUG.test(place) || !SLUG.test(slug)) return null;
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/get_event_id_by_slug`, {
+      method: 'POST',
+      headers: { apikey: ANON_KEY, Authorization: `Bearer ${ANON_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_place_slug: place, p_slug: slug }),
+      signal: AbortSignal.timeout(5000),
+    });
+    if (!res.ok) return null;
+    const id = (await res.json()) as unknown;
+    return typeof id === 'string' && isUuid(id) ? id.toLowerCase() : null;
+  } catch {
+    return null;
+  }
+};
+
 export const loadEventShare = async (id: string): Promise<EventShare | null> => {
   if (!SUPABASE_URL || !ANON_KEY) return null;
   try {

@@ -846,7 +846,19 @@
                 "dark": "Dunkel (Bildschirme)"
             },
             "showPoster": "Auf dem Bildschirm zeigen",
-            "posterFooterLink": "Scanne den Code, um die Party zu sehen und dein Ticket zu holen"
+            "posterFooterLink": "Scanne den Code, um die Party zu sehen und dein Ticket zu holen",
+            "posterScan": "Scannen",
+            "posterTicker": "Scannen · Rein · Leute kennenlernen",
+            "posterSteps": {
+                "open": "Fiestea öffnen",
+                "scan": "Diesen Code scannen",
+                "meet": "Swipen und matchen"
+            },
+            "posterStepsLink": {
+                "camera": "Kamera draufhalten",
+                "open": "Party ansehen",
+                "ticket": "Ticket holen"
+            }
         },
         "stats": {
             "title": "Statistiken",
@@ -4012,5 +4024,18 @@
         "shareTextEta": "Ich fahre von {{venue}} nach Hause und bin gegen {{time}} da. Ich melde mich.",
         "theParty": "der Party",
         "copied": "Nachricht kopiert: Füge sie ein, wo du willst."
+    },
+    "notice": {
+        "now": "jetzt",
+        "kind": {
+            "message": "Nachricht",
+            "match": "Neues Match",
+            "supercrush": "Supercrush",
+            "raffle": "Verlosung",
+            "alert": "Wichtig",
+            "event": "Party",
+            "other": "Fiestea",
+            "news": "Neuigkeit"
+        }
     }
 }

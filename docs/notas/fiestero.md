@@ -151,6 +151,12 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
     caduca con el match (una hora tras el final, o nunca si se guarda).
 - **El modo invisible es de pago y se comprueba en la base de datos**
   (migración 025), no en la interfaz.
+- **Avisos de un negocio** (`notify-events`, `send-push`): salen con el nombre
+  del local de título, «título · texto» de cuerpo y su `logo_url` de imagen
+  (`image` en FCM). Android la pone a la derecha del aviso; **iOS no la enseña**
+  sin una Notification Service Extension, que la app aún no tiene. Con la app
+  abierta, el aviso lo pinta `in-app-notice.tsx` (arriba, logo o icono por
+  tipo, se toca entero, se desliza hacia arriba para cerrar).
 - **Avisos push** (migración 039). Mensaje nuevo y vybe match: disparadores
   `push_on_message`/`push_on_connection` → `push_webhook()` → `send-push` por
   `pg_net` (secretos de Vault `push_hook_secret` y `functions_url`). Evento que

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useEventIdParam } from '@/hooks/use-event-id-param';
 import { useTranslation } from 'react-i18next';
 import { CalendarDays, CalendarPlus, Clock, ExternalLink, Loader2, MapPin, Music, Navigation, Smartphone } from 'lucide-react';
 import LanguageSwitcher from '@/components/language-switcher';
@@ -22,12 +22,13 @@ import { setSeo } from '@/lib/seo';
  * correo del formulario. Quién va, el tablón y lo demás siguen en la app.
  */
 const PublicEventPage = () => {
-  const { eventId = '' } = useParams<{ eventId: string }>();
+  const eventId = useEventIdParam();
   const { t, i18n } = useTranslation();
   const [evento, setEvento] = useState<PublicEvent | null | undefined>(undefined);
   const [conEntradas, setConEntradas] = useState(0);
 
   useEffect(() => {
+    if (!eventId) return;
     let vivo = true;
     void ticketsService.getPublicEvent(eventId).then((e) => vivo && setEvento(e));
     return () => {

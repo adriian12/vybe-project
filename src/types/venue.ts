@@ -96,6 +96,9 @@ export interface Event {
   maxCapacity?: number;
   /** Destacado de pago hasta esta hora: sale primero en inicio y en el mapa. */
   featuredUntil?: string;
+  /** La URL legible, `/event/<placeSlug>/<slug>` (migración 133). */
+  placeSlug?: string;
+  slug?: string;
   /** `false`: se entra sin comprobar la ubicación (la sala de pruebas). */
   requiresLocation?: boolean;
   /** Si se puede entrar (QR, código o ubicación); apagado, sólo «Voy a ir» (111). */

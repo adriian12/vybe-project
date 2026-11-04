@@ -149,8 +149,12 @@ export interface FcmResult {
  */
 export const sendFcm = async (
   token: string,
-  notification: { title: string; body: string; url?: string; tag?: string },
+  notification: { title: string; body: string; url?: string; tag?: string; image?: string },
 ): Promise<FcmResult> => {
+  // Sólo imágenes públicas por https: Firebase descarga la imagen desde el
+  // teléfono y, si no puede, el aviso llega igual pero sin ella.
+  const image = notification.image?.startsWith('https://') ? notification.image : undefined;
+
   const account = readServiceAccount();
   if (!account) throw new FcmNotConfiguredError();
 
@@ -170,12 +174,16 @@ export const sendFcm = async (
           notification: {
             title: notification.title,
             body: notification.body,
+            // El logo del negocio: Android lo pone a la derecha del aviso y
+            // en grande al desplegarlo.
+            ...(image ? { image } : {}),
           },
           // Los datos llegan al manejador de la aplicación: es lo que permite
           // abrir la pantalla correcta al tocar el aviso.
           data: {
             url: notification.url ?? '/home',
             ...(notification.tag ? { tag: notification.tag } : {}),
+            ...(image ? { image } : {}),
           },
           android: {
             priority: 'HIGH',
@@ -197,8 +205,12 @@ export const sendFcm = async (
               aps: {
                 sound: 'default',
                 'thread-id': notification.tag,
+                // iOS sólo enseña la imagen con una extensión de servicio de
+                // avisos; sin ella, esto no cambia nada.
+                ...(image ? { 'mutable-content': 1 } : {}),
               },
             },
+            ...(image ? { fcm_options: { image } } : {}),
           },
         },
       }),

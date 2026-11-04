@@ -21,6 +21,8 @@ public class MainActivity extends BridgeActivity implements ModifiedMainActivity
     public void onCreate(Bundle savedInstanceState) {
         // Plugin propio: ubicación con aviso de «simulada» (migración 101).
         registerPlugin(FiesteaLocationPlugin.class);
+        // Plugin propio: «Al calendario» sin pasar por el navegador.
+        registerPlugin(FiesteaCalendarPlugin.class);
         super.onCreate(savedInstanceState);
     }
 

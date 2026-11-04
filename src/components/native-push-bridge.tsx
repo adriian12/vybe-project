@@ -1,9 +1,7 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { useAppContext } from '@/context/app-context';
-import { useToast } from '@/components/ui/use-toast';
-import { ToastAction } from '@/components/ui/toast';
+import InAppNotice, { type InAppNoticeData } from '@/components/in-app-notice';
 import { isNative } from '@/services/native';
 import {
   autoRegisterNativePush,
@@ -17,9 +15,9 @@ import {
  *
  * - Al tocar un aviso se abre su pantalla (la conversación, la lista de vybes o
  *   la puerta del evento), también si la app estaba cerrada.
- * - Si llega con la app delante, Android no lo enseña: sale como un aviso de la
- *   propia app, salvo que ya estés en esa pantalla (en el chat con esa persona
- *   el mensaje ya aparece solo).
+ * - Si llega con la app delante, el sistema no lo enseña: sale arriba el aviso
+ *   de la propia app (`InAppNotice`), salvo que ya estés en esa pantalla (en
+ *   el chat con esa persona el mensaje ya aparece solo).
  * - Con sesión de clubber, registra el teléfono y la primera vez pide permiso.
  *
  * Vive dentro del router porque necesita `useNavigate`.
@@ -27,34 +25,24 @@ import {
 const NativePushBridge = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const { t } = useTranslation();
-  const { toast } = useToast();
+  const [aviso, setAviso] = useState<(InAppNoticeData & { id: number }) | null>(null);
   const { currentUser, userType } = useAppContext();
 
   // Los manejadores se ponen una sola vez y leen lo último de aquí: si se
   // quitaran y pusieran en cada navegación, un toque podría caer en el hueco.
-  const latest = useRef({ navigate, pathname, t, toast });
-  latest.current = { navigate, pathname, t, toast };
+  const latest = useRef({ navigate, pathname });
+  latest.current = { navigate, pathname };
 
   useEffect(() => {
     if (!isNative()) return;
 
     setNativePushHandlers({
       onOpen: (url) => latest.current.navigate(url),
-      onForeground: ({ title, body, url, tag }) => {
+      onForeground: (push) => {
         const actual = latest.current;
-        if (url && actual.pathname === url) return;
-        if (tag?.startsWith('match-') && wasMatchCelebrated(tag.slice('match-'.length))) return;
-
-        actual.toast({
-          title,
-          description: body,
-          action: url ? (
-            <ToastAction altText={actual.t('common.open')} onClick={() => actual.navigate(url)}>
-              {actual.t('common.open')}
-            </ToastAction>
-          ) : undefined,
-        });
+        if (push.url && actual.pathname === push.url) return;
+        if (push.tag?.startsWith('match-') && wasMatchCelebrated(push.tag.slice('match-'.length))) return;
+        setAviso({ ...push, id: Date.now() });
       },
     });
 
@@ -69,7 +57,7 @@ const NativePushBridge = () => {
     void autoRegisterNativePush();
   }, [profileId, clubber]);
 
-  return null;
+  return <InAppNotice notice={aviso} onOpen={(url) => navigate(url)} onClose={(id) => setAviso((a) => (a?.id === id ? null : a))} />;
 };
 
 export default NativePushBridge;

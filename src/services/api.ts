@@ -164,6 +164,8 @@ const dbEventToEvent = (dbEvent: EventRow, venue?: Partial<VenueRow>): Event => 
   description: dbEvent.description ?? undefined,
   maxCapacity: dbEvent.max_capacity ?? undefined,
   featuredUntil: dbEvent.featured_until ?? undefined,
+  placeSlug: dbEvent.place_slug ?? undefined,
+  slug: dbEvent.slug ?? undefined,
   requiresLocation: dbEvent.requires_location ?? true,
   entryEnabled: dbEvent.entry_enabled ?? true,
   swipeEnabled: dbEvent.swipe_enabled ?? true,

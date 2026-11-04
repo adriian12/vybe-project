@@ -641,19 +641,110 @@
 }
 
 .print-poster-inner {
+  position: relative;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   text-align: center;
   flex-shrink: 0;
   width: calc(210 * var(--u));
   height: calc(297 * var(--u));
-  padding: calc(14 * var(--u)) calc(12 * var(--u));
+  padding: calc(17 * var(--u)) calc(14 * var(--u)) calc(15 * var(--u));
   color: var(--tinta);
-  font-family: ui-sans-serif, system-ui, sans-serif;
+  background: var(--fondo);
+  font-family: 'Plus Jakarta Sans Variable', 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
 }
 
+.print-poster-inner > *:not(.print-poster-deco):not(.print-poster-ticker) {
+  position: relative;
+  z-index: 1;
+}
+
+/* ---- decoración: ondas que salen del QR, destellos y confeti ---- */
+.print-poster-deco {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.print-poster-ring {
+  position: absolute;
+  left: 50%;
+  top: 47%;
+  border-radius: 9999px;
+  border: calc(0.8 * var(--u)) solid var(--marca);
+  transform: translate(-50%, -50%);
+  opacity: 0.1;
+}
+
+.print-poster-ring--1 { width: calc(160 * var(--u)); height: calc(160 * var(--u)); }
+.print-poster-ring--2 { width: calc(205 * var(--u)); height: calc(205 * var(--u)); opacity: 0.07; }
+.print-poster-ring--3 { width: calc(255 * var(--u)); height: calc(255 * var(--u)); opacity: 0.05; }
+
+/* El destello del logo, en grande. */
+.print-poster-spark {
+  position: absolute;
+  width: calc(14 * var(--u));
+  height: calc(14 * var(--u));
+  background: var(--marca);
+  clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%);
+}
+
+.print-poster-spark--1 { left: calc(14 * var(--u)); top: calc(62 * var(--u)); }
+.print-poster-spark--2 { right: calc(16 * var(--u)); top: calc(48 * var(--u)); width: calc(9 * var(--u)); height: calc(9 * var(--u)); }
+.print-poster-spark--3 { right: calc(22 * var(--u)); top: calc(178 * var(--u)); width: calc(11 * var(--u)); height: calc(11 * var(--u)); }
+
+.print-poster-confetti {
+  position: absolute;
+  inset: 0;
+  opacity: 0.16;
+  background-image:
+    radial-gradient(circle, var(--marca) calc(0.9 * var(--u)), transparent calc(1 * var(--u))),
+    radial-gradient(circle, var(--marca) calc(0.6 * var(--u)), transparent calc(0.7 * var(--u)));
+  background-size: calc(23 * var(--u)) calc(23 * var(--u)), calc(17 * var(--u)) calc(17 * var(--u));
+  background-position: 0 0, calc(9 * var(--u)) calc(11 * var(--u));
+  -webkit-mask-image: radial-gradient(ellipse at 50% 47%, transparent 38%, #000 70%);
+  mask-image: radial-gradient(ellipse at 50% 47%, transparent 38%, #000 70%);
+}
+
+/* En blanco, la decoración va en amarillo para que el cartel no quede gris. */
+.print-poster--white .print-poster-deco { --marca: #F8D000; }
+.print-poster--white .print-poster-ring { opacity: 0.5; }
+.print-poster--white .print-poster-confetti { opacity: 0.7; }
+
+/* ---- cinta de arriba y abajo ---- */
+.print-poster-ticker {
+  position: absolute;
+  z-index: 1;
+  left: calc(-10 * var(--u));
+  right: calc(-10 * var(--u));
+  display: flex;
+  gap: calc(8 * var(--u));
+  justify-content: center;
+  padding: calc(2 * var(--u)) 0;
+  background: var(--tinta);
+  color: var(--fondo);
+  font-family: 'Outfit Variable', 'Outfit', ui-sans-serif, system-ui, sans-serif;
+  font-size: calc(3.6 * var(--u));
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.print-poster-ticker span::after {
+  content: '\2726';
+  margin-left: calc(8 * var(--u));
+}
+
+.print-poster-ticker--top { top: 0; }
+.print-poster-ticker--bottom { bottom: 0; }
+
+.print-poster--dark .print-poster-ticker { background: var(--marca); color: #141414; }
+.print-poster--white .print-poster-ticker { background: #141414; color: #F8D000; }
+
+/* ---- cabecera ---- */
 .print-poster-top,
 .print-poster-scan,
 .print-poster-bottom {
@@ -662,85 +753,233 @@
   align-items: center;
 }
 
-.print-poster-bottom {
-  flex: 1;
-}
-
 .print-poster-brand {
+  display: flex;
+  align-items: center;
+  gap: calc(3.5 * var(--u));
   color: var(--marca);
-  font-size: calc(22 * var(--u));
+  font-family: 'Outfit Variable', 'Outfit', ui-sans-serif, system-ui, sans-serif;
+  font-size: calc(19 * var(--u));
   font-weight: 800;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
   line-height: 1;
 }
 
+.print-poster-brand svg {
+  width: calc(15 * var(--u));
+  height: calc(15 * var(--u));
+}
+
 .print-poster-headline {
-  margin-top: calc(6 * var(--u));
-  font-size: calc(7 * var(--u));
-  font-weight: 600;
-  line-height: 1.25;
-  max-width: calc(150 * var(--u));
+  margin-top: calc(5 * var(--u));
+  font-family: 'Outfit Variable', 'Outfit', ui-sans-serif, system-ui, sans-serif;
+  font-size: calc(8.2 * var(--u));
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  max-width: calc(165 * var(--u));
   text-wrap: balance;
 }
 
-/* El QR ocupa cerca de la mitad del alto: es lo único que hay que escanear
-   desde lejos y con gente delante. Siempre sobre blanco, también en oscuro. */
+/* ---- el QR: siempre sobre blanco, con marco de visor y el logo al centro ---- */
+.print-poster-scan {
+  margin-top: calc(9 * var(--u));
+}
+
 .print-poster-qr {
-  margin-top: calc(8 * var(--u));
+  position: relative;
   background: #ffffff;
-  padding: calc(6 * var(--u));
-  border-radius: calc(6 * var(--u));
+  padding: calc(7 * var(--u));
+  border-radius: calc(7 * var(--u));
   line-height: 0;
+  box-shadow: 0 calc(2 * var(--u)) 0 calc(0.8 * var(--u)) rgba(0, 0, 0, 0.18);
+  transform: rotate(-1.5deg);
 }
 
 .print-poster--white .print-poster-qr {
   border: calc(0.6 * var(--u)) solid #141414;
+  box-shadow: calc(2 * var(--u)) calc(2 * var(--u)) 0 #F8D000;
 }
 
-.print-poster-qr svg {
-  width: calc(110 * var(--u));
-  height: calc(110 * var(--u));
+.print-poster-qr > svg {
+  width: calc(100 * var(--u));
+  height: calc(100 * var(--u));
 }
+
+.print-poster-corner {
+  position: absolute;
+  width: calc(10 * var(--u));
+  height: calc(10 * var(--u));
+  border: calc(1.4 * var(--u)) solid var(--tinta);
+}
+
+.print-poster--dark .print-poster-corner { border-color: var(--marca); }
+
+.print-poster-corner--tl { left: calc(-4 * var(--u)); top: calc(-4 * var(--u)); border-right: 0; border-bottom: 0; border-top-left-radius: calc(4 * var(--u)); }
+.print-poster-corner--tr { right: calc(-4 * var(--u)); top: calc(-4 * var(--u)); border-left: 0; border-bottom: 0; border-top-right-radius: calc(4 * var(--u)); }
+.print-poster-corner--bl { left: calc(-4 * var(--u)); bottom: calc(-4 * var(--u)); border-right: 0; border-top: 0; border-bottom-left-radius: calc(4 * var(--u)); }
+.print-poster-corner--br { right: calc(-4 * var(--u)); bottom: calc(-4 * var(--u)); border-left: 0; border-top: 0; border-bottom-right-radius: calc(4 * var(--u)); }
+
+/* El logo en el centro del QR: el nivel H aguanta tapar hasta un 30 %. */
+.print-poster-qr-logo {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  padding: calc(1.6 * var(--u));
+  border-radius: calc(4 * var(--u));
+  background: #ffffff;
+}
+
+.print-poster-qr-logo svg {
+  display: block;
+  width: calc(17 * var(--u));
+  height: calc(17 * var(--u));
+}
+
+.print-poster-sticker {
+  position: absolute;
+  right: calc(-13 * var(--u));
+  top: calc(-9 * var(--u));
+  padding: calc(2.2 * var(--u)) calc(4.5 * var(--u));
+  border-radius: 9999px;
+  background: #141414;
+  color: #F8D000;
+  font-family: 'Outfit Variable', 'Outfit', ui-sans-serif, system-ui, sans-serif;
+  font-size: calc(5 * var(--u));
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
+  transform: rotate(9deg);
+  box-shadow: 0 calc(1 * var(--u)) calc(2 * var(--u)) rgba(0, 0, 0, 0.25);
+}
+
+.print-poster--dark .print-poster-sticker { background: var(--marca); color: #141414; }
 
 .print-poster-code {
-  margin-top: calc(5 * var(--u));
-  font-size: calc(9 * var(--u));
-  font-weight: 700;
-  letter-spacing: 0.25em;
+  margin-top: calc(7 * var(--u));
+  padding: calc(1.5 * var(--u)) calc(5 * var(--u));
+  border: calc(0.6 * var(--u)) dashed currentColor;
+  border-radius: calc(3 * var(--u));
+  font-size: calc(8 * var(--u));
+  font-weight: 800;
+  letter-spacing: 0.3em;
   font-variant-numeric: tabular-nums;
 }
 
+/* ---- la fiesta, los pasos y el pie ---- */
+.print-poster-bottom {
+  flex: 1;
+  width: 100%;
+}
+
 .print-poster-event {
-  margin-top: calc(6 * var(--u));
+  margin-top: calc(7 * var(--u));
 }
 
 .print-poster-event-name {
-  font-size: calc(8 * var(--u));
-  font-weight: 700;
-  line-height: 1.15;
+  font-family: 'Outfit Variable', 'Outfit', ui-sans-serif, system-ui, sans-serif;
+  font-size: calc(10 * var(--u));
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
 }
 
-.print-poster-venue {
-  margin-top: calc(1.5 * var(--u));
-  font-size: calc(5.5 * var(--u));
-  opacity: 0.85;
+.print-poster-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: calc(1.5 * var(--u)) calc(4 * var(--u));
+  margin-top: calc(2.5 * var(--u));
+  font-size: calc(4.4 * var(--u));
+  font-weight: 600;
 }
+
+.print-poster-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(1.4 * var(--u));
+}
+
+.print-poster-meta span:first-letter {
+  text-transform: uppercase;
+}
+
+.print-poster-meta svg {
+  width: calc(4.4 * var(--u));
+  height: calc(4.4 * var(--u));
+  stroke-width: 2.5;
+}
+
+.print-poster-steps {
+  display: flex;
+  justify-content: center;
+  gap: calc(3 * var(--u));
+  margin: calc(7 * var(--u)) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.print-poster-steps li {
+  display: flex;
+  align-items: center;
+  gap: calc(1.8 * var(--u));
+  padding: calc(1.8 * var(--u)) calc(3.2 * var(--u)) calc(1.8 * var(--u)) calc(1.8 * var(--u));
+  border-radius: 9999px;
+  background: rgba(20, 20, 20, 0.09);
+  font-size: calc(3.7 * var(--u));
+  font-weight: 700;
+  line-height: 1.1;
+  text-align: left;
+}
+
+.print-poster--dark .print-poster-steps li { background: rgba(255, 255, 255, 0.08); }
+.print-poster--white .print-poster-steps li { background: #F5F5F7; }
+
+.print-poster-steps b {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: calc(5.5 * var(--u));
+  height: calc(5.5 * var(--u));
+  border-radius: 9999px;
+  background: var(--tinta);
+  color: var(--fondo);
+  font-size: calc(3.2 * var(--u));
+}
+
+.print-poster--dark .print-poster-steps b { background: var(--marca); color: #141414; }
+.print-poster--white .print-poster-steps b { background: #F8D000; color: #141414; }
 
 .print-poster-footer {
   margin-top: auto;
-  font-size: calc(4.5 * var(--u));
-  opacity: 0.8;
+  padding-bottom: calc(4 * var(--u));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(0.8 * var(--u));
+  font-size: calc(3.8 * var(--u));
 }
 
-/* Apaisado: el texto a la izquierda y el QR a la derecha, a toda altura. */
+.print-poster-footer strong {
+  font-family: 'Outfit Variable', 'Outfit', ui-sans-serif, system-ui, sans-serif;
+  font-size: calc(4.6 * var(--u));
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+/* ---- apaisado: el texto a la izquierda y el QR a la derecha ---- */
 .print-poster--landscape .print-poster-inner {
   display: grid;
   grid-template-columns: 1fr auto;
   grid-template-rows: auto 1fr;
-  column-gap: calc(14 * var(--u));
+  column-gap: calc(18 * var(--u));
   width: calc(297 * var(--u));
   height: calc(210 * var(--u));
-  padding: calc(14 * var(--u)) calc(16 * var(--u));
+  padding: calc(17 * var(--u)) calc(22 * var(--u)) calc(13 * var(--u));
   text-align: left;
 }
 
@@ -754,24 +993,30 @@
   grid-column: 2;
   grid-row: 1 / span 2;
   align-self: center;
-}
-
-.print-poster--landscape .print-poster-qr {
   margin-top: 0;
 }
 
-.print-poster--landscape .print-poster-qr svg {
-  width: calc(130 * var(--u));
-  height: calc(130 * var(--u));
+.print-poster--landscape .print-poster-qr > svg {
+  width: calc(118 * var(--u));
+  height: calc(118 * var(--u));
 }
 
 .print-poster--landscape .print-poster-headline {
-  font-size: calc(9 * var(--u));
+  font-size: calc(10 * var(--u));
+  max-width: calc(140 * var(--u));
 }
 
-.print-poster--landscape .print-poster-event {
-  margin-top: calc(10 * var(--u));
+.print-poster--landscape .print-poster-event { margin-top: calc(9 * var(--u)); }
+.print-poster--landscape .print-poster-meta { justify-content: flex-start; }
+.print-poster--landscape .print-poster-steps { flex-direction: column; align-items: flex-start; }
+.print-poster--landscape .print-poster-footer { align-items: flex-start; }
+.print-poster--landscape .print-poster-ring { left: 74%; top: 50%; }
+.print-poster--landscape .print-poster-confetti {
+  -webkit-mask-image: radial-gradient(ellipse at 74% 50%, transparent 30%, #000 62%);
+  mask-image: radial-gradient(ellipse at 74% 50%, transparent 30%, #000 62%);
 }
+.print-poster--landscape .print-poster-spark--1 { left: auto; right: calc(150 * var(--u)); top: calc(30 * var(--u)); }
+.print-poster--landscape .print-poster-spark--3 { top: calc(160 * var(--u)); right: calc(14 * var(--u)); }
 
 @media print {
   /* Cuando hay cartel, la página deja de existir. */
@@ -825,4 +1070,56 @@
 html.no-zoom,
 html.no-zoom body {
   touch-action: pan-x pan-y;
+}
+
+/* El aviso de arriba cuando llega un push con la app abierta
+   (`in-app-notice.tsx`). Baja con la curva de los paneles y sube al cerrarse. */
+.in-app-notice {
+  animation: in-app-notice-in 280ms var(--ease-out) backwards;
+  transition: transform 200ms var(--ease-out), opacity 200ms var(--ease-out);
+  touch-action: none;
+  user-select: none;
+}
+
+.in-app-notice--out {
+  transform: translateY(-120%) !important;
+  opacity: 0 !important;
+}
+
+@keyframes in-app-notice-in {
+  from {
+    transform: translateY(-120%);
+    opacity: 0;
+  }
+}
+
+.in-app-notice-bar {
+  transform-origin: left;
+  animation-name: in-app-notice-bar;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+@keyframes in-app-notice-bar {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .in-app-notice {
+    animation: none;
+    transition: opacity 200ms linear;
+  }
+
+  .in-app-notice--out {
+    transform: none !important;
+  }
+
+  .in-app-notice-bar {
+    animation: none;
+  }
 }

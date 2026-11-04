@@ -7,6 +7,11 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
 - **Cartel imprimible:** `venue-qr-poster.tsx` va en un portal a `body`. La
   regla de impresión oculta todo lo que cuelga de `body` salvo el cartel, y
   dentro de la app salía la hoja en blanco.
+- **Panel y cartel del QR:** el cartel va con `memo` y el QR en `useMemo`: el
+  panel se repinta cada segundo por la cuenta atrás y rehacía el cartel entero,
+  y por eso los botones de orientación y color tardaban. El cartel lleva fecha,
+  sala, tres pasos y la cinta «Escanea · Entra · Conoce gente»; el logo va en el
+  centro del QR (nivel H, aguanta tapar hasta un 30 %).
 - **Avisos del local** (migración 053). `queue_broadcast()` acepta
   `scheduled_at`: sin hora sale en la siguiente pasada de `notify-events`, con
   hora espera a esa hora. Programados a la vez: 1 en Gratis y 20 en

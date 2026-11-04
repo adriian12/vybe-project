@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { useEventIdParam } from '@/hooks/use-event-id-param';
 import { useTranslation } from 'react-i18next';
 import {
   AlertTriangle,
@@ -7,7 +8,6 @@ import {
   AtSign,
   Bookmark,
   BookmarkCheck,
-  CalendarPlus,
   CheckCircle2,
   Heart,
   ChevronDown,
@@ -44,11 +44,10 @@ import { api } from '@/services/api';
 import { calculateDistance, Coordinates, formatDistance, getCurrentPosition } from '@/services/geo';
 import { franjaDe, sePuedeEntrar } from '@/lib/party-filters';
 import { openExternal } from '@/services/native';
-import { eventCalendarUrl } from '@/lib/event-calendar';
 import { eventWatchService } from '@/services/event-watch';
 import { rutaHasta } from '@/lib/maps';
 import { EMPTY_ACTIVITY, socialService } from '@/services/social';
-import { publicLink } from '@/lib/share';
+import { eventPath, publicLink } from '@/lib/share';
 import { useShareSheet } from '@/components/share-sheet';
 import { track } from '@/lib/observability';
 import { cn } from '@/lib/utils';
@@ -107,7 +106,7 @@ const Etiqueta: React.FC<{ children: React.ReactNode; icon?: typeof Music }> = (
  * acceso, para la puerta.
  */
 const EventDetailPage = () => {
-  const { eventId } = useParams<{ eventId: string }>();
+  const eventId = useEventIdParam();
   const navigate = useNavigate();
   const { toast } = useToast();
   const { share, sheet } = useShareSheet();
@@ -235,7 +234,7 @@ const EventDetailPage = () => {
     share({
       title: event.name,
       text: t('eventDetail.shareText', { name: event.name, venue: event.venueName ?? '', date: fecha }),
-      url: publicLink(`/event/${event.id}`),
+      url: publicLink(eventPath(event)),
     });
 
   const pedirUbicacion = async () => {
@@ -551,22 +550,6 @@ const EventDetailPage = () => {
               donde se decide marcarlo. */}
           {!terminado && !live && (
             <p className="text-caption text-party-gray">{t('eventDetail.intentNote')}</p>
-          )}
-
-          {/* Para todo el mundo, con cuenta o sin ella: el calendario del móvil
-              recuerda la fiesta aunque los avisos de la app estén apagados. */}
-          {!terminado && !live && (
-            <button
-              type="button"
-              onClick={() => {
-                track('event_calendar_added', { eventId: event.id });
-                void openExternal(eventCalendarUrl(event.id), { system: true });
-              }}
-              className="press flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-white/15 font-bold text-white"
-            >
-              <CalendarPlus size={17} />
-              {t('eventDetail.addToCalendar')}
-            </button>
           )}
 
           {/* ----------------------------------------------------- organiza */}

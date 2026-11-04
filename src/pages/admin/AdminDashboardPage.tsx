@@ -58,7 +58,7 @@ import AdminCreate from '@/components/admin/admin-create';
 import AdminEventForm from '@/components/admin/admin-event-form';
 import AdminEventTickets from '@/components/admin/admin-event-tickets';
 import VenueQRPoster from '@/components/venue/venue-qr-poster';
-import { publicLink } from '@/lib/share';
+import { eventPath, publicLink } from '@/lib/share';
 import AdminFunout from '@/components/admin/admin-funout';
 import AdminScanner from '@/components/admin/admin-scanner';
 import AdminVenues from '@/components/admin/admin-venues';
@@ -1428,8 +1428,9 @@ const AdminDashboardPage = () => {
           {cartelEvento && (
             <VenueQRPoster
               key={cartelEvento.id}
-              link={publicLink(`/event/${cartelEvento.id}`)}
+              link={publicLink(eventPath(cartelEvento))}
               eventName={cartelEvento.name}
+              eventDate={cartelEvento.startDate}
               venueName={cartelEvento.placeName ?? (cartelEvento.byPlatform ? undefined : cartelEvento.venueName)}
             />
           )}

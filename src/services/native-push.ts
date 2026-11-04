@@ -18,7 +18,14 @@ export interface NativePushHandlers {
   /** Se ha tocado el aviso: hay que abrir su pantalla. */
   onOpen: (url: string) => void;
   /** Ha llegado con la app delante: el sistema no lo enseña, lo enseña la app. */
-  onForeground: (push: { title: string; body: string; url: string | null; tag: string | null }) => void;
+  onForeground: (push: {
+    title: string;
+    body: string;
+    url: string | null;
+    tag: string | null;
+    /** El logo del negocio, si el aviso es suyo. */
+    image: string | null;
+  }) => void;
 }
 
 /** Canal de Android con importancia alta: el aviso baja desde arriba y suena. */
@@ -98,7 +105,9 @@ export const initNativePush = (): Promise<void> => {
       await PushNotifications.addListener('pushNotificationReceived', (notification) => {
         const url = notification.data?.url;
         const tag = notification.data?.tag;
+        const image = notification.data?.image;
         handlers?.onForeground({
+          image: typeof image === 'string' && image.startsWith('https://') ? image : null,
           title: notification.title ?? 'Fiestea',
           body: notification.body ?? '',
           url: typeof url === 'string' && url.startsWith('/') ? url : null,

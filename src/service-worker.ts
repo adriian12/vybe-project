@@ -32,6 +32,8 @@ interface PushPayload {
   /** Agrupa notificaciones del mismo hilo (una por conversación). */
   tag?: string;
   icon?: string;
+  /** El logo del negocio, si el aviso es suyo: va de icono en vez del de Fiestea. */
+  image?: string;
   renotify?: boolean;
 }
 
@@ -51,7 +53,7 @@ self.addEventListener('push', (event) => {
   // de TypeScript, de ahí el ensanchado del objeto de opciones.
   const options: NotificationOptions = {
     body: payload.body,
-    icon: payload.icon ?? DEFAULT_ICON,
+    icon: payload.icon ?? payload.image ?? DEFAULT_ICON,
     badge: DEFAULT_ICON,
     tag: payload.tag,
     data: { url: payload.url ?? '/' },

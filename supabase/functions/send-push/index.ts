@@ -25,6 +25,12 @@ interface PushRequest {
   body: string;
   url?: string;
   tag?: string;
+  /**
+   * Imagen del aviso: el logo del negocio cuando el aviso es suyo. Android la
+   * enseña a la derecha y en grande al desplegarlo; dentro de la app sale en
+   * el aviso en lugar del icono de Fiestea.
+   */
+  image?: string;
 }
 
 interface WebhookPayload {
@@ -74,12 +80,13 @@ const fromVenueEvent = async (
 
   const { data: evento } = await supabase
     .from('events')
-    .select('id, name, start_date, venue_id, venues(name)')
+    .select('id, name, start_date, venue_id, venues(name, logo_url)')
     .eq('id', eventId)
     .maybeSingle();
   if (!evento) return [];
 
-  const venueName = (evento.venues as { name?: string } | null)?.name ?? 'Fiestea';
+  const venue = evento.venues as { name?: string; logo_url?: string | null } | null;
+  const venueName = venue?.name ?? 'Fiestea';
   const { data: seguidores } = await supabase
     .from('venue_followers')
     .select('profile_id, profiles(locale)')
@@ -94,6 +101,7 @@ const fromVenueEvent = async (
       ...pushTexts(locale).newEvent(venueName, evento.name, cuandoLocal(evento.start_date, locale)),
       url: `/event/${evento.id}`,
       tag: `venue-event-${evento.id}`,
+      image: venue?.logo_url ?? undefined,
     };
   });
 };
@@ -135,7 +143,7 @@ const fromVenueEventsBulk = async (
   const { venue_id: venueId, count } = payload.record as { venue_id?: string; count?: number };
   if (!venueId || !count) return [];
 
-  const { data: venue } = await supabase.from('venues').select('name').eq('id', venueId).maybeSingle();
+  const { data: venue } = await supabase.from('venues').select('name, logo_url').eq('id', venueId).maybeSingle();
   const venueName = venue?.name ?? 'Fiestea';
   const { data: seguidores } = await supabase
     .from('venue_followers')
@@ -151,6 +159,7 @@ const fromVenueEventsBulk = async (
       ...pushTexts(locale).newEvents(venueName, count),
       url: '/map',
       tag: `venue-events-${venueId}`,
+      image: venue?.logo_url ?? undefined,
     };
   });
 };
@@ -459,6 +468,7 @@ const deliver = async (
     body: payload.body,
     url: payload.url ?? '/matches',
     tag: payload.tag,
+    image: payload.image,
   });
 
   let sent = 0;
@@ -478,6 +488,7 @@ const deliver = async (
             body: payload.body,
             url: payload.url ?? '/matches',
             tag: payload.tag,
+            image: payload.image,
           });
 
           if (result.ok) sent += 1;

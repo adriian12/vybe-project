@@ -15,6 +15,23 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
   copiar y la hoja del sistema (`@capacitor/share` en la app). El enlace
   sale siempre de `app.fiestea.es` (`APP_URL`); `VITE_SITE_URL` ya no existe
   (en el APK seguía apuntando al dominio antiguo).
+- **URL legible de una fiesta** (migración 133): `/event/<sala>/<fiesta>`
+  («/event/amok-mallorca/el-tardeo-reggaeton-viejo»). `events.place_slug` sale de
+  `place_name` o del local; `events.slug`, del nombre, y si la sala ya tiene uno
+  igual (las que se repiten cada semana) se le añade el día («-9-noviembre»).
+  Se fijan al crear la fiesta y **no cambian** al renombrarla, para no romper
+  enlaces compartidos. Lo hace el disparador `events_set_slug`, que también
+  impide cambiarlos desde la app. La ruta `/event/:placeSlug/:eventSlug`
+  resuelve el id con `get_event_id_by_slug` (`useEventIdParam`); `/event/:id`
+  sigue funcionando. `eventPath()` (`src/lib/share.ts`) da la ruta para
+  compartir y vuelve al id si aún no hay slug. «access» y «live» nunca son slug.
+  Hay una segunda regla de `vercel.json` para la vista previa de estas URL
+  (`?place=…&slug=…`).
+- **«Al calendario»** sólo está en el aviso de «Voy a ir», no en la ficha. En
+  Android abre la pantalla «Nuevo evento» del calendario ya rellena
+  (`FiesteaCalendarPlugin.java`, un intent sin permisos); en iOS, en la web o si
+  falta el plugin (una APK vieja), el `.ics` de `event-calendar`. Para que llegue
+  a los móviles hace falta una APK nueva.
 - **Vista previa del enlace de una fiesta** (migración 108, `api/`).
   - **Para quién:** los robots de WhatsApp, Telegram, iMessage, X, Slack,
     Discord… no ejecutan JavaScript. Una regla de `vercel.json` (cabecera

@@ -846,7 +846,19 @@
                 "dark": "Fosc (pantalles)"
             },
             "showPoster": "Mostrar a la pantalla",
-            "posterFooterLink": "Escaneja el codi per veure la festa i aconseguir la teva entrada"
+            "posterFooterLink": "Escaneja el codi per veure la festa i aconseguir la teva entrada",
+            "posterScan": "Escaneja",
+            "posterTicker": "Escaneja · Entra · Coneix gent",
+            "posterSteps": {
+                "open": "Obre Fiestea",
+                "scan": "Escaneja aquest codi",
+                "meet": "Llisca i fes match"
+            },
+            "posterStepsLink": {
+                "camera": "Apunta amb la càmera",
+                "open": "Mira la festa",
+                "ticket": "Aconsegueix l’entrada"
+            }
         },
         "stats": {
             "title": "Estadístiques",
@@ -4012,5 +4024,18 @@
         "shareTextEta": "Torno a casa des de {{venue}}, arribo cap a les {{time}}. T'aviso quan arribi.",
         "theParty": "la festa",
         "copied": "Missatge copiat: enganxa-ho on vulguis."
+    },
+    "notice": {
+        "now": "ara",
+        "kind": {
+            "message": "Missatge",
+            "match": "Nou match",
+            "supercrush": "Supercrush",
+            "raffle": "Sorteig",
+            "alert": "Avís important",
+            "event": "Festa",
+            "other": "Fiestea",
+            "news": "Novetat"
+        }
     }
 }

@@ -846,7 +846,19 @@
                 "dark": "Oscuro (pantallas)"
             },
             "showPoster": "Mostrar en pantalla",
-            "posterFooterLink": "Escanea el código para ver la fiesta y conseguir tu entrada"
+            "posterFooterLink": "Escanea el código para ver la fiesta y conseguir tu entrada",
+            "posterScan": "Escanea",
+            "posterTicker": "Escanea · Entra · Conoce gente",
+            "posterSteps": {
+                "open": "Abre Fiestea",
+                "scan": "Escanea este código",
+                "meet": "Desliza y haz match"
+            },
+            "posterStepsLink": {
+                "camera": "Apunta con la cámara",
+                "open": "Mira la fiesta",
+                "ticket": "Consigue tu entrada"
+            }
         },
         "stats": {
             "title": "Estadísticas",
@@ -4012,5 +4024,18 @@
         "shareTextEta": "Vuelvo a casa desde {{venue}}, llego sobre las {{time}}. Te aviso al llegar.",
         "theParty": "la fiesta",
         "copied": "Mensaje copiado: pégalo donde quieras."
+    },
+    "notice": {
+        "now": "ahora",
+        "kind": {
+            "message": "Mensaje",
+            "match": "Nuevo match",
+            "supercrush": "Supercrush",
+            "raffle": "Sorteo",
+            "alert": "Aviso importante",
+            "event": "Fiesta",
+            "other": "Fiestea",
+            "news": "Novedad"
+        }
     }
 }

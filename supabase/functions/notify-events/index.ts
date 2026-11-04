@@ -157,6 +157,22 @@ serve(async (req: Request): Promise<Response> => {
         p_broadcast_id: broadcast.id,
       });
 
+      // El aviso de un negocio sale a su nombre y con su logo («AMOK» →
+      // «Esta noche…»), no como si lo mandara Fiestea. El título que escribió
+      // va delante del texto. Los de administración, como siempre.
+      const { data: origen } = await supabase
+        .from('broadcasts')
+        .select('venues(name, logo_url, is_platform)')
+        .eq('id', broadcast.id)
+        .maybeSingle();
+      const negocio = (origen?.venues ?? null) as { name?: string; logo_url?: string | null; is_platform?: boolean } | null;
+      const deNegocio = Boolean(negocio?.name && !negocio.is_platform);
+      const titulo = deNegocio ? (negocio?.name as string) : broadcast.title;
+      const texto = deNegocio
+        ? [broadcast.title, broadcast.body].map((t) => t?.trim()).filter(Boolean).join(' · ')
+        : broadcast.body;
+      const imagen = deNegocio ? (negocio?.logo_url ?? undefined) : undefined;
+
       // De 20 en 20: una novedad de administración va a todo el mundo.
       const lista = (recipients ?? []) as { profile_id: string }[];
       let sent = 0;
@@ -166,10 +182,11 @@ serve(async (req: Request): Promise<Response> => {
             push({
               profileId: recipient.profile_id,
               kind: 'event',
-              title: broadcast.title,
-              body: broadcast.body,
+              title: titulo,
+              body: texto,
               url: broadcast.url ?? '/home',
               tag: `broadcast-${broadcast.id}`,
+              image: imagen,
             }).catch(() => 0),
           ),
         );
