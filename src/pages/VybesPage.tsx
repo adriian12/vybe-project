@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Heart, Hourglass, Loader2, Lock, Star, Zap } from 'lucide-react';
+import { Heart, Hourglass, Loader2, Lock, Star, X, Zap } from 'lucide-react';
 import Header from '@/components/header';
 import Footer from '@/components/footer';
 import ConnectionListItem from '@/components/connection-list-item';
@@ -28,6 +28,17 @@ import {
 
 const FALLBACK_PHOTO = '/placeholder.svg';
 
+/** Quien cierra el aviso de «los chats caducan» no lo vuelve a ver en ese móvil. */
+const AVISO_CADUCAN = 'fiestea:aviso-chats-caducan-oculto';
+
+const avisoOcultoGuardado = (): boolean => {
+  try {
+    return localStorage.getItem(AVISO_CADUCAN) === '1';
+  } catch {
+    return false;
+  }
+};
+
 type Pestana = 'matches' | 'likes';
 
 /**
@@ -45,6 +56,15 @@ const VybesPage = () => {
   // pestaña React lo conserva y no vuelve a pedir los likes.
   const initialTab: Pestana = pathname.startsWith('/likes') ? 'likes' : 'matches';
   const { toast } = useToast();
+  const [avisoOculto, setAvisoOculto] = useState(avisoOcultoGuardado);
+  const ocultarAviso = () => {
+    setAvisoOculto(true);
+    try {
+      localStorage.setItem(AVISO_CADUCAN, '1');
+    } catch {
+      // Sin almacenamiento: se oculta hasta salir de la pantalla.
+    }
+  };
   const { connections, messages, currentUser, activeEvent, events, refreshConnections } = useAppContext();
   const { isPremium, setShowPremiumDialog } = usePremium();
   // El crush que acaba de salir al devolver un like: se celebra igual que en
@@ -266,14 +286,22 @@ const VybesPage = () => {
             )}
 
             {/* ------------------------------------------------------ aviso */}
-            {connections.some((c) => c.expiresAt) && (
-              <div className="flex items-center gap-3 rounded-2xl bg-card p-4">
+            {!avisoOculto && connections.some((c) => c.expiresAt) && (
+              <div className="relative flex items-center gap-3 rounded-2xl bg-card p-4 pr-11">
                 <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-party-primary/20 text-party-primary">
                   <Zap size={20} />
                 </span>
                 <p className="text-body-md text-[#C8C6C5]">
                   {t('vybes.expireNotice')} <strong className="text-white">{t('vybes.expireCta')}</strong>
                 </p>
+                <button
+                  type="button"
+                  onClick={ocultarAviso}
+                  aria-label={t('common.close')}
+                  className="press absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full text-party-gray hover:bg-white/10 hover:text-white"
+                >
+                  <X size={16} />
+                </button>
               </div>
             )}
 

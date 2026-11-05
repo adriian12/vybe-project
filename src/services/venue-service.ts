@@ -197,6 +197,15 @@ export interface Broadcast {
   /** Hora a la que saldrá. Nulo: sale en la siguiente pasada. */
   scheduledAt: string | null;
   audience: BroadcastAudience;
+  /** El evento del aviso. Nulo con «todos los eventos» (migración 134). */
+  eventId: string | null;
+}
+
+/** Un evento del local para elegir a quién va un aviso. */
+export interface AudienceEvent {
+  id: string;
+  name: string;
+  startDate: string;
 }
 
 /**
@@ -991,14 +1000,16 @@ export const venueService = {
     return Number(data ?? 1);
   },
 
-  getBroadcasts: async (eventId?: string): Promise<Broadcast[]> => {
+  getBroadcasts: async (eventId?: string, venueId?: string): Promise<Broadcast[]> => {
     let query = supabase
       .from('broadcasts')
-      .select('id, title, body, status, recipients, created_at, sent_at, scheduled_at, audience')
+      .select('id, title, body, status, recipients, created_at, sent_at, scheduled_at, audience, event_id')
       .order('created_at', { ascending: false })
       .limit(20);
 
-    if (eventId) query = query.eq('event_id', eventId);
+    // Con el local, también los avisos a «todos los eventos» (sin evento).
+    if (eventId && venueId) query = query.eq('venue_id', venueId).or(`event_id.eq.${eventId},event_id.is.null`);
+    else if (eventId) query = query.eq('event_id', eventId);
 
     const { data, error } = await query;
     if (error || !data) return [];
@@ -1013,7 +1024,25 @@ export const venueService = {
       sentAt: row.sent_at,
       scheduledAt: row.scheduled_at,
       audience: (row.audience ?? 'inside') as BroadcastAudience,
+      eventId: row.event_id ?? null,
     }));
+  },
+
+  /**
+   * Eventos del local para elegir el público de un aviso: los de los últimos
+   * 90 días y los próximos, del más reciente al más antiguo.
+   */
+  getAudienceEvents: async (venueId: string): Promise<AudienceEvent[]> => {
+    const desde = new Date(Date.now() - 90 * 24 * 3600 * 1000).toISOString();
+    const { data, error } = await supabase
+      .from('events')
+      .select('id, name, start_date')
+      .eq('venue_id', venueId)
+      .gte('start_date', desde)
+      .order('start_date', { ascending: false })
+      .limit(60);
+    if (error || !data) return [];
+    return data.map((e) => ({ id: e.id, name: e.name, startDate: e.start_date }));
   },
 
   /** Aviso a un público del local (Pro y Business salvo «inside»). */
@@ -1021,7 +1050,8 @@ export const venueService = {
     audience: BroadcastAudience,
     title: string,
     body: string,
-    eventId: string,
+    /** Nulo: «todos los eventos» (sólo «Dijeron que venían» y «Nunca han venido»). */
+    eventId: string | null,
     scheduledAt?: string | null,
   ): Promise<string> => {
     const { data, error } = await supabase.rpc('queue_audience_broadcast', {
@@ -1036,7 +1066,7 @@ export const venueService = {
   },
 
   /** Cuántas personas recibirían un aviso a ese público. */
-  countAudience: async (audience: BroadcastAudience, eventId: string): Promise<number | null> => {
+  countAudience: async (audience: BroadcastAudience, eventId: string | null): Promise<number | null> => {
     const { data, error } = await supabase.rpc('count_broadcast_audience', {
       p_audience: audience,
       p_event_id: eventId,

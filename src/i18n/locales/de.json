@@ -761,7 +761,8 @@
         "errors": {
             "already": "Du hast hier schon Premium.",
             "notAtEvent": "Du musst auf der Party sein, um ihren Pass zu kaufen.",
-            "unavailable": "Zahlungen sind gerade nicht verfügbar."
+            "unavailable": "Zahlungen sind gerade nicht verfügbar.",
+            "paidPending": "Deine Zahlung ist eingegangen und wird bestätigt. Sie wird in ein paar Minuten automatisch gutgeschrieben (oder beim nächsten Öffnen der App): bitte nicht erneut kaufen."
         },
         "appleTerms": "Premium monatlich: {{price}} pro Monat. Wird über deine Apple-ID abgerechnet und verlängert sich automatisch, wenn du nicht mindestens 24 Stunden vor Monatsende kündigst – unter Einstellungen › dein Name › Abonnements.",
         "restore": "Käufe wiederherstellen",
@@ -769,7 +770,8 @@
         "nothingToRestore": "Keine Käufe zum Wiederherstellen",
         "manageOnIphone": "Dein Premium wurde auf dem iPhone gekauft: Kündige es unter Einstellungen › dein Name › Abonnements.",
         "googleTerms": "Premium monatlich: {{price}} pro Monat. Wird über dein Google-Play-Konto abgerechnet und verlängert sich automatisch, bis du es unter Google Play › Zahlungen & Abos › Abos kündigst.",
-        "manageOnAndroid": "Dein Premium wurde über Google Play gekauft: Kündige es unter Google Play › Zahlungen & Abos › Abos."
+        "manageOnAndroid": "Dein Premium wurde über Google Play gekauft: Kündige es unter Google Play › Zahlungen & Abos › Abos.",
+        "paidPendingTitle": "Zahlung erhalten"
     },
     "likes": {
         "title": "Du gefällst ihnen",
@@ -1368,12 +1370,17 @@
                 "insideHelp": "Wer gerade auf der Party ist.",
                 "followersHelp": "Alle, die der Location folgen.",
                 "regularsHelp": "Wer 3 Nächte oder öfter da war.",
-                "no_showHelp": "Haben bei dieser Party „Ich gehe hin“ markiert und sind nicht gekommen.",
-                "never_cameHelp": "Folgen der Location, waren aber nie da.",
+                "no_showHelp": "Haben bei diesem Event „Ich gehe hin“ gedrückt. Hat es begonnen, nur wer nicht drin war.",
+                "never_cameHelp": "Folgen dem Laden und waren nicht bei diesem Event.",
                 "reach_one": "erreicht {{count}} Person",
                 "reach_other": "erreicht {{count}} Personen",
-                "locked": "Zielgruppen gibt es im Business-Tarif."
-            }
+                "locked": "Zielgruppen gibt es im Business-Tarif.",
+                "whichEvent": "Welches Event?",
+                "allEvents": "Alle Events",
+                "no_showAllHelp": "Haben bei einem deiner Events „Ich gehe hin“ gedrückt und waren nicht drin (oder es hat noch nicht begonnen).",
+                "never_cameAllHelp": "Folgen dem Laden, waren aber noch bei keinem Event."
+            },
+            "resend": "Erneut senden"
         },
         "documents": {
             "help": "Der Nachweis, dass das Lokal dir gehört. Die Verwaltung prüft ihn vor der Freigabe.",

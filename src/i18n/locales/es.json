@@ -761,7 +761,8 @@
         "errors": {
             "already": "Ya tienes Premium activo aquí.",
             "notAtEvent": "Tienes que estar dentro de la fiesta para comprar su pase.",
-            "unavailable": "Los pagos no están disponibles ahora mismo."
+            "unavailable": "Los pagos no están disponibles ahora mismo.",
+            "paidPending": "Google ya te ha cobrado y lo estamos confirmando. Se añadirá solo en unos minutos (o al volver a abrir la app): no lo compres otra vez."
         },
         "appleTerms": "Premium mensual: {{price}} al mes. Se cobra en tu Apple ID y se renueva solo salvo que lo canceles al menos 24 horas antes de que acabe el mes, en Ajustes › tu nombre › Suscripciones.",
         "restore": "Restaurar compras",
@@ -769,7 +770,8 @@
         "nothingToRestore": "No hay compras que restaurar",
         "manageOnIphone": "Tu Premium se compró en el iPhone: cancélalo en Ajustes › tu nombre › Suscripciones.",
         "googleTerms": "Premium mensual: {{price}} al mes. Se cobra en tu cuenta de Google Play y se renueva solo hasta que lo canceles en Google Play › Pagos y suscripciones › Suscripciones.",
-        "manageOnAndroid": "Tu Premium se compró en Google Play: cancélalo en Google Play › Pagos y suscripciones › Suscripciones."
+        "manageOnAndroid": "Tu Premium se compró en Google Play: cancélalo en Google Play › Pagos y suscripciones › Suscripciones.",
+        "paidPendingTitle": "Pago recibido"
     },
     "likes": {
         "title": "Les gustas",
@@ -1368,12 +1370,17 @@
                 "insideHelp": "Quien está en la fiesta ahora mismo.",
                 "followersHelp": "Todas las personas que siguen al negocio.",
                 "regularsHelp": "Quien ha venido 3 noches o más.",
-                "no_showHelp": "Marcaron «voy a ir» en esta fiesta y no han entrado.",
-                "never_cameHelp": "Siguen al negocio pero nunca han venido.",
+                "no_showHelp": "Marcaron «voy a ir» en este evento. Si ya ha empezado, sólo los que no han entrado.",
+                "never_cameHelp": "Siguen al negocio y no vinieron a este evento.",
                 "reach_one": "llegará a {{count}} persona",
                 "reach_other": "llegará a {{count}} personas",
-                "locked": "Los públicos concretos son del plan Business."
-            }
+                "locked": "Los públicos concretos son del plan Business.",
+                "whichEvent": "¿De qué evento?",
+                "allEvents": "Todos los eventos",
+                "no_showAllHelp": "Marcaron «voy a ir» en alguno de tus eventos y no entraron (o aún no ha empezado).",
+                "never_cameAllHelp": "Siguen al negocio pero nunca han venido a ningún evento."
+            },
+            "resend": "Volver a enviar"
         },
         "documents": {
             "help": "Lo que acredita que el negocio es tuyo. Administración lo revisa antes de aprobar la cuenta.",

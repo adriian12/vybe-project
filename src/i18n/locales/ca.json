@@ -761,7 +761,8 @@
         "errors": {
             "already": "Ja tens Premium actiu aquí.",
             "notAtEvent": "Has d'estar dins la festa per comprar-ne el passi.",
-            "unavailable": "Els pagaments no estan disponibles ara mateix."
+            "unavailable": "Els pagaments no estan disponibles ara mateix.",
+            "paidPending": "El pagament s’ha fet i l’estem confirmant. S’afegirà sol en uns minuts (o quan tornis a obrir l’app): no el tornis a comprar."
         },
         "appleTerms": "Premium mensual: {{price}} al mes. Es cobra al teu Apple ID i es renova sol si no el cancel·les almenys 24 hores abans que acabi el mes, a Configuració › el teu nom › Subscripcions.",
         "restore": "Restaura les compres",
@@ -769,7 +770,8 @@
         "nothingToRestore": "No hi ha compres per restaurar",
         "manageOnIphone": "El teu Premium es va comprar a l'iPhone: cancel·la'l a Configuració › el teu nom › Subscripcions.",
         "googleTerms": "Premium mensual: {{price}} al mes. Es cobra al teu compte de Google Play i es renova tot sol fins que el cancel·lis a Google Play › Pagaments i subscripcions › Subscripcions.",
-        "manageOnAndroid": "El teu Premium es va comprar a Google Play: cancel·la’l a Google Play › Pagaments i subscripcions › Subscripcions."
+        "manageOnAndroid": "El teu Premium es va comprar a Google Play: cancel·la’l a Google Play › Pagaments i subscripcions › Subscripcions.",
+        "paidPendingTitle": "Pagament rebut"
     },
     "likes": {
         "title": "Els agrades",
@@ -1368,12 +1370,17 @@
                 "insideHelp": "Qui és a la festa ara mateix.",
                 "followersHelp": "Totes les persones que segueixen el negoci.",
                 "regularsHelp": "Qui ha vingut 3 nits o més.",
-                "no_showHelp": "Van marcar «hi vaig» en aquesta festa i no han entrat.",
-                "never_cameHelp": "Segueixen el negoci però mai no hi han vingut.",
+                "no_showHelp": "Van marcar «hi aniré» en aquest esdeveniment. Si ja ha començat, només els que no han entrat.",
+                "never_cameHelp": "Segueixen el negoci i no van venir a aquest esdeveniment.",
                 "reach_one": "arribarà a {{count}} persona",
                 "reach_other": "arribarà a {{count}} persones",
-                "locked": "Els públics concrets són del pla Business."
-            }
+                "locked": "Els públics concrets són del pla Business.",
+                "whichEvent": "De quin esdeveniment?",
+                "allEvents": "Tots els esdeveniments",
+                "no_showAllHelp": "Van marcar «hi aniré» en algun dels teus esdeveniments i no van entrar (o encara no ha començat).",
+                "never_cameAllHelp": "Segueixen el negoci però no han vingut mai a cap esdeveniment."
+            },
+            "resend": "Tornar a enviar"
         },
         "documents": {
             "help": "El que acredita que el negoci és teu. Administració ho revisa abans d'aprovar el compte.",

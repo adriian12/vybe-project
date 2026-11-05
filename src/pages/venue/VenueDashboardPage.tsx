@@ -1231,7 +1231,9 @@ const VenueDashboardPage = () => {
         open={drawer === 'documents' || drawer === 'broadcast'}
         onOpenChange={(open) => !open && setDrawer(null)}
       >
-        <SheetContent side="bottom" className="cards-light max-h-[88vh] overflow-y-auto lg:inset-x-auto lg:bottom-auto lg:right-4 lg:top-4 lg:w-[440px] lg:rounded-3xl">
+        {/* En escritorio, a toda la altura de la pantalla y sin barra de
+            desplazamiento (se sigue pudiendo bajar con la rueda o el dedo). */}
+        <SheetContent side="bottom" className="cards-light no-scrollbar max-h-[88vh] overflow-y-auto lg:inset-x-auto lg:inset-y-0 lg:right-0 lg:h-full lg:max-h-none lg:w-[440px] lg:rounded-none lg:rounded-l-3xl">
           <SheetHeader className="mb-4 text-left">
             <SheetTitle>
               {drawer === 'documents' ? t('venue.drawer.documents') : t('venue.broadcast.title')}

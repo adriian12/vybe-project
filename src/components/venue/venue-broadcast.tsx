@@ -1,12 +1,12 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Megaphone, Send, Loader2, Check, Clock, Crown, Users, X } from 'lucide-react';
+import { Megaphone, Send, Loader2, Check, Clock, Crown, Users, X, CalendarDays, RotateCcw } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { PartyButton } from '@/components/ui-custom/party-button';
 import { useToast } from '@/components/ui/use-toast';
 import { ApiError } from '@/services/api';
-import { venueService, Broadcast, BroadcastAudience, VenuePlanStatus } from '@/services/venue-service';
+import { venueService, AudienceEvent, Broadcast, BroadcastAudience, VenuePlanStatus } from '@/services/venue-service';
 import { planHas } from '@/lib/venue-plans';
 import { cn } from '@/lib/utils';
 import InfoHelp from '@/components/venue/info-help';
@@ -24,6 +24,12 @@ interface VenueBroadcastProps {
 }
 
 const PUBLICOS: BroadcastAudience[] = ['inside', 'followers', 'regulars', 'no_show', 'never_came'];
+
+/** Públicos que se pueden mandar a un evento concreto o a todos (migración 134). */
+const POR_EVENTO: BroadcastAudience[] = ['no_show', 'never_came'];
+
+/** «Todos los eventos» en el selector. */
+const TODOS = 'all';
 
 /** «2026-09-20T23:45» para el campo de fecha y hora, en hora local. */
 const paraInput = (fecha: Date): string => {
@@ -59,7 +65,22 @@ const VenueBroadcast = ({ eventId, venueId, audiences }: VenueBroadcastProps) =>
   const [programar, setProgramar] = useState(false);
   const [publico, setPublico] = useState<BroadcastAudience>('inside');
   const [alcance, setAlcance] = useState<number | null>(null);
+  const [eventos, setEventos] = useState<AudienceEvent[]>([]);
+  // De qué evento: el que se está trabajando, otro o «todos». Sólo cuenta en
+  // «Dijeron que venían» y «Nunca han venido»; los demás usan `eventId`.
+  const [deEvento, setDeEvento] = useState<string>(eventId ?? TODOS);
+  const cuerpo = useRef<HTMLInputElement>(null);
   const segmentos = audiences ? planHas(audiences.plan?.plan, 'audiences') : false;
+  const porEvento = POR_EVENTO.includes(publico);
+  /** El evento del aviso según el público elegido. Nulo: todos los eventos. */
+  const eventoDelAviso = porEvento ? (deEvento === TODOS ? null : deEvento) : (eventId ?? null);
+
+  useEffect(() => setDeEvento(eventId ?? TODOS), [eventId]);
+
+  useEffect(() => {
+    if (!venueId || !segmentos) return;
+    void venueService.getAudienceEvents(venueId).then(setEventos);
+  }, [venueId, segmentos]);
 
   // Cuánta gente recibiría el aviso: se cuenta en el servidor con la misma
   // definición con la que se envía.
@@ -67,18 +88,18 @@ const VenueBroadcast = ({ eventId, venueId, audiences }: VenueBroadcastProps) =>
     setAlcance(null);
     if (!eventId || publico === 'inside' || !segmentos) return;
     let vivo = true;
-    void venueService.countAudience(publico, eventId).then((n) => {
+    void venueService.countAudience(publico, eventoDelAviso).then((n) => {
       if (vivo) setAlcance(n);
     });
     return () => {
       vivo = false;
     };
-  }, [eventId, publico, segmentos]);
+  }, [eventId, publico, segmentos, eventoDelAviso]);
 
   const load = useCallback(async () => {
-    setSent(await venueService.getBroadcasts(eventId));
+    setSent(await venueService.getBroadcasts(eventId, venueId));
     setIsLoading(false);
-  }, [eventId]);
+  }, [eventId, venueId]);
 
   useEffect(() => {
     void load();
@@ -103,7 +124,7 @@ const VenueBroadcast = ({ eventId, venueId, audiences }: VenueBroadcastProps) =>
       // Con hora, el aviso espera a esa hora; sin ella, sale al momento.
       const programado = cuando ? new Date(cuando).toISOString() : null;
       if (publico !== 'inside' && eventId) {
-        await venueService.queueAudienceBroadcast(publico, titulo, texto, eventId, programado);
+        await venueService.queueAudienceBroadcast(publico, titulo, texto, eventoDelAviso, programado);
       } else {
         await venueService.queueBroadcast(titulo, texto, eventId, programado);
       }
@@ -118,6 +139,31 @@ const VenueBroadcast = ({ eventId, venueId, audiences }: VenueBroadcastProps) =>
       setIsBusy(false);
     }
   };
+
+  /**
+   * «Volver a enviar»: rellena el formulario con el mensaje, el público y el
+   * evento de un aviso anterior. No sale solo: se revisa y se pulsa «Enviar».
+   */
+  const reutilizar = (b: Broadcast) => {
+    setBody(b.body);
+    if (b.audience === 'inside' || segmentos) setPublico(b.audience);
+    if (POR_EVENTO.includes(b.audience)) setDeEvento(b.eventId ?? TODOS);
+    setCuando('');
+    setProgramar(false);
+    cuerpo.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    window.setTimeout(() => cuerpo.current?.focus(), 250);
+  };
+
+  const puedeEnviar = !isBusy && Boolean(body.trim()) && !(Boolean(cuando) && programados.length >= limite);
+  const botonEnviar = (
+    <>
+      {isBusy ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />}
+      {t(cuando ? 'venue.broadcast.schedule' : 'venue.broadcast.send')}
+    </>
+  );
+
+  const fechaEvento = (iso: string) =>
+    new Date(iso).toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' });
 
   return (
     <section className="surface-light space-y-4 rounded-2xl p-4">
@@ -159,8 +205,29 @@ const VenueBroadcast = ({ eventId, venueId, audiences }: VenueBroadcastProps) =>
                 );
               })}
             </div>
+            {porEvento && (
+              <div className="space-y-1">
+                <Label htmlFor="broadcast-event" className="flex items-center gap-1.5 text-caption font-bold">
+                  <CalendarDays size={12} />
+                  {t('venue.broadcast.audience.whichEvent')}
+                </Label>
+                <select
+                  id="broadcast-event"
+                  value={deEvento}
+                  onChange={(e) => setDeEvento(e.target.value)}
+                  className="h-10 w-full rounded-xl border border-black/10 bg-[#F5F5F7] px-3 text-body-sm font-semibold text-ink focus:outline-none focus:ring-2 focus:ring-party-primary"
+                >
+                  <option value={TODOS}>{t('venue.broadcast.audience.allEvents')}</option>
+                  {eventos.map((e) => (
+                    <option key={e.id} value={e.id}>
+                      {e.name} · {fechaEvento(e.startDate)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
             <p className="text-caption text-party-gray">
-              {t(`venue.broadcast.audience.${publico}Help`)}
+              {t(`venue.broadcast.audience.${publico}${porEvento && deEvento === TODOS ? 'AllHelp' : 'Help'}`)}
               {alcance !== null && ` · ${t('venue.broadcast.audience.reach', { count: alcance })}`}
             </p>
           </div>
@@ -172,6 +239,7 @@ const VenueBroadcast = ({ eventId, venueId, audiences }: VenueBroadcastProps) =>
           </Label>
           <Input
             id="broadcast-body"
+            ref={cuerpo}
             value={body}
             onChange={(e) => setBody(e.target.value)}
             placeholder={t('venue.broadcast.messagePlaceholder')}
@@ -222,13 +290,10 @@ const VenueBroadcast = ({ eventId, venueId, audiences }: VenueBroadcastProps) =>
           </button>
         )}
 
-        <PartyButton
-          className="w-full gap-2"
-          disabled={isBusy || !body.trim() || (Boolean(cuando) && programados.length >= limite)}
-          onClick={() => void send()}
-        >
-          {isBusy ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />}
-          {t(cuando ? 'venue.broadcast.schedule' : 'venue.broadcast.send')}
+        {/* En el móvil, debajo del mensaje; en escritorio va al final del
+            panel, fijo abajo a la derecha (ver más abajo). */}
+        <PartyButton className="w-full gap-2 lg:hidden" disabled={!puedeEnviar} onClick={() => void send()}>
+          {botonEnviar}
         </PartyButton>
       </div>
 
@@ -256,6 +321,14 @@ const VenueBroadcast = ({ eventId, venueId, audiences }: VenueBroadcastProps) =>
                       <p className="truncate text-caption text-party-gray">{broadcast.body}</p>
                     </>
                   )}
+                  <button
+                    type="button"
+                    onClick={() => reutilizar(broadcast)}
+                    className="press mt-1.5 inline-flex items-center gap-1 rounded-full bg-black/[0.06] px-2.5 py-1 text-caption font-bold text-ink hover:bg-black/10"
+                  >
+                    <RotateCcw size={11} />
+                    {t('venue.broadcast.resend')}
+                  </button>
                 </div>
 
                 {broadcast.status === 'sent' ? (
@@ -302,6 +375,18 @@ const VenueBroadcast = ({ eventId, venueId, audiences }: VenueBroadcastProps) =>
           ))}
         </ul>
       ) : null}
+
+      {/* Escritorio: el botón se queda fijo abajo a la derecha mientras se baja
+          por el historial (pegado al fondo del panel, que es el que se desplaza). */}
+      <div className="pointer-events-none sticky bottom-4 z-10 hidden justify-end lg:flex">
+        <PartyButton
+          className="pointer-events-auto gap-2 px-6 shadow-[0_10px_30px_rgba(0,0,0,0.25)]"
+          disabled={!puedeEnviar}
+          onClick={() => void send()}
+        >
+          {botonEnviar}
+        </PartyButton>
+      </div>
     </section>
   );
 };

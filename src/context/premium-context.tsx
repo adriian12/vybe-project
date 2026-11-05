@@ -207,6 +207,23 @@ export const PremiumProvider = ({ children }: { children: ReactNode }) => {
   const fallo = useCallback(
     (error: unknown) => {
       const code = error instanceof ApiError ? error.code : '';
+      // Cobrado y pendiente de confirmar: no es un error para quien compra. Se
+      // reintenta solo un par de veces; si no, al volver a abrir la app.
+      if (code === 'IAP_PAID_PENDING') {
+        setShowPremiumDialog(false);
+        setShowSupercrushDialog(false);
+        toast({ title: t('premium.paidPendingTitle'), description: t('premium.errors.paidPending') });
+        for (const ms of [30_000, 120_000, 600_000]) {
+          window.setTimeout(() => {
+            void syncStorePurchases().then((n) => {
+              if (n === 0) return;
+              void loadSubscription();
+              void refreshSupercrush();
+            });
+          }, ms);
+        }
+        return;
+      }
       const known: Record<string, string> = {
         ALREADY_PREMIUM: 'premium.errors.already',
         NOT_AT_EVENT: 'premium.errors.notAtEvent',
@@ -226,7 +243,7 @@ export const PremiumProvider = ({ children }: { children: ReactNode }) => {
         variant: 'destructive',
       });
     },
-    [toast, t, i18n],
+    [toast, t, i18n, loadSubscription, refreshSupercrush],
   );
 
   /**

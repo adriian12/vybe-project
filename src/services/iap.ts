@@ -184,7 +184,17 @@ export const buyInStore = async (
     throw new ApiError('IAP_FAILED', 'premium.errors.unavailable');
   }
 
-  await verificarYCerrar(tx, options.eventId);
+  try {
+    await verificarYCerrar(tx, options.eventId);
+  } catch {
+    // La tienda ya ha cobrado, pero el servidor no ha podido comprobarlo (sin
+    // red, o Google o Apple no responden). La compra no se cierra en la tienda,
+    // así que no se pierde: `syncStorePurchases` la vuelve a mandar al abrir la
+    // app y en los reintentos de `premium-context`. Si nunca se confirma, la
+    // tienda la devuelve sola (Google, a los tres días). Antes salía «Error» y
+    // parecía que se había perdido el dinero.
+    throw new ApiError('IAP_PAID_PENDING', 'premium.errors.paidPending');
+  }
   return true;
 };
 
