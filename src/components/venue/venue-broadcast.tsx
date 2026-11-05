@@ -50,7 +50,6 @@ const VenueBroadcast = ({ eventId, venueId, audiences }: VenueBroadcastProps) =>
   const { t } = useTranslation();
   const { toast } = useToast();
 
-  const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [isBusy, setIsBusy] = useState(false);
   const [sent, setSent] = useState<Broadcast[]>([]);
@@ -92,18 +91,22 @@ const VenueBroadcast = ({ eventId, venueId, audiences }: VenueBroadcastProps) =>
   const programados = sent.filter((b) => b.status === 'pending' && b.scheduledAt);
 
   const send = async () => {
-    if (!title.trim() || !body.trim()) return;
+    const texto = body.trim();
+    if (!texto) return;
+    // El aviso ya sale con el nombre del negocio de título (`notify-events`),
+    // así que sólo se escribe el mensaje. La base de datos sigue pidiendo un
+    // título: va el principio del mensaje, que es lo que se ve en el historial.
+    const titulo = texto.slice(0, 60);
 
     setIsBusy(true);
     try {
       // Con hora, el aviso espera a esa hora; sin ella, sale al momento.
       const programado = cuando ? new Date(cuando).toISOString() : null;
       if (publico !== 'inside' && eventId) {
-        await venueService.queueAudienceBroadcast(publico, title.trim(), body.trim(), eventId, programado);
+        await venueService.queueAudienceBroadcast(publico, titulo, texto, eventId, programado);
       } else {
-        await venueService.queueBroadcast(title.trim(), body.trim(), eventId, programado);
+        await venueService.queueBroadcast(titulo, texto, eventId, programado);
       }
-      setTitle('');
       setBody('');
       setCuando('');
       await load();
@@ -164,19 +167,6 @@ const VenueBroadcast = ({ eventId, venueId, audiences }: VenueBroadcastProps) =>
         )}
 
         <div className="space-y-1.5">
-          <Label htmlFor="broadcast-title" className="text-caption">
-            {t('venue.broadcast.heading')}
-          </Label>
-          <Input
-            id="broadcast-title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder={t('venue.broadcast.headingPlaceholder')}
-            maxLength={60}
-          />
-        </div>
-
-        <div className="space-y-1.5">
           <Label htmlFor="broadcast-body" className="text-caption">
             {t('venue.broadcast.message')}
           </Label>
@@ -234,7 +224,7 @@ const VenueBroadcast = ({ eventId, venueId, audiences }: VenueBroadcastProps) =>
 
         <PartyButton
           className="w-full gap-2"
-          disabled={isBusy || !title.trim() || !body.trim() || (Boolean(cuando) && programados.length >= limite)}
+          disabled={isBusy || !body.trim() || (Boolean(cuando) && programados.length >= limite)}
           onClick={() => void send()}
         >
           {isBusy ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />}
@@ -257,8 +247,15 @@ const VenueBroadcast = ({ eventId, venueId, audiences }: VenueBroadcastProps) =>
                       {t(`venue.broadcast.audience.${broadcast.audience}`)}
                     </p>
                   )}
-                  <p className="truncate text-body-sm font-bold">{broadcast.title}</p>
-                  <p className="truncate text-caption text-party-gray">{broadcast.body}</p>
+                  {/* Los antiguos llevaban título aparte; los nuevos, sólo el mensaje. */}
+                  {broadcast.body.startsWith(broadcast.title) ? (
+                    <p className="line-clamp-2 text-body-sm font-bold">{broadcast.body}</p>
+                  ) : (
+                    <>
+                      <p className="truncate text-body-sm font-bold">{broadcast.title}</p>
+                      <p className="truncate text-caption text-party-gray">{broadcast.body}</p>
+                    </>
+                  )}
                 </div>
 
                 {broadcast.status === 'sent' ? (

@@ -1337,8 +1337,6 @@
             "title": "Enviar un aviso",
             "subtitle": "Un aviso al móvil de quien elijas en «A quién», al momento o a la hora que pongas.",
             "subtitleGlobal": "Este aviso llega a todo el mundo. Úsalo con cuidado.",
-            "heading": "Título",
-            "headingPlaceholder": "Cambio de sala",
             "message": "Mensaje",
             "messagePlaceholder": "En 10 minutos empieza la sesión en la sala 2",
             "send": "Enviar aviso",

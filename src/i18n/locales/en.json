@@ -1337,8 +1337,6 @@
             "title": "Send a notice",
             "subtitle": "A notice to the phones of whoever you pick in \"To whom\", now or at the time you set.",
             "subtitleGlobal": "This goes to everybody. Use it sparingly.",
-            "heading": "Title",
-            "headingPlaceholder": "Room change",
             "message": "Message",
             "messagePlaceholder": "Room 2 starts in 10 minutes",
             "send": "Send message",

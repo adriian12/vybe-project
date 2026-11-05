@@ -158,8 +158,10 @@ serve(async (req: Request): Promise<Response> => {
       });
 
       // El aviso de un negocio sale a su nombre y con su logo («AMOK» →
-      // «Esta noche…»), no como si lo mandara Fiestea. El título que escribió
-      // va delante del texto. Los de administración, como siempre.
+      // «Esta noche…»), no como si lo mandara Fiestea. El negocio ya no escribe
+      // título (el panel guarda en él el principio del mensaje): sólo va el
+      // mensaje. Los antiguos, con título propio, lo llevan delante. Los de
+      // administración, como siempre.
       const { data: origen } = await supabase
         .from('broadcasts')
         .select('venues(name, logo_url, is_platform)')
@@ -168,7 +170,8 @@ serve(async (req: Request): Promise<Response> => {
       const negocio = (origen?.venues ?? null) as { name?: string; logo_url?: string | null; is_platform?: boolean } | null;
       const deNegocio = Boolean(negocio?.name && !negocio.is_platform);
       const titulo = deNegocio ? (negocio?.name as string) : broadcast.title;
-      const texto = deNegocio
+      const soloMensaje = !broadcast.title?.trim() || broadcast.body.trim().startsWith(broadcast.title.trim());
+      const texto = deNegocio && !soloMensaje
         ? [broadcast.title, broadcast.body].map((t) => t?.trim()).filter(Boolean).join(' · ')
         : broadcast.body;
       const imagen = deNegocio ? (negocio?.logo_url ?? undefined) : undefined;

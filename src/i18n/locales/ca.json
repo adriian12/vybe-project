@@ -1337,8 +1337,6 @@
             "title": "Enviar un avís",
             "subtitle": "Un avís al mòbil de qui triïs a «A qui», al moment o a l'hora que posis.",
             "subtitleGlobal": "Aquest avís arriba a tothom. Fes-lo servir amb cura.",
-            "heading": "Títol",
-            "headingPlaceholder": "Canvi de sala",
             "message": "Missatge",
             "messagePlaceholder": "En 10 minuts comença la sessió a la sala 2",
             "send": "Enviar avís",

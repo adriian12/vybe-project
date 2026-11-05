@@ -1337,8 +1337,6 @@
             "title": "Hinweis senden",
             "subtitle": "Ein Hinweis aufs Handy der Personen, die du unter „An wen“ wählst – sofort oder zur gewünschten Uhrzeit.",
             "subtitleGlobal": "Das geht an alle. Sparsam verwenden.",
-            "heading": "Titel",
-            "headingPlaceholder": "Raumwechsel",
             "message": "Nachricht",
             "messagePlaceholder": "In 10 Minuten geht es in Raum 2 los",
             "send": "Nachricht senden",
