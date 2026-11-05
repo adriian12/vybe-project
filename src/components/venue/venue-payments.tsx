@@ -24,7 +24,10 @@ const VenuePayments = ({ onStatus }: { onStatus?: (status: PaymentsStatus | null
   const [status, setStatus] = useState<PaymentsStatus | null>(null);
   const [cargando, setCargando] = useState(true);
   const [busy, setBusy] = useState(false);
-  const [abierto, setAbierto] = useState(false);
+  // `?seccion=sales&cobros=1` lo abre ya desplegado: son las direcciones que
+  // tiene Stripe en Connect → «Enlaces del sitio» para mandar al negocio a ver
+  // sus pagos, saldo, transferencias o documentos.
+  const [abierto, setAbierto] = useState(() => new URLSearchParams(window.location.search).has('cobros'));
 
   const aplicar = useCallback(
     (s: PaymentsStatus | null) => {
@@ -185,7 +188,7 @@ const VenuePayments = ({ onStatus }: { onStatus?: (status: PaymentsStatus | null
         )}
       </div>
 
-      {abierto && (
+      {abierto && status?.connected && status.detailsSubmitted && (
         <div className="mt-4 border-t border-black/10 pt-4">
           <Suspense fallback={<div className="h-40 animate-pulse rounded-xl bg-black/5" />}>
             <VenueStripePanel />
