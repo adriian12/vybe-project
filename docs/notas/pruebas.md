@@ -19,6 +19,17 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
   Connect). Foto de perfil de Unsplash en `event-photos`. No borrarla mientras
   haya versiones en revisión. Durante una revisión, Aurora no puede tener la
   entrada cerrada (`entry_closed_at`): el revisor entra con 394410.
+  **Tiene que ser fiester@ (`account_type = 'vyber'`)**: el 05-11-2026 Apple
+  rechazó la 1.0 (2.1(a)) porque estaba como invitado y no había pestaña
+  Crushes. Se pasó a fiester@, se le dejó dentro de Aurora con foto, 5 matches
+  con mensajes (Aina, Alba, Camila, Marc, Biel) y 3 likes sin responder.
+- **Cuenta demo de negocio** (05-11-2026): `revision.negocio@fiestea.es`, dueña
+  de «Sala Aurora» (`venues.venue_id`, antes `local@vybe-test.local`), plan
+  Business hasta el 30-06-2027. Tiene que ser la dueña y no un miembro: en la
+  app del móvil `get_my_venue_membership()` no abre el panel (sólo en
+  `app.fiestea.es`). Su contraseña, las notas para App Review y la respuesta a
+  Apple están en `D:\Webs\Fiestea\revision-app-store-credenciales.txt` (fuera
+  de git).
 - **Salas de pruebas:** «Aurora Sessions» (código `394410`, Sala Aurora) y
   «Fiestea Test Night» (código `LAB777`, Fiestea · Sala de pruebas). Las dos tienen
   `requires_location = FALSE` y `test_lab = TRUE`.
