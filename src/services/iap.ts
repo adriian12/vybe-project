@@ -181,6 +181,14 @@ export const buyInStore = async (
     });
   } catch (error) {
     if (cancelada(error)) return false;
+    // El motivo real de la tienda queda en los registros del servidor: el
+    // rechazo de Apple del 10-11-2026 sólo decía «error al comprar» y aquí no
+    // había nada con lo que saber por qué.
+    void supabase.functions
+      .invoke(funcion(), {
+        body: { action: 'client_error', plan, message: String(error instanceof Error ? error.message : error).slice(0, 300) },
+      })
+      .catch(() => undefined);
     throw new ApiError('IAP_FAILED', 'premium.errors.unavailable');
   }
 

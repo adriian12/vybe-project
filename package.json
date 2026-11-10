@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "postinstall": "node scripts/parchear-native-purchases.mjs",
     "dev": "vite",
     "dev:https": "node scripts/dev-https.mjs",
     "build": "vite build",

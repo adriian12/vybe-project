@@ -35,12 +35,21 @@ serve(async (req: Request): Promise<Response> => {
     const profileId = await getProfileId(supabase, user.id);
     if (!profileId) return json({ error: 'PROFILE_NOT_FOUND' }, 404);
 
-    const { action, plan, eventId, jws } = (await req.json()) as {
-      action?: 'precheck' | 'verify';
+    const { action, plan, eventId, jws, message } = (await req.json()) as {
+      action?: 'precheck' | 'verify' | 'client_error';
       plan?: 'monthly' | 'event' | 'supercrush';
       eventId?: string | null;
       jws?: string;
+      message?: string;
     };
+
+    // --------------------------------------------------------- client_error
+    // Lo que respondió StoreKit cuando la compra falla en el móvil, para verlo
+    // en los registros de la función (antes sólo quedaba «error al comprar»).
+    if (action === 'client_error') {
+      console.error('apple-iap client:', profileId, plan ?? '-', String(message ?? '').slice(0, 300));
+      return json({ ok: true });
+    }
 
     // ------------------------------------------------------------- precheck
     if (action === 'precheck') {

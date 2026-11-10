@@ -37,13 +37,20 @@ serve(async (req: Request): Promise<Response> => {
     const profileId = await getProfileId(supabase, user.id);
     if (!profileId) return json({ error: 'PROFILE_NOT_FOUND' }, 404);
 
-    const { action, plan, eventId, productId, purchaseToken } = (await req.json()) as {
-      action?: 'precheck' | 'verify';
+    const { action, plan, eventId, productId, purchaseToken, message } = (await req.json()) as {
+      action?: 'precheck' | 'verify' | 'client_error';
       plan?: 'monthly' | 'event' | 'supercrush';
       eventId?: string | null;
       productId?: string;
       purchaseToken?: string;
+      message?: string;
     };
+
+    // Lo que respondió Google Play cuando la compra falla en el móvil.
+    if (action === 'client_error') {
+      console.error('google-play client:', profileId, plan ?? '-', String(message ?? '').slice(0, 300));
+      return json({ ok: true });
+    }
 
     if (action === 'precheck') {
       const fallo = await storePrecheck(supabase, profileId, plan, eventId);
