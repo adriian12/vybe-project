@@ -26,6 +26,8 @@ export const PLAN_FEATURES = [
   // 131: Ventas → Resumen y tramos de precio.
   'salesDashboard',
   'priceTiers',
+  // 135: avisos con el logo del negocio (casilla en Avisos).
+  'brandedPush',
 ] as const;
 
 export type PlanId = 'free' | 'business';
@@ -81,6 +83,7 @@ export const PLANS: Record<PlanId, { events: number | null; team: number | null;
       includedBoost: false,
       salesDashboard: false,
       priceTiers: false,
+      brandedPush: false,
     },
   },
   business: {
@@ -103,6 +106,7 @@ export const PLANS: Record<PlanId, { events: number | null; team: number | null;
       includedBoost: true,
       salesDashboard: true,
       priceTiers: true,
+      brandedPush: true,
     },
   },
 };

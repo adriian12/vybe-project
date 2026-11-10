@@ -132,7 +132,7 @@ const InAppNotice = ({
       >
         <button
           type="button"
-          className="flex w-full items-center gap-3 rounded-2xl border border-white/10 bg-[#1C1C21]/95 p-3 text-left shadow-[0_18px_40px_rgba(0,0,0,0.55)] backdrop-blur-xl"
+          className="flex w-full items-center gap-3 rounded-2xl border border-party-primary/80 bg-[#0E0E11] p-3 text-left shadow-[0_18px_40px_rgba(0,0,0,0.55)]"
           aria-label={notice.url ? `${notice.title}. ${t('common.open')}` : notice.title}
           // El clic lo resuelve `onPointerUp` (para distinguirlo del arrastre);
           // el teclado entra por aquí.
@@ -155,7 +155,7 @@ const InAppNotice = ({
             )}
             {/* Quién lo manda: la marca, pequeña, en la esquina. */}
             {conLogo && (
-              <span className="absolute -bottom-1 -right-1 rounded-md ring-2 ring-[#1C1C21]">
+              <span className="absolute -bottom-1 -right-1 rounded-md ring-2 ring-[#0E0E11]">
                 <VybeMark size={16} />
               </span>
             )}

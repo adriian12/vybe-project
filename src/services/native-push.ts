@@ -224,11 +224,24 @@ const saveToken = async (token: string): Promise<void> => {
   const { data } = await supabase.auth.getSession();
   if (!data.session) return;
 
+  // El número de compilación dice al servidor que esta versión sabe pintar los
+  // avisos con el logo del negocio (`FiesteaMessagingService`, migración 135):
+  // a las versiones viejas, que no lo mandan, les llega el aviso normal.
+  let appBuild: number | null = null;
+  try {
+    const { App } = await import('@capacitor/app');
+    const n = Number.parseInt((await App.getInfo()).build, 10);
+    appBuild = Number.isFinite(n) ? n : null;
+  } catch {
+    // Sin el dato, el aviso normal.
+  }
+
   const { error } = await supabase.rpc('save_native_push_token', {
     p_token: token,
     p_platform: platform() === 'ios' ? 'ios' : 'android',
     p_device_model: navigator.userAgent.slice(0, 120),
-  });
+    p_app_build: appBuild,
+  } as never);
 
   if (error) {
     tokenSaved = null;

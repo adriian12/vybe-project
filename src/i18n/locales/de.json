@@ -241,7 +241,7 @@
         "noPartiesThatDay": "Keine Partys für {{day}}: Hier sind die nächsten.",
         "nearDate": "Rund um dieses Datum",
         "fromPrice": "Ab {{price}}",
-        "addToCalendarShort": "In den Kalender",
+        "addToCalendarShort": "Zum Kalender",
         "view": {
             "label": "Ansicht",
             "cards": "Karten",
@@ -1267,7 +1267,8 @@
                 "guestLists": "Gästelisten",
                 "includedBoost": "Ein Highlight pro Monat inklusive",
                 "salesDashboard": "Verkaufsübersicht für die ganze Location",
-                "priceTiers": "Preisstufen nach Menge oder Datum"
+                "priceTiers": "Preisstufen nach Menge oder Datum",
+                "brandedPush": "Benachrichtigungen mit deinem Logo"
             },
             "yourPlan": "Dein aktueller Tarif",
             "choose": "Wählen",
@@ -1380,7 +1381,13 @@
                 "no_showAllHelp": "Haben bei einem deiner Events „Ich gehe hin“ gedrückt und waren nicht drin (oder es hat noch nicht begonnen).",
                 "never_cameAllHelp": "Folgen dem Laden, waren aber noch bei keinem Event."
             },
-            "resend": "Erneut senden"
+            "resend": "Erneut senden",
+            "branded": {
+                "label": "Personalisierte Benachrichtigungen",
+                "help": "Deine Benachrichtigungen zeigen das Logo deines Ladens statt dem von Fiestea.",
+                "noLogo": "Füge in deinem Profil ein Logo hinzu, damit es in den Benachrichtigungen erscheint.",
+                "business": "Mit Business zeigen deine Benachrichtigungen das Logo deines Ladens."
+            }
         },
         "documents": {
             "help": "Der Nachweis, dass das Lokal dir gehört. Die Verwaltung prüft ihn vor der Freigabe.",

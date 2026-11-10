@@ -241,7 +241,7 @@
         "noPartiesThatDay": "No hi ha festes per a {{day}}: aquestes són les properes.",
         "nearDate": "A prop d'aquesta data",
         "fromPrice": "Des de {{price}}",
-        "addToCalendarShort": "Al calendari",
+        "addToCalendarShort": "Anar al calendari",
         "view": {
             "label": "Vista",
             "cards": "Targetes",
@@ -1267,7 +1267,8 @@
                 "guestLists": "Llistes de convidats",
                 "includedBoost": "Un destacat al mes inclòs",
                 "salesDashboard": "Resum de vendes de tot el local",
-                "priceTiers": "Salts de preu per quantitat o data"
+                "priceTiers": "Salts de preu per quantitat o data",
+                "brandedPush": "Avisos amb el logo del teu negoci"
             },
             "yourPlan": "El teu pla actual",
             "choose": "Triar",
@@ -1380,7 +1381,13 @@
                 "no_showAllHelp": "Van marcar «hi aniré» en algun dels teus esdeveniments i no van entrar (o encara no ha començat).",
                 "never_cameAllHelp": "Segueixen el negoci però no han vingut mai a cap esdeveniment."
             },
-            "resend": "Tornar a enviar"
+            "resend": "Tornar a enviar",
+            "branded": {
+                "label": "Notificacions personalitzades",
+                "help": "Els teus avisos surten amb el logo del teu negoci en lloc del de Fiestea.",
+                "noLogo": "Afegeix el logo a la fitxa del negoci perquè surti als avisos.",
+                "business": "Amb Business, els teus avisos surten amb el logo del teu negoci."
+            }
         },
         "documents": {
             "help": "El que acredita que el negoci és teu. Administració ho revisa abans d'aprovar el compte.",

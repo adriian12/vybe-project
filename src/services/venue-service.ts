@@ -1000,6 +1000,27 @@ export const venueService = {
     return Number(data ?? 1);
   },
 
+  /**
+   * «Notificaciones personalizadas» (Business, migración 135): si los avisos
+   * del local salen con su logo. También dice si el local tiene logo, porque
+   * sin él no hay nada que enseñar.
+   */
+  getBrandedPush: async (venueId: string): Promise<{ enabled: boolean; hasLogo: boolean }> => {
+    const { data } = await supabase
+      .from('venues')
+      .select('branded_push, logo_url')
+      .eq('id', venueId)
+      .maybeSingle();
+    const row = data as { branded_push?: boolean | null; logo_url?: string | null } | null;
+    return { enabled: Boolean(row?.branded_push), hasLogo: Boolean(row?.logo_url) };
+  },
+
+  setBrandedPush: async (enabled: boolean): Promise<boolean> => {
+    const { data, error } = await supabase.rpc('set_venue_branded_push' as never, { p_enabled: enabled } as never);
+    if (error) throw venueError(error.message);
+    return Boolean(data);
+  },
+
   getBroadcasts: async (eventId?: string, venueId?: string): Promise<Broadcast[]> => {
     let query = supabase
       .from('broadcasts')

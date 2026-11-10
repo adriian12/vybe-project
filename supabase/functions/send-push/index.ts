@@ -33,6 +33,21 @@ interface PushRequest {
   image?: string;
 }
 
+/**
+ * ¿Salen los avisos de este negocio con su logo? Sólo con «notificaciones
+ * personalizadas» marcada en Avisos y un plan que las incluya (Business,
+ * migración 135). Si no, el aviso normal, con el icono de Fiestea.
+ */
+const logoDelNegocio = async (
+  supabase: ReturnType<typeof adminClient>,
+  venueId: string,
+  venue: { logo_url?: string | null; branded_push?: boolean | null } | null,
+): Promise<string | undefined> => {
+  if (!venue?.branded_push || !venue.logo_url?.startsWith('https://')) return undefined;
+  const { data } = await supabase.rpc('venue_has_feature', { p_feature: 'branded_push', p_venue_id: venueId });
+  return data === true ? venue.logo_url : undefined;
+};
+
 interface WebhookPayload {
   type:
     | 'INSERT'
@@ -80,12 +95,13 @@ const fromVenueEvent = async (
 
   const { data: evento } = await supabase
     .from('events')
-    .select('id, name, start_date, venue_id, venues(name, logo_url)')
+    .select('id, name, start_date, venue_id, venues(name, logo_url, branded_push)')
     .eq('id', eventId)
     .maybeSingle();
   if (!evento) return [];
 
-  const venue = evento.venues as { name?: string; logo_url?: string | null } | null;
+  const venue = evento.venues as { name?: string; logo_url?: string | null; branded_push?: boolean | null } | null;
+  const logo = await logoDelNegocio(supabase, evento.venue_id as string, venue);
   const venueName = venue?.name ?? 'Fiestea';
   const { data: seguidores } = await supabase
     .from('venue_followers')
@@ -101,7 +117,7 @@ const fromVenueEvent = async (
       ...pushTexts(locale).newEvent(venueName, evento.name, cuandoLocal(evento.start_date, locale)),
       url: `/event/${evento.id}`,
       tag: `venue-event-${evento.id}`,
-      image: venue?.logo_url ?? undefined,
+      image: logo,
     };
   });
 };
@@ -143,7 +159,8 @@ const fromVenueEventsBulk = async (
   const { venue_id: venueId, count } = payload.record as { venue_id?: string; count?: number };
   if (!venueId || !count) return [];
 
-  const { data: venue } = await supabase.from('venues').select('name, logo_url').eq('id', venueId).maybeSingle();
+  const { data: venue } = await supabase.from('venues').select('name, logo_url, branded_push').eq('id', venueId).maybeSingle();
+  const logo = await logoDelNegocio(supabase, venueId, venue);
   const venueName = venue?.name ?? 'Fiestea';
   const { data: seguidores } = await supabase
     .from('venue_followers')
@@ -159,7 +176,7 @@ const fromVenueEventsBulk = async (
       ...pushTexts(locale).newEvents(venueName, count),
       url: '/map',
       tag: `venue-events-${venueId}`,
-      image: venue?.logo_url ?? undefined,
+      image: logo,
     };
   });
 };
@@ -458,7 +475,7 @@ const deliver = async (
 
   const { data: subscriptions } = await supabase
     .from('push_subscriptions')
-    .select('id, endpoint, p256dh, auth, platform, native_token')
+    .select('id, endpoint, p256dh, auth, platform, native_token, app_build')
     .eq('profile_id', payload.profileId);
 
   if (!subscriptions || subscriptions.length === 0) return 0;
@@ -489,6 +506,10 @@ const deliver = async (
             url: payload.url ?? '/matches',
             tag: payload.tag,
             image: payload.image,
+          }, {
+            // Con logo, en Android lo pinta la app (logo a la izquierda), pero
+            // sólo las versiones que lo saben hacer: mandan `app_build`.
+            branded: Boolean(payload.image) && subscription.platform === 'android' && subscription.app_build != null,
           });
 
           if (result.ok) sent += 1;

@@ -241,7 +241,7 @@
         "noPartiesThatDay": "No hay fiestas para {{day}}: estas son las próximas.",
         "nearDate": "Cerca de esa fecha",
         "fromPrice": "Desde {{price}}",
-        "addToCalendarShort": "Al calendario",
+        "addToCalendarShort": "Ir al calendario",
         "view": {
             "label": "Vista",
             "cards": "Tarjetas",
@@ -1267,7 +1267,8 @@
                 "guestLists": "Listas de invitados",
                 "includedBoost": "Un destacado al mes incluido",
                 "salesDashboard": "Resumen de ventas de todo el local",
-                "priceTiers": "Saltos de precio por cantidad o fecha"
+                "priceTiers": "Saltos de precio por cantidad o fecha",
+                "brandedPush": "Avisos con el logo de tu negocio"
             },
             "yourPlan": "Tu plan actual",
             "choose": "Elegir",
@@ -1380,7 +1381,13 @@
                 "no_showAllHelp": "Marcaron «voy a ir» en alguno de tus eventos y no entraron (o aún no ha empezado).",
                 "never_cameAllHelp": "Siguen al negocio pero nunca han venido a ningún evento."
             },
-            "resend": "Volver a enviar"
+            "resend": "Volver a enviar",
+            "branded": {
+                "label": "Notificaciones personalizadas",
+                "help": "Tus avisos salen con el logo de tu negocio en lugar del de Fiestea.",
+                "noLogo": "Añade el logo en tu ficha de negocio para que salga en los avisos.",
+                "business": "Con Business, tus avisos salen con el logo de tu negocio."
+            }
         },
         "documents": {
             "help": "Lo que acredita que el negocio es tuyo. Administración lo revisa antes de aprobar la cuenta.",

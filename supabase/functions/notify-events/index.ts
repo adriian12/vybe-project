@@ -164,17 +164,31 @@ serve(async (req: Request): Promise<Response> => {
       // administración, como siempre.
       const { data: origen } = await supabase
         .from('broadcasts')
-        .select('venues(name, logo_url, is_platform)')
+        .select('venue_id, venues(name, logo_url, is_platform, branded_push)')
         .eq('id', broadcast.id)
         .maybeSingle();
-      const negocio = (origen?.venues ?? null) as { name?: string; logo_url?: string | null; is_platform?: boolean } | null;
+      const negocio = (origen?.venues ?? null) as {
+        name?: string;
+        logo_url?: string | null;
+        is_platform?: boolean;
+        branded_push?: boolean | null;
+      } | null;
       const deNegocio = Boolean(negocio?.name && !negocio.is_platform);
       const titulo = deNegocio ? (negocio?.name as string) : broadcast.title;
       const soloMensaje = !broadcast.title?.trim() || broadcast.body.trim().startsWith(broadcast.title.trim());
       const texto = deNegocio && !soloMensaje
         ? [broadcast.title, broadcast.body].map((t) => t?.trim()).filter(Boolean).join(' · ')
         : broadcast.body;
-      const imagen = deNegocio ? (negocio?.logo_url ?? undefined) : undefined;
+      // El logo, sólo con «notificaciones personalizadas» marcada y Business
+      // (migración 135); si no, el aviso normal con el icono de Fiestea.
+      let imagen: string | undefined;
+      if (deNegocio && negocio?.branded_push && negocio.logo_url?.startsWith('https://') && origen?.venue_id) {
+        const { data: incluido } = await supabase.rpc('venue_has_feature', {
+          p_feature: 'branded_push',
+          p_venue_id: origen.venue_id,
+        });
+        if (incluido === true) imagen = negocio.logo_url;
+      }
 
       // De 20 en 20: una novedad de administración va a todo el mundo.
       const lista = (recipients ?? []) as { profile_id: string }[];

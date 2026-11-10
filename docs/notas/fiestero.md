@@ -152,11 +152,17 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
 - **El modo invisible es de pago y se comprueba en la base de datos**
   (migración 025), no en la interfaz.
 - **Avisos de un negocio** (`notify-events`, `send-push`): salen con el nombre
-  del local de título, «título · texto» de cuerpo y su `logo_url` de imagen
-  (`image` en FCM). Android la pone a la derecha del aviso; **iOS no la enseña**
-  sin una Notification Service Extension, que la app aún no tiene. Con la app
-  abierta, el aviso lo pinta `in-app-notice.tsx` (arriba, logo o icono por
-  tipo, se toca entero, se desliza hacia arriba para cerrar).
+  del local de título y el mensaje de cuerpo. **Con el logo, sólo con Business y
+  la casilla «Notificaciones personalizadas» de Avisos** (`venues.branded_push`,
+  función de plan `branded_push`, migración 135); si no, sin imagen y con el
+  icono de Fiestea. Con logo, a los Android cuya app manda `app_build`
+  (`save_native_push_token`) se les envía el aviso **sólo con datos**
+  (`fiestea_brand`) y lo pinta `FiesteaMessagingService.java` como
+  conversación: logo a la izquierda y la F en la esquina. Ese servicio sustituye
+  en el manifiesto al del plugin de Capacitor y lo llama primero. A las versiones
+  viejas, iOS y web les llega el aviso normal con la imagen (Android la pone a la
+  derecha; **iOS no la enseña** sin una Notification Service Extension). Con la
+  app abierta, el aviso lo pinta `in-app-notice.tsx`.
 - **Avisos push** (migración 039). Mensaje nuevo y vybe match: disparadores
   `push_on_message`/`push_on_connection` → `push_webhook()` → `send-push` por
   `pg_net` (secretos de Vault `push_hook_secret` y `functions_url`). Evento que

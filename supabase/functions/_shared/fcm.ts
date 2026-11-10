@@ -150,6 +150,13 @@ export interface FcmResult {
 export const sendFcm = async (
   token: string,
   notification: { title: string; body: string; url?: string; tag?: string; image?: string },
+  /**
+   * Aviso con el logo del negocio que pinta la propia app de Android
+   * (`FiesteaMessagingService`): se manda sólo con datos, sin el bloque
+   * `notification`, porque si no lo pinta Android con el icono de Fiestea.
+   * Sólo para teléfonos Android con una versión que lo sabe pintar.
+   */
+  options: { branded?: boolean } = {},
 ): Promise<FcmResult> => {
   // Sólo imágenes públicas por https: Firebase descarga la imagen desde el
   // teléfono y, si no puede, el aviso llega igual pero sin ella.
@@ -159,6 +166,14 @@ export const sendFcm = async (
   if (!account) throw new FcmNotConfiguredError();
 
   const accessToken = await getAccessToken(account);
+  const branded = Boolean(options.branded && image);
+
+  const data = {
+    url: notification.url ?? '/home',
+    ...(notification.tag ? { tag: notification.tag } : {}),
+    ...(image ? { image } : {}),
+    ...(branded ? { fiestea_brand: '1', title: notification.title, body: notification.body } : {}),
+  };
 
   const response = await fetch(
     `https://fcm.googleapis.com/v1/projects/${account.projectId}/messages:send`,
@@ -169,7 +184,9 @@ export const sendFcm = async (
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        message: {
+        message: branded
+          ? { token, data, android: { priority: 'HIGH' } }
+          : {
           token,
           notification: {
             title: notification.title,
@@ -180,11 +197,7 @@ export const sendFcm = async (
           },
           // Los datos llegan al manejador de la aplicación: es lo que permite
           // abrir la pantalla correcta al tocar el aviso.
-          data: {
-            url: notification.url ?? '/home',
-            ...(notification.tag ? { tag: notification.tag } : {}),
-            ...(image ? { image } : {}),
-          },
+          data,
           android: {
             priority: 'HIGH',
             notification: {

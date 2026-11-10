@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Megaphone, Send, Loader2, Check, Clock, Crown, Users, X, CalendarDays, RotateCcw } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import { PartyButton } from '@/components/ui-custom/party-button';
 import { useToast } from '@/components/ui/use-toast';
 import { ApiError } from '@/services/api';
@@ -76,6 +77,33 @@ const VenueBroadcast = ({ eventId, venueId, audiences }: VenueBroadcastProps) =>
   const eventoDelAviso = porEvento ? (deEvento === TODOS ? null : deEvento) : (eventId ?? null);
 
   useEffect(() => setDeEvento(eventId ?? TODOS), [eventId]);
+
+  // Notificaciones personalizadas (Business, migración 135).
+  const conMarca = audiences ? planHas(audiences.plan?.plan, 'brandedPush') : false;
+  const [marca, setMarca] = useState({ enabled: false, hasLogo: true });
+  const [guardandoMarca, setGuardandoMarca] = useState(false);
+
+  useEffect(() => {
+    if (venueId) void venueService.getBrandedPush(venueId).then(setMarca);
+  }, [venueId]);
+
+  const cambiarMarca = async (enabled: boolean) => {
+    if (!conMarca) {
+      audiences?.onUpgrade();
+      return;
+    }
+    setGuardandoMarca(true);
+    setMarca((m) => ({ ...m, enabled }));
+    try {
+      await venueService.setBrandedPush(enabled);
+    } catch (error) {
+      setMarca((m) => ({ ...m, enabled: !enabled }));
+      const key = error instanceof ApiError ? error.message : 'errors.generic';
+      toast({ title: t('common.error'), description: t(key), variant: 'destructive' });
+    } finally {
+      setGuardandoMarca(false);
+    }
+  };
 
   useEffect(() => {
     if (!venueId || !segmentos) return;
@@ -246,6 +274,35 @@ const VenueBroadcast = ({ eventId, venueId, audiences }: VenueBroadcastProps) =>
             maxLength={160}
           />
         </div>
+
+        {/* Notificaciones personalizadas (Business): los avisos salen con el
+            logo del negocio. Sin marcar, el aviso normal con el de Fiestea. */}
+        {audiences && venueId && (
+          <div className="rounded-xl border border-black/10 bg-black/[0.03] p-3">
+            <div className="flex items-start gap-3">
+              <div className="min-w-0 flex-1">
+                <p id="broadcast-branded" className="flex items-center gap-1.5 text-body-sm font-bold">
+                  {!conMarca && <Crown size={12} className="text-party-primary" />}
+                  {t('venue.broadcast.branded.label')}
+                </p>
+                <p className="mt-0.5 text-caption text-party-gray">
+                  {conMarca
+                    ? marca.enabled && !marca.hasLogo
+                      ? t('venue.broadcast.branded.noLogo')
+                      : t('venue.broadcast.branded.help')
+                    : t('venue.broadcast.branded.business')}
+                </p>
+              </div>
+              <Switch
+                aria-labelledby="broadcast-branded"
+                checked={conMarca && marca.enabled}
+                disabled={guardandoMarca}
+                onCheckedChange={(v) => void cambiarMarca(v)}
+                className="mt-0.5 shrink-0"
+              />
+            </div>
+          </div>
+        )}
 
         {/* La hora sólo aparece si se pide: en el móvil, un campo de fecha y
             hora ocupaba media tarjeta para algo que casi nunca se usa. */}
