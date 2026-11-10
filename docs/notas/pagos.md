@@ -26,6 +26,16 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
 
     Al abrir la app, `syncApplePurchases()` reenvía lo que quedó abierto.
     `apple_transactions` evita sumar dos veces.
+  - **iPad y el parche del plugin** (10-11-2026): Apple revisa también en iPad
+    (la app es de iPhone, pero se instala allí en modo compatible) y rechazó la
+    1.0 porque la suscripción fallaba en iPadOS 27: el plugin compra con
+    `purchase(options:)` sin escena. `scripts/parchear-native-purchases.mjs`
+    (`postinstall`, también en Codemagic) lo cambia por
+    `purchase(confirmIn: escena, options:)`. Al actualizar el plugin, mira el
+    aviso del `postinstall`: si dice que no encuentra el texto, revisa si la
+    versión nueva ya usa `confirmIn`. Si una compra falla en el móvil, el
+    motivo real de la tienda sale en los registros de `apple-iap` /
+    `google-play` («client:», acción `client_error`).
   - **Renovaciones, cancelaciones y devoluciones:** llegan por App Store
     Server Notifications V2 a `apple-notifications` (sin JWT, verifica la
     firma). La URL está puesta en la ficha, también para sandbox.
