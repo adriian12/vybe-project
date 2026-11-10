@@ -388,6 +388,21 @@ serve(async (req: Request): Promise<Response> => {
     // primero, la que ya se conozca por el mismo nombre; si no, Photon (una
     // vez por sala), por la dirección (lo más preciso) y, si no, por el nombre.
     const conocidas = new Map<string, { lat: number; lng: number; address: string | null }>();
+    // Las salas ya localizadas en escaneos anteriores: así sólo se buscan en
+    // Photon las nuevas. Buscar todas cada vez (una a una) era lo que agotaba
+    // el tiempo de la función.
+    const { data: previas } = await supabase
+      .from('scanned_events')
+      .select('place_name, latitude, longitude, address')
+      .eq('city', CIUDADES[ciudad].nombre)
+      .not('latitude', 'is', null)
+      .not('place_name', 'is', null)
+      .order('synced_at', { ascending: false })
+      .limit(2000);
+    for (const p of (previas ?? []) as { place_name: string; latitude: number; longitude: number; address: string | null }[]) {
+      const clave = p.place_name.toLowerCase();
+      if (!conocidas.has(clave)) conocidas.set(clave, { lat: p.latitude, lng: p.longitude, address: p.address });
+    }
     for (const f of filas) {
       if (f.place_name && f.latitude !== null && f.longitude !== null) {
         conocidas.set(f.place_name.toLowerCase(), { lat: f.latitude, lng: f.longitude, address: f.address });

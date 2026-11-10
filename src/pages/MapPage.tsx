@@ -30,6 +30,7 @@ import { MUSICAS, musicaDe } from '@/lib/music';
 import VenueSearchResults from '@/components/venue-search-results';
 import CitySearchResults from '@/components/city-search-results';
 import PlaceSearchResults, { PlaceResult } from '@/components/place-search-results';
+import EventSearchResults from '@/components/event-search-results';
 import { clave } from '@/lib/scan-groups';
 import { useToast } from '@/components/ui/use-toast';
 import { enZona, Zona } from '@/lib/places';
@@ -214,6 +215,19 @@ const MapPage = () => {
       porSala.set(k, actual);
     }
     return [...porSala.values()].sort((a, b) => b.upcoming - a.upcoming).slice(0, 4);
+  }, [withDistance, busqueda]);
+
+  // Fiestas por su nombre, en cualquier ciudad y día (la zona, la fecha y los
+  // filtros no cuentan aquí): «tardeo» → «El tardeo reggaeton viejo».
+  const fiestasBuscadas = useMemo(() => {
+    const q = clave(busqueda);
+    if (q.length < 3) return [];
+    const ahora = Date.now();
+    return withDistance
+      .filter(({ event }) => new Date(event.endDate).getTime() > ahora && clave(event.name).includes(q))
+      .sort((a, b) => new Date(a.event.startDate).getTime() - new Date(b.event.startDate).getTime())
+      .slice(0, 5)
+      .map(({ event }) => event);
   }, [withDistance, busqueda]);
 
   const tiposPresentes = useMemo(
@@ -461,7 +475,9 @@ const MapPage = () => {
             </button>
           </div>
 
-          {/* Ciudades (para ir allí) y negocios (para ir a su ficha). */}
+          {/* Fiestas por nombre (a su ficha), ciudades (para ir allí) y
+              negocios (para ir a su ficha). */}
+          <EventSearchResults events={fiestasBuscadas} />
           <CitySearchResults query={busqueda} onPick={irAZona} />
           <PlaceSearchResults places={salas} />
           <VenueSearchResults query={busqueda} />

@@ -33,9 +33,17 @@ interface EventCardProps {
   variant?: 'featured' | 'full' | 'grid' | 'row';
 }
 
-/** Píldora oscura sobre la tarjeta blanca: edad, género, código de vestimenta. */
-const Tag: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <span className="rounded-full bg-surface-low px-2.5 py-1 text-[11px] font-bold text-foreground">
+/**
+ * Píldora oscura sobre la tarjeta blanca: edad, género, código de vestimenta.
+ * `small`, la de la cuadrícula: más baja para que quepan dos filas fijas.
+ */
+const Tag: React.FC<{ children: React.ReactNode; small?: boolean }> = ({ children, small }) => (
+  <span
+    className={cn(
+      'whitespace-nowrap rounded-full bg-surface-low font-bold text-foreground',
+      small ? 'px-2 py-[3px] text-[10px] leading-[14px]' : 'px-2.5 py-1 text-[11px]',
+    )}
+  >
     {children}
   </span>
 );
@@ -114,11 +122,54 @@ const EventCard: React.FC<EventCardProps> = ({
     // Lo mismo que el pie de la tarjeta grande: «Entradas» si vende en la app
     // (a la ficha) o en otra web (a esa web); si no, «Voy a ir».
     const venta = activity?.hasTickets ? 'app' : event.bookingUrl ? 'web' : null;
-    const boton = 'press absolute bottom-2 right-2 inline-flex h-8 items-center gap-1 rounded-lg px-3 text-xs font-bold';
+    // El botón va en la fila del precio y los km, al final: antes flotaba
+    // encima de la tarjeta y pisaba la línea del sitio, y los km se partían
+    // en dos («57 / km») por falta de sitio.
+    const boton = 'press inline-flex h-8 shrink-0 items-center gap-1 whitespace-nowrap rounded-lg px-2.5 text-xs font-bold';
+    const accion =
+      venta === 'app' ? (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onOpen();
+          }}
+          className={cn(boton, 'bg-ink text-party-primary')}
+        >
+          {t('home.buy')}
+          <Ticket size={13} />
+        </button>
+      ) : venta === 'web' ? (
+        <a
+          href={event.bookingUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={(e) => {
+            e.stopPropagation();
+            void socialService.trackBookingClick(event.id).catch(() => undefined);
+          }}
+          className={cn(boton, 'bg-ink text-party-primary')}
+        >
+          {t('home.buy')}
+          <Ticket size={13} />
+        </a>
+      ) : (
+        <button
+          type="button"
+          disabled={busy}
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleIntent();
+          }}
+          className={cn(boton, 'disabled:opacity-50', going ? 'bg-party-primary text-ink' : 'bg-ink text-party-primary')}
+        >
+          {going ? t('home.goingShort') : t('home.imGoing')}
+        </button>
+      );
     return (
       <article
         onClick={onOpen}
-        className="press relative flex w-full cursor-pointer select-none items-stretch gap-3 overflow-hidden rounded-2xl bg-white p-2 pr-12 shadow-xl"
+        className="press relative flex w-full cursor-pointer select-none items-stretch gap-3 overflow-hidden rounded-2xl bg-white p-2 shadow-xl"
       >
         <div className="relative h-[84px] w-[84px] shrink-0 overflow-hidden rounded-xl bg-surface">
           {event.posterUrl ? (
@@ -131,86 +182,51 @@ const EventCard: React.FC<EventCardProps> = ({
           {live && <LivePill className="absolute bottom-1.5 left-1.5 scale-90" />}
         </div>
         <div className="flex min-w-0 flex-1 flex-col justify-center gap-0.5 py-0.5">
-          <p className="truncate text-[11px] font-black uppercase tracking-wide text-[#66666E]">
+          {/* Con el marcador arriba a la derecha, las dos primeras líneas le dejan sitio. */}
+          <p className={cn('truncate text-[11px] font-black uppercase tracking-wide text-[#66666E]', venta && 'pr-9')}>
             {new Date(event.startDate)
               .toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' })
               .replace(/\./g, '')}
             {' · '}
             {formatHourRange(event.startDate, event.endDate)}
           </p>
-          <h3 className="truncate font-display text-title-card text-ink">{event.name}</h3>
+          <h3 className={cn('truncate font-display text-title-card text-ink', venta && 'pr-9')}>{event.name}</h3>
           <p className="truncate text-body-sm text-[#66666E]">
             {anfitrion}
             {event.city ? ` · ${event.city}` : ''}
           </p>
-          <div className="mt-1 flex min-w-0 items-center gap-1.5 pr-14">
+          <div className="mt-1 flex min-w-0 items-center gap-1.5">
             {precio && (
-              <span className="shrink-0 rounded-full bg-party-primary px-2 py-0.5 text-[11px] font-black text-ink">{precio}</span>
-            )}
-            {distance !== null && (
-              <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#66666E]">
-                <MapPin size={11} />
-                {formatDistance(distance)}
+              <span className="shrink-0 whitespace-nowrap rounded-full bg-party-primary px-2 py-0.5 text-[11px] font-black text-ink">
+                {precio}
               </span>
             )}
+            {distance !== null && (
+              <span className="inline-flex min-w-0 items-center gap-1 whitespace-nowrap text-[11px] font-semibold text-[#66666E]">
+                <MapPin size={11} className="shrink-0" />
+                <span className="truncate">{formatDistance(distance)}</span>
+              </span>
+            )}
+            <span className="ml-auto shrink-0">{accion}</span>
           </div>
         </div>
         {/* Con «Voy a ir» abajo, el marcador de arriba sobra. */}
         {venta && (
-        <button
-          type="button"
-          aria-label={going ? t('home.notGoing') : t('home.imGoing')}
-          aria-pressed={going}
-          disabled={busy}
-          onClick={(e) => {
-            e.stopPropagation();
-            onToggleIntent();
-          }}
-          className={cn(
-            'press absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full',
-            going ? 'bg-party-primary text-ink' : 'bg-surface-low text-white',
-          )}
-        >
-          {going ? <BookmarkCheck size={16} /> : <Bookmark size={16} />}
-        </button>
-        )}
-        {venta === 'app' ? (
           <button
             type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onOpen();
-            }}
-            className={cn(boton, 'bg-ink text-party-primary')}
-          >
-            {t('home.buy')}
-            <Ticket size={13} />
-          </button>
-        ) : venta === 'web' ? (
-          <a
-            href={event.bookingUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={(e) => {
-              e.stopPropagation();
-              void socialService.trackBookingClick(event.id).catch(() => undefined);
-            }}
-            className={cn(boton, 'bg-ink text-party-primary')}
-          >
-            {t('home.buy')}
-            <Ticket size={13} />
-          </a>
-        ) : (
-          <button
-            type="button"
+            aria-label={going ? t('home.notGoing') : t('home.imGoing')}
+            aria-pressed={going}
             disabled={busy}
             onClick={(e) => {
               e.stopPropagation();
               onToggleIntent();
             }}
-            className={cn(boton, 'disabled:opacity-50', going ? 'bg-party-primary text-ink' : 'bg-ink text-party-primary')}
+            className={cn(
+              'press absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full',
+              going ? 'bg-party-primary text-ink' : 'bg-surface-low text-white',
+            )}
           >
-            {going ? t('home.goingShort') : t('home.imGoing')}
+            {going ? <BookmarkCheck size={16} /> : <Bookmark size={16} />}
           </button>
         )}
       </article>
@@ -222,7 +238,8 @@ const EventCard: React.FC<EventCardProps> = ({
       onClick={onOpen}
       className={cn(
         'press flex cursor-pointer select-none flex-col overflow-hidden rounded-2xl bg-white shadow-xl',
-        grid ? 'w-full p-2' : featured ? 'w-[215px] shrink-0 p-2' : 'w-full p-3',
+        // En la cuadrícula, todas igual de altas (h-full en su fila y bloques fijos abajo).
+        grid ? 'h-full w-full p-2' : featured ? 'w-[215px] shrink-0 p-2' : 'w-full p-3',
       )}
     >
       {/* ----------------------------------------------------------- cartel */}
@@ -277,7 +294,7 @@ const EventCard: React.FC<EventCardProps> = ({
       </div>
 
       {/* ------------------------------------------------------------ datos */}
-      <div className={cn('flex flex-col px-1 pb-1', featured ? 'pt-3' : 'pt-3')}>
+      <div className={cn('flex flex-col px-1 pb-1 pt-3', grid && 'flex-1')}>
         {featured ? (
           <>
             <h3 className="truncate font-display text-title-card text-ink">{event.name}</h3>
@@ -285,10 +302,17 @@ const EventCard: React.FC<EventCardProps> = ({
               {anfitrion}
               {event.city ? ` · ${event.city}` : ''}
             </p>
-            {grid && distance !== null && (
-              <p className="mt-0.5 inline-flex items-center gap-1 text-[11px] font-semibold text-[#66666E]">
+            {/* En la cuadrícula la línea va siempre (vacía si no hay km) para
+                que todas las tarjetas midan lo mismo. */}
+            {grid && (
+              <p
+                className={cn(
+                  'mt-0.5 inline-flex items-center gap-1 whitespace-nowrap text-[11px] font-semibold text-[#66666E]',
+                  distance === null && 'invisible',
+                )}
+              >
                 <MapPin size={11} className="shrink-0" />
-                {formatDistance(distance)}
+                {distance !== null ? formatDistance(distance) : '—'}
               </p>
             )}
           </>
@@ -311,15 +335,27 @@ const EventCard: React.FC<EventCardProps> = ({
           </div>
         )}
 
-        <div className={cn('flex flex-wrap items-center gap-1.5', featured ? 'mt-2.5' : 'mt-3')}>
+        {/* En la cuadrícula, dos filas fijas de etiquetas pequeñas: lo que no
+            quepa se queda fuera, pero ninguna tarjeta crece más que otra. */}
+        <div
+          className={cn(
+            'flex flex-wrap items-center',
+            grid ? 'mt-2 h-[44px] content-start gap-1 overflow-hidden' : featured ? 'mt-2.5 gap-1.5' : 'mt-3 gap-1.5',
+          )}
+        >
           {featured && precio && (
-            <span className="rounded-full bg-party-primary px-2.5 py-1 text-[11px] font-black text-ink">
+            <span
+              className={cn(
+                'whitespace-nowrap rounded-full bg-party-primary font-black text-ink',
+                grid ? 'px-2 py-[3px] text-[10px] leading-[14px]' : 'px-2.5 py-1 text-[11px]',
+              )}
+            >
               {precio}
             </span>
           )}
-          {franja && <Tag>{t(`filters.franjas.${franja}`)}</Tag>}
-          {event.theme && <Tag>{event.theme}</Tag>}
-          {event.minAge !== undefined && <Tag>{event.minAge}+</Tag>}
+          {franja && <Tag small={grid}>{t(`filters.franjas.${franja}`)}</Tag>}
+          {event.theme && <Tag small={grid}>{event.theme}</Tag>}
+          {event.minAge !== undefined && <Tag small={grid}>{event.minAge}+</Tag>}
           {!featured && event.dressCode && <Tag>{event.dressCode}</Tag>}
           {!featured && live && <Tag>{t('home.endsAt', { time: formatHour(event.endDate) })}</Tag>}
         </div>

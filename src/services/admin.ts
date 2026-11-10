@@ -349,12 +349,27 @@ export const adminService = {
     }));
   },
 
-  /** Vuelve a escanear Xceed y Resident Advisor (`scan-sync`). */
-  scan: async (cities?: string[]): Promise<{ saved: number; cities: Record<string, Record<string, number | string>> }> => {
-    const { data, error } = await supabase.functions.invoke('scan-sync', { body: cities ? { cities } : {} });
-    if (error) throw new Error('SCAN_FAILED');
-    const d = (data ?? {}) as { saved?: number; cities?: Record<string, Record<string, number | string>> };
-    return { saved: Number(d.saved ?? 0), cities: d.cities ?? {} };
+  /**
+   * Vuelve a escanear Xceed y Resident Advisor (`scan-sync`), **una llamada
+   * por ciudad** y las tres a la vez. Con una sola llamada para todas,
+   * Barcelona se comía el tiempo de la función, que moría (546/504) antes de
+   * llegar a Madrid y Alicante: llevaban semanas sin actualizarse. Si falla
+   * una ciudad, las demás se guardan igual; sólo es error si fallan todas.
+   */
+  scan: async (cities: string[] = ['barcelona', 'madrid', 'alicante']): Promise<{ saved: number; cities: Record<string, Record<string, number | string>> }> => {
+    const resultados = await Promise.allSettled(
+      cities.map(async (ciudad) => {
+        const { data, error } = await supabase.functions.invoke('scan-sync', { body: { cities: [ciudad] } });
+        if (error) throw new Error('SCAN_FAILED');
+        return (data ?? {}) as { saved?: number; cities?: Record<string, Record<string, number | string>> };
+      }),
+    );
+    const bien = resultados.filter((r) => r.status === 'fulfilled').map((r) => r.value);
+    if (bien.length === 0) throw new Error('SCAN_FAILED');
+    return {
+      saved: bien.reduce((n, d) => n + Number(d.saved ?? 0), 0),
+      cities: Object.assign({}, ...bien.map((d) => d.cities ?? {})),
+    };
   },
 
   /** Crea una fiesta por grupo, con el enlace de entradas elegido. */

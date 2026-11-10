@@ -2445,7 +2445,8 @@
             "discoteca": "Discoteca",
             "terraza": "Terraza",
             "aire_libre": "Al aire libre"
-        }
+        },
+        "parties": "Fiestas"
     },
     "tickets": {
         "external": {
