@@ -15,6 +15,7 @@ import {
   TrendingUp,
   Users,
   Wallet,
+  type LucideIcon,
 } from 'lucide-react';
 import WelcomeTour, { type TourStep } from '@/components/welcome-tour/welcome-tour';
 import { ArtCard } from '@/components/welcome-tour/tour-art';
@@ -26,8 +27,8 @@ import { cn } from '@/lib/utils';
  * el centro y, alrededor, las cosas que se hacen en ella.
  */
 const Seccion: React.FC<{
-  Icon: React.FC<{ size?: number; strokeWidth?: number }>;
-  chips: { Icon: React.FC<{ size?: number }>; texto: string }[];
+  Icon: LucideIcon;
+  chips: { Icon: LucideIcon; texto: string }[];
 }> = ({ Icon, chips }) => {
   const sitios = ['left-[6%] top-[12%]', 'right-[6%] top-[22%]', 'bottom-[22%] left-[6%]', 'bottom-[10%] right-[8%]'];
   return (
@@ -55,7 +56,7 @@ const Seccion: React.FC<{
 };
 
 /** Un dibujo por paso, con los textos de `venueTour.art`. */
-const arte = (Icon: React.FC<{ size?: number; strokeWidth?: number }>, chips: [React.FC<{ size?: number }>, string][]) => {
+const arte = (Icon: LucideIcon, chips: [LucideIcon, string][]) => {
   const Art: React.FC = () => {
     const { t } = useTranslation();
     return <Seccion Icon={Icon} chips={chips.map(([I, clave]) => ({ Icon: I, texto: t(`venueTour.art.${clave}`) }))} />;
@@ -76,7 +77,7 @@ const IntroArt: React.FC = () => (
       [Megaphone, 'bottom-[16%] left-[20%]'],
       [BarChart3, 'bottom-[18%] right-[16%]'],
     ].map(([I, sitio], i) => {
-      const Icono = I as React.FC<{ size?: number }>;
+      const Icono = I as LucideIcon;
       return (
         <span
           key={i}
