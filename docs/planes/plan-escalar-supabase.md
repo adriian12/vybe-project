@@ -118,6 +118,41 @@ Para volver atrás, lo mismo eligiendo **Micro**.
 
 ---
 
+## Más allá del Small
+
+El Small es el tercero de una escala larga. Precios aproximados de 2026, a
+todos se les descuentan los 10 $ de crédito de Pro:
+
+| Tamaño | RAM | CPU | Conexiones Postgres | ≈ $/mes |
+|---|---|---|---|---|
+| Nano (gratis) | 0,5 GB | compartida | 60 | 0 |
+| Micro | 1 GB | 2 núcleos compartidos | 60 | 10 (gratis con Pro) |
+| **Small** | 2 GB | 2 núcleos compartidos | 90 | 15 |
+| Medium | 4 GB | 2 núcleos compartidos | 120 | 60 |
+| **Large** | 8 GB | **2 núcleos dedicados** | 160 | 110 |
+| XL | 16 GB | 4 núcleos dedicados | 240 | 210 |
+| 2XL | 32 GB | 8 núcleos dedicados | 380 | 410 |
+| 4XL | 64 GB | 16 núcleos dedicados | 480 | 960 |
+| 8XL | 128 GB | 32 núcleos dedicados | 490 | 1.870 |
+| 12XL / 16XL | 192 / 256 GB | 48 / 64 núcleos | 500 | 2.800 / 3.700 |
+
+Por encima, máquinas a medida hablando con su equipo comercial.
+
+- Hasta **Medium** la CPU es compartida: puede ir a tirones en momentos de
+  mucha carga. Desde **Large** los núcleos son dedicados: es el salto que se
+  nota con varias salas llenas a la vez.
+- Medium no compensa: cuatro veces el Small con la CPU aún compartida.
+- El cambio es siempre igual (Compute and Disk, unos minutos de reinicio) y se
+  cobra por horas: se puede subir a Large sólo los fines de semana de
+  temporada alta y bajar el lunes.
+
+**Orden de saltos:** Pro con Micro al empezar → **Small** cuando lo pidan las
+métricas (fase 3) → **Large** cuando haya varias ciudades con fiestas llenas a
+la vez. Lo que va más allá de Large, sólo con miles de personas conectadas a la
+vez y medido antes con k6.
+
+---
+
 ## Fase 4 · Medir después de cada salto
 
 Repetir la prueba de carga (`docs/notas/pruebas.md` explica cómo): crear
