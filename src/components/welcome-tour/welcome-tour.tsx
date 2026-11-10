@@ -96,7 +96,9 @@ const WelcomeTour: React.FC<WelcomeTourProps> = ({ onClose, loggedIn = false, st
       role="dialog"
       aria-modal="true"
       aria-labelledby="tour-title"
-      className="pt-safe pb-safe fixed inset-0 z-[1000] flex flex-col bg-background"
+      // En escritorio, una ventana centrada sobre lo que haya debajo (el panel
+      // de negocio) en vez de la columna estrecha del móvil en una pantalla negra.
+      className="pt-safe pb-safe fixed inset-0 z-[1000] flex flex-col bg-background lg:items-center lg:justify-center lg:bg-black/75 lg:backdrop-blur-sm"
       onTouchStart={(e) => {
         const p = e.touches[0];
         toque.current = { x: p.clientX, y: p.clientY };
@@ -113,7 +115,7 @@ const WelcomeTour: React.FC<WelcomeTourProps> = ({ onClose, loggedIn = false, st
         }
       }}
     >
-      <div className="mx-auto flex w-full max-w-md flex-1 flex-col overflow-hidden px-margin">
+      <div className="mx-auto flex w-full max-w-md flex-1 flex-col overflow-hidden px-margin lg:max-h-[min(640px,92vh)] lg:max-w-4xl lg:flex-none lg:rounded-[32px] lg:border lg:border-white/10 lg:bg-background lg:px-10 lg:pb-4 lg:shadow-[0_30px_80px_rgba(0,0,0,0.6)]">
         {/* Progreso: un tramo por paso, encendidos hasta el actual. */}
         <div
           className="flex gap-1.5 pt-4"
@@ -168,11 +170,12 @@ const WelcomeTour: React.FC<WelcomeTourProps> = ({ onClose, loggedIn = false, st
         </div>
 
         {/* El contenido cambia de clave en cada paso para repetir la entrada. */}
-        <div key={id} className="flex min-h-0 flex-1 flex-col overflow-y-auto pb-2 pt-2">
+        {/* En escritorio, el dibujo a la izquierda y el texto a la derecha. */}
+        <div key={id} className="flex min-h-0 flex-1 flex-col overflow-y-auto pb-2 pt-2 lg:grid lg:grid-cols-2 lg:items-center lg:gap-10 lg:py-6">
           <div className="enter">
             <Art />
           </div>
-          <div className="stagger mt-7">
+          <div className="stagger mt-7 lg:mt-0">
             <p style={{ '--i': 1 } as React.CSSProperties} className="text-label-pill font-extrabold uppercase tracking-[0.16em] text-party-primary">
               {t(`${textos}.steps.${id}.label`)}
             </p>
@@ -189,11 +192,11 @@ const WelcomeTour: React.FC<WelcomeTourProps> = ({ onClose, loggedIn = false, st
           </div>
         </div>
 
-        <div className="space-y-1 pb-4 pt-3">
+        <div className="space-y-1 pb-4 pt-3 lg:flex lg:items-center lg:justify-between lg:gap-4 lg:space-y-0 lg:pb-2">
           <button
             type="button"
             onClick={siguiente}
-            className="press flex h-14 w-full items-center justify-center rounded-2xl bg-party-primary font-display text-title-card text-ink shadow-[0_10px_30px_rgba(248,208,0,0.18)] hover:bg-[#E0BC00]"
+            className="press flex h-14 w-full items-center justify-center rounded-2xl bg-party-primary font-display text-title-card text-ink shadow-[0_10px_30px_rgba(248,208,0,0.18)] hover:bg-[#E0BC00] lg:order-last lg:w-72"
           >
             {paso === 0 ? t(`${textos}.start`) : ultimo ? t(`${textos}.finish`) : t(`${textos}.next`)}
           </button>
@@ -201,7 +204,7 @@ const WelcomeTour: React.FC<WelcomeTourProps> = ({ onClose, loggedIn = false, st
             type="button"
             onClick={onClose}
             className={cn(
-              'press h-11 w-full rounded-xl text-body-sm font-semibold text-party-gray hover:text-foreground',
+              'press h-11 w-full rounded-xl text-body-sm font-semibold text-party-gray hover:text-foreground lg:w-auto lg:px-2',
               ultimo && 'invisible',
             )}
           >
