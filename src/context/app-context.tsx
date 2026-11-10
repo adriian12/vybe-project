@@ -547,36 +547,74 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
     const profileId = currentUser.id;
     let channel: RealtimeChannel | null = null;
+    let reintento: ReturnType<typeof setTimeout> | null = null;
+    let intentos = 0;
+    let cerrado = false;
 
-    channel = supabase
-      .channel(`vybe:${profileId}`)
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'messages', filter: `sender_id=eq.${profileId}` },
-        (payload) => applyRealtimeMessage(payload as never, profileId),
-      )
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'messages', filter: `receiver_id=eq.${profileId}` },
-        (payload) => applyRealtimeMessage(payload as never, profileId),
-      )
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'connections' },
-        () => {
-          void loadConnections();
-        },
-      )
-      .subscribe((status) => {
-        if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
-          console.warn('Realtime no disponible; el chat funcionará sin actualización automática.');
-        }
-      });
+    // Con mucha gente conectándose a la vez (al abrir puertas, tras un aviso a
+    // todos), Supabase no da de alta todas las suscripciones a tiempo y responde
+    // «Too many database timeouts». La prueba de carga de noviembre de 2026 lo
+    // vio en hasta la mitad de 100 canales; repartidos en el tiempo, ninguno
+    // falló. Así que se reintenta con espera creciente y al azar, y al volver se
+    // recarga lo que llegó mientras tanto.
+    const reintentar = () => {
+      if (cerrado || reintento) return;
+      if (channel) void supabase.removeChannel(channel);
+      channel = null;
+      const espera = Math.min(30_000, 1_000 * 2 ** intentos) * (0.5 + Math.random());
+      intentos += 1;
+      reintento = setTimeout(() => {
+        reintento = null;
+        conectar();
+      }, espera);
+    };
+
+    const conectar = () => {
+      channel = supabase
+        .channel(`vybe:${profileId}`)
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'messages', filter: `sender_id=eq.${profileId}` },
+          (payload) => applyRealtimeMessage(payload as never, profileId),
+        )
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'messages', filter: `receiver_id=eq.${profileId}` },
+          (payload) => applyRealtimeMessage(payload as never, profileId),
+        )
+        .on(
+          'postgres_changes',
+          { event: 'INSERT', schema: 'public', table: 'connections' },
+          () => {
+            void loadConnections();
+          },
+        )
+        // El fallo de los cambios de la base de datos llega como aviso del
+        // sistema con el canal ya unido, no siempre como CHANNEL_ERROR.
+        .on('system', {}, (payload: { status?: string }) => {
+          if (payload?.status === 'error') reintentar();
+        })
+        .subscribe((status) => {
+          if (status === 'SUBSCRIBED') {
+            if (intentos > 0) {
+              void loadMessages();
+              void loadConnections();
+            }
+            intentos = 0;
+          } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+            reintentar();
+          }
+        });
+    };
+
+    conectar();
 
     return () => {
+      cerrado = true;
+      if (reintento) clearTimeout(reintento);
       if (channel) void supabase.removeChannel(channel);
     };
-  }, [currentUser, userType, applyRealtimeMessage, loadConnections]);
+  }, [currentUser, userType, applyRealtimeMessage, loadConnections, loadMessages]);
 
   // Realtime sólo entrega lo que pasa con la conexión abierta. Con la app en
   // segundo plano el sistema la corta y lo que llegó entretanto no se repite:

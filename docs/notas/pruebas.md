@@ -51,3 +51,22 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
   El evento dura hasta 2030. **Se queda así hasta que el usuario pida
   borrarlos.** En los demás eventos el tablón y el canje siguen filtrando por
   distancia con el radio del local.
+- **Prueba de carga** (10-11-2026, k6 de Grafana, 100 fiester@s de prueba en
+  Fiestea Test Night, ya borrados). Servidor Nano (60 conexiones):
+  - Recorrido completo a ritmo humano: 100 % bien, 64 peticiones/s, mediana
+    106 ms, p95 0,36 s; la base de datos, con 1-3 consultas activas.
+  - Lo único que saturaba era la lista de fiestas (`select *`, ~770 KB por
+    persona): con 100 abriendo a la vez, hasta 7-10 s. Sin ella, 262
+    peticiones/s. Ahora `getEvents` pide sólo `EVENTO_LISTA` (−37 %).
+  - Chat en directo: con 100 conectándose en el mismo segundo, Realtime
+    respondía «Too many database timeouts» en el 30-50 % de los canales; con la
+    entrada repartida en 30 s, ninguno. La app ahora reintenta con espera
+    creciente y al azar (`app-context.tsx`) y recarga mensajes y conexiones al
+    volver.
+  - Login: unos 30 por IP cada 5 min (Auth → Rate Limits). Ojo con el wifi
+    compartido de un local; la sesión se renueva sola y eso tiene 150.
+  - Los scripts no están en el repositorio: se pueden rehacer con k6 contra la
+    API (login, `get_my_profile`, lista, `get_events_activity`,
+    `redeem_event_code`, `set_event_photo` con foto preaprobada en
+    `moderation_queue`, `get_nearby_profiles`, `swipes`, `connections`,
+    `messages`) y un WebSocket a `/realtime/v1/websocket`.

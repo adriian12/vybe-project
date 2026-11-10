@@ -73,6 +73,19 @@ const VENUE_PUBLICO =
   'id, name, is_platform, type, event_radius, city, region, address, latitude, longitude';
 
 /**
+ * Columnas de la lista de fiestas (`getEvents`): las que leen las tarjetas, el
+ * mapa y los filtros. Con `*` eran 54 columnas y unos 770 KB con 435 fiestas,
+ * y en la prueba de carga de noviembre de 2026 era lo único que saturaba el
+ * servidor con 100 personas abriendo la app a la vez. La descripción y el
+ * line-up no van: la ficha pide su fiesta entera con `getEventById`.
+ */
+const EVENTO_LISTA =
+  'id, name, venue_id, place_name, place_type, external_source, city, region, start_date, end_date, ' +
+  'min_age, max_age, theme, dress_code, price, booking_url, poster_url, max_capacity, featured_until, ' +
+  'place_slug, slug, requires_location, entry_enabled, swipe_enabled, show_headcount, show_gender_split, ' +
+  'recurrence, latitude, longitude, address';
+
+/**
  * Columnas de otra persona que el móvil puede leer (094). Nunca `profiles(*)`:
  * con privilegios por columna, el `*` incluye el teléfono o el correo y
  * PostgREST rechaza la consulta entera. Así se quedaron vacíos los crushes.
@@ -1276,7 +1289,7 @@ export const api = {
     for (let pagina = 0; pagina < 10; pagina++) {
       const { data, error } = await supabase
         .from('events')
-        .select(`*, venues!inner(${VENUE_PUBLICO})`)
+        .select(`${EVENTO_LISTA}, venues!inner(${VENUE_PUBLICO})`)
         .gt('end_date', desde)
         .order('start_date', { ascending: true })
         .order('id', { ascending: true })
