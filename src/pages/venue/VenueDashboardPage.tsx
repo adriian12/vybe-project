@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -16,6 +16,7 @@ import {
   ExternalLink,
   FileText,
   HelpCircle,
+  GraduationCap,
   Loader2,
   LogOut,
   Megaphone,
@@ -100,6 +101,10 @@ import {
 } from '@/services/venue-service';
 import { cn } from '@/lib/utils';
 import { COMPANY } from '@/lib/company';
+import { markVenueTourSeen, venueTourSeen } from '@/lib/venue-tour';
+
+// El tutorial del panel: pantalla grande que sólo se abre una vez.
+const VenueTour = lazy(() => import('@/components/venue/venue-tour'));
 import { Event as VybeEvent, VenueStats } from '@/types/venue';
 
 /**
@@ -172,6 +177,21 @@ const VenueDashboardPage = () => {
   const [eventoPanel, setEventoPanel] = useState<string | null>(null);
   const [editing, setEditing] = useState<VybeEvent | null>(null);
   const [reportOpen, setReportOpen] = useState(false);
+  // Tutorial del panel: sale solo la primera vez y desde el menú de la cuenta.
+  const [tourAbierto, setTourAbierto] = useState(false);
+  useEffect(() => {
+    let vivo = true;
+    void venueTourSeen().then((visto) => {
+      if (vivo && !visto) setTourAbierto(true);
+    });
+    return () => {
+      vivo = false;
+    };
+  }, []);
+  const cerrarTour = () => {
+    setTourAbierto(false);
+    void markVenueTourSeen();
+  };
 
   useEffect(() => {
     try {
@@ -494,6 +514,15 @@ const VenueDashboardPage = () => {
         setReportOpen(true);
       },
       show: puedeDifundir,
+    },
+    {
+      icon: GraduationCap,
+      label: t('venueTour.replay'),
+      onClick: () => {
+        setDrawer(null);
+        setTourAbierto(true);
+      },
+      show: true,
     },
     {
       icon: HelpCircle,
@@ -1256,6 +1285,12 @@ const VenueDashboardPage = () => {
       </Sheet>
 
       {puedeDifundir && <VenueWeeklyReport open={reportOpen} onOpenChange={setReportOpen} />}
+
+      {tourAbierto && (
+        <Suspense fallback={null}>
+          <VenueTour onClose={cerrarTour} />
+        </Suspense>
+      )}
 
       <Dialog open={Boolean(editing)} onOpenChange={(open) => !open && setEditing(null)}>
         <DialogContent className="max-h-[90vh] w-[calc(100%-2rem)] max-w-xl overflow-y-auto rounded-[20px] border-0 bg-white p-0 text-ink [&>button]:hidden">

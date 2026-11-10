@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
-import { ChevronRight, Heart, LifeBuoy, MapPin, Ban, Flag, ShieldCheck, Sparkles, X } from 'lucide-react';
+import { ChevronRight, Heart, House, LifeBuoy, MapPin, Ban, Flag, Share2, ShieldCheck, Sparkles, X } from 'lucide-react';
 import { VybeMark } from '@/components/brand/vybe-logo';
+import { CabifyLogo, UberLogo } from '@/components/go-home/ride-logos';
 import { cn } from '@/lib/utils';
 
 /**
@@ -276,6 +277,45 @@ export const VenueArt = () => {
         <Aviso title={t('tour.art.offerTitle')} body={t('tour.art.offerBody')} />
         <Aviso title={t('tour.art.raffleTitle')} body={t('tour.art.raffleBody')} action={t('tour.art.raffleAction')} />
         <Aviso title={t('tour.art.noticeTitle')} className="opacity-70" />
+      </div>
+    </ArtCard>
+  );
+};
+
+/** «Volver a casa»: Uber y Cabify con tu casa de destino y el precio aproximado. */
+export const GoHomeArt = () => {
+  const { t } = useTranslation();
+  const fila = (logo: React.ReactNode, nombre: string, precio: string, minutos: string) => (
+    <div className="flex items-center gap-3 rounded-2xl bg-surface-highest/80 p-2.5">
+      {logo}
+      <span className="min-w-0 flex-1">
+        <span className="block font-display text-[15px] font-extrabold leading-tight text-foreground">{nombre}</span>
+        <span className="block text-[12px] text-party-gray">
+          {precio} · {minutos}
+        </span>
+      </span>
+      <span className="flex h-8 items-center rounded-full bg-party-primary px-3 text-[12px] font-bold text-ink">
+        {t('tour.art.rideOpen')}
+      </span>
+    </div>
+  );
+  return (
+    <ArtCard>
+      <div className="absolute inset-0 flex flex-col justify-center gap-2.5 px-4">
+        <div className="flex items-center gap-2 px-1">
+          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-party-primary text-ink">
+            <House size={18} strokeWidth={2.4} />
+          </span>
+          <span className="min-w-0">
+            <span className="block font-display text-[16px] font-extrabold leading-tight text-foreground">{t('goHome.title')}</span>
+            <span className="block truncate text-[12px] text-party-gray">{t('tour.art.rideTo')}</span>
+          </span>
+        </div>
+        {fila(<UberLogo />, 'Uber', '14–18 €', t('tour.art.rideMinutes', { count: 16 }))}
+        {fila(<CabifyLogo />, 'Cabify', '15–19 €', t('tour.art.rideMinutes', { count: 16 }))}
+        <div className="flex items-center justify-center gap-1.5 rounded-full border border-white/15 py-2 text-[12px] font-bold text-foreground">
+          <Share2 size={13} /> {t('goHome.tellSomeone')}
+        </div>
       </div>
     </ArtCard>
   );

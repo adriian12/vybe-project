@@ -12,6 +12,13 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
   y por eso los botones de orientación y color tardaban. El cartel lleva fecha,
   sala, tres pasos y la cinta «Escanea · Entra · Conoce gente»; el logo va en el
   centro del QR (nivel H, aguanta tapar hasta un 30 %).
+- **Tutorial del panel** (`venue-tour.tsx`, textos en `venueTour.*`): ocho
+  pantallas con el mismo formato que el de bienvenida (`WelcomeTour` con
+  `steps` y `textos`): eventos, puerta, ventas, avisos, estadísticas, negocio
+  y equipo, plan. Sale la primera vez que alguien entra al panel
+  (`user_metadata.venue_tour_seen_at` y en el dispositivo) y se vuelve a ver
+  desde el menú de la cuenta → «Tutorial del panel». Si cambia una sección del
+  panel, cambia su paso.
 - **Avisos del local** (migración 053). `queue_broadcast()` acepta
   `scheduled_at`: sin hora sale en la siguiente pasada de `notify-events`, con
   hora espera a esa hora. Programados a la vez: 1 en Gratis y 20 en

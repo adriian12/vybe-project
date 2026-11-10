@@ -3984,6 +3984,11 @@
                 "title": "Ofertes, sorteigs i avisos",
                 "body": "El local t'envia les seves ofertes, els sorteigs i el que passarà aquesta nit. Només t'arriben mentre ets dins la festa."
             },
+            "goHome": {
+                "label": "En sortir",
+                "title": "Torna a casa sense embolics",
+                "body": "Quan s’acabi la festa, «Tornar a casa» obre Uber o Cabify amb casa teva ja com a destinació i et diu més o menys quant costa. I amb un toc avises algú que tornes."
+            },
             "safety": {
                 "label": "Seguretat",
                 "title": "Festa segura i a la teva manera",
@@ -4011,7 +4016,11 @@
             "block": "Bloquejar",
             "report": "Denunciar",
             "help": "Ajuda",
-            "premium": "Premium · opcional"
+            "premium": "Premium · opcional",
+            "rideOpen": "Demanar",
+            "rideTo": "Destinació: Casa",
+            "rideMinutes_one": "{{count}} min",
+            "rideMinutes_other": "{{count}} min"
         }
     },
     "goHome": {
@@ -4049,6 +4058,87 @@
             "event": "Festa",
             "other": "Fiestea",
             "news": "Novetat"
+        }
+    },
+    "venueTour": {
+        "start": "Veure com funciona",
+        "next": "Següent",
+        "finish": "Som-hi!",
+        "skip": "Saltar el tutorial",
+        "back": "Enrere",
+        "replay": "Tutorial del panell",
+        "progress": "Pas {{current}} de {{total}}",
+        "steps": {
+            "intro": {
+                "label": "Panell de Fiestea",
+                "title": "El teu negoci, en un sol panell",
+                "body": "Des d’aquí crees les teves festes, controles la porta, vens entrades i parles amb el teu públic. T’ensenyem on és cada cosa en un minut."
+            },
+            "events": {
+                "label": "Esdeveniments",
+                "title": "Crea i publica les teves festes",
+                "body": "A Esdeveniments crees la festa amb el cartell, l’horari, el line-up i els preus. En publicar-la, els teus seguidors reben un avís. Si vols que surti la primera a Inici i al mapa, destaca-la."
+            },
+            "door": {
+                "label": "Codi QR i porta",
+                "title": "La nit, des de la porta",
+                "body": "A «Codi QR i entrada» tens el cartell amb el QR perquè la gent entri a la festa des de l’app. A «Control de porta» escanejes entrades, portes l’aforament en directe i reps els avisos d’ajuda (SOS)."
+            },
+            "sales": {
+                "label": "Vendes",
+                "title": "Ven entrades i cobra",
+                "body": "A Vendes actives els cobraments amb Stripe (un cop), crees tipus d’entrada i llistes, i veus el que portes venut. Els diners arriben al teu compte bancari."
+            },
+            "broadcast": {
+                "label": "Avisos i promocions",
+                "title": "Parla amb el teu públic",
+                "body": "Envia un avís al mòbil de qui és dins, dels teus seguidors o de qui va dir que venia. A Promocions llances ofertes i sortejos per a la gent de la festa."
+            },
+            "stats": {
+                "label": "Estadístiques",
+                "title": "Mesura cada nit",
+                "body": "A Estadístiques veus quanta gent va venir, a quina hora, com et valoren i la previsió de la propera festa. Cada setmana t’arriba un informe amb el més important."
+            },
+            "business": {
+                "label": "Negoci i equip",
+                "title": "La teva fitxa i el teu equip",
+                "body": "A Negoci poses el logo, les fotos i les xarxes: és la teva fitxa pública a Fiestea. A Equip convides porters i RRPP; cada RRPP té el seu codi perquè vegis qui porta."
+            },
+            "plan": {
+                "label": "Pla",
+                "title": "Gratis o Business",
+                "body": "Amb Gratis tens l’essencial. Business hi afegeix avisos per públics, notificacions amb el teu logo, RRPP, estadístiques completes, exportar i un destacat al mes. El canvies a «Pla i facturació»."
+            }
+        },
+        "art": {
+            "newEvent": "Nova festa",
+            "boost": "Destacar",
+            "followers": "Avisa seguidors",
+            "lineup": "Line-up i preus",
+            "qr": "Cartell amb QR",
+            "scan": "Escanejar entrades",
+            "capacity": "Aforament en directe",
+            "sos": "Avisos SOS",
+            "stripe": "Activar cobraments",
+            "ticketTypes": "Tipus d’entrada",
+            "lists": "Llistes",
+            "payouts": "Transferències",
+            "notice": "Enviar avís",
+            "promos": "Ofertes i sortejos",
+            "audiences": "Per públics",
+            "brandedPush": "Amb el teu logo",
+            "forecast": "Previsió",
+            "nightly": "Gent per hora",
+            "demographics": "Públic",
+            "weekly": "Informe setmanal",
+            "profile": "Fitxa pública",
+            "team": "Porters",
+            "promoters": "Codis de RRPP",
+            "socials": "Xarxes i fotos",
+            "business": "Business",
+            "boostIncluded": "1 destacat al mes",
+            "audiencesPlan": "Avisos per públics",
+            "exports": "Exportar"
         }
     }
 }

@@ -191,7 +191,7 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
   el mapa), ni la etiqueta naranja de destacado en las tarjetas: los
   destacados tienen su carrusel.
 - **Tutorial de bienvenida** (`components/welcome-tour/`, textos en `tour.*`):
-  siete pantallas a página completa (estilo de la intro de Appark con los
+  ocho pantallas (la séptima, «Vuelve a casa» con Uber y Cabify) a página completa (estilo de la intro de Appark con los
   colores de Fiestea; ilustraciones propias, sin fotos). Sale una vez por
   persona: sin cuenta, sobre la bienvenida de la app instalada
   (`fiestea_welcome_tour_seen` en el móvil); con cuenta, al primer inicio o

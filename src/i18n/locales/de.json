@@ -3984,6 +3984,11 @@
                 "title": "Angebote, Gewinnspiele und News",
                 "body": "Die Location schickt dir ihre Angebote, Gewinnspiele und was heute Nacht passiert. Du bekommst sie nur, solange du auf der Party bist."
             },
+            "goHome": {
+                "label": "Danach",
+                "title": "Entspannt nach Hause",
+                "body": "Wenn die Party vorbei ist, öffnet „Nach Hause“ Uber oder Cabify mit deinem Zuhause als Ziel und einem ungefähren Preis. Mit einem Tipp sagst du jemandem Bescheid, dass du unterwegs bist."
+            },
             "safety": {
                 "label": "Sicherheit",
                 "title": "Sicher feiern, wie du willst",
@@ -4011,7 +4016,11 @@
             "block": "Blockieren",
             "report": "Melden",
             "help": "Hilfe",
-            "premium": "Premium · optional"
+            "premium": "Premium · optional",
+            "rideOpen": "Buchen",
+            "rideTo": "Ziel: Zuhause",
+            "rideMinutes_one": "{{count}} Min.",
+            "rideMinutes_other": "{{count}} Min."
         }
     },
     "goHome": {
@@ -4049,6 +4058,87 @@
             "event": "Party",
             "other": "Fiestea",
             "news": "Neuigkeit"
+        }
+    },
+    "venueTour": {
+        "start": "So funktioniert’s",
+        "next": "Weiter",
+        "finish": "Los geht’s!",
+        "skip": "Tutorial überspringen",
+        "back": "Zurück",
+        "replay": "Panel-Tutorial",
+        "progress": "Schritt {{current}} von {{total}}",
+        "steps": {
+            "intro": {
+                "label": "Fiestea-Panel",
+                "title": "Dein Laden in einem Panel",
+                "body": "Hier erstellst du deine Partys, steuerst den Einlass, verkaufst Tickets und sprichst mit deinem Publikum. Wir zeigen dir in einer Minute, wo alles ist."
+            },
+            "events": {
+                "label": "Events",
+                "title": "Partys erstellen und veröffentlichen",
+                "body": "Unter Events erstellst du die Party mit Plakat, Zeiten, Line-up und Preisen. Beim Veröffentlichen bekommen deine Follower eine Benachrichtigung. Hervorheben bringt sie ganz nach oben auf Start und Karte."
+            },
+            "door": {
+                "label": "QR-Code und Einlass",
+                "title": "Die Nacht vom Einlass aus",
+                "body": "Unter „QR-Code und Einlass“ hast du das Plakat mit dem QR, mit dem die Leute in der App der Party beitreten. Unter „Einlasskontrolle“ scannst du Tickets, siehst die Auslastung live und bekommst Hilfe-Alarme (SOS)."
+            },
+            "sales": {
+                "label": "Verkauf",
+                "title": "Tickets verkaufen und kassieren",
+                "body": "Unter Verkauf aktivierst du Zahlungen mit Stripe (einmalig), legst Ticketarten und Listen an und siehst, was du verkauft hast. Das Geld geht auf dein Bankkonto."
+            },
+            "broadcast": {
+                "label": "Benachrichtigungen und Aktionen",
+                "title": "Sprich mit deinem Publikum",
+                "body": "Schick eine Benachrichtigung an alle drinnen, deine Follower oder die, die zugesagt haben. Unter Aktionen startest du Angebote und Verlosungen für die Leute auf der Party."
+            },
+            "stats": {
+                "label": "Statistiken",
+                "title": "Jede Nacht messen",
+                "body": "Unter Statistiken siehst du, wie viele kamen, wann, wie sie dich bewerten und die Prognose für die nächste Party. Jede Woche kommt ein Bericht mit dem Wichtigsten."
+            },
+            "business": {
+                "label": "Laden und Team",
+                "title": "Dein Profil und dein Team",
+                "body": "Unter Laden fügst du Logo, Fotos und Social Media hinzu: dein öffentliches Profil bei Fiestea. Unter Team lädst du Türsteher und Promoter ein; jeder Promoter hat einen Code, damit du siehst, wen er bringt."
+            },
+            "plan": {
+                "label": "Tarif",
+                "title": "Gratis oder Business",
+                "body": "Gratis deckt das Wichtigste ab. Business bringt Benachrichtigungen nach Zielgruppe, Benachrichtigungen mit deinem Logo, Promoter, volle Statistiken, Export und eine hervorgehobene Party pro Monat. Ändern unter „Tarif und Abrechnung“."
+            }
+        },
+        "art": {
+            "newEvent": "Neue Party",
+            "boost": "Hervorheben",
+            "followers": "Follower benachrichtigen",
+            "lineup": "Line-up und Preise",
+            "qr": "QR-Plakat",
+            "scan": "Tickets scannen",
+            "capacity": "Auslastung live",
+            "sos": "SOS-Alarme",
+            "stripe": "Zahlungen aktivieren",
+            "ticketTypes": "Ticketarten",
+            "lists": "Listen",
+            "payouts": "Auszahlungen",
+            "notice": "Benachrichtigen",
+            "promos": "Angebote",
+            "audiences": "Nach Zielgruppe",
+            "brandedPush": "Mit deinem Logo",
+            "forecast": "Prognose",
+            "nightly": "Leute pro Stunde",
+            "demographics": "Publikum",
+            "weekly": "Wochenbericht",
+            "profile": "Öffentliches Profil",
+            "team": "Türsteher",
+            "promoters": "Promoter-Codes",
+            "socials": "Social & Fotos",
+            "business": "Business",
+            "boostIncluded": "1 Highlight pro Monat",
+            "audiencesPlan": "Zielgruppen",
+            "exports": "Export"
         }
     }
 }

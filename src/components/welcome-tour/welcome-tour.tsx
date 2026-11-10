@@ -4,18 +4,25 @@ import { ChevronLeft } from 'lucide-react';
 import { SUPPORTED_LANGUAGES, changeLanguage } from '@/i18n';
 import { api } from '@/services/api';
 import { cn } from '@/lib/utils';
-import { DiscoverArt, EnterArt, IntroArt, SafetyArt, SwipeArt, TicketsArt, VenueArt } from './tour-art';
+import { DiscoverArt, EnterArt, GoHomeArt, IntroArt, SafetyArt, SwipeArt, TicketsArt, VenueArt } from './tour-art';
 
-/** Los pasos, en orden. Los textos están en `tour.steps.<id>`. */
-const PASOS = [
+/** Un paso: su clave de textos (`<textos>.steps.<id>`) y su dibujo. */
+export interface TourStep {
+  id: string;
+  Art: React.FC;
+}
+
+/** Los pasos del tutorial de bienvenida, en orden. Los textos están en `tour.steps.<id>`. */
+const PASOS: readonly TourStep[] = [
   { id: 'intro', Art: IntroArt },
   { id: 'discover', Art: DiscoverArt },
   { id: 'tickets', Art: TicketsArt },
   { id: 'enter', Art: EnterArt },
   { id: 'swipe', Art: SwipeArt },
   { id: 'venue', Art: VenueArt },
+  { id: 'goHome', Art: GoHomeArt },
   { id: 'safety', Art: SafetyArt },
-] as const;
+];
 
 /** El orden de la referencia: primero las lenguas de aquí. */
 const IDIOMAS = ['es', 'ca', 'en', 'de'] as const;
@@ -25,20 +32,26 @@ interface WelcomeTourProps {
   onClose: () => void;
   /** Con sesión, el idioma elegido se guarda también en el perfil. */
   loggedIn?: boolean;
+  /**
+   * Otro tutorial con el mismo formato (el del panel de negocio): sus pasos y
+   * el prefijo de sus textos (`<textos>.start`, `<textos>.steps.<id>.title`…).
+   */
+  steps?: readonly TourStep[];
+  textos?: string;
 }
 
 /**
- * El tutorial de bienvenida: siete pantallas a página completa con barra de
+ * El tutorial de bienvenida: ocho pantallas a página completa con barra de
  * progreso, «Atrás», idioma, un dibujo, la etiqueta, el titular y el texto.
  * Se pasa con el botón, deslizando de lado o con las flechas del teclado.
  */
-const WelcomeTour: React.FC<WelcomeTourProps> = ({ onClose, loggedIn = false }) => {
+const WelcomeTour: React.FC<WelcomeTourProps> = ({ onClose, loggedIn = false, steps = PASOS, textos = 'tour' }) => {
   const { t, i18n } = useTranslation();
   const [paso, setPaso] = useState(0);
   const toque = useRef<{ x: number; y: number } | null>(null);
 
-  const ultimo = paso === PASOS.length - 1;
-  const { id, Art } = PASOS[paso];
+  const ultimo = paso === steps.length - 1;
+  const { id, Art } = steps[paso];
 
   const siguiente = useCallback(() => {
     if (ultimo) onClose();
@@ -106,11 +119,11 @@ const WelcomeTour: React.FC<WelcomeTourProps> = ({ onClose, loggedIn = false }) 
           className="flex gap-1.5 pt-4"
           role="progressbar"
           aria-valuemin={1}
-          aria-valuemax={PASOS.length}
+          aria-valuemax={steps.length}
           aria-valuenow={paso + 1}
-          aria-label={t('tour.progress', { current: paso + 1, total: PASOS.length })}
+          aria-label={t(`${textos}.progress`, { current: paso + 1, total: steps.length })}
         >
-          {PASOS.map((p, i) => (
+          {steps.map((p, i) => (
             <span
               key={p.id}
               className={cn(
@@ -129,7 +142,7 @@ const WelcomeTour: React.FC<WelcomeTourProps> = ({ onClose, loggedIn = false }) 
               className="press -ml-1 flex items-center gap-0.5 rounded-lg py-2 pr-2 font-display text-title-card text-party-gray hover:text-foreground"
             >
               <ChevronLeft size={20} />
-              {t('tour.back')}
+              {t(`${textos}.back`)}
             </button>
           ) : (
             <span />
@@ -161,17 +174,17 @@ const WelcomeTour: React.FC<WelcomeTourProps> = ({ onClose, loggedIn = false }) 
           </div>
           <div className="stagger mt-7">
             <p style={{ '--i': 1 } as React.CSSProperties} className="text-label-pill font-extrabold uppercase tracking-[0.16em] text-party-primary">
-              {t(`tour.steps.${id}.label`)}
+              {t(`${textos}.steps.${id}.label`)}
             </p>
             <h1
               id="tour-title"
               style={{ '--i': 2 } as React.CSSProperties}
               className="mt-2 font-display text-[32px] font-extrabold leading-[1.05] tracking-tight"
             >
-              {t(`tour.steps.${id}.title`)}
+              {t(`${textos}.steps.${id}.title`)}
             </h1>
             <p style={{ '--i': 3 } as React.CSSProperties} className="mt-3 text-body-md text-party-gray">
-              {t(`tour.steps.${id}.body`)}
+              {t(`${textos}.steps.${id}.body`)}
             </p>
           </div>
         </div>
@@ -182,7 +195,7 @@ const WelcomeTour: React.FC<WelcomeTourProps> = ({ onClose, loggedIn = false }) 
             onClick={siguiente}
             className="press flex h-14 w-full items-center justify-center rounded-2xl bg-party-primary font-display text-title-card text-ink shadow-[0_10px_30px_rgba(248,208,0,0.18)] hover:bg-[#E0BC00]"
           >
-            {paso === 0 ? t('tour.start') : ultimo ? t('tour.finish') : t('tour.next')}
+            {paso === 0 ? t(`${textos}.start`) : ultimo ? t(`${textos}.finish`) : t(`${textos}.next`)}
           </button>
           <button
             type="button"
@@ -192,7 +205,7 @@ const WelcomeTour: React.FC<WelcomeTourProps> = ({ onClose, loggedIn = false }) 
               ultimo && 'invisible',
             )}
           >
-            {t('tour.skip')}
+            {t(`${textos}.skip`)}
           </button>
         </div>
       </div>

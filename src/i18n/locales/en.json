@@ -3984,6 +3984,11 @@
                 "title": "Offers, raffles and updates",
                 "body": "The venue sends you its offers, raffles and what is happening tonight. You only get them while you are at the party."
             },
+            "goHome": {
+                "label": "Heading out",
+                "title": "Get home hassle-free",
+                "body": "When the party’s over, «Go home» opens Uber or Cabify with your home already set as the destination and an estimated price. One tap lets someone know you’re on your way."
+            },
             "safety": {
                 "label": "Safety",
                 "title": "Party safe, your way",
@@ -4011,7 +4016,11 @@
             "block": "Block",
             "report": "Report",
             "help": "Help",
-            "premium": "Premium · optional"
+            "premium": "Premium · optional",
+            "rideOpen": "Book",
+            "rideTo": "Destination: Home",
+            "rideMinutes_one": "{{count}} min",
+            "rideMinutes_other": "{{count}} min"
         }
     },
     "goHome": {
@@ -4049,6 +4058,87 @@
             "event": "Party",
             "other": "Fiestea",
             "news": "News"
+        }
+    },
+    "venueTour": {
+        "start": "See how it works",
+        "next": "Next",
+        "finish": "Let’s go!",
+        "skip": "Skip the tutorial",
+        "back": "Back",
+        "replay": "Panel tutorial",
+        "progress": "Step {{current}} of {{total}}",
+        "steps": {
+            "intro": {
+                "label": "Fiestea panel",
+                "title": "Your venue, in one panel",
+                "body": "Here you create your parties, run the door, sell tickets and talk to your crowd. We’ll show you where everything is in a minute."
+            },
+            "events": {
+                "label": "Events",
+                "title": "Create and publish your parties",
+                "body": "In Events you create the party with its poster, times, line-up and prices. When you publish it, your followers get a notification. To show it first on Home and the map, feature it."
+            },
+            "door": {
+                "label": "QR code and door",
+                "title": "Run the night from the door",
+                "body": "In «QR code and entry» you have the poster with the QR so people can join the party in the app. In «Door control» you scan tickets, track capacity live and get help alerts (SOS)."
+            },
+            "sales": {
+                "label": "Sales",
+                "title": "Sell tickets and get paid",
+                "body": "In Sales you turn on payments with Stripe (once), create ticket types and guest lists, and see what you’ve sold. The money goes to your bank account."
+            },
+            "broadcast": {
+                "label": "Notifications and promos",
+                "title": "Talk to your crowd",
+                "body": "Send a notification to people inside, your followers or those who said they’d come. In Promotions you launch offers and giveaways for people at the party."
+            },
+            "stats": {
+                "label": "Stats",
+                "title": "Measure every night",
+                "body": "In Stats you see how many people came, when, how they rate you and the forecast for your next party. Every week you get a report with the highlights."
+            },
+            "business": {
+                "label": "Venue and team",
+                "title": "Your profile and your team",
+                "body": "In Venue you add your logo, photos and socials: your public profile on Fiestea. In Team you invite door staff and promoters; each promoter has a code so you see who they bring."
+            },
+            "plan": {
+                "label": "Plan",
+                "title": "Free or Business",
+                "body": "Free covers the essentials. Business adds audience notifications, notifications with your logo, promoters, full stats, exports and one featured party a month. Change it in «Plan and billing»."
+            }
+        },
+        "art": {
+            "newEvent": "New party",
+            "boost": "Feature",
+            "followers": "Notify followers",
+            "lineup": "Line-up and prices",
+            "qr": "QR poster",
+            "scan": "Scan tickets",
+            "capacity": "Live capacity",
+            "sos": "SOS alerts",
+            "stripe": "Turn on payments",
+            "ticketTypes": "Ticket types",
+            "lists": "Guest lists",
+            "payouts": "Payouts",
+            "notice": "Send notification",
+            "promos": "Offers and giveaways",
+            "audiences": "By audience",
+            "brandedPush": "With your logo",
+            "forecast": "Forecast",
+            "nightly": "People per hour",
+            "demographics": "Audience",
+            "weekly": "Weekly report",
+            "profile": "Public profile",
+            "team": "Door staff",
+            "promoters": "Promoter codes",
+            "socials": "Socials and photos",
+            "business": "Business",
+            "boostIncluded": "1 featured a month",
+            "audiencesPlan": "Audience notifications",
+            "exports": "Export"
         }
     }
 }

@@ -3984,6 +3984,11 @@
                 "title": "Ofertas, sorteos y avisos",
                 "body": "El local te manda sus ofertas, sus sorteos y lo que va a pasar esta noche. Sólo te llegan mientras estás dentro de la fiesta."
             },
+            "goHome": {
+                "label": "Al salir",
+                "title": "Vuelve a casa sin líos",
+                "body": "Cuando acabe la fiesta, «Volver a casa» abre Uber o Cabify con tu casa ya de destino y te dice más o menos cuánto cuesta. Y con un toque avisas a alguien de que vuelves."
+            },
             "safety": {
                 "label": "Seguridad",
                 "title": "Fiesta segura y a tu manera",
@@ -4011,7 +4016,11 @@
             "block": "Bloquear",
             "report": "Denunciar",
             "help": "Ayuda",
-            "premium": "Premium · opcional"
+            "premium": "Premium · opcional",
+            "rideOpen": "Pedir",
+            "rideTo": "Destino: Casa",
+            "rideMinutes_one": "{{count}} min",
+            "rideMinutes_other": "{{count}} min"
         }
     },
     "goHome": {
@@ -4049,6 +4058,87 @@
             "event": "Fiesta",
             "other": "Fiestea",
             "news": "Novedad"
+        }
+    },
+    "venueTour": {
+        "start": "Ver cómo funciona",
+        "next": "Siguiente",
+        "finish": "¡Vamos allá!",
+        "skip": "Saltar el tutorial",
+        "back": "Atrás",
+        "replay": "Tutorial del panel",
+        "progress": "Paso {{current}} de {{total}}",
+        "steps": {
+            "intro": {
+                "label": "Panel de Fiestea",
+                "title": "Tu negocio, en un solo panel",
+                "body": "Desde aquí creas tus fiestas, controlas la puerta, vendes entradas y hablas con tu público. Te enseñamos dónde está cada cosa en un minuto."
+            },
+            "events": {
+                "label": "Eventos",
+                "title": "Crea y publica tus fiestas",
+                "body": "En Eventos creas la fiesta con su cartel, horario, line-up y precios. Al publicarla, tus seguidores reciben un aviso. Si quieres que salga la primera en Inicio y en el mapa, destácala."
+            },
+            "door": {
+                "label": "Código QR y puerta",
+                "title": "La noche, desde la puerta",
+                "body": "En «Código QR y entrada» tienes el cartel con el QR para que la gente entre en la fiesta desde la app. En «Control de puerta» escaneas entradas, llevas el aforo en directo y recibes los avisos de ayuda (SOS)."
+            },
+            "sales": {
+                "label": "Ventas",
+                "title": "Vende entradas y cobra",
+                "body": "En Ventas activas los cobros con Stripe (una vez), creas tipos de entrada y listas, y ves lo que llevas vendido. El dinero llega a tu cuenta bancaria."
+            },
+            "broadcast": {
+                "label": "Avisos y promociones",
+                "title": "Habla con tu público",
+                "body": "Manda un aviso al móvil de quien está dentro, de tus seguidores o de quien dijo que venía. En Promociones lanzas ofertas y sorteos para la gente que está en la fiesta."
+            },
+            "stats": {
+                "label": "Estadísticas",
+                "title": "Mide cada noche",
+                "body": "En Estadísticas ves cuánta gente vino, a qué hora, cómo te valoran y la previsión de la próxima fiesta. Cada semana te llega un informe con lo más importante."
+            },
+            "business": {
+                "label": "Negocio y equipo",
+                "title": "Tu ficha y tu equipo",
+                "body": "En Negocio pones tu logo, fotos y redes: es tu ficha pública en Fiestea. En Equipo invitas a porteros y RRPP; cada RRPP tiene su código para que veas a quién trae."
+            },
+            "plan": {
+                "label": "Plan",
+                "title": "Gratis o Business",
+                "body": "Con Gratis tienes lo esencial. Business añade avisos por públicos, notificaciones con tu logo, RRPP, estadísticas completas, exportar y un destacado al mes. Lo cambias en «Plan y facturación»."
+            }
+        },
+        "art": {
+            "newEvent": "Nueva fiesta",
+            "boost": "Destacar",
+            "followers": "Avisa a seguidores",
+            "lineup": "Line-up y precios",
+            "qr": "Cartel con QR",
+            "scan": "Escanear entradas",
+            "capacity": "Aforo en directo",
+            "sos": "Avisos SOS",
+            "stripe": "Activar cobros",
+            "ticketTypes": "Tipos de entrada",
+            "lists": "Listas",
+            "payouts": "Transferencias",
+            "notice": "Enviar aviso",
+            "promos": "Ofertas y sorteos",
+            "audiences": "Por públicos",
+            "brandedPush": "Con tu logo",
+            "forecast": "Previsión",
+            "nightly": "Gente por hora",
+            "demographics": "Público",
+            "weekly": "Informe semanal",
+            "profile": "Ficha pública",
+            "team": "Porteros",
+            "promoters": "Códigos de RRPP",
+            "socials": "Redes y fotos",
+            "business": "Business",
+            "boostIncluded": "1 destacado al mes",
+            "audiencesPlan": "Avisos por públicos",
+            "exports": "Exportar"
         }
     }
 }
