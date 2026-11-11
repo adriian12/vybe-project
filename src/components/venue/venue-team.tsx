@@ -302,6 +302,14 @@ const VenueTeam: React.FC<VenueTeamProps> = ({ venueId, role, events, canCommiss
         <p className="rounded-2xl bg-card p-4 text-body-sm text-party-gray">{t('venue.team.onlyOwner')}</p>
       )}
 
+      {/* Equipos de RRPP, al final de esta columna. */}
+      {isOwner && (
+        <PromoterTeams
+          teams={teams}
+          promoters={links.filter((l) => l.role === 'promoter' && !l.revokedAt)}
+          onChanged={loadTeams}
+        />
+      )}
       </div>
 
       <div className="min-w-0 space-y-4">
@@ -471,19 +479,12 @@ const VenueTeam: React.FC<VenueTeamProps> = ({ venueId, role, events, canCommiss
           </ul>
         </section>
       )}
+      {/* El ranking de RRPP, justo debajo de los enlaces. Antes iba en una
+          fila a todo el ancho que empezaba bajo la columna más alta (cuentas e
+          invitación) y dejaba un hueco negro bajo la de los enlaces. */}
+      {isOwner && <PromoterRanking events={events} teams={teams} showMoney={canCommission} version={teamsVersion} />}
       </div>
 
-      {/* ------------------------------------------ equipos y ranking de RRPP */}
-      {isOwner && (
-        <div className="grid min-w-0 items-start gap-4 lg:col-span-2 lg:grid-cols-2">
-          <PromoterTeams
-            teams={teams}
-            promoters={links.filter((l) => l.role === 'promoter' && !l.revokedAt)}
-            onChanged={loadTeams}
-          />
-          <PromoterRanking events={events} teams={teams} showMoney={canCommission} version={teamsVersion} />
-        </div>
-      )}
 
       <Dialog open={Boolean(viendo)} onOpenChange={(open) => !open && setViendo(null)}>
         <DialogContent className="surface-light !bg-white text-ink sm:max-w-sm">

@@ -1037,8 +1037,13 @@ const VenueDashboardPage = () => {
                 <Loader2 className="h-6 w-6 animate-spin text-party-primary" />
               </div>
             ) : (
-              <>
-                <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+              // Como Control de puerta: en escritorio, lo de cada noche (evento,
+              // curva de entrada y análisis) a la izquierda, al 70 %, y el
+              // resumen del periodo a la derecha, al 30 %. En el móvil, uno
+              // debajo de otro, con el resumen arriba.
+              <div className="space-y-4 lg:grid lg:grid-cols-10 lg:items-start lg:gap-5 lg:space-y-0">
+                <aside className="space-y-4 lg:order-last lg:col-span-3">
+                <div className="grid grid-cols-2 gap-3">
                   {[
                     { label: t('venue.stats.totalCheckIns'), value: stats.scans },
                     { label: t('venue.stats.activeUsers'), value: stats.activeUsers },
@@ -1074,7 +1079,9 @@ const VenueDashboardPage = () => {
 
                 {/* Lo que opinan los clientes (Pro y Business). */}
                 <VenueRatings plan={plan} />
+                </aside>
 
+                <div className="min-w-0 space-y-4 lg:col-span-7">
                 {summary.length > 0 ? (
                   <>
                     {selectorEvento}
@@ -1098,7 +1105,8 @@ const VenueDashboardPage = () => {
                 ) : (
                   <Vacio icon={BarChart3} text={t('venue.stats.empty')} />
                 )}
-              </>
+                </div>
+              </div>
             )}
           </div>
         )}
