@@ -124,7 +124,7 @@ export const CodeValidator = ({ title, placeholder, minLength, maxLength, check 
       {camara && <div id={readerId} className="mb-3 overflow-hidden rounded-xl bg-black" />}
 
       <form
-        className="flex flex-col gap-2 sm:flex-row lg:flex-col"
+        className="flex flex-col gap-2 sm:flex-row"
         onSubmit={(e) => {
           e.preventDefault();
           void validar(codigo);

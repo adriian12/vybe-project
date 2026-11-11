@@ -364,11 +364,18 @@ const VenueDoor = ({ eventId, plan, onUpgrade, startsAt }: VenueDoorProps) => {
       {/* --------------------------------------------------- gente dentro */}
       {pestana === 'inside' && (
         <div className="space-y-4">
-        {/* Contador, enlaces del portero y validar entrada, uno al lado del
-            otro en escritorio (40 % · 40 % · 20 %). */}
-        <div className="grid items-start gap-4 lg:grid-cols-10">
+        {/* Validar entrada primero y a la izquierda: es lo que se usa en la
+            puerta. Antes iba en una columna estrecha a la derecha (20 %) y, sin
+            aforo, la columna de los enlaces del portero dejaba un hueco vacío en
+            medio. Ahora el contador y sus enlaces van juntos a la derecha. */}
+        <div className="grid items-start gap-4 lg:grid-cols-12">
+          {/* --------------------------------- entradas compradas en la app */}
+          <div className="lg:col-span-5">
+            <TicketValidator />
+          </div>
+          <div className="space-y-4 lg:col-span-7">
           {/* ---------------------------------------------------- contador */}
-          <div className="surface-light rounded-2xl p-4 lg:col-span-4">
+          <div className="surface-light rounded-2xl p-4">
             {occupancy?.capacity ? (
               <>
                 <Titulo extra={<InfoHelp topic="counter" />}>{t('venue.counter.title')}</Titulo>
@@ -413,10 +420,7 @@ const VenueDoor = ({ eventId, plan, onUpgrade, startsAt }: VenueDoorProps) => {
             )}
           </div>
           {/* ------------------------------------------ enlaces del portero */}
-          <div className="lg:col-span-4">{occupancy?.capacity ? <CounterLinks eventId={eventId} /> : null}</div>
-          {/* --------------------------------- entradas compradas en la app */}
-          <div className="lg:col-span-2">
-            <TicketValidator />
+          {occupancy?.capacity ? <CounterLinks eventId={eventId} /> : null}
           </div>
         </div>
           {/* -------------------------------------------------- denuncias */}
