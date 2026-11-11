@@ -810,8 +810,10 @@ const VenueDashboardPage = () => {
         )}
 
         {/* --------------------------------------------------------- puerta */}
-        {section === 'door' && puede('door') && <VenueSosAlerts sos={sos} />}
         {section === 'door' && picker}
+        {/* Las peticiones de ayuda van dentro de la puerta, en su columna de
+            resumen (a la derecha en escritorio). Sin evento, arriba. */}
+        {section === 'door' && puede('door') && !workingEventId && <VenueSosAlerts sos={sos} />}
         {section === 'door' &&
           (workingEventId ? (
             <VenueDoor
@@ -821,6 +823,7 @@ const VenueDashboardPage = () => {
               plan={plan}
               onUpgrade={() => goTo('plan')}
               startsAt={workingEvent?.startDate}
+              top={puede('door') ? <VenueSosAlerts sos={sos} /> : null}
             />
           ) : (
             <Vacio icon={DoorOpen} text={t('venue.door.noEvent')} action={() => goTo('events')} actionLabel={t('venue.events.newEvent')} />

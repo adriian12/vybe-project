@@ -52,6 +52,8 @@ interface VenueDoorProps {
   onUpgrade: () => void;
   /** Hora de inicio: antes de abrir se enseña la previsión de asistencia. */
   startsAt?: string;
+  /** Lo primero del resumen (las peticiones de ayuda), encima de la previsión. */
+  top?: React.ReactNode;
 }
 
 const FALLBACK_AVATAR = '/placeholder.svg';
@@ -90,7 +92,7 @@ const Titulo: React.FC<{ children: React.ReactNode; extra?: React.ReactNode }> =
  */
 type PestanaPuerta = 'inside' | 'lists' | 'notices' | 'promoters';
 
-const VenueDoor = ({ eventId, plan, onUpgrade, startsAt }: VenueDoorProps) => {
+const VenueDoor = ({ eventId, plan, onUpgrade, startsAt, top }: VenueDoorProps) => {
   const [pestana, setPestana] = useState<PestanaPuerta>('inside');
   const { t } = useTranslation();
   const { toast } = useToast();
@@ -285,14 +287,21 @@ const VenueDoor = ({ eventId, plan, onUpgrade, startsAt }: VenueDoorProps) => {
   const deGratis = !noche?.ticketed && (noche?.price ?? 0) <= 0;
 
   return (
-    <div className="space-y-4 pb-24">
+    // En escritorio, dos columnas: las pestañas (gente dentro, listas, avisos,
+    // RRPP) a la izquierda, al 70 %, y el resumen (ayuda, previsión y cifras) a
+    // la derecha, al 30 %. Antes el resumen iba arriba a todo el ancho y había
+    // que bajar para llegar a lo que se usa. En el móvil, uno debajo de otro.
+    <div className="space-y-4 pb-24 lg:grid lg:grid-cols-10 lg:items-start lg:gap-5 lg:space-y-0">
+      <aside className="space-y-4 lg:order-last lg:col-span-3">
+      {/* ------------------------------------------------ ayuda (SOS) */}
+      {top}
       {/* -------------------------------------------------- previsión */}
       <VenueForecast eventId={eventId} started={startsAt ? new Date(startsAt).getTime() <= Date.now() : false} />
 
       {/* ------------------------------------------------------ cifras */}
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3">
         {/* Dentro ahora, con el aforo: una sola barra para toda la pantalla. */}
-        <div className="surface-light col-span-2 rounded-2xl p-4 lg:col-span-1">
+        <div className="surface-light col-span-2 rounded-2xl p-4">
           <div className="flex items-baseline justify-between gap-2">
             <p className="font-display text-[32px] font-extrabold leading-none tabular">{dentroAhora}</p>
             {occupancy?.capacity ? (
@@ -330,7 +339,7 @@ const VenueDoor = ({ eventId, plan, onUpgrade, startsAt }: VenueDoorProps) => {
           <p className="font-display text-[32px] font-extrabold leading-none tabular">{activos.length}</p>
           <p className="mt-2 text-caption uppercase tracking-wide text-party-gray">{t('venue.door.activeCodes')}</p>
         </div>
-        <div className="surface-light hidden rounded-2xl p-4 lg:block">
+        <div className="surface-light hidden rounded-2xl p-4 lg:col-span-2 lg:block">
           <p
             className={cn(
               'font-display text-[32px] font-extrabold leading-none tabular',
@@ -350,6 +359,9 @@ const VenueDoor = ({ eventId, plan, onUpgrade, startsAt }: VenueDoorProps) => {
         </p>
       )}
 
+      </aside>
+
+      <div className="min-w-0 space-y-4 lg:col-span-7">
       <PanelTabs
         tabs={[
           { id: 'inside', label: t('venue.door.tabs.inside') },
@@ -659,6 +671,8 @@ const VenueDoor = ({ eventId, plan, onUpgrade, startsAt }: VenueDoorProps) => {
           </div>
         </div>
       )}
+
+      </div>
 
       {/* ------------------------------------------ puerta, siempre a mano */}
       <div className="pb-safe fixed inset-x-0 bottom-0 z-30 border-t border-white/[0.06] bg-background/95 px-4 pt-3 backdrop-blur-lg">
