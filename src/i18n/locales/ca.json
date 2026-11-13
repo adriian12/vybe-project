@@ -123,7 +123,8 @@
         "genderHelp": "No es pot canviar més endavant.",
         "genders": {
             "man": "Home",
-            "woman": "Dona"
+            "woman": "Dona",
+            "none": "Prefereixo no dir-ho"
         },
         "wants": "Vull veure",
         "wantsHelp": "Això sí que ho pots canviar quan vulguis des del teu perfil.",
@@ -1307,7 +1308,8 @@
             "boostsLeft": "Et queden {{count}} destacats inclosos aquest mes",
             "boostsUsed": "Ja has fet servir el destacat inclòs d’aquest mes",
             "compareShow": "Veure què inclou i comparar plans",
-            "compareHide": "Amagar plans"
+            "compareHide": "Amagar plans",
+            "businessFeature": "Aquesta funció és del pla Business."
         },
         "safety": {
             "needsHelp": "{{name}} ha demanat ajuda",
@@ -3892,7 +3894,8 @@
         "chooseContinue": "Continuar amb {{kind}}",
         "chooseFirst": "Tria una opció",
         "birthDate": "Data de naixement",
-        "birthDateHelp": "La teva edat surt d'aquí. Només la veus tu, i omple les entrades que compris."
+        "birthDateHelp": "La teva edat surt d'aquí. Només la veus tu, i omple les entrades que compris.",
+        "genderNoneHelp": "Si no ho dius, et pot veure tothom al tauler."
     },
     "share": {
         "title": "Compartir",

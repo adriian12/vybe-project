@@ -123,7 +123,8 @@
         "genderHelp": "This can't be changed later.",
         "genders": {
             "man": "A man",
-            "woman": "A woman"
+            "woman": "A woman",
+            "none": "Prefer not to say"
         },
         "wants": "I want to see",
         "wantsHelp": "You can change this any time from your profile.",
@@ -1307,7 +1308,8 @@
             "boostsLeft": "{{count}} included features left this month",
             "boostsUsed": "You've used this month's included feature",
             "compareShow": "See what's included and compare plans",
-            "compareHide": "Hide plans"
+            "compareHide": "Hide plans",
+            "businessFeature": "This feature is part of the Business plan."
         },
         "safety": {
             "needsHelp": "{{name}} asked for help",
@@ -3892,7 +3894,8 @@
         "chooseContinue": "Continue with {{kind}}",
         "chooseFirst": "Choose an option",
         "birthDate": "Date of birth",
-        "birthDateHelp": "Your age comes from this. Only you see it, and it fills in the tickets you buy."
+        "birthDateHelp": "Your age comes from this. Only you see it, and it fills in the tickets you buy.",
+        "genderNoneHelp": "If you don't say, everyone can see you on the board."
     },
     "share": {
         "title": "Share",

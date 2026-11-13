@@ -49,6 +49,7 @@ import { VENUE_RADIUS, VenueType } from '@/types/venue';
 import SocialLoginButtons from '@/components/social-login-buttons';
 import PhoneAuthForm from '@/components/phone-auth-form';
 import { PHONE_SIGNUP } from '@/lib/features';
+import { sinPagosDeNegocio } from '@/services/native';
 
 const VENUE_TYPES: VenueType[] = [
   'discoteca',
@@ -1073,6 +1074,9 @@ const AuthPage = () => {
   const soloEmpresas = siteMode() === 'app';
   const accountType =
     searchParams.get('type') === 'venue' || (soloEmpresas && authMode === 'register') ? 'venue' : 'user';
+  // En iOS los locales sólo entran con su cuenta: el alta va en la web
+  // (guideline 3.1.1 de Apple). Aunque llegue `mode=register`, se queda en entrar.
+  const modo = accountType === 'venue' && sinPagosDeNegocio() ? 'login' : authMode;
 
   useEffect(() => {
     setAuthMode(searchParams.get('mode') === 'register' ? 'register' : 'login');
@@ -1088,7 +1092,7 @@ const AuthPage = () => {
 
   const renderForm = () => {
     if (accountType === 'venue') {
-      return authMode === 'login' ? <VenueLoginForm /> : <VenueRegisterForm />;
+      return modo === 'login' ? <VenueLoginForm /> : <VenueRegisterForm />;
     }
     if (authMode === 'login') {
       return (
@@ -1168,21 +1172,21 @@ const AuthPage = () => {
               {t(accountType === 'venue' ? 'auth.venueAccess' : soloEmpresas ? 'auth.adminAccess' : 'auth.userAccess')}
             </p>
             <h1 className="mt-1 font-display text-headline-xl">
-              {t(authMode === 'login' ? 'auth.loginTitle' : 'auth.registerTitle')}
+              {t(modo === 'login' ? 'auth.loginTitle' : 'auth.registerTitle')}
             </h1>
             <p className="mt-1 text-body-md text-party-gray">
-              {t(authMode === 'login' ? 'auth.loginSubtitle' : 'auth.registerSubtitle')}
+              {t(modo === 'login' ? 'auth.loginSubtitle' : 'auth.registerSubtitle')}
             </p>
           </div>
           <VybeMark size={44} className="mt-1" />
         </div>
 
-        <div key={`${accountType}-${authMode}`} className="enter">
+        <div key={`${accountType}-${modo}`} className="enter">
           {renderForm()}
         </div>
 
-        {/* El acceso de administración no tiene registro. */}
-        {!(soloEmpresas && accountType === 'user') && (
+        {/* El acceso de administración no tiene registro, ni el de locales en iOS. */}
+        {!(soloEmpresas && accountType === 'user') && !(accountType === 'venue' && sinPagosDeNegocio()) && (
           <p className="mt-6 text-center text-body-md text-party-gray">
             {t(authMode === 'login' ? 'auth.noAccount' : 'auth.haveAccount')}{' '}
             <button

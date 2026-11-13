@@ -21,6 +21,15 @@ export const isNative = (): boolean => Capacitor.isNativePlatform();
 export const platform = (): string => Capacitor.getPlatform();
 
 /**
+ * La app de iOS no puede registrar negocios ni venderles nada fuera de la
+ * compra integrada de Apple (guideline 3.1.1; rechazo del 12-11-2026): ni el
+ * alta de locales, ni el plan Business, ni el destacado pagado. Esas cosas
+ * siguen en la web (`app.fiestea.es`); en el iPhone el negocio sólo entra con
+ * su cuenta y usa lo que ya tiene.
+ */
+export const sinPagosDeNegocio = (): boolean => platform() === 'ios';
+
+/**
  * Prepara la pantalla al arrancar: quita el splash y ajusta la barra de estado.
  *
  * Se importa de forma perezosa para que el navegador no cargue código nativo

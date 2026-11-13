@@ -123,7 +123,8 @@
         "genderHelp": "Das lässt sich später nicht ändern.",
         "genders": {
             "man": "Ein Mann",
-            "woman": "Eine Frau"
+            "woman": "Eine Frau",
+            "none": "Keine Angabe"
         },
         "wants": "Ich möchte sehen",
         "wantsHelp": "Das kannst du jederzeit in deinem Profil ändern.",
@@ -1307,7 +1308,8 @@
             "boostsLeft": "Diesen Monat noch {{count}} Hervorhebungen inklusive",
             "boostsUsed": "Die inklusive Hervorhebung dieses Monats ist schon genutzt",
             "compareShow": "Leistungen ansehen und Tarife vergleichen",
-            "compareHide": "Tarife ausblenden"
+            "compareHide": "Tarife ausblenden",
+            "businessFeature": "Diese Funktion gehört zum Business-Plan."
         },
         "safety": {
             "needsHelp": "{{name}} hat um Hilfe gebeten",
@@ -3892,7 +3894,8 @@
         "chooseContinue": "Weiter mit {{kind}}",
         "chooseFirst": "Wähle eine Option",
         "birthDate": "Geburtsdatum",
-        "birthDateHelp": "Daraus ergibt sich dein Alter. Nur du siehst es, und es füllt die Tickets aus, die du kaufst."
+        "birthDateHelp": "Daraus ergibt sich dein Alter. Nur du siehst es, und es füllt die Tickets aus, die du kaufst.",
+        "genderNoneHelp": "Ohne Angabe können dich alle auf der Pinnwand sehen."
     },
     "share": {
         "title": "Teilen",

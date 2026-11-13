@@ -91,7 +91,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { api } from '@/services/api';
-import { isNative, openExternal } from '@/services/native';
+import { isNative, openExternal, sinPagosDeNegocio } from '@/services/native';
 import {
   venueService,
   EventOccupancy,
@@ -228,7 +228,9 @@ const VenueDashboardPage = () => {
   // Mientras el plan carga se deja, para no sacar a nadie de la sección.
   const puede = useCallback(
     (s: Section) =>
-      SECCIONES_POR_ROL[papel].includes(s) && (s !== 'sales' || plan === null || planHas(plan.plan, 'ticketSales')),
+      SECCIONES_POR_ROL[papel].includes(s) &&
+      (s !== 'sales' || plan === null || planHas(plan.plan, 'ticketSales')) &&
+      (s !== 'plan' || !sinPagosDeNegocio()),
     [papel, plan],
   );
   const esPropietario = papel === 'owner';
@@ -301,6 +303,11 @@ const VenueDashboardPage = () => {
         setToBoost(null);
         toast({ title: t('venue.boost.paid'), description: t('venue.boost.paidBody') });
         void refreshEvents();
+        return;
+      }
+      // En iOS sólo se usan los destacados incluidos; pagarlos va en la web.
+      if (sinPagosDeNegocio()) {
+        setToBoost(null);
         return;
       }
       const url = await nightService.startBoostCheckout(toBoost.id);
@@ -462,6 +469,11 @@ const VenueDashboardPage = () => {
   }
 
   const goTo = (next: Section) => {
+    // En iOS no se contrata nada desde el panel: lo que pide Business se dice y ya.
+    if (next === 'plan' && sinPagosDeNegocio()) {
+      toast({ title: t('venue.plan.businessFeature') });
+      return;
+    }
     setSection(next);
     setDrawer(null);
     window.scrollTo({ top: 0 });
@@ -710,7 +722,7 @@ const VenueDashboardPage = () => {
                 </span>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-60">
-                {planEnMenu && esPropietario && (
+                {planEnMenu && esPropietario && !sinPagosDeNegocio() && (
                   <DropdownMenuItem onClick={() => goTo('plan')}>
                     <CreditCard size={15} className="mr-2" />
                     {t('venue.nav.plan')}
@@ -949,7 +961,7 @@ const VenueDashboardPage = () => {
                                     {t('venue.followers.notify')}
                                   </DropdownMenuItem>
                                 )}
-                                {puedeDifundir && !event.featured && (
+                                {puedeDifundir && !event.featured && (!sinPagosDeNegocio() || boostsIncluidos > 0) && (
                                   <DropdownMenuItem onClick={() => setToBoost({ id: event.id, name: event.name })}>
                                     <Sparkles size={15} className="mr-2" />
                                     {boostsIncluidos > 0 ? (

@@ -368,14 +368,15 @@ export const api = {
 
   /**
    * Cambia el tipo de cuenta. A invitado siempre; a vyber, con el límite del
-   * plan y con el perfil completo (género y a quién quiere ver).
+   * plan y con la ficha de fiester@ rellenada (el género es opcional).
    */
   /** La ficha de fiester@ (migración 075): se rellena una vez al entrar. */
   completeProfile: async (input: {
     age: number;
     /** «AAAA-MM-DD»; si viene, se guarda con `set_my_birth_date` (pone la edad). */
     birthDate?: string;
-    gender: 'man' | 'woman';
+    /** Opcional (migración 136, Apple 5.1.1(v)): null es «prefiero no decirlo». */
+    gender: 'man' | 'woman' | null;
     wants: 'men' | 'women' | 'all';
     planTonight?: string;
     bio?: string;

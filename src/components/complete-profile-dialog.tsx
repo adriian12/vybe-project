@@ -65,7 +65,8 @@ export interface FiesterData {
   age: number;
   /** «AAAA-MM-DD»: se pide en lugar de la edad, que sale de ella. */
   birthDate: string;
-  gender: 'woman' | 'man';
+  /** Opcional (Apple, guideline 5.1.1(v)): null es «prefiero no decirlo». */
+  gender: 'woman' | 'man' | null;
   wants: 'women' | 'men' | 'all';
   planTonight: string;
   bio: string;
@@ -88,7 +89,8 @@ export const FiesterForm = ({
   const { t } = useTranslation();
   const [nacimiento, setNacimiento] = useState(initial?.birthDate ?? '');
   const edad = edadDe(nacimiento);
-  const [genero, setGenero] = useState<'woman' | 'man' | null>(initial?.gender ?? null);
+  // 'none' es «prefiero no decirlo», y también lo que hay si no se toca nada.
+  const [genero, setGenero] = useState<'woman' | 'man' | 'none'>(initial?.gender ?? 'none');
   const [quiere, setQuiere] = useState<'women' | 'men' | 'all' | null>(initial?.wants ?? null);
   const [plan, setPlan] = useState<string>('');
   const [otroPlan, setOtroPlan] = useState(initial?.planTonight ?? '');
@@ -96,16 +98,16 @@ export const FiesterForm = ({
   const [enviando, setEnviando] = useState(false);
 
   const planFinal = otroPlan.trim() || (plan ? t(`completeProfile.plans.${plan}`) : '');
-  const listo = edad !== null && edad >= 18 && edad <= 99 && genero !== null && quiere !== null;
+  const listo = edad !== null && edad >= 18 && edad <= 99 && quiere !== null;
 
   const guardar = async () => {
-    if (!listo || !genero || !quiere || edad === null) return;
+    if (!listo || !quiere || edad === null) return;
     setEnviando(true);
     try {
       await onSubmit({
         age: edad,
         birthDate: nacimiento,
-        gender: genero,
+        gender: genero === 'none' ? null : genero,
         wants: quiere,
         planTonight: planFinal,
         bio: bio.trim(),
@@ -136,9 +138,18 @@ export const FiesterForm = ({
       </div>
 
       <div className="space-y-2">
-        <p className="text-body-sm font-bold">{t('completeProfile.gender')}</p>
-        <Opciones value={genero} options={['woman', 'man'] as const} label={(o) => t(`auth.genders.${o}`)} onChange={(o) => setGenero(o as 'woman' | 'man')} />
-        <p className="text-caption text-party-gray">{t('completeProfile.genderHelp')}</p>
+        <p className="text-body-sm font-bold">
+          {t('completeProfile.gender')} <span className="font-normal text-party-gray">({t('completeProfile.optional')})</span>
+        </p>
+        <Opciones
+          value={genero}
+          options={['woman', 'man', 'none'] as const}
+          label={(o) => t(`auth.genders.${o}`)}
+          onChange={(o) => setGenero(o as 'woman' | 'man' | 'none')}
+        />
+        <p className="text-caption text-party-gray">
+          {t(genero === 'none' ? 'completeProfile.genderNoneHelp' : 'completeProfile.genderHelp')}
+        </p>
       </div>
 
       <div className="space-y-2">

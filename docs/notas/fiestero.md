@@ -284,3 +284,9 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
     formulario de una fiesta no puede ponerles un fin pasado
     (`keep_test_lab_open`): el 1 de octubre de 2026 eso cerró Aurora y se
     perdieron sus me gusta.
+- **El género es opcional** (migración 136, 13-11-2026; Apple lo exige, guideline
+  5.1.1(v)). La ficha ofrece «Prefiero no decirlo» y lo deja marcado por
+  defecto; queda `gender` NULL y, como ya hacía `wants_gender()`, esa persona
+  ve y la ve todo el mundo. «Ficha sin hacer» se mide por
+  `profile_completed_at`, no por el género. Nunca vuelvas a hacerlo
+  obligatorio en la app de iOS.

@@ -123,7 +123,8 @@
         "genderHelp": "No se puede cambiar más adelante.",
         "genders": {
             "man": "Hombre",
-            "woman": "Mujer"
+            "woman": "Mujer",
+            "none": "Prefiero no decirlo"
         },
         "wants": "Quiero ver",
         "wantsHelp": "Esto sí lo puedes cambiar cuando quieras desde tu perfil.",
@@ -1307,7 +1308,8 @@
             "boostsLeft": "Te quedan {{count}} destacados incluidos este mes",
             "boostsUsed": "Ya has usado el destacado incluido de este mes",
             "compareShow": "Ver qué incluye y comparar planes",
-            "compareHide": "Ocultar planes"
+            "compareHide": "Ocultar planes",
+            "businessFeature": "Esta función es del plan Business."
         },
         "safety": {
             "needsHelp": "{{name}} ha pedido ayuda",
@@ -3892,7 +3894,8 @@
         "chooseContinue": "Continuar con {{kind}}",
         "chooseFirst": "Elige una opción",
         "birthDate": "Fecha de nacimiento",
-        "birthDateHelp": "Tu edad sale de aquí. Sólo la ves tú, y rellena las entradas que compres."
+        "birthDateHelp": "Tu edad sale de aquí. Sólo la ves tú, y rellena las entradas que compres.",
+        "genderNoneHelp": "Si no lo dices, te puede ver todo el mundo en el tablón."
     },
     "share": {
         "title": "Compartir",

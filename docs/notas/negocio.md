@@ -294,3 +294,10 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
   la sección en curso abre el desplegable lateral con todas y lo de la cuenta.
   Con Business pagado, «Plan» es un resumen pequeño con el destacado a
   ~~19,99 €~~ 9,99 € y la comparativa de planes plegada.
+- **En la app de iOS no se registra ni se cobra a negocios** (13-11-2026; Apple,
+  guideline 3.1.1). `sinPagosDeNegocio()` (`services/native.ts`): el acceso de
+  locales sólo deja entrar (sin «Regístrate»), el panel no tiene la sección
+  Plan, lo que pide Business sólo lo avisa, y el destacado sólo se puede usar
+  si quedan incluidos. Alta, plan y destacado pagado siguen en la web
+  (`app.fiestea.es`) y en Android. No añadas en iOS botones ni enlaces para
+  contratar o pagar fuera de la compra de Apple.
