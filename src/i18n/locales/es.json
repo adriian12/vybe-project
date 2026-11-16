@@ -184,6 +184,15 @@
             "verify": "Entrar",
             "change": "Cambiar el número",
             "failed": "No se ha podido verificar el móvil."
+        },
+        "placeClaim": {
+            "hint": "¿Ya salen tus fiestas en Fiestea? Elige tu local:",
+            "events_one": "{{count}} fiesta",
+            "events_other": "{{count}} fiestas",
+            "linked_one": "Fiestea ya tiene {{count}} fiesta próxima en «{{name}}». Cuando validemos tu alta pasará a tu negocio y saldrás tú como organizador.",
+            "linked_other": "Fiestea ya tiene {{count}} fiestas próximas en «{{name}}». Cuando validemos tu alta pasarán a tu negocio y saldrás tú como organizador.",
+            "unlink": "No es mi local",
+            "none": "Mi local no está en la lista"
         }
     },
     "consent": {
@@ -2266,6 +2275,13 @@
             "create": "Crear entrada gratuita",
             "created": "Entrada gratuita creada",
             "resent": "Correo reenviado"
+        },
+        "placeClaim": {
+            "title": "Pide las fiestas de «{{name}}»",
+            "counts_one": "{{count}} próxima ({{total}} en total). Marcado: se las pasa al aprobar.",
+            "counts_other": "{{count}} próximas ({{total}} en total). Marcado: se las pasa al aprobar.",
+            "moved_one": "{{count}} fiesta pasa a {{name}}",
+            "moved_other": "{{count}} fiestas pasan a {{name}}"
         }
     },
     "pwa": {

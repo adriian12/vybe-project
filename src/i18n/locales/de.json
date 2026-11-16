@@ -184,6 +184,15 @@
             "verify": "Anmelden",
             "change": "Nummer ändern",
             "failed": "Handynummer konnte nicht bestätigt werden."
+        },
+        "placeClaim": {
+            "hint": "Sind deine Partys schon auf Fiestea? Wähle deine Location:",
+            "events_one": "{{count}} Party",
+            "events_other": "{{count}} Partys",
+            "linked_one": "Fiestea hat schon {{count}} kommende Party in „{{name}}“. Sobald wir deine Anmeldung bestätigen, geht sie an dein Unternehmen und du erscheinst als Veranstalter.",
+            "linked_other": "Fiestea hat schon {{count}} kommende Partys in „{{name}}“. Sobald wir deine Anmeldung bestätigen, gehen sie an dein Unternehmen und du erscheinst als Veranstalter.",
+            "unlink": "Nicht meine Location",
+            "none": "Meine Location ist nicht in der Liste"
         }
     },
     "consent": {
@@ -2266,6 +2275,13 @@
             "create": "Gratis-Ticket erstellen",
             "created": "Gratis-Ticket erstellt",
             "resent": "E-Mail erneut gesendet"
+        },
+        "placeClaim": {
+            "title": "Beansprucht die Partys in „{{name}}“",
+            "counts_one": "{{count}} kommende ({{total}} insgesamt). Angehakt: werden beim Freigeben übertragen.",
+            "counts_other": "{{count}} kommende ({{total}} insgesamt). Angehakt: werden beim Freigeben übertragen.",
+            "moved_one": "{{count}} Party an {{name}} übertragen",
+            "moved_other": "{{count}} Partys an {{name}} übertragen"
         }
     },
     "pwa": {

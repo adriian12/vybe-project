@@ -43,6 +43,22 @@ const CONVERSATION_PAGE_SIZE = 50;
 
 export type StorageBucket = 'avatars' | 'event-photos' | 'event-posters' | 'documents';
 
+/** Sala de las fiestas de Fiestea que un negocio puede pedir como suya. */
+export interface HousePlace {
+  placeName: string;
+  city: string | null;
+  upcoming: number;
+}
+
+/** Un negocio pide quedarse con las fiestas de una sala (lo valida administración). */
+export interface PlaceClaim {
+  id: string;
+  venueId: string;
+  placeName: string;
+  upcoming: number;
+  total: number;
+}
+
 /** Un swipe que ha acabado en match; `superCrush` si alguno de los dos lo dio. */
 export interface SwipeMatch {
   superCrush: boolean;
@@ -1625,6 +1641,40 @@ export const api = {
     }
 
     return (data as unknown as VenueRow[]).map(venueRowToVenue);
+  },
+
+  /**
+   * Salas de las fiestas de Fiestea (administración, Funout, escáner) que se
+   * parecen a lo escrito: el alta de negocio las sugiere para quedarse con
+   * ellas. `upcoming` sólo cuenta las que no han pasado.
+   */
+  searchHousePlaces: async (query: string): Promise<HousePlace[]> => {
+    const { data, error } = await supabase.rpc('search_house_places', { p_query: query });
+    if (error || !data) return [];
+    return data.map((row) => ({ placeName: row.place_name, city: row.city, upcoming: Number(row.upcoming ?? 0) }));
+  },
+
+  /** Solicitudes de negocios pendientes de quedarse con las fiestas de una sala. */
+  getPendingPlaceClaims: async (): Promise<PlaceClaim[]> => {
+    const { data, error } = await supabase.rpc('admin_pending_place_claims');
+    if (error || !data) return [];
+    return data.map((row) => ({
+      id: row.claim_id,
+      venueId: row.venue_id,
+      placeName: row.place_name,
+      upcoming: Number(row.upcoming ?? 0),
+      total: Number(row.total ?? 0),
+    }));
+  },
+
+  /** Aprueba (pasa las fiestas al negocio) o rechaza. Devuelve cuántas pasaron. */
+  decidePlaceClaim: async (claimId: string, approve: boolean): Promise<number> => {
+    const { data, error } = await supabase.rpc('admin_decide_place_claim', {
+      p_claim_id: claimId,
+      p_approve: approve,
+    });
+    if (error) throw new ApiError(error.message, 'errors.generic');
+    return Number(data ?? 0);
   },
 
   reviewVenue: async (venueId: string, approve: boolean): Promise<void> => {

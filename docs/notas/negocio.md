@@ -301,3 +301,21 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
   si quedan incluidos. Alta, plan y destacado pagado siguen en la web
   (`app.fiestea.es`) y en Android. No añadas en iOS botones ni enlaces para
   contratar o pagar fuera de la compra de Apple.
+- **Un negocio nuevo se queda con las fiestas de su sala** (16-11-2026,
+  migración 137, `house-place-suggestions.tsx`).
+  - **Alta:** al escribir el nombre, `search_house_places` sugiere las salas
+    (`place_name`) de las fiestas del negocio de la casa con su número de
+    fiestas **próximas**. Elegir una manda `claimed_place` en los metadatos;
+    si no elige pero el nombre es igual (`venue_search_key`) a una sala, vale
+    igual. Un nombre que no existe crea el negocio sin fiestas.
+  - **Solicitud:** el disparador `venues_claim_place` crea la fila en
+    `venue_place_claims` (pendiente) al insertar el negocio.
+  - **Administración:** en Negocios pendientes sale «Pide las fiestas de X» con
+    una casilla marcada; al aprobar, `admin_decide_place_claim` pasa al negocio
+    **todas** las fiestas de esa sala (también las pasadas: su historial) y ya
+    sale él como organizador. Desmarcada: se aprueba sin fiestas. Una sala sólo
+    puede tener un dueño (`PLACE_ALREADY_CLAIMED`).
+  - **Lo que llegue después** de esa sala (Funout, escáner, administración)
+    nace ya del negocio: `a_events_route_claimed_place`.
+  - **Limitación:** se reclama una clave de sala exacta. Variantes del mismo
+    local («Studio76 Club» y «TBA - STUDIO 76 - MADRID») son salas distintas.

@@ -184,6 +184,15 @@
             "verify": "Entra",
             "change": "Canvia el número",
             "failed": "No s'ha pogut verificar el mòbil."
+        },
+        "placeClaim": {
+            "hint": "Les teves festes ja surten a Fiestea? Tria el teu local:",
+            "events_one": "{{count}} festa",
+            "events_other": "{{count}} festes",
+            "linked_one": "Fiestea ja té {{count}} festa propera a «{{name}}». Quan validem la teva alta passarà al teu negoci i sortiràs tu com a organitzador.",
+            "linked_other": "Fiestea ja té {{count}} festes properes a «{{name}}». Quan validem la teva alta passaran al teu negoci i sortiràs tu com a organitzador.",
+            "unlink": "No és el meu local",
+            "none": "El meu local no és a la llista"
         }
     },
     "consent": {
@@ -2266,6 +2275,13 @@
             "create": "Crear entrada gratuïta",
             "created": "Entrada gratuïta creada",
             "resent": "Correu reenviat"
+        },
+        "placeClaim": {
+            "title": "Demana les festes de «{{name}}»",
+            "counts_one": "{{count}} propera ({{total}} en total). Marcat: se li passen en aprovar.",
+            "counts_other": "{{count}} properes ({{total}} en total). Marcat: se li passen en aprovar.",
+            "moved_one": "{{count}} festa passa a {{name}}",
+            "moved_other": "{{count}} festes passen a {{name}}"
         }
     },
     "pwa": {

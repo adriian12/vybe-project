@@ -41,7 +41,8 @@ import {
   authEmailMessage,
   AuthEmailFailure,
 } from '@/services/auth-email';
-import { api } from '@/services/api';
+import { api, HousePlace } from '@/services/api';
+import HousePlaceSuggestions from '@/components/venue/house-place-suggestions';
 import { isValidNif, normalizeNif } from '@/lib/nif';
 import { track } from '@/lib/observability';
 import { DOWNLOAD_PATH, DownloadReason, landingHref, siteMode } from '@/lib/hosts';
@@ -639,6 +640,8 @@ const VenueRegisterForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [step, setStep] = useState(1);
   const [documents, setDocuments] = useState<File[]>([]);
+  // Sala de las fiestas de Fiestea que dice ser suya (la valida administración).
+  const [sala, setSala] = useState<HousePlace | null>(null);
 
   const schema = useMemo(() => buildVenueRegisterSchema(t), [t]);
   const form = useForm<z.infer<typeof schema>>({
@@ -708,6 +711,7 @@ const VenueRegisterForm = () => {
         metadata: {
           account_type: 'venue',
           venue_name: values.venueName,
+          claimed_place: sala?.placeName ?? null,
           venue_type: values.venueType,
           phone: values.phone,
           tax_id: values.taxId,
@@ -822,8 +826,16 @@ const VenueRegisterForm = () => {
                 <FormItem>
                   <FormLabel>{t('auth.venueName')}</FormLabel>
                   <FormControl>
-                    <Input placeholder={t('auth.venueNamePlaceholder')} {...field} />
+                    <Input placeholder={t('auth.venueNamePlaceholder')} autoComplete="off" {...field} />
                   </FormControl>
+                  <HousePlaceSuggestions
+                    query={field.value}
+                    selected={sala}
+                    onSelect={(place) => {
+                      setSala(place);
+                      if (place) form.setValue('venueName', place.placeName, { shouldValidate: true });
+                    }}
+                  />
                   <FormMessage />
                 </FormItem>
               )}

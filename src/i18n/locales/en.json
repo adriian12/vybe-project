@@ -184,6 +184,15 @@
             "verify": "Sign in",
             "change": "Change number",
             "failed": "Could not verify the phone."
+        },
+        "placeClaim": {
+            "hint": "Are your parties already on Fiestea? Pick your venue:",
+            "events_one": "{{count}} party",
+            "events_other": "{{count}} parties",
+            "linked_one": "Fiestea already has {{count}} upcoming party at “{{name}}”. Once we approve your sign-up it will move to your business and you will show as the organiser.",
+            "linked_other": "Fiestea already has {{count}} upcoming parties at “{{name}}”. Once we approve your sign-up they will move to your business and you will show as the organiser.",
+            "unlink": "Not my venue",
+            "none": "My venue is not on the list"
         }
     },
     "consent": {
@@ -2266,6 +2275,13 @@
             "create": "Create free ticket",
             "created": "Free ticket created",
             "resent": "Email sent again"
+        },
+        "placeClaim": {
+            "title": "Claims the parties at “{{name}}”",
+            "counts_one": "{{count}} upcoming ({{total}} in total). Ticked: they move on approval.",
+            "counts_other": "{{count}} upcoming ({{total}} in total). Ticked: they move on approval.",
+            "moved_one": "{{count}} party moved to {{name}}",
+            "moved_other": "{{count}} parties moved to {{name}}"
         }
     },
     "pwa": {

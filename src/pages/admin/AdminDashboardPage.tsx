@@ -64,7 +64,7 @@ import AdminScanner from '@/components/admin/admin-scanner';
 import AdminVenues from '@/components/admin/admin-venues';
 import TestLabCard from '@/components/admin/test-lab-card';
 import { VybeMark } from '@/components/brand/vybe-logo';
-import { api } from '@/services/api';
+import { api, PlaceClaim } from '@/services/api';
 import { openExternal } from '@/services/native';
 import { safetyService, SosAlert, PendingPhoto } from '@/services/safety';
 import { LEAD_STATUSES, LeadStatus, leadsService, VenueLead } from '@/services/leads';
@@ -148,6 +148,10 @@ const AdminDashboardPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [pendingVenues, setPendingVenues] = useState<Venue[]>([]);
+  // Negocios pendientes que piden las fiestas de una sala (por id del negocio).
+  const [claims, setClaims] = useState<Record<string, PlaceClaim>>({});
+  // Los que administración ha desmarcado: se aprueba el negocio sin pasarle fiestas.
+  const [sinFiestas, setSinFiestas] = useState<Set<string>>(new Set());
   const [events, setEvents] = useState<Event[]>([]);
   const [reports, setReports] = useState<Report[]>([]);
   const [photos, setPhotos] = useState<PendingPhoto[]>([]);
@@ -191,7 +195,7 @@ const AdminDashboardPage = () => {
       if (silencioso) setRefreshing(true);
       else setIsLoading(true);
       try {
-        const [venues, allEvents, allReports, pendingPhotos, activeAlerts, allLeads] = await Promise.all([
+        const [venues, allEvents, allReports, pendingPhotos, activeAlerts, allLeads, pendingClaims] = await Promise.all([
           api.getPendingVenues(),
           api.getAllEventsForAdmin(),
           api.getReports(),
@@ -199,9 +203,11 @@ const AdminDashboardPage = () => {
           safetyService.getActiveAlerts(),
           // Las solicitudes no deben tumbar el panel si fallan: son lo menos urgente.
           leadsService.list().catch(() => [] as VenueLead[]),
+          api.getPendingPlaceClaims(),
         ]);
 
         setPendingVenues(venues);
+        setClaims(Object.fromEntries(pendingClaims.map((c) => [c.venueId, c])));
         setEvents(allEvents);
         setReports(allReports);
         setPhotos(pendingPhotos);
@@ -315,9 +321,50 @@ const AdminDashboardPage = () => {
       venue.id,
       async () => {
         await api.reviewVenue(venue.id, approve);
+        // La solicitud de sus fiestas se decide al aprobar; al denegar se borra
+        // con el negocio.
+        const claim = claims[venue.id];
+        if (approve && claim) {
+          const pasadas = await api.decidePlaceClaim(claim.id, !sinFiestas.has(venue.id));
+          if (pasadas > 0) {
+            toast({ title: t('admin.placeClaim.moved', { count: pasadas, name: venue.name }) });
+          }
+        }
         setPendingVenues((prev) => prev.filter((v) => v.id !== venue.id));
       },
       approve ? 'admin.venues.approved' : 'admin.venues.rejected',
+    );
+  };
+
+  /** «Pide sus fiestas de Fitz»: casilla marcada = se las pasa al aprobar. */
+  const solicitudDeSala = (venueId: string) => {
+    const claim = claims[venueId];
+    if (!claim) return null;
+    const pasar = !sinFiestas.has(venueId);
+    return (
+      <label className="mt-2 flex cursor-pointer items-start gap-2 rounded-lg bg-party-primary/15 p-2 text-caption">
+        <input
+          type="checkbox"
+          checked={pasar}
+          onChange={() =>
+            setSinFiestas((prev) => {
+              const next = new Set(prev);
+              if (next.has(venueId)) next.delete(venueId);
+              else next.add(venueId);
+              return next;
+            })
+          }
+          className="mt-0.5 h-4 w-4 shrink-0 accent-[#7a6200]"
+        />
+        <span>
+          <span className="block font-bold">
+            {t('admin.placeClaim.title', { name: claim.placeName })}
+          </span>
+          <span className="block text-party-gray">
+            {t('admin.placeClaim.counts', { count: claim.upcoming, total: claim.total })}
+          </span>
+        </span>
+      </label>
     );
   };
 
@@ -688,6 +735,7 @@ const AdminDashboardPage = () => {
                                 {t(`venueTypes.${venue.type}`)} · {venue.email}
                               </p>
                               {venue.postalAddress && <p className="text-caption text-party-gray">{venue.postalAddress}</p>}
+                              {solicitudDeSala(venue.id)}
                             </td>
                             <td className="px-3 py-3">{venue.city ?? '—'}</td>
                             <td className="px-3 py-3 font-mono">{venue.taxId ?? '—'}</td>
@@ -747,6 +795,7 @@ const AdminDashboardPage = () => {
                         <p className="text-caption text-party-gray">
                           {t(`venueTypes.${venue.type}`)} · {venue.eventRadius} m
                         </p>
+                        {solicitudDeSala(venue.id)}
                         <dl className="mt-3 space-y-1.5 text-body-sm">
                           {[
                             [t('auth.email'), venue.email],

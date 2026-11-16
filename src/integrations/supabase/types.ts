@@ -3935,6 +3935,20 @@ export type Database = {
           target_id: string
         }[]
       }
+      admin_decide_place_claim: {
+        Args: { p_approve: boolean; p_claim_id: string }
+        Returns: number
+      }
+      admin_pending_place_claims: {
+        Args: never
+        Returns: {
+          claim_id: string
+          place_name: string
+          total: number
+          upcoming: number
+          venue_id: string
+        }[]
+      }
       admin_house_venue: { Args: never; Returns: string }
       admin_import_funout: { Args: { p_ids: number[] }; Returns: number }
       admin_is_staff_only: { Args: never; Returns: boolean }
@@ -5682,6 +5696,10 @@ export type Database = {
           p_sales_start_at?: string
         }
         Returns: string
+      }
+      search_house_places: {
+        Args: { p_query: string }
+        Returns: { city: string; place_name: string; upcoming: number }[]
       }
       search_venues: {
         Args: { p_query: string }
