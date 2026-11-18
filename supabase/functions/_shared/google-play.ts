@@ -1,6 +1,7 @@
 import type { SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.49.4';
 import { googleAccessToken } from './google-auth.ts';
 import { eventPurchaseAllowed } from './iap-precheck.ts';
+import { testPurchaseAllowed } from './test-purchases.ts';
 
 /**
  * Compras de Google Play (migración 090): comprobar una compra con la Google
@@ -171,7 +172,10 @@ export const grantGooglePurchase = async (
     return { ok: false, error: 'WRONG_ACCOUNT' };
   }
   if (!compra.valid) return { ok: false, error: compra.kind === 'monthly' ? 'EXPIRED' : 'NOT_PURCHASED' };
-  if (!ALLOW_TEST && compra.test) return { ok: false, error: 'TEST_PURCHASE' };
+  // De prueba (licencias de prueba): sólo administradores y cuentas de revisión.
+  if (!ALLOW_TEST && compra.test && !(await testPurchaseAllowed(supabase, profileId))) {
+    return { ok: false, error: 'TEST_PURCHASE' };
+  }
 
   const { data: previa } = await supabase
     .from('google_purchases')

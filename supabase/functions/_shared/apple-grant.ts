@@ -1,6 +1,7 @@
 import type { SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.49.4';
 import { APPLE_BUNDLE_IDS, AppleTransaction, productKind } from './apple-jws.ts';
 import { eventPurchaseAllowed } from './iap-precheck.ts';
+import { testPurchaseAllowed } from './test-purchases.ts';
 
 /**
  * Activa lo comprado en una transacción de Apple ya verificada, con las mismas
@@ -34,9 +35,6 @@ export const grantAppleTransaction = async (
   opts: { profileId: string | null; eventId?: string | null },
 ): Promise<GrantResult> => {
   if (!APPLE_BUNDLE_IDS.includes(tx.bundleId)) return { ok: false, error: 'WRONG_APP' };
-  if (!ALLOW_SANDBOX && tx.environment && tx.environment !== 'Production') {
-    return { ok: false, error: 'SANDBOX_TRANSACTION' };
-  }
   const kind = productKind(tx.productId);
   if (!kind) return { ok: false, error: 'UNKNOWN_PRODUCT' };
 
@@ -44,6 +42,15 @@ export const grantAppleTransaction = async (
   const profileId = tx.appAccountToken ?? opts.profileId;
   if (!profileId || (opts.profileId && tx.appAccountToken && tx.appAccountToken !== opts.profileId)) {
     return { ok: false, error: 'WRONG_ACCOUNT' };
+  }
+  // Sandbox: sólo administradores y la cuenta de revisión de Apple.
+  if (
+    !ALLOW_SANDBOX &&
+    tx.environment &&
+    tx.environment !== 'Production' &&
+    !(await testPurchaseAllowed(supabase, profileId))
+  ) {
+    return { ok: false, error: 'SANDBOX_TRANSACTION' };
   }
   if (tx.revocationDate) return { ok: false, error: 'REVOKED' };
 
