@@ -127,3 +127,15 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
     administración.
   - `events.city` y `events.region` no existían y `admin_create_event` fallaba
     siempre. La app usa la localidad del evento antes que la del local.
+- **Reportar error** (17-11-2026, migración 138, `bug-report-dialog.tsx`,
+  `admin-bug-reports.tsx`).
+  - **Dónde:** Perfil → Ajustes («Reportar error») y, en el panel del negocio,
+    el menú de la cuenta. Título (3-120), descripción (10-4000) y una imagen
+    opcional (JPG, PNG o WebP de hasta 5 MB; en el móvil, de la galería).
+  - **Guardado:** tabla `bug_reports` sin acceso directo (`submit_bug_report`,
+    como mucho 5 por hora y cuenta) y bucket privado `bug-reports` (cada uno en
+    su carpeta `<uid>/`; lee administración). Se guarda también la plataforma,
+    la pantalla, el idioma y el tamaño de pantalla (`context`).
+  - **Administración:** Reportes tiene dos pestañas, «Personas» (las denuncias
+    de siempre, tabla `reports`) y «Errores de la app»; el número de la sección
+    suma las dos. «Ver captura» firma el enlace una hora.

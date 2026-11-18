@@ -2282,6 +2282,22 @@
             "counts_other": "{{count}} kommende ({{total}} insgesamt). Angehakt: werden beim Freigeben übertragen.",
             "moved_one": "{{count}} Party an {{name}} übertragen",
             "moved_other": "{{count}} Partys an {{name}} übertragen"
+        },
+        "bugs": {
+            "tab": {
+                "people": "Personen · {{count}}",
+                "bugs": "App-Fehler · {{count}}"
+            },
+            "empty": "Keine Fehler gemeldet.",
+            "unknown": "Gelöschtes Konto",
+            "capture": "Screenshot ansehen",
+            "fixed": "Behoben",
+            "reopen": "Wieder öffnen",
+            "done": {
+                "resolved": "Als behoben markiert",
+                "dismissed": "Fehler verworfen",
+                "pending": "Fehler wieder geöffnet"
+            }
         }
     },
     "pwa": {
@@ -4159,5 +4175,24 @@
             "audiencesPlan": "Zielgruppen",
             "exports": "Export"
         }
+    },
+    "bugReport": {
+        "title": "Fehler melden",
+        "rowHelp": "Sag uns, was nicht funktioniert hat",
+        "subtitle": "Erzähl uns, was passiert ist, und wir schauen es uns an. Füge wenn möglich einen Screenshot hinzu.",
+        "fieldTitle": "Titel des Fehlers",
+        "fieldTitlePlaceholder": "Z. B.: Die Karte lädt nicht",
+        "fieldMessage": "Beschreibe den Fehler",
+        "fieldMessagePlaceholder": "Was du gemacht hast, was du erwartet hast und was passiert ist.",
+        "fieldMessageHelp": "Mindestens 10 Zeichen.",
+        "image": "Bild (optional)",
+        "addImage": "Bild anhängen",
+        "removeImage": "Bild entfernen",
+        "imageType": "Das Bild muss JPG, PNG oder WebP sein.",
+        "imageTooBig": "Das Bild ist größer als 5 MB.",
+        "send": "Senden",
+        "sent": "Fehler gesendet",
+        "sentBody": "Danke. Wir schauen es uns so schnell wie möglich an.",
+        "tooMany": "Du hast viele Meldungen hintereinander gesendet. Versuch es später noch einmal."
     }
 }

@@ -21,6 +21,7 @@ import {
   LockKeyhole,
   LogOut,
   PlayCircle,
+  Bug,
   Trash2,
   Pencil,
   Plus,
@@ -43,6 +44,7 @@ import CameraCapture from '@/components/camera-capture';
 import FaceVerification from '@/components/face-verification';
 import InterestPicker, { useInterestLabel } from '@/components/interest-picker';
 import SafetySheet from '@/components/safety-sheet';
+import BugReportDialog from '@/components/bug-report-dialog';
 import PrivacySheet from '@/components/privacy-sheet';
 import {
   DropdownMenu,
@@ -165,6 +167,7 @@ const ProfilePage = () => {
   const [showFaceVerification, setShowFaceVerification] = useState(false);
   const [showSafety, setShowSafety] = useState(false);
   const [showTour, setShowTour] = useState(false);
+  const [showBugReport, setShowBugReport] = useState(false);
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [confirmCancel, setConfirmCancel] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -1038,6 +1041,13 @@ const ProfilePage = () => {
 
             <Fila icon={PlayCircle} title={t('tour.replay')} onClick={() => setShowTour(true)} />
 
+            <Fila
+              icon={Bug}
+              title={t('bugReport.title')}
+              subtitle={t('bugReport.rowHelp')}
+              onClick={() => setShowBugReport(true)}
+            />
+
             {/* La cuenta de administración usa la misma pantalla de perfil que
                 cualquiera: sin esto no había forma de llegar al panel desde aquí. */}
             {userType === 'admin' && (
@@ -1077,6 +1087,7 @@ const ProfilePage = () => {
       </main>
 
       <SafetySheet open={showSafety} onOpenChange={setShowSafety} />
+      <BugReportDialog open={showBugReport} onOpenChange={setShowBugReport} />
       {showTour && (
         <Suspense fallback={null}>
           <WelcomeTour loggedIn onClose={() => setShowTour(false)} />

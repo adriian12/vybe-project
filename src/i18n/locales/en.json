@@ -2282,6 +2282,22 @@
             "counts_other": "{{count}} upcoming ({{total}} in total). Ticked: they move on approval.",
             "moved_one": "{{count}} party moved to {{name}}",
             "moved_other": "{{count}} parties moved to {{name}}"
+        },
+        "bugs": {
+            "tab": {
+                "people": "People · {{count}}",
+                "bugs": "App bugs · {{count}}"
+            },
+            "empty": "No bugs reported.",
+            "unknown": "Deleted account",
+            "capture": "View screenshot",
+            "fixed": "Fixed",
+            "reopen": "Reopen",
+            "done": {
+                "resolved": "Marked as fixed",
+                "dismissed": "Bug dismissed",
+                "pending": "Bug reopened"
+            }
         }
     },
     "pwa": {
@@ -4159,5 +4175,24 @@
             "audiencesPlan": "Audience notifications",
             "exports": "Export"
         }
+    },
+    "bugReport": {
+        "title": "Report a bug",
+        "rowHelp": "Tell us what went wrong",
+        "subtitle": "Tell us what happened and we will look into it. Add a screenshot if you can.",
+        "fieldTitle": "Bug title",
+        "fieldTitlePlaceholder": "E.g. The map does not load",
+        "fieldMessage": "Describe the bug",
+        "fieldMessagePlaceholder": "What you were doing, what you expected and what happened.",
+        "fieldMessageHelp": "At least 10 characters.",
+        "image": "Image (optional)",
+        "addImage": "Attach image",
+        "removeImage": "Remove image",
+        "imageType": "The image must be JPG, PNG or WebP.",
+        "imageTooBig": "The image is larger than 5 MB.",
+        "send": "Send",
+        "sent": "Bug sent",
+        "sentBody": "Thanks. We will look into it as soon as possible.",
+        "tooMany": "You have sent a lot of reports in a row. Try again in a while."
     }
 }

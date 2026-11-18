@@ -8,6 +8,7 @@ import {
   Sparkles,
   BarChart3,
   Building2,
+  Bug,
   CalendarDays,
   CopyPlus,
   CreditCard,
@@ -43,6 +44,7 @@ import VenueDoor from '@/components/venue/venue-door';
 import VenuePromotions from '@/components/venue/venue-promotions';
 import VenueInsights from '@/components/venue/venue-insights';
 import VenuePlan from '@/components/venue/venue-plan';
+import BugReportDialog from '@/components/bug-report-dialog';
 import EventPicker from '@/components/venue/event-picker';
 import VenueWeeklyReport from '@/components/venue/venue-weekly-report';
 import VenueProfileForm from '@/components/venue/venue-profile-form';
@@ -179,6 +181,7 @@ const VenueDashboardPage = () => {
   const [reportOpen, setReportOpen] = useState(false);
   // Tutorial del panel: sale solo la primera vez y desde el menú de la cuenta.
   const [tourAbierto, setTourAbierto] = useState(false);
+  const [bugAbierto, setBugAbierto] = useState(false);
   useEffect(() => {
     let vivo = true;
     void venueTourSeen().then((visto) => {
@@ -533,6 +536,15 @@ const VenueDashboardPage = () => {
       onClick: () => {
         setDrawer(null);
         setTourAbierto(true);
+      },
+      show: true,
+    },
+    {
+      icon: Bug,
+      label: t('bugReport.title'),
+      onClick: () => {
+        setDrawer(null);
+        setBugAbierto(true);
       },
       show: true,
     },
@@ -1308,6 +1320,8 @@ const VenueDashboardPage = () => {
       </Sheet>
 
       {puedeDifundir && <VenueWeeklyReport open={reportOpen} onOpenChange={setReportOpen} />}
+
+      <BugReportDialog open={bugAbierto} onOpenChange={setBugAbierto} />
 
       {tourAbierto && (
         <Suspense fallback={null}>

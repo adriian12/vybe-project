@@ -41,7 +41,20 @@ const RECENT_MESSAGES_LIMIT = 200;
 /** Tamaño de página al desplazarse hacia atrás dentro de un chat. */
 const CONVERSATION_PAGE_SIZE = 50;
 
-export type StorageBucket = 'avatars' | 'event-photos' | 'event-posters' | 'documents';
+export type StorageBucket = 'avatars' | 'event-photos' | 'event-posters' | 'documents' | 'bug-reports';
+
+/** Un error que alguien ha reportado desde Ajustes (lo ve administración). */
+export interface BugReport {
+  id: string;
+  title: string;
+  message: string;
+  imagePath: string | null;
+  context: Record<string, unknown>;
+  status: 'pending' | 'resolved' | 'dismissed';
+  createdAt: string;
+  reporterName: string | null;
+  reporterEmail: string | null;
+}
 
 /** Sala de las fiestas de Fiestea que un negocio puede pedir como suya. */
 export interface HousePlace {
@@ -978,7 +991,7 @@ export const api = {
       throw new ApiError('UPLOAD_FAILED', 'No se pudo subir el archivo');
     }
 
-    if (bucket === 'documents') {
+    if (bucket === 'documents' || bucket === 'bug-reports') {
       const { data: signed } = await supabase.storage
         .from(bucket)
         .createSignedUrl(path, 60 * 60 * 24 * 7);
@@ -1782,6 +1795,60 @@ export const api = {
         createdAt: record.created_at,
       };
     });
+  },
+
+  /**
+   * «Reportar error» de Ajustes: la captura (opcional) va al bucket privado
+   * `bug-reports` y el resto a `submit_bug_report` (5 por hora como mucho).
+   */
+  submitBugReport: async (input: {
+    title: string;
+    message: string;
+    image?: Blob | null;
+    context?: Record<string, unknown>;
+  }): Promise<void> => {
+    let imagePath: string | null = null;
+    if (input.image) {
+      const ext = input.image.type === 'image/png' ? 'png' : input.image.type === 'image/webp' ? 'webp' : 'jpg';
+      ({ path: imagePath } = await api.uploadFile('bug-reports', input.image, `captura.${ext}`));
+    }
+    const { error } = await supabase.rpc('submit_bug_report', {
+      p_title: input.title,
+      p_message: input.message,
+      p_image_path: imagePath ?? undefined,
+      p_context: (input.context ?? {}) as Json,
+    });
+    if (error) {
+      const code = error.message.includes('TOO_MANY_REPORTS') ? 'TOO_MANY_REPORTS' : 'BUG_REPORT_FAILED';
+      throw new ApiError(code, error.message);
+    }
+  },
+
+  getBugReports: async (): Promise<BugReport[]> => {
+    const { data, error } = await supabase.rpc('admin_list_bug_reports');
+    if (error || !data) return [];
+    return data.map((row) => ({
+      id: row.id,
+      title: row.title,
+      message: row.message,
+      imagePath: row.image_path,
+      context: (row.context ?? {}) as Record<string, unknown>,
+      status: row.status as BugReport['status'],
+      createdAt: row.created_at,
+      reporterName: row.reporter_name,
+      reporterEmail: row.reporter_email,
+    }));
+  },
+
+  setBugReportStatus: async (id: string, status: BugReport['status']): Promise<void> => {
+    const { error } = await supabase.rpc('admin_set_bug_report_status', { p_id: id, p_status: status });
+    if (error) throw new ApiError('RESOLVE_FAILED', error.message);
+  },
+
+  /** Enlace de una hora para ver la captura de un reporte de error. */
+  signedBugCaptureUrl: async (path: string): Promise<string | null> => {
+    const { data } = await supabase.storage.from('bug-reports').createSignedUrl(path, 60 * 60);
+    return data?.signedUrl ?? null;
   },
 
   resolveReport: async (reportId: string, status: 'resolved' | 'dismissed'): Promise<void> => {

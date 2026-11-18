@@ -3949,6 +3949,24 @@ export type Database = {
           venue_id: string
         }[]
       }
+      admin_list_bug_reports: {
+        Args: never
+        Returns: {
+          context: Json
+          created_at: string
+          id: string
+          image_path: string
+          message: string
+          reporter_email: string
+          reporter_name: string
+          status: string
+          title: string
+        }[]
+      }
+      admin_set_bug_report_status: {
+        Args: { p_id: string; p_status: string }
+        Returns: undefined
+      }
       admin_house_venue: { Args: never; Returns: string }
       admin_import_funout: { Args: { p_ids: number[] }; Returns: number }
       admin_is_staff_only: { Args: never; Returns: boolean }
@@ -5700,6 +5718,10 @@ export type Database = {
       search_house_places: {
         Args: { p_query: string }
         Returns: { city: string; place_name: string; upcoming: number }[]
+      }
+      submit_bug_report: {
+        Args: { p_context?: Json; p_image_path?: string; p_message: string; p_title: string }
+        Returns: string
       }
       search_venues: {
         Args: { p_query: string }

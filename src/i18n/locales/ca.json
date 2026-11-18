@@ -2282,6 +2282,22 @@
             "counts_other": "{{count}} properes ({{total}} en total). Marcat: se li passen en aprovar.",
             "moved_one": "{{count}} festa passa a {{name}}",
             "moved_other": "{{count}} festes passen a {{name}}"
+        },
+        "bugs": {
+            "tab": {
+                "people": "Persones · {{count}}",
+                "bugs": "Errors de l’app · {{count}}"
+            },
+            "empty": "No hi ha errors informats.",
+            "unknown": "Compte esborrat",
+            "capture": "Veure captura",
+            "fixed": "Arreglat",
+            "reopen": "Tornar a obrir",
+            "done": {
+                "resolved": "Marcat com a arreglat",
+                "dismissed": "Error descartat",
+                "pending": "Error obert de nou"
+            }
         }
     },
     "pwa": {
@@ -4159,5 +4175,24 @@
             "audiencesPlan": "Avisos per públics",
             "exports": "Exportar"
         }
+    },
+    "bugReport": {
+        "title": "Informar d’un error",
+        "rowHelp": "Explica’ns què ha fallat",
+        "subtitle": "Explica’ns què ha passat i ho revisarem. Si pots, afegeix una captura de pantalla.",
+        "fieldTitle": "Títol de l’error",
+        "fieldTitlePlaceholder": "P. ex.: No carrega el mapa",
+        "fieldMessage": "Descriu l’error",
+        "fieldMessagePlaceholder": "Què feies, què esperaves que passés i què ha passat.",
+        "fieldMessageHelp": "Mínim 10 caràcters.",
+        "image": "Imatge (opcional)",
+        "addImage": "Adjuntar imatge",
+        "removeImage": "Treure la imatge",
+        "imageType": "La imatge ha de ser JPG, PNG o WebP.",
+        "imageTooBig": "La imatge pesa més de 5 MB.",
+        "send": "Enviar",
+        "sent": "Error enviat",
+        "sentBody": "Gràcies. Ho revisarem al més aviat possible.",
+        "tooMany": "Has enviat molts informes seguits. Torna-ho a provar d’aquí a una estona."
     }
 }

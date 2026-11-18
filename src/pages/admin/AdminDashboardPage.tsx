@@ -64,7 +64,8 @@ import AdminScanner from '@/components/admin/admin-scanner';
 import AdminVenues from '@/components/admin/admin-venues';
 import TestLabCard from '@/components/admin/test-lab-card';
 import { VybeMark } from '@/components/brand/vybe-logo';
-import { api, PlaceClaim } from '@/services/api';
+import { api, BugReport, PlaceClaim } from '@/services/api';
+import AdminBugReports from '@/components/admin/admin-bug-reports';
 import { openExternal } from '@/services/native';
 import { safetyService, SosAlert, PendingPhoto } from '@/services/safety';
 import { LEAD_STATUSES, LeadStatus, leadsService, VenueLead } from '@/services/leads';
@@ -154,6 +155,9 @@ const AdminDashboardPage = () => {
   const [sinFiestas, setSinFiestas] = useState<Set<string>>(new Set());
   const [events, setEvents] = useState<Event[]>([]);
   const [reports, setReports] = useState<Report[]>([]);
+  // Errores de la app (Ajustes → Reportar error), en la misma sección que los reportes.
+  const [bugReports, setBugReports] = useState<BugReport[]>([]);
+  const [pestanaReportes, setPestanaReportes] = useState<'people' | 'bugs'>('people');
   const [photos, setPhotos] = useState<PendingPhoto[]>([]);
   const [alerts, setAlerts] = useState<SosAlert[]>([]);
   const [leads, setLeads] = useState<VenueLead[]>([]);
@@ -195,7 +199,7 @@ const AdminDashboardPage = () => {
       if (silencioso) setRefreshing(true);
       else setIsLoading(true);
       try {
-        const [venues, allEvents, allReports, pendingPhotos, activeAlerts, allLeads, pendingClaims] = await Promise.all([
+        const [venues, allEvents, allReports, pendingPhotos, activeAlerts, allLeads, pendingClaims, allBugs] = await Promise.all([
           api.getPendingVenues(),
           api.getAllEventsForAdmin(),
           api.getReports(),
@@ -204,12 +208,14 @@ const AdminDashboardPage = () => {
           // Las solicitudes no deben tumbar el panel si fallan: son lo menos urgente.
           leadsService.list().catch(() => [] as VenueLead[]),
           api.getPendingPlaceClaims(),
+          api.getBugReports(),
         ]);
 
         setPendingVenues(venues);
         setClaims(Object.fromEntries(pendingClaims.map((c) => [c.venueId, c])));
         setEvents(allEvents);
         setReports(allReports);
+        setBugReports(allBugs);
         setPhotos(pendingPhotos);
         setAlerts(activeAlerts);
         setLeads(allLeads);
@@ -253,6 +259,7 @@ const AdminDashboardPage = () => {
   };
 
   const pendingReports = reports.filter((r) => r.status === 'pending');
+  const pendingBugs = bugReports.filter((b) => b.status === 'pending');
   const ahora = Date.now();
   const enDirecto = events.filter(
     (e) => new Date(e.startDate).getTime() <= ahora && new Date(e.endDate).getTime() > ahora,
@@ -269,7 +276,7 @@ const AdminDashboardPage = () => {
     venues: pendingVenues.length,
     leads: newLeads.length,
     photos: photos.length,
-    reports: pendingReports.length,
+    reports: pendingReports.length + pendingBugs.length,
     sos: alerts.length,
     events: 0,
     metrics: 0,
@@ -567,7 +574,7 @@ const AdminDashboardPage = () => {
               <div className="grid grid-cols-2 gap-3 lg:grid-cols-3 lg:gap-4">
                 {[
                   { id: 'sos' as const, label: t('admin.overview.sos'), value: alerts.length, help: t('admin.overview.sosHelp'), danger: true },
-                  { id: 'reports' as const, label: t('admin.overview.reports'), value: pendingReports.length, help: t('admin.overview.reportsHelp') },
+                  { id: 'reports' as const, label: t('admin.overview.reports'), value: pendingReports.length + pendingBugs.length, help: t('admin.overview.reportsHelp') },
                   { id: 'photos' as const, label: t('admin.overview.photos'), value: photos.length, help: t('admin.overview.photosHelp'), urgent: photos.filter((p) => p.urgent).length },
                   { id: 'venues' as const, label: t('admin.overview.venues'), value: pendingVenues.length, help: t('admin.overview.venuesHelp') },
                   { id: 'events' as const, label: t('admin.overview.live'), value: enDirecto.length, help: t('admin.overview.liveHelp') },
@@ -948,9 +955,33 @@ const AdminDashboardPage = () => {
               <CabeceraSeccion
                 title={t('admin.reports.title')}
                 subtitle={t('admin.reports.subtitle')}
-                count={pendingReports.length}
+                count={pendingReports.length + pendingBugs.length}
               />
-              {reports.length === 0 ? (
+              <div className="mb-4 inline-flex rounded-xl bg-black/[0.05] p-1">
+                {(['people', 'bugs'] as const).map((tab) => (
+                  <button
+                    key={tab}
+                    type="button"
+                    onClick={() => setPestanaReportes(tab)}
+                    aria-pressed={pestanaReportes === tab}
+                    className={`press h-9 rounded-lg px-4 text-caption font-bold ${
+                      pestanaReportes === tab ? 'bg-ink text-white' : 'text-party-gray'
+                    }`}
+                  >
+                    {t(`admin.bugs.tab.${tab}`, {
+                      count: tab === 'people' ? pendingReports.length : pendingBugs.length,
+                    })}
+                  </button>
+                ))}
+              </div>
+              {pestanaReportes === 'bugs' ? (
+                <AdminBugReports
+                  reports={bugReports}
+                  onChange={(id, status) =>
+                    setBugReports((prev) => prev.map((b) => (b.id === id ? { ...b, status } : b)))
+                  }
+                />
+              ) : reports.length === 0 ? (
                 <Vacio text={t('admin.reports.empty')} />
               ) : (
                 <ul className="grid gap-3 lg:grid-cols-2">
