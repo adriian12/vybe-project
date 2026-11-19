@@ -1001,7 +1001,7 @@
             "saveChanges": "Desar els canvis",
             "saved": "Esdeveniment desat",
             "location": "Ubicació de l'esdeveniment",
-            "locationSearch": "Cerca l'adreça del negoci",
+            "locationSearch": "Cerca la sala o l’adreça",
             "locationMissing": "Falta la ubicació de l'esdeveniment",
             "locationHelp": "Arrossega el punt o toca el mapa per ajustar-lo. Amb aquesta ubicació es comprova que la gent és a dins.",
             "repeat": "Repetir",
@@ -1013,7 +1013,10 @@
             "posterUrlPlaceholder": "O enganxa l'enllaç de la imatge (https://…)",
             "posterUrlUse": "Fer servir",
             "posterUrlInvalid": "L'enllaç ha de començar per https://",
-            "musicPick": "Tria la música"
+            "musicPick": "Tria la música",
+            "knownPlaces": "Sales a {{app}}",
+            "knownPlaceEvents_one": "{{count}} festa",
+            "knownPlaceEvents_other": "{{count}} festes"
         },
         "team": {
             "title": "Equip",

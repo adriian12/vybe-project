@@ -1001,7 +1001,7 @@
             "saveChanges": "Änderungen speichern",
             "saved": "Event gespeichert",
             "location": "Ort des Events",
-            "locationSearch": "Adresse der Location suchen",
+            "locationSearch": "Location oder Adresse suchen",
             "locationMissing": "Der Ort des Events fehlt",
             "locationHelp": "Zieh den Punkt oder tipp auf die Karte, um ihn anzupassen. Mit diesem Ort wird geprüft, ob die Leute drinnen sind.",
             "repeat": "Wiederholen",
@@ -1013,7 +1013,10 @@
             "posterUrlPlaceholder": "Oder füge den Bildlink ein (https://…)",
             "posterUrlUse": "Übernehmen",
             "posterUrlInvalid": "Der Link muss mit https:// beginnen",
-            "musicPick": "Musik wählen"
+            "musicPick": "Musik wählen",
+            "knownPlaces": "Locations auf {{app}}",
+            "knownPlaceEvents_one": "{{count}} Party",
+            "knownPlaceEvents_other": "{{count}} Partys"
         },
         "team": {
             "title": "Team",

@@ -5719,6 +5719,17 @@ export type Database = {
         Args: { p_query: string }
         Returns: { city: string; place_name: string; upcoming: number }[]
       }
+      search_known_places: {
+        Args: { p_query: string }
+        Returns: {
+          address: string | null
+          city: string | null
+          events: number
+          latitude: number
+          longitude: number
+          place_name: string
+        }[]
+      }
       submit_bug_report: {
         Args: { p_context?: Json; p_image_path?: string; p_message: string; p_title: string }
         Returns: string

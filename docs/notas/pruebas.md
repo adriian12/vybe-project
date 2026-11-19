@@ -1,5 +1,13 @@
 # Cuentas y salas de pruebas
 
+> **Borrado programado (19-11-2026).** Cuando la versión de producción salga en Google Play,
+> la tarea de Windows «Fiestea - borrar datos de prueba» (`tools/limpiar-pruebas.mjs` de `D:/Webs/Fiestea`,
+> fuera de git) borra Aurora Sessions, Fiestea Test Night, Sala Aurora, las «Parapapaia», la fiesta
+> «Prueba» de Events Mallorca y todos los usuarios de @seed.vybe.test, @vybe-test.local, @test.com y
+> @example.com (con sus salas seed y fotos). Se quedan revision.apple@, revision.negocio@ (sin sala) y
+> sistema@fiestea.es. A partir de ahí, lo que esta nota cuenta de esas salas y cuentas ya no existe: para
+> una revisión de tienda hay que montar una sala temporal.
+
 Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca este tema.
 
 - El puerto de Vite es 5173 y debe coincidir con las Redirect URLs de Supabase.

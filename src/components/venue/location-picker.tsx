@@ -2,9 +2,10 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { Loader2, LocateFixed, MapPin, Search } from 'lucide-react';
+import { Loader2, LocateFixed, MapPin, Music, Search } from 'lucide-react';
 import { addBaseMap } from '@/lib/base-map';
 import { getCurrentPosition } from '@/services/geo';
+import { api, KnownPlace } from '@/services/api';
 
 export interface PickedLocation {
   latitude: number;
@@ -34,9 +35,12 @@ const MALLORCA: [number, number] = [39.6, 2.9];
 const LocationPicker = ({
   value,
   onChange,
+  onPlace,
 }: {
   value: PickedLocation | null;
   onChange: (location: PickedLocation) => void;
+  /** Al elegir una sala conocida (para rellenar su nombre y ciudad en el formulario). */
+  onPlace?: (place: KnownPlace) => void;
 }) => {
   const { t, i18n } = useTranslation();
   const contenedor = useRef<HTMLDivElement | null>(null);
@@ -49,6 +53,41 @@ const LocationPicker = ({
   const [resultados, setResultados] = useState<Resultado[]>([]);
   const [buscando, setBuscando] = useState(false);
   const [localizando, setLocalizando] = useState(false);
+  // Salas que ya salen en otras fiestas («gremi» → Es Gremi), mientras se escribe:
+  // así todas sus fiestas quedan en el mismo punto (migración 139).
+  const [salas, setSalas] = useState<KnownPlace[]>([]);
+  const elegida = useRef<string | null>(null);
+
+  useEffect(() => {
+    const texto = query.trim();
+    if (texto.length < 2 || texto === elegida.current) {
+      setSalas([]);
+      return;
+    }
+    let vigente = true;
+    const espera = window.setTimeout(() => {
+      void api.searchKnownPlaces(texto).then((lista) => {
+        if (vigente) setSalas(lista);
+      });
+    }, 250);
+    return () => {
+      vigente = false;
+      window.clearTimeout(espera);
+    };
+  }, [query]);
+
+  const elegirSala = (sala: KnownPlace) => {
+    elegida.current = sala.placeName;
+    setQuery(sala.placeName);
+    setSalas([]);
+    setResultados([]);
+    onChange({
+      latitude: sala.latitude,
+      longitude: sala.longitude,
+      label: sala.address ?? [sala.placeName, sala.city].filter(Boolean).join(', '),
+    });
+    onPlace?.(sala);
+  };
 
   // El mapa, una sola vez.
   useEffect(() => {
@@ -151,6 +190,36 @@ const LocationPicker = ({
           {buscando ? <Loader2 size={15} className="animate-spin" /> : t('common.search')}
         </button>
       </div>
+
+      {salas.length > 0 && (
+        <div className="overflow-hidden rounded-xl bg-white">
+          <p className="px-3 pt-2 text-caption font-bold uppercase tracking-wide text-ink/50">
+            {t('venue.events.knownPlaces', { app: t('common.appName') })}
+          </p>
+          <ul className="divide-y divide-black/[0.06]">
+            {salas.map((sala) => (
+              <li key={`${sala.placeName}|${sala.latitude}`}>
+                <button
+                  type="button"
+                  onClick={() => elegirSala(sala)}
+                  className="press flex w-full items-center gap-2 px-3 py-2 text-left text-body-sm text-ink"
+                >
+                  <Music size={14} className="shrink-0 text-[#554600]" />
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate font-semibold">{sala.placeName}</span>
+                    {(sala.address || sala.city) && (
+                      <span className="block truncate text-caption text-ink/60">{sala.address ?? sala.city}</span>
+                    )}
+                  </span>
+                  <span className="shrink-0 rounded-full bg-party-primary px-2 py-0.5 text-caption font-bold text-ink">
+                    {t('venue.events.knownPlaceEvents', { count: sala.events })}
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {resultados.length > 0 && (
         <ul className="divide-y divide-black/[0.06] overflow-hidden rounded-xl bg-white">

@@ -63,6 +63,16 @@ export interface HousePlace {
   upcoming: number;
 }
 
+/** Una sala que ya sale en fiestas, con su punto en el mapa (migración 139). */
+export interface KnownPlace {
+  placeName: string;
+  address: string | null;
+  city: string | null;
+  latitude: number;
+  longitude: number;
+  events: number;
+}
+
 /** Un negocio pide quedarse con las fiestas de una sala (lo valida administración). */
 export interface PlaceClaim {
   id: string;
@@ -1339,6 +1349,27 @@ export const api = {
     });
   },
 
+  /**
+   * Fiestas por nombre, en el servidor: la lista del mapa se carga al abrir la
+   * app y una fiesta creada después («BIO 200») no salía en el buscador.
+   */
+  searchEventsByName: async (texto: string): Promise<Event[]> => {
+    const q = texto.trim().replace(/[%_,()\\]/g, ' ').trim();
+    if (q.length < 3) return [];
+    const { data, error } = await supabase
+      .from('events')
+      .select(`${EVENTO_LISTA}, venues!inner(${VENUE_PUBLICO})`)
+      .ilike('name', `%${q}%`)
+      .gt('end_date', new Date().toISOString())
+      .order('start_date', { ascending: true })
+      .limit(5);
+    if (error || !data) return [];
+    return data.map((row) => {
+      const { venues, ...eventRow } = row as unknown as EventRow & { venues: VenueRow };
+      return dbEventToEvent(eventRow as EventRow, venues);
+    });
+  },
+
   getEventById: async (eventId: string): Promise<Event | null> => {
     const { data, error } = await supabase
       .from('events')
@@ -1665,6 +1696,20 @@ export const api = {
     const { data, error } = await supabase.rpc('search_house_places', { p_query: query });
     if (error || !data) return [];
     return data.map((row) => ({ placeName: row.place_name, city: row.city, upcoming: Number(row.upcoming ?? 0) }));
+  },
+
+  /** Salas conocidas para el buscador de ubicación al crear una fiesta. */
+  searchKnownPlaces: async (query: string): Promise<KnownPlace[]> => {
+    const { data, error } = await supabase.rpc('search_known_places', { p_query: query });
+    if (error || !data) return [];
+    return data.map((row) => ({
+      placeName: row.place_name,
+      address: row.address,
+      city: row.city,
+      latitude: Number(row.latitude),
+      longitude: Number(row.longitude),
+      events: Number(row.events ?? 0),
+    }));
   },
 
   /** Solicitudes de negocios pendientes de quedarse con las fiestas de una sala. */

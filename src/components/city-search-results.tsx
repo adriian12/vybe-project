@@ -1,16 +1,29 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MapPin } from 'lucide-react';
-import { buscarCiudades, Zona } from '@/lib/places';
+import { buscarCiudades, sinContenidas, Zona } from '@/lib/places';
 
 /**
  * Ciudades que coinciden con lo que se escribe en el buscador del mapa. Al
  * elegir una, el mapa va allí y enseña sus fiestas (como «Palma» o «Madrid»).
  * Va encima de los negocios: buscar un sitio es lo más habitual.
+ *
+ * Sólo salen los sitios con alguna fiesta (`conFiestas`): con «bio» salían
+ * Biota y Biosca, donde no hay nada; con «palma», Palma sí (y no Palma del Río).
  */
-const CitySearchResults = ({ query, onPick }: { query: string; onPick: (zona: Zona) => void }) => {
+const CitySearchResults = ({
+  query,
+  onPick,
+  conFiestas,
+}: {
+  query: string;
+  onPick: (zona: Zona) => void;
+  conFiestas: (zona: Zona) => boolean;
+}) => {
   const { t } = useTranslation();
   const [ciudades, setCiudades] = useState<Zona[]>([]);
+  const filtro = useRef(conFiestas);
+  filtro.current = conFiestas;
 
   useEffect(() => {
     if (query.trim().length < 3) {
@@ -20,7 +33,7 @@ const CitySearchResults = ({ query, onPick }: { query: string; onPick: (zona: Zo
     const control = new AbortController();
     const espera = window.setTimeout(() => {
       void buscarCiudades(query, control.signal)
-        .then(setCiudades)
+        .then((zonas) => setCiudades(sinContenidas(zonas.filter((z) => filtro.current(z))).slice(0, 5)))
         .catch(() => {
           if (!control.signal.aborted) setCiudades([]);
         });

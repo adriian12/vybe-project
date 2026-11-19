@@ -334,6 +334,11 @@ const AdminEventForm = ({
             setLugar(l);
             if (l.label) setAddress(l.label);
           }}
+          /* Una sala ya conocida (Es Gremi, Amok…): su nombre y, si falta, su ciudad. */
+          onPlace={(sala) => {
+            setPlaceName(sala.placeName);
+            if (!city.trim() && sala.city) setCity(sala.city);
+          }}
         />
       </div>
 

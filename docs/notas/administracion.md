@@ -139,3 +139,12 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
   - **Administración:** Reportes tiene dos pestañas, «Personas» (las denuncias
     de siempre, tabla `reports`) y «Errores de la app»; el número de la sección
     suma las dos. «Ver captura» firma el enlace una hora.
+
+## Ubicación de una fiesta: salas conocidas
+
+En el buscador de ubicación (`LocationPicker`), al escribir salen las salas que ya
+están en otras fiestas (`search_known_places`, migración 139: agrupa por
+`venue_search_key`, así «Es gremi» y «Es Gremi» son una, y da el punto, la dirección
+y la ciudad que más se repiten). Al elegir una, el pin va a su sitio y, en el
+formulario de administración, se rellenan el nombre de la sala y, si falta, la
+ciudad. Sólo para administración y cuentas con negocio.

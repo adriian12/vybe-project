@@ -78,6 +78,16 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
     fecha sólo enseña las noches con fiesta en esa ciudad (`deLaZona`).
   - Photon corrige de más («amok» → «A Moa»): sólo se sugieren las ciudades
     cuyo nombre contiene lo escrito.
+  - **Sólo sitios con fiesta** (19-11-2026, `zonaConFiestas`): con «bio» salían
+    Biota y Biosca. Se sugiere una ciudad si alguna fiesta por venir cae en su
+    término; un sitio sin término (urbanización, barrio), si hay una a menos de
+    2,5 km. `sinContenidas` quita lo que cae dentro de otra sugerencia más
+    grande (Alicante sí, Bahía Alicante no). Las islas (`ISLAS`: Mallorca,
+    Ibiza, Menorca, Tenerife, Gran Canaria) van a mano: Photon no las da.
+  - **Fiestas por nombre también en el servidor** (`searchEventsByName`): la
+    lista se carga al abrir la app y una fiesta creada después no salía.
+  - La tarjeta de la lista del mapa enseña la sala (`placeName`) y no el
+    organizador («Fiestea»), como la de inicio.
   - Mientras se escribe, los resultados van en `z-[650]`, por encima de la
     hoja de abajo (`z-[600]`), con scroll propio.
 - **Música en cinco categorías** (`lib/music.ts`, con tests): Comercial,

@@ -1001,7 +1001,7 @@
             "saveChanges": "Save changes",
             "saved": "Event saved",
             "location": "Event location",
-            "locationSearch": "Search for the venue's address",
+            "locationSearch": "Search the venue or the address",
             "locationMissing": "The event location is missing",
             "locationHelp": "Drag the pin or tap the map to adjust it. This location is used to check that people are inside.",
             "repeat": "Repeat",
@@ -1013,7 +1013,10 @@
             "posterUrlPlaceholder": "Or paste the image link (https://…)",
             "posterUrlUse": "Use",
             "posterUrlInvalid": "The link must start with https://",
-            "musicPick": "Choose the music"
+            "musicPick": "Choose the music",
+            "knownPlaces": "Venues on {{app}}",
+            "knownPlaceEvents_one": "{{count}} party",
+            "knownPlaceEvents_other": "{{count}} parties"
         },
         "team": {
             "title": "Team",

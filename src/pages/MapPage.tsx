@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import L from 'leaflet';
@@ -22,7 +22,8 @@ import { DateFilter } from '@/components/party-filters';
 import { matchesDate, nightOf, useDateSelection } from '@/lib/date-filter';
 import { formatDistance } from '@/services/geo';
 import { cn } from '@/lib/utils';
-import { PlaceType } from '@/types/venue';
+import { Event, PlaceType } from '@/types/venue';
+import { api } from '@/services/api';
 import { featuredFirst, isFeatured } from '@/lib/featured';
 import MapFiltersSheet from '@/components/map-filters-sheet';
 import { aplicarFiltros, conFlechazo, Franja } from '@/lib/party-filters';
@@ -33,7 +34,7 @@ import PlaceSearchResults, { PlaceResult } from '@/components/place-search-resul
 import EventSearchResults from '@/components/event-search-results';
 import { clave } from '@/lib/scan-groups';
 import { useToast } from '@/components/ui/use-toast';
-import { enZona, Zona } from '@/lib/places';
+import { enZona, Zona, zonaConFiestas } from '@/lib/places';
 
 /** Centro por defecto: Palma, cuando no hay ubicación ni eventos con punto. */
 const PALMA: L.LatLngTuple = [39.5696, 2.6502];
@@ -219,16 +220,43 @@ const MapPage = () => {
 
   // Fiestas por su nombre, en cualquier ciudad y día (la zona, la fecha y los
   // filtros no cuentan aquí): «tardeo» → «El tardeo reggaeton viejo».
+  // Además se pregunta al servidor: la lista se carga al abrir la app y una
+  // fiesta creada después no estaba en ella.
+  const [delServidor, setDelServidor] = useState<Event[]>([]);
+  useEffect(() => {
+    const texto = busqueda.trim();
+    if (clave(texto).length < 3) {
+      setDelServidor([]);
+      return;
+    }
+    let vigente = true;
+    const espera = window.setTimeout(() => {
+      void api.searchEventsByName(texto).then((lista) => {
+        if (vigente) setDelServidor(lista);
+      });
+    }, 300);
+    return () => {
+      vigente = false;
+      window.clearTimeout(espera);
+    };
+  }, [busqueda]);
+
   const fiestasBuscadas = useMemo(() => {
     const q = clave(busqueda);
     if (q.length < 3) return [];
     const ahora = Date.now();
-    return withDistance
+    const locales = withDistance
       .filter(({ event }) => new Date(event.endDate).getTime() > ahora && clave(event.name).includes(q))
-      .sort((a, b) => new Date(a.event.startDate).getTime() - new Date(b.event.startDate).getTime())
-      .slice(0, 5)
       .map(({ event }) => event);
-  }, [withDistance, busqueda]);
+    const vistas = new Set(locales.map((e) => e.id));
+    return [...locales, ...delServidor.filter((e) => !vistas.has(e.id) && clave(e.name).includes(q))]
+      .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
+      .slice(0, 5);
+  }, [withDistance, busqueda, delServidor]);
+
+  // Sólo se sugieren ciudades e islas con alguna fiesta por venir.
+  const puntosFiestas = useMemo(() => conPunto.map(({ event }) => event.location!), [conPunto]);
+  const conFiestas = useCallback((z: Zona) => zonaConFiestas(z, puntosFiestas), [puntosFiestas]);
 
   const tiposPresentes = useMemo(
     () => TIPOS.filter((tp) => conPunto.some(({ event }) => event.placeType === tp)),
@@ -478,7 +506,7 @@ const MapPage = () => {
           {/* Fiestas por nombre (a su ficha), ciudades (para ir allí) y
               negocios (para ir a su ficha). */}
           <EventSearchResults events={fiestasBuscadas} />
-          <CitySearchResults query={busqueda} onPick={irAZona} />
+          <CitySearchResults query={busqueda} onPick={irAZona} conFiestas={conFiestas} />
           <PlaceSearchResults places={salas} />
           <VenueSearchResults query={busqueda} />
 
@@ -660,7 +688,9 @@ const MapPage = () => {
                     <div className="flex min-w-0 flex-1 flex-col justify-center">
                       <h3 className="truncate font-display text-title-card">{event.name}</h3>
                       <p className={cn('mt-0.5 truncate text-body-sm', activa ? 'text-[#554600]' : 'text-[#C8C6C5]')}>
-                        {event.venueName}
+                        {/* La sala (Amok, Es Gremi…) dice dónde es; el organizador
+                            («Fiestea» o el negocio) no, y sólo si no hay sala. */}
+                        {event.placeName || event.venueName}
                         {event.city ? ` · ${event.city}` : ''}
                       </p>
                       <div

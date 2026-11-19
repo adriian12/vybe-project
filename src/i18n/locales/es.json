@@ -1001,7 +1001,7 @@
             "saveChanges": "Guardar cambios",
             "saved": "Evento guardado",
             "location": "Ubicación del evento",
-            "locationSearch": "Busca la dirección del negocio",
+            "locationSearch": "Busca la sala o la dirección",
             "locationMissing": "Falta la ubicación del evento",
             "locationHelp": "Arrastra el punto o toca el mapa para ajustarlo. Con esta ubicación se comprueba que la gente está dentro.",
             "repeat": "Repetir",
@@ -1013,7 +1013,10 @@
             "posterUrlPlaceholder": "O pega el enlace de la imagen (https://…)",
             "posterUrlUse": "Usar",
             "posterUrlInvalid": "El enlace tiene que empezar por https://",
-            "musicPick": "Elige la música"
+            "musicPick": "Elige la música",
+            "knownPlaces": "Salas en {{app}}",
+            "knownPlaceEvents_one": "{{count}} fiesta",
+            "knownPlaceEvents_other": "{{count}} fiestas"
         },
         "team": {
             "title": "Equipo",
