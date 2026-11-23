@@ -2343,6 +2343,18 @@
                 "expired": "Nicht veröffentlicht",
                 "scheduled": "Geplant",
                 "manualScheduled": "Kommt per Telegram"
+            },
+            "viewer": {
+                "open": "Groß ansehen",
+                "previous": "Zurück",
+                "next": "Weiter",
+                "slide": "Foto {{n}}",
+                "count": "{{n}} von {{total}}",
+                "caption": "Bildunterschrift",
+                "copy": "Kopieren",
+                "copied": "Text kopiert",
+                "noCaption": "Storys werden ohne Text veröffentlicht.",
+                "noMedia": "Diese Aufgabe hat kein Bild."
             }
         }
     },

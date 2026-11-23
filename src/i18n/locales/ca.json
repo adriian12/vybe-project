@@ -2343,6 +2343,18 @@
                 "expired": "No s'ha publicat",
                 "scheduled": "Programat",
                 "manualScheduled": "T'arribarà per Telegram"
+            },
+            "viewer": {
+                "open": "Veure en gran",
+                "previous": "Anterior",
+                "next": "Següent",
+                "slide": "Foto {{n}}",
+                "count": "{{n}} de {{total}}",
+                "caption": "Text que es publica",
+                "copy": "Copiar",
+                "copied": "Text copiat",
+                "noCaption": "Les històries es publiquen sense text.",
+                "noMedia": "Aquesta tasca no té imatge."
             }
         }
     },

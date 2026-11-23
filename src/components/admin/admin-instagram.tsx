@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
 import { openExternal } from '@/services/native';
 import { cn } from '@/lib/utils';
+import AdminInstagramViewer, { Pieza } from '@/components/admin/admin-instagram-viewer';
 
 type Post = {
   id: string;
@@ -22,6 +23,8 @@ type Post = {
   preview_url: string | null;
   done_at: string | null;
   synced_at: string;
+  media: Pieza[];
+  caption: string | null;
 };
 
 type Filtro = 'upcoming' | 'manual' | 'all';
@@ -44,6 +47,7 @@ const AdminInstagram = () => {
   const [posts, setPosts] = useState<Post[] | null>(null);
   const [filtro, setFiltro] = useState<Filtro>('upcoming');
   const [ocupado, setOcupado] = useState<string | null>(null);
+  const [abierto, setAbierto] = useState<Post | null>(null);
 
   const cargar = useCallback(async () => {
     const { data, error } = await supabase.rpc('admin_get_instagram_posts');
@@ -52,7 +56,7 @@ const AdminInstagram = () => {
       setPosts([]);
       return;
     }
-    setPosts(data as Post[]);
+    setPosts(data as unknown as Post[]);
   }, [t, toast]);
 
   useEffect(() => {
@@ -166,7 +170,12 @@ const AdminInstagram = () => {
               const toca = porSubir(p);
               return (
                 <li key={p.id} className={cn('surface-light flex gap-3 rounded-2xl p-3', listo && 'opacity-70')}>
-                  <div className="relative h-24 w-[3.4rem] shrink-0 overflow-hidden rounded-lg bg-black/[0.06]">
+                  <button
+                    type="button"
+                    onClick={() => setAbierto(p)}
+                    aria-label={t('admin.instagram.viewer.open')}
+                    className="press relative h-24 w-[3.4rem] shrink-0 overflow-hidden rounded-lg bg-black/[0.06] ring-party-primary hover:ring-2"
+                  >
                     {p.preview_url ? (
                       <img src={p.preview_url} alt="" loading="lazy" className="h-full w-full object-cover" />
                     ) : (
@@ -177,7 +186,7 @@ const AdminInstagram = () => {
                         <Check size={13} strokeWidth={3} />
                       </span>
                     )}
-                  </div>
+                  </button>
 
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-1.5">
@@ -206,7 +215,9 @@ const AdminInstagram = () => {
                       </span>
                     </div>
 
-                    <p className="mt-1 line-clamp-2 text-body-sm font-semibold">{p.titulo}</p>
+                    <button type="button" onClick={() => setAbierto(p)} className="mt-1 line-clamp-2 text-left text-body-sm font-semibold hover:underline">
+                      {p.titulo}
+                    </button>
                     {toca && p.detalle && <p className="mt-1 text-caption text-ink/70">{p.detalle}</p>}
 
                     <div className="mt-2 flex flex-wrap items-center gap-2 text-caption font-bold">
@@ -243,6 +254,8 @@ const AdminInstagram = () => {
           </ul>
         </section>
       ))}
+
+      <AdminInstagramViewer post={abierto} onClose={() => setAbierto(null)} />
     </div>
   );
 };

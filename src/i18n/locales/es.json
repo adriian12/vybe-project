@@ -2343,6 +2343,18 @@
                 "expired": "No se publicó",
                 "scheduled": "Programado",
                 "manualScheduled": "Te llegará por Telegram"
+            },
+            "viewer": {
+                "open": "Ver en grande",
+                "previous": "Anterior",
+                "next": "Siguiente",
+                "slide": "Foto {{n}}",
+                "count": "{{n}} de {{total}}",
+                "caption": "Texto que se publica",
+                "copy": "Copiar",
+                "copied": "Texto copiado",
+                "noCaption": "Las historias se publican sin texto.",
+                "noMedia": "Esta tarea no tiene imagen."
             }
         }
     },

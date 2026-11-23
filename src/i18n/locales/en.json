@@ -2343,6 +2343,18 @@
                 "expired": "Not published",
                 "scheduled": "Scheduled",
                 "manualScheduled": "Will arrive via Telegram"
+            },
+            "viewer": {
+                "open": "View large",
+                "previous": "Previous",
+                "next": "Next",
+                "slide": "Photo {{n}}",
+                "count": "{{n}} of {{total}}",
+                "caption": "Caption",
+                "copy": "Copy",
+                "copied": "Caption copied",
+                "noCaption": "Stories are posted without a caption.",
+                "noMedia": "This task has no image."
             }
         }
     },

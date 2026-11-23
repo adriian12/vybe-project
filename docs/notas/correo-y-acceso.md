@@ -71,3 +71,5 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
   Google; Fiester@ rellena la ficha (`FiesterForm`). Pasar de invitado a
   fiester@ sin ficha pide el mismo formulario (`account-type-card.tsx`); si
   ya fue fiester@, sus datos siguen y se cambian en el perfil.
+
+- **Correos propios de Supabase Auth** (aviso de contraseña cambiada y confirmación de cambio de correo): salen por el SMTP de Resend (`smtp.resend.com:465`, usuario `resend`, la `RESEND_API_KEY`) desde `no-reply@fiestea.es` con remitente «Fiestea». Hasta el 23-11-2026 salían por el Gmail `vybe.party@gmail.com` como «Vybe». Plantillas en español con la marca; se cambian por la Management API (`/config/auth`).

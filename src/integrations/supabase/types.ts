@@ -3914,6 +3914,8 @@ export type Database = {
           preview_url: string | null
           done_at: string | null
           synced_at: string
+          media: Json
+          caption: string | null
         }[]
       }
       admin_mark_instagram_done: {
