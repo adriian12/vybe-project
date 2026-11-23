@@ -49,10 +49,20 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({
     setError(null);
 
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: camara, width: { ideal: 1280 }, height: { ideal: 1280 } },
-        audio: false,
-      });
+      // Primero se exige la cámara elegida: con `facingMode` a secas muchos
+      // Android ignoran la trasera y siguen con la frontal. Si el móvil no
+      // tiene esa cámara, se acepta la que haya.
+      const pedir = (facing: ConstrainDOMString) =>
+        navigator.mediaDevices.getUserMedia({
+          video: { facingMode: facing, width: { ideal: 1280 }, height: { ideal: 1280 } },
+          audio: false,
+        });
+      let stream: MediaStream;
+      try {
+        stream = await pedir({ exact: camara });
+      } catch {
+        stream = await pedir(camara);
+      }
 
       streamRef.current = stream;
       if (videoRef.current) {
@@ -109,6 +119,8 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({
           muted
           className="w-full h-full object-cover"
         />
+        {/* Cambiar de cámara: con texto, para que se vea que te la puede
+            hacer otra persona con la cámara trasera. */}
         {isReady && !error && (
           <button
             type="button"
@@ -117,9 +129,10 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({
               setCamara((actual) => (actual === 'user' ? 'environment' : 'user'));
             }}
             aria-label={t('camera.switch')}
-            className="press absolute right-3 top-3 flex h-11 w-11 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur"
+            className="press absolute bottom-3 left-1/2 flex h-10 -translate-x-1/2 items-center gap-2 whitespace-nowrap rounded-full bg-black/65 px-4 text-sm font-bold text-white backdrop-blur"
           >
-            <SwitchCamera size={20} />
+            <SwitchCamera size={18} />
+            {t(camara === 'user' ? 'camera.useBack' : 'camera.useFront')}
           </button>
         )}
         {!isReady && !error && (

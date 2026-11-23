@@ -3270,7 +3270,9 @@
         "and": "y"
     },
     "camera": {
-        "switch": "Cambiar de cámara"
+        "switch": "Cambiar de cámara",
+        "useBack": "Cámara trasera",
+        "useFront": "Cámara frontal"
     },
     "eventMode": {
         "chooseTitle": "Estás a punto de entrar a «{{name}}»",

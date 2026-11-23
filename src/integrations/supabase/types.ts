@@ -5638,6 +5638,10 @@ export type Database = {
           venue_type: string
         }[]
       }
+      record_app_install: {
+        Args: { p_app_version?: string; p_device_model?: string; p_platform: string }
+        Returns: undefined
+      }
       reinstate_profile: { Args: { p_profile_id: string }; Returns: undefined }
       remove_group_member: {
         Args: { p_group_id: string; p_profile_id: string }

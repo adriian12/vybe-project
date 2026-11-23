@@ -3270,7 +3270,9 @@
         "and": "und"
     },
     "camera": {
-        "switch": "Kamera wechseln"
+        "switch": "Kamera wechseln",
+        "useBack": "Rückkamera",
+        "useFront": "Frontkamera"
     },
     "eventMode": {
         "chooseTitle": "Du betrittst gleich «{{name}}»",

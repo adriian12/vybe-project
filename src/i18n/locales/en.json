@@ -3270,7 +3270,9 @@
         "and": "and"
     },
     "camera": {
-        "switch": "Switch camera"
+        "switch": "Switch camera",
+        "useBack": "Back camera",
+        "useFront": "Front camera"
     },
     "eventMode": {
         "chooseTitle": "You're about to enter «{{name}}»",

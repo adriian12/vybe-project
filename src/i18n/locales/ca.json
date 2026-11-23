@@ -3270,7 +3270,9 @@
         "and": "i"
     },
     "camera": {
-        "switch": "Canviar de càmera"
+        "switch": "Canviar de càmera",
+        "useBack": "Càmera posterior",
+        "useFront": "Càmera frontal"
     },
     "eventMode": {
         "chooseTitle": "Estàs a punt d'entrar a «{{name}}»",

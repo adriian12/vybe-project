@@ -76,6 +76,38 @@ export const setupNativeShell = async (): Promise<void> => {
   } catch (error) {
     console.error('No se pudo quitar la pantalla de arranque:', error);
   }
+
+  // La primera apertura de la app instalada cuenta como una descarga (141).
+  void recordInstallOnce();
+};
+
+const INSTALL_KEY = 'fiestea_install_recorded';
+
+/**
+ * Apunta la descarga una sola vez por instalación. La marca se guarda cuando
+ * el servidor la ha recibido: sin conexión se vuelve a intentar al abrir otra
+ * vez la app. Sólo se envían la plataforma y la versión, nada de la persona.
+ */
+const recordInstallOnce = async (): Promise<void> => {
+  try {
+    const plat = platform();
+    if (plat !== 'android' && plat !== 'ios') return;
+    if (window.localStorage.getItem(INSTALL_KEY)) return;
+
+    let version: string | undefined;
+    try {
+      const { App } = await import('@capacitor/app');
+      const info = await App.getInfo();
+      version = `${info.version} (${info.build})`;
+    } catch {
+      // Sin versión se cuenta igual.
+    }
+
+    const { error } = await supabase.rpc('record_app_install', { p_platform: plat, p_app_version: version });
+    if (!error) window.localStorage.setItem(INSTALL_KEY, new Date().toISOString());
+  } catch {
+    // Sin almacenamiento sólo se pierde registrar la apertura.
+  }
 };
 
 /**
