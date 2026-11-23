@@ -161,7 +161,12 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
   conversación: logo a la izquierda y la F en la esquina. Ese servicio sustituye
   en el manifiesto al del plugin de Capacitor y lo llama primero. A las versiones
   viejas, iOS y web les llega el aviso normal con la imagen (Android la pone a la
-  derecha; **iOS no la enseña** sin una Notification Service Extension). Con la
+  derecha). **iOS** la enseña a partir de la versión siguiente a la 1.1, con la extensión
+  `ios/App/NotificationService` (target propio, `es.fiestea.ios.NotificationService`,
+  identificador creado por la API el 23-11-2026; Codemagic baja su perfil aparte):
+  descarga `fcm_options.image` y la adjunta como miniatura a la derecha; el icono
+  del aviso sigue siendo el de Fiestea (cambiarlo exigiría avisos de
+  comunicación, pensados para apps de mensajería). Con la
   app abierta, el aviso lo pinta `in-app-notice.tsx`.
 - **Avisos push** (migración 039). Mensaje nuevo y vybe match: disparadores
   `push_on_message`/`push_on_connection` → `push_webhook()` → `send-push` por

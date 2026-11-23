@@ -104,7 +104,11 @@ workflows:
       - name: Identificador de la app
         script: |
           cd ios/App
-          sed -i '' "s/PRODUCT_BUNDLE_IDENTIFIER = [^;]*;/PRODUCT_BUNDLE_IDENTIFIER = $BUNDLE_ID;/g" App.xcodeproj/project.pbxproj
+          # La de la app; la extensión de avisos con logo (NotificationService)
+          # lleva el suyo, colgado del de la app.
+          sed -i '' "/NotificationService/! s/PRODUCT_BUNDLE_IDENTIFIER = [^;]*;/PRODUCT_BUNDLE_IDENTIFIER = $BUNDLE_ID;/g" App.xcodeproj/project.pbxproj
+          sed -i '' "s/PRODUCT_BUNDLE_IDENTIFIER = [^;]*\.NotificationService;/PRODUCT_BUNDLE_IDENTIFIER = $BUNDLE_ID.NotificationService;/g" App.xcodeproj/project.pbxproj
+          grep -c "PRODUCT_BUNDLE_IDENTIFIER = $BUNDLE_ID.NotificationService;" App.xcodeproj/project.pbxproj
 
       - name: Firmar
         script: |
@@ -114,6 +118,9 @@ workflows:
           # certificado, para que las siguientes builds reutilicen el mismo.
           keychain initialize
           app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE --create             --certificate-key=@env:CERTIFICATE_PRIVATE_KEY
+          # La extensión de avisos con logo necesita su propio perfil
+          # (identificador creado el 23-11-2026 por la API).
+          app-store-connect fetch-signing-files "$BUNDLE_ID.NotificationService" --type IOS_APP_STORE --create             --certificate-key=@env:CERTIFICATE_PRIVATE_KEY
           keychain add-certificates
           xcode-project use-profiles --project ios/App/App.xcodeproj
 
