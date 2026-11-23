@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Star, TrendingDown, TrendingUp } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Star, TrendingDown, TrendingUp } from 'lucide-react';
 import { nota, ratingsService, VenueRatings as Datos } from '@/services/ratings';
 import type { VenuePlanStatus } from '@/services/venue-service';
 import { planHas } from '@/lib/venue-plans';
@@ -65,15 +65,17 @@ const VenueRatings = ({ plan }: { plan: VenuePlanStatus | null }) => {
     { key: 'price', value: summary.price },
   ];
 
+  // Va en la columna estrecha del panel: siempre una sola columna, sea cual
+  // sea el ancho de la pantalla.
   return (
-    <div className="grid gap-4 lg:grid-cols-12">
-      <div className="surface-light space-y-4 rounded-2xl p-4 lg:col-span-5">
+    <div className="space-y-4">
+      <div className="surface-light min-w-0 space-y-4 rounded-2xl p-4">
         {Titulo}
-        <div className="flex items-end gap-3">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
           <p className="font-display text-[44px] font-extrabold leading-none tabular">
             {summary.overall !== null ? nota(summary.overall) : '—'}
           </p>
-          <div className="pb-1">
+          <div className="min-w-0">
             <p className="flex">
               {[1, 2, 3, 4, 5].map((n) => (
                 <Star
@@ -90,7 +92,7 @@ const VenueRatings = ({ plan }: { plan: VenuePlanStatus | null }) => {
           {tendencia !== null && tendencia !== 0 && (
             <span
               className={cn(
-                'ml-auto flex items-center gap-1 rounded-md px-2 py-0.5 text-caption font-bold',
+                'flex items-center gap-1 rounded-md px-2 py-0.5 text-caption font-bold',
                 tendencia > 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-destructive/10 text-destructive',
               )}
             >
@@ -116,15 +118,14 @@ const VenueRatings = ({ plan }: { plan: VenuePlanStatus | null }) => {
 
         <div className="grid grid-cols-3 gap-2">
           {detalle.map((item) => (
-            <div key={item.key} className="rounded-xl bg-black/[0.04] p-2 text-center">
+            <div key={item.key} className="min-w-0 rounded-xl bg-black/[0.04] px-1 py-2 text-center">
               <p className="font-display text-title-card tabular">{item.value !== null ? nota(item.value) : '—'}</p>
-              <p className="text-caption text-party-gray">{t(`rating.${item.key}`)}</p>
+              <p className="truncate text-[11px] text-party-gray">{t(`rating.${item.key}`)}</p>
             </div>
           ))}
         </div>
       </div>
 
-      <div className="space-y-4 lg:col-span-7">
         {nights.length > 0 && (
           <div className="surface-light rounded-2xl p-4">
             <h3 className="mb-2 font-display text-title-card uppercase tracking-wide">{t('rating.venue.byNight')}</h3>
@@ -148,26 +149,110 @@ const VenueRatings = ({ plan }: { plan: VenuePlanStatus | null }) => {
           </div>
         )}
 
-        <div className="surface-light rounded-2xl p-4">
-          <h3 className="mb-2 font-display text-title-card uppercase tracking-wide">{t('rating.venue.comments')}</h3>
-          {comments.length === 0 ? (
-            <p className="text-body-sm text-party-gray">{t('rating.venue.noComments')}</p>
-          ) : (
-            <ul className="max-h-[420px] space-y-2 overflow-y-auto">
-              {comments.map((c, i) => (
-                <li key={`${c.createdAt}-${i}`} className="rounded-xl bg-black/[0.03] p-3">
-                  <p className="flex items-center gap-1 text-caption text-party-gray">
-                    <Star size={12} className="fill-party-primary text-party-primary" />
-                    <span className="font-bold text-ink">{c.overall}</span> · {c.eventName} ·{' '}
-                    {new Date(c.createdAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}
-                  </p>
-                  <p className="mt-1 break-words text-body-sm">{c.comment}</p>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+        <Comentarios comments={comments} />
+    </div>
+  );
+};
+
+/** A partir de aquí un comentario se recorta y sale «Leer más». */
+const LARGO = 180;
+
+/**
+ * Los comentarios, de uno en uno: el total junto al título, flechas para
+ * pasar al anterior o al siguiente (o deslizar con el dedo) y «Leer más» en
+ * los largos.
+ */
+const Comentarios = ({ comments }: { comments: Datos['comments'] }) => {
+  const { t } = useTranslation();
+  const [actual, setActual] = useState(0);
+  const [abierto, setAbierto] = useState(false);
+  const inicioX = useRef<number | null>(null);
+
+  const total = comments.length;
+  const indice = Math.min(actual, Math.max(total - 1, 0));
+  const ir = (paso: number) => {
+    if (total < 2) return;
+    setActual((indice + paso + total) % total);
+    setAbierto(false);
+  };
+
+  const c = comments[indice];
+  const largo = Boolean(c && c.comment.length > LARGO);
+
+  return (
+    <div className="surface-light min-w-0 rounded-2xl p-4">
+      <div className="mb-2 flex items-center gap-2">
+        <h3 className="font-display text-title-card uppercase tracking-wide">{t('rating.venue.comments')}</h3>
+        {total > 1 && (
+          <span className="rounded-full bg-black/[0.06] px-1.5 py-0.5 text-[11px] font-bold tabular text-party-gray">
+            {total}
+          </span>
+        )}
       </div>
+
+      {!c ? (
+        <p className="text-body-sm text-party-gray">{t('rating.venue.noComments')}</p>
+      ) : (
+        <>
+          <div
+            className="rounded-xl bg-black/[0.03] p-3"
+            onTouchStart={(e) => {
+              inicioX.current = e.touches[0].clientX;
+            }}
+            onTouchEnd={(e) => {
+              if (inicioX.current === null) return;
+              const dx = e.changedTouches[0].clientX - inicioX.current;
+              inicioX.current = null;
+              if (Math.abs(dx) > 40) ir(dx < 0 ? 1 : -1);
+            }}
+          >
+            <p className="flex min-w-0 items-center gap-1 text-caption text-party-gray">
+              <Star size={12} className="shrink-0 fill-party-primary text-party-primary" />
+              <span className="shrink-0 font-bold text-ink">{c.overall}</span>
+              <span className="truncate">
+                · {c.eventName} ·{' '}
+                {new Date(c.createdAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}
+              </span>
+            </p>
+            <p className={cn('mt-1 whitespace-pre-line break-words text-body-sm', largo && !abierto && 'line-clamp-4')}>
+              {c.comment}
+            </p>
+            {largo && (
+              <button
+                type="button"
+                onClick={() => setAbierto((v) => !v)}
+                className="press mt-1 text-caption font-bold underline"
+              >
+                {t(abierto ? 'rating.venue.readLess' : 'rating.venue.readMore')}
+              </button>
+            )}
+          </div>
+
+          {total > 1 && (
+            <div className="mt-2 flex items-center justify-between">
+              <button
+                type="button"
+                onClick={() => ir(-1)}
+                aria-label={t('rating.venue.prevComment')}
+                className="press flex h-9 w-9 items-center justify-center rounded-full bg-black/[0.06]"
+              >
+                <ChevronLeft size={18} />
+              </button>
+              <span className="text-caption tabular text-party-gray">
+                {indice + 1} / {total}
+              </span>
+              <button
+                type="button"
+                onClick={() => ir(1)}
+                aria-label={t('rating.venue.nextComment')}
+                className="press flex h-9 w-9 items-center justify-center rounded-full bg-black/[0.06]"
+              >
+                <ChevronRight size={18} />
+              </button>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 };

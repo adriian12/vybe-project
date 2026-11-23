@@ -3491,7 +3491,11 @@
             "vsPrev": "vs mes anterior",
             "byNight": "Per nit",
             "comments": "Comentaris",
-            "noComments": "Encara ningú no ha deixat cap comentari."
+            "noComments": "Encara ningú no ha deixat cap comentari.",
+            "readMore": "Llegir-ne més",
+            "readLess": "Llegir-ne menys",
+            "prevComment": "Comentari anterior",
+            "nextComment": "Comentari següent"
         }
     },
     "sales": {

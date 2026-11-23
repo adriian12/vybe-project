@@ -3491,7 +3491,11 @@
             "vsPrev": "vs mes anterior",
             "byNight": "Por noche",
             "comments": "Comentarios",
-            "noComments": "Todavía nadie ha dejado un comentario."
+            "noComments": "Todavía nadie ha dejado un comentario.",
+            "readMore": "Leer más",
+            "readLess": "Leer menos",
+            "prevComment": "Comentario anterior",
+            "nextComment": "Comentario siguiente"
         }
     },
     "sales": {
