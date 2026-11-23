@@ -61,8 +61,8 @@ const TicketOrderPage = lazy(() => import('./pages/TicketOrderPage'));
 const UserProfilePage = lazy(() => import('./pages/UserProfilePage'));
 const EventSwipingPage = lazy(() => import('./pages/EventSwipingPage'));
 const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage'));
-// La landing: los botones de las tiendas salen como «Próximamente» mientras no
-// haya enlaces (`store-buttons.tsx`). Google Wallet revisa esta web.
+// La landing: los botones de las tiendas llevan a Google Play y al App Store
+// (`store-buttons.tsx`, enlaces en `lib/hosts.ts`). Google Wallet revisa esta web.
 const LandingPage = lazy(() => import('./pages/LandingPage'));
 const MobileOnlyPage = lazy(() => import('./pages/MobileOnlyPage'));
 // El contador del portero: se abre sin cuenta, desde el enlace que crea el local.

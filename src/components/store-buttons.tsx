@@ -6,8 +6,8 @@ import { cn } from '@/lib/utils';
 /**
  * Botones de Google Play y App Store.
  *
- * Mientras la app no está publicada (`VITE_PLAY_STORE_URL` y
- * `VITE_APP_STORE_URL` vacías) salen desactivados con «Próximamente», en vez de
+ * Llevan a la ficha de cada tienda (`lib/hosts.ts`). Si algún día un enlace
+ * quedara vacío, ese botón saldría desactivado con «Próximamente», en vez de
  * llevar a una página que no existe.
  */
 const StoreButtons = ({ className, tone = 'dark' }: { className?: string; tone?: 'dark' | 'ink' }) => {
