@@ -2209,7 +2209,10 @@
             "renews": "Renews on {{date}}",
             "ends": "Expires on {{date}} (won't renew)",
             "endsCancelled": "Cancelled: expires on {{date}}",
-            "trialEnds": "Free trial until {{date}}"
+            "trialEnds": "Free trial until {{date}}",
+            "expiresSoon_zero": "Expires today",
+            "expiresSoon_one": "Expires tomorrow",
+            "expiresSoon_other": "Expires in {{count}} days"
         },
         "funout": {
             "synced_one": "{{count}} event up to date",
@@ -2490,7 +2493,7 @@
             "add": "Add ticket",
             "addHint": "Bought your ticket on Fourvenues or another website? Add it and keep it here with the rest.",
             "addTitle": "Add a ticket",
-            "addBody": "Upload your ticket PDF or a screenshot with the QR code. It is read on your phone: the file is not uploaded anywhere.",
+            "addBody": "Upload your ticket PDF or a screenshot: we read the party, the date and the QR on your phone and add it for you. The file is not uploaded anywhere.",
             "choose": "Choose PDF or screenshot",
             "reading": "Reading your ticket…",
             "noQr": "We could not find a QR code. Try the original PDF or a sharper screenshot.",
@@ -2515,7 +2518,11 @@
             "removed": "Ticket removed",
             "free": "Free",
             "untilClose": "until closing",
-            "another": "Choose another file"
+            "another": "Choose another file",
+            "updated": "You already had this ticket: it has been updated",
+            "incomplete": "The image does not show the full party details. Fill in the name and the date.",
+            "pastTitle": "Your ticket",
+            "pastBody": "From a party that has already ended."
         },
         "title": "My tickets",
         "subtitle": "Ready for the door and the bar",

@@ -71,6 +71,8 @@ const TicketsPage = () => {
   const [historial, setHistorial] = useState<EventHistoryItem[] | null>(null);
   const [anadir, setAnadir] = useState(false);
   const [entradasPasadas, setEntradasPasadas] = useState(0);
+  // Entradas de otras webs (Fourvenues…) de fiestas que ya terminaron.
+  const [externasPasadas, setExternasPasadas] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -169,7 +171,7 @@ const TicketsPage = () => {
             >
               {clave === 'upcoming'
                 ? t('tickets.upcoming', { count: activas })
-                : t('tickets.past', { count: pasadas.length + entradasPasadas })}
+                : t('tickets.past', { count: pasadas.length + entradasPasadas + externasPasadas })}
             </button>
           ))}
         </div>
@@ -186,7 +188,7 @@ const TicketsPage = () => {
                 </PartyButton>
               </div>
               <PurchasedTickets view="upcoming" onPastCount={setEntradasPasadas} />
-              <ExternalTickets events={eventosFeed} addOpen={anadir} onAddOpenChange={setAnadir} />
+              <ExternalTickets events={eventosFeed} addOpen={anadir} onAddOpenChange={setAnadir} onPastCount={setExternasPasadas} />
             </section>
 
             {/* ---------------------------------------------- vales de esta noche */}
@@ -329,12 +331,13 @@ const TicketsPage = () => {
           <>
             {/* Entradas usadas o de fiestas que ya terminaron. */}
             <PurchasedTickets view="past" onPastCount={setEntradasPasadas} />
+            <ExternalTickets view="past" events={eventosFeed} onPastCount={setExternasPasadas} />
             {historial === null ? (
               <div className="flex justify-center py-10">
                 <Loader2 className="h-7 w-7 animate-spin text-party-primary" />
               </div>
             ) : pasadas.length === 0 ? (
-              entradasPasadas === 0 && (
+              entradasPasadas + externasPasadas === 0 && (
               <div className="flex flex-col items-center rounded-2xl bg-card px-6 py-10 text-center">
                 <CalendarX2 size={40} className="mb-3 text-party-gray" />
                 <h2 className="font-display text-headline-md">{t('tickets.pastEmptyTitle')}</h2>

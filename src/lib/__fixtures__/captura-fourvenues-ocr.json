@@ -1,0 +1,989 @@
+{
+ "width": 1440,
+ "lines": [
+  {
+   "text": "Neull EZ",
+   "y": 41,
+   "h": 51,
+   "conf": 46,
+   "words": [
+    {
+     "text": "Neull",
+     "x": 1103
+    },
+    {
+     "text": "EZ",
+     "x": 1247
+    }
+   ]
+  },
+  {
+   "text": "17:54 O + Q XI E »",
+   "y": 42,
+   "h": 54,
+   "conf": 61,
+   "words": [
+    {
+     "text": "17:54",
+     "x": 100
+    },
+    {
+     "text": "O",
+     "x": 253
+    },
+    {
+     "text": "+",
+     "x": 323
+    },
+    {
+     "text": "Q",
+     "x": 1026
+    },
+    {
+     "text": "XI",
+     "x": 1087
+    },
+    {
+     "text": "E",
+     "x": 1267
+    },
+    {
+     "text": "»",
+     "x": 1355
+    }
+   ]
+  },
+  {
+   "text": "(N ()efourvenuescom + “Y E",
+   "y": 214,
+   "h": 76,
+   "conf": 41,
+   "words": [
+    {
+     "text": "(N",
+     "x": 60
+    },
+    {
+     "text": "()efourvenuescom",
+     "x": 202
+    },
+    {
+     "text": "+",
+     "x": 953
+    },
+    {
+     "text": "“Y",
+     "x": 1137
+    },
+    {
+     "text": "E",
+     "x": 1316
+    }
+   ]
+  },
+  {
+   "text": "o",
+   "y": 450,
+   "h": 24,
+   "conf": 33,
+   "words": [
+    {
+     "text": "o",
+     "x": 204
+    }
+   ]
+  },
+  {
+   "text": "(Y AMOK powered by 4 fourvenues",
+   "y": 454,
+   "h": 60,
+   "conf": 88,
+   "words": [
+    {
+     "text": "(Y",
+     "x": 165
+    },
+    {
+     "text": "AMOK",
+     "x": 262
+    },
+    {
+     "text": "powered",
+     "x": 968
+    },
+    {
+     "text": "by",
+     "x": 1075
+    },
+    {
+     "text": "4",
+     "x": 1088
+    },
+    {
+     "text": "fourvenues",
+     "x": 1112
+    }
+   ]
+  },
+  {
+   "text": "<",
+   "y": 510,
+   "h": 8,
+   "conf": 75,
+   "words": [
+    {
+     "text": "<",
+     "x": 174
+    }
+   ]
+  },
+  {
+   "text": "ENTRADA SÁB. 21 DE NOV. DE 2026 | 6:00 PM - 11:45 PM",
+   "y": 588,
+   "h": 33,
+   "conf": 92,
+   "words": [
+    {
+     "text": "ENTRADA",
+     "x": 177
+    },
+    {
+     "text": "SÁB.",
+     "x": 692
+    },
+    {
+     "text": "21",
+     "x": 758
+    },
+    {
+     "text": "DE",
+     "x": 793
+    },
+    {
+     "text": "NOV.",
+     "x": 834
+    },
+    {
+     "text": "DE",
+     "x": 899
+    },
+    {
+     "text": "2026",
+     "x": 939
+    },
+    {
+     "text": "|",
+     "x": 1016
+    },
+    {
+     "text": "6:00",
+     "x": 1042
+    },
+    {
+     "text": "PM",
+     "x": 1099
+    },
+    {
+     "text": "-",
+     "x": 1143
+    },
+    {
+     "text": "11:45",
+     "x": 1158
+    },
+    {
+     "text": "PM",
+     "x": 1227
+    }
+   ]
+  },
+  {
+   "text": "El Tardeo de Reggaeton Viejo",
+   "y": 686,
+   "h": 50,
+   "conf": 95,
+   "words": [
+    {
+     "text": "El",
+     "x": 312
+    },
+    {
+     "text": "Tardeo",
+     "x": 382
+    },
+    {
+     "text": "de",
+     "x": 591
+    },
+    {
+     "text": "Reggaeton",
+     "x": 677
+    },
+    {
+     "text": "Viejo",
+     "x": 992
+    }
+   ]
+  },
+  {
+   "text": "La]",
+   "y": 878,
+   "h": 24,
+   "conf": 3,
+   "words": [
+    {
+     "text": "La]",
+     "x": 756
+    }
+   ]
+  },
+  {
+   "text": "E",
+   "y": 976,
+   "h": 24,
+   "conf": 70,
+   "words": [
+    {
+     "text": "E",
+     "x": 658
+    }
+   ]
+  },
+  {
+   "text": "-",
+   "y": 1122,
+   "h": 24,
+   "conf": 0,
+   "words": [
+    {
+     "text": "-",
+     "x": 756
+    }
+   ]
+  },
+  {
+   "text": "; \" E",
+   "y": 1073,
+   "h": 123,
+   "conf": 39,
+   "words": [
+    {
+     "text": ";",
+     "x": 513
+    },
+    {
+     "text": "\"",
+     "x": 561
+    },
+    {
+     "text": "E",
+     "x": 610
+    }
+   ]
+  },
+  {
+   "text": "[m] \"",
+   "y": 1215,
+   "h": 185,
+   "conf": 55,
+   "words": [
+    {
+     "text": "[m]",
+     "x": 460
+    },
+    {
+     "text": "\"",
+     "x": 756
+    }
+   ]
+  },
+  {
+   "text": "L",
+   "y": 1366,
+   "h": 25,
+   "conf": 3,
+   "words": [
+    {
+     "text": "L",
+     "x": 756
+    }
+   ]
+  },
+  {
+   "text": "FBMS2VXB8",
+   "y": 1429,
+   "h": 26,
+   "conf": 91,
+   "words": [
+    {
+     "text": "FBMS2VXB8",
+     "x": 600
+    }
+   ]
+  },
+  {
+   "text": "Válido para 1 persona",
+   "y": 1537,
+   "h": 21,
+   "conf": 97,
+   "words": [
+    {
+     "text": "Válido",
+     "x": 602
+    },
+    {
+     "text": "para",
+     "x": 677
+    },
+    {
+     "text": "1",
+     "x": 736
+    },
+    {
+     "text": "persona",
+     "x": 752
+    }
+   ]
+  },
+  {
+   "text": "Early Access Laura Ferrer Pons",
+   "y": 1659,
+   "h": 42,
+   "conf": 97,
+   "words": [
+    {
+     "text": "Early",
+     "x": 207
+    },
+    {
+     "text": "Access",
+     "x": 302
+    },
+    {
+     "text": "Laura",
+     "x": 785
+    },
+    {
+     "text": "Ferrer",
+     "x": 921
+    },
+    {
+     "text": "Pons",
+     "x": 1075
+    }
+   ]
+  },
+  {
+   "text": "Precio: 15,82 € Teléfono: +34600000000",
+   "y": 1708,
+   "h": 27,
+   "conf": 95,
+   "words": [
+    {
+     "text": "Precio:",
+     "x": 206
+    },
+    {
+     "text": "15,82",
+     "x": 291
+    },
+    {
+     "text": "€",
+     "x": 358
+    },
+    {
+     "text": "Teléfono:",
+     "x": 785
+    },
+    {
+     "text": "+34600000000",
+     "x": 892
+    }
+   ]
+  },
+  {
+   "text": "Email: correo@ejemplo.es correo@ejemplo.es",
+   "y": 1744,
+   "h": 22,
+   "conf": 86,
+   "words": [
+    {
+     "text": "Email:",
+     "x": 786
+    },
+    {
+     "text": "correo@ejemplo.es",
+     "x": 864
+    },
+    {
+     "text": "correo@ejemplo.es",
+     "x": 1068
+    }
+   ]
+  },
+  {
+   "text": "Contenido: Acceso antess de las 19h,",
+   "y": 1778,
+   "h": 19,
+   "conf": 95,
+   "words": [
+    {
+     "text": "Contenido:",
+     "x": 206
+    },
+    {
+     "text": "Acceso",
+     "x": 332
+    },
+    {
+     "text": "antess",
+     "x": 426
+    },
+    {
+     "text": "de",
+     "x": 512
+    },
+    {
+     "text": "las",
+     "x": 548
+    },
+    {
+     "text": "19h,",
+     "x": 590
+    }
+   ]
+  },
+  {
+   "text": "llegando a partir de esa hora se",
+   "y": 1814,
+   "h": 22,
+   "conf": 97,
+   "words": [
+    {
+     "text": "llegando",
+     "x": 206
+    },
+    {
+     "text": "a",
+     "x": 314
+    },
+    {
+     "text": "partir",
+     "x": 335
+    },
+    {
+     "text": "de",
+     "x": 404
+    },
+    {
+     "text": "esa",
+     "x": 440
+    },
+    {
+     "text": "hora",
+     "x": 489
+    },
+    {
+     "text": "se",
+     "x": 549
+    }
+   ]
+  },
+  {
+   "text": "pagara la diferencia de precio en",
+   "y": 1849,
+   "h": 22,
+   "conf": 97,
+   "words": [
+    {
+     "text": "pagara",
+     "x": 206
+    },
+    {
+     "text": "la",
+     "x": 294
+    },
+    {
+     "text": "diferencia",
+     "x": 321
+    },
+    {
+     "text": "de",
+     "x": 444
+    },
+    {
+     "text": "precio",
+     "x": 480
+    },
+    {
+     "text": "en",
+     "x": 561
+    }
+   ]
+  },
+  {
+   "text": "puerta",
+   "y": 1887,
+   "h": 20,
+   "conf": 97,
+   "words": [
+    {
+     "text": "puerta",
+     "x": 206
+    }
+   ]
+  },
+  {
+   "text": "UBICACIÓN",
+   "y": 2057,
+   "h": 22,
+   "conf": 97,
+   "words": [
+    {
+     "text": "UBICACIÓN",
+     "x": 651
+    }
+   ]
+  },
+  {
+   "text": "Camí Can Capó, 4, 07199 Palma (Islas Baleares), España",
+   "y": 2096,
+   "h": 23,
+   "conf": 95,
+   "words": [
+    {
+     "text": "Camí",
+     "x": 401
+    },
+    {
+     "text": "Can",
+     "x": 467
+    },
+    {
+     "text": "Capó,",
+     "x": 519
+    },
+    {
+     "text": "4,",
+     "x": 592
+    },
+    {
+     "text": "07199",
+     "x": 618
+    },
+    {
+     "text": "Palma",
+     "x": 695
+    },
+    {
+     "text": "(Islas",
+     "x": 772
+    },
+    {
+     "text": "Baleares),",
+     "x": 838
+    },
+    {
+     "text": "España",
+     "x": 957
+    }
+   ]
+  },
+  {
+   "text": ">»",
+   "y": 2368,
+   "h": 18,
+   "conf": 63,
+   "words": [
+    {
+     "text": ">»",
+     "x": 204
+    }
+   ]
+  },
+  {
+   "text": "Y AMOK powered by 4 fourvenues",
+   "y": 2371,
+   "h": 61,
+   "conf": 91,
+   "words": [
+    {
+     "text": "Y",
+     "x": 165
+    },
+    {
+     "text": "AMOK",
+     "x": 262
+    },
+    {
+     "text": "powered",
+     "x": 969
+    },
+    {
+     "text": "by",
+     "x": 1075
+    },
+    {
+     "text": "4",
+     "x": 1095
+    },
+    {
+     "text": "fourvenues",
+     "x": 1112
+    }
+   ]
+  },
+  {
+   "text": "<a",
+   "y": 2428,
+   "h": 8,
+   "conf": 54,
+   "words": [
+    {
+     "text": "<a",
+     "x": 174
+    }
+   ]
+  },
+  {
+   "text": "Sin extras + Añadir extras",
+   "y": 2524,
+   "h": 34,
+   "conf": 95,
+   "words": [
+    {
+     "text": "Sin",
+     "x": 185
+    },
+    {
+     "text": "extras",
+     "x": 229
+    },
+    {
+     "text": "+",
+     "x": 1034
+    },
+    {
+     "text": "Añadir",
+     "x": 1071
+    },
+    {
+     "text": "extras",
+     "x": 1156
+    }
+   ]
+  },
+  {
+   "text": "CONDICIONES GENERALES",
+   "y": 2660,
+   "h": 21,
+   "conf": 97,
+   "words": [
+    {
+     "text": "CONDICIONES",
+     "x": 156
+    },
+    {
+     "text": "GENERALES",
+     "x": 363
+    }
+   ]
+  },
+  {
+   "text": "AMOK MALLORCA",
+   "y": 2715,
+   "h": 17,
+   "conf": 76,
+   "words": [
+    {
+     "text": "AMOK",
+     "x": 156
+    },
+    {
+     "text": "MALLORCA",
+     "x": 237
+    }
+   ]
+  },
+  {
+   "text": "DRESS CODE — ELEGANTE / SMART (condición de acceso obligatoria)",
+   "y": 2751,
+   "h": 18,
+   "conf": 95,
+   "words": [
+    {
+     "text": "DRESS",
+     "x": 158
+    },
+    {
+     "text": "CODE",
+     "x": 249
+    },
+    {
+     "text": "—",
+     "x": 329
+    },
+    {
+     "text": "ELEGANTE",
+     "x": 359
+    },
+    {
+     "text": "/",
+     "x": 496
+    },
+    {
+     "text": "SMART",
+     "x": 512
+    },
+    {
+     "text": "(condición",
+     "x": 604
+    },
+    {
+     "text": "de",
+     "x": 723
+    },
+    {
+     "text": "acceso",
+     "x": 758
+    },
+    {
+     "text": "obligatoria)",
+     "x": 842
+    }
+   ]
+  },
+  {
+   "text": "Se recomienda / bienvenido",
+   "y": 2786,
+   "h": 16,
+   "conf": 95,
+   "words": [
+    {
+     "text": "Se",
+     "x": 158
+    },
+    {
+     "text": "recomienda",
+     "x": 194
+    },
+    {
+     "text": "/",
+     "x": 330
+    },
+    {
+     "text": "bienvenido",
+     "x": 344
+    }
+   ]
+  },
+  {
+   "text": "Camisas, polos o camisetas de vestir en hombres; vestidos, monos, blusas o conjuntos elegá VA",
+   "y": 2819,
+   "h": 77,
+   "conf": 95,
+   "words": [
+    {
+     "text": "Camisas,",
+     "x": 157
+    },
+    {
+     "text": "polos",
+     "x": 267
+    },
+    {
+     "text": "o",
+     "x": 332
+    },
+    {
+     "text": "camisetas",
+     "x": 352
+    },
+    {
+     "text": "de",
+     "x": 471
+    },
+    {
+     "text": "vestir",
+     "x": 508
+    },
+    {
+     "text": "en",
+     "x": 570
+    },
+    {
+     "text": "hombres;",
+     "x": 606
+    },
+    {
+     "text": "vestidos,",
+     "x": 715
+    },
+    {
+     "text": "monos,",
+     "x": 820
+    },
+    {
+     "text": "blusas",
+     "x": 908
+    },
+    {
+     "text": "o",
+     "x": 986
+    },
+    {
+     "text": "conjuntos",
+     "x": 1006
+    },
+    {
+     "text": "elegá",
+     "x": 1118
+    },
+    {
+     "text": "VA",
+     "x": 1236
+    }
+   ]
+  },
+  {
+   "text": "mujeres",
+   "y": 2896,
+   "h": 18,
+   "conf": 96,
+   "words": [
+    {
+     "text": "mujeres",
+     "x": 158
+    }
+   ]
+  },
+  {
+   "text": "Pantalón de vestir, chino o vaquero elegante (sin roturas ni desgaste)",
+   "y": 2928,
+   "h": 20,
+   "conf": 97,
+   "words": [
+    {
+     "text": "Pantalón",
+     "x": 158
+    },
+    {
+     "text": "de",
+     "x": 262
+    },
+    {
+     "text": "vestir,",
+     "x": 295
+    },
+    {
+     "text": "chino",
+     "x": 366
+    },
+    {
+     "text": "o",
+     "x": 432
+    },
+    {
+     "text": "vaquero",
+     "x": 454
+    },
+    {
+     "text": "elegante",
+     "x": 549
+    },
+    {
+     "text": "(sin",
+     "x": 651
+    },
+    {
+     "text": "roturas",
+     "x": 698
+    },
+    {
+     "text": "ni",
+     "x": 782
+    },
+    {
+     "text": "desgaste)",
+     "x": 807
+    }
+   ]
+  },
+  {
+   "text": "Zapato cerrado, mocasín, botín o zapatilla urbana de gama alta",
+   "y": 2963,
+   "h": 21,
+   "conf": 95,
+   "words": [
+    {
+     "text": "Zapato",
+     "x": 156
+    },
+    {
+     "text": "cerrado,",
+     "x": 240
+    },
+    {
+     "text": "mocasín,",
+     "x": 338
+    },
+    {
+     "text": "botín",
+     "x": 445
+    },
+    {
+     "text": "o",
+     "x": 506
+    },
+    {
+     "text": "zapatilla",
+     "x": 527
+    },
+    {
+     "text": "urbana",
+     "x": 626
+    },
+    {
+     "text": "de",
+     "x": 708
+    },
+    {
+     "text": "gama",
+     "x": 742
+    },
+    {
+     "text": "alta",
+     "x": 812
+    }
+   ]
+  },
+  {
+   "text": "Blazer o americana (no obligatoria)",
+   "y": 2998,
+   "h": 19,
+   "conf": 93,
+   "words": [
+    {
+     "text": "Blazer",
+     "x": 158
+    },
+    {
+     "text": "o",
+     "x": 234
+    },
+    {
+     "text": "americana",
+     "x": 254
+    },
+    {
+     "text": "(no",
+     "x": 376
+    },
+    {
+     "text": "obligatoria)",
+     "x": 418
+    }
+   ]
+  }
+ ]
+}

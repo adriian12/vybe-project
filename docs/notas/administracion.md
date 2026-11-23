@@ -148,3 +148,9 @@ están en otras fiestas (`search_known_places`, migración 139: agrupa por
 y la ciudad que más se repiten). Al elegir una, el pin va a su sitio y, en el
 formulario de administración, se rellenan el nombre de la sala y, si falta, la
 ciudad. Sólo para administración y cuentas con negocio.
+
+## Caduca pronto sin renovación
+
+En Usuarios y en Negocios, una etiqueta roja «Caduca en N días» para el Premium o
+el plan que acaba en 7 días o menos sin renovación automática (`lib/caducidad.ts`,
+con test). En negocios va en la cabecera de la tarjeta, sin tener que abrirla.

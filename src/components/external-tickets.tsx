@@ -8,7 +8,14 @@ import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { PartyButton } from '@/components/ui-custom/party-button';
 import { useToast } from '@/components/ui/use-toast';
-import { ExternalTicket, externalTicketsService, matchEvent, readTicketFile, TicketReadError } from '@/services/external-tickets';
+import {
+  asociarFiesta,
+  completarConFiesta,
+  ExternalTicket,
+  externalTicketsService,
+  readTicketFile,
+  TicketReadError,
+} from '@/services/external-tickets';
 import type { ImportedTicket } from '@/lib/ticket-import';
 import type { Event } from '@/types/venue';
 import { cn } from '@/lib/utils';
@@ -21,8 +28,26 @@ import { cn } from '@/lib/utils';
 
 const NOMBRE_PLATAFORMA: Record<string, string> = { fourvenues: 'Fourvenues' };
 
-/** Una entrada de una fiesta que ya terminó deja de salir (12 h después del inicio). */
-const vigente = (t: ExternalTicket) => !t.startsAt || new Date(t.startsAt).getTime() + 12 * 3600 * 1000 > Date.now();
+/**
+ * Cuándo termina la fiesta de la entrada: la de la ficha de Fiestea si está
+ * enlazada; si no, la hora de fin que trae la entrada («23:45», al día
+ * siguiente si es antes del inicio); si tampoco, 12 h después del inicio.
+ * Hasta entonces sale en «Próximas» (también cuando ya ha empezado: es cuando
+ * hace falta en la puerta); después, en «Pasadas».
+ */
+const finDe = (t: ExternalTicket, ficha?: Event): number | null => {
+  if (ficha) return new Date(ficha.endDate).getTime();
+  if (!t.startsAt) return null;
+  const inicio = new Date(t.startsAt);
+  const hora = t.endsLabel?.match(/^(\d{1,2}):(\d{2})$/);
+  if (hora) {
+    const fin = new Date(inicio);
+    fin.setHours(Number(hora[1]), Number(hora[2]), 0, 0);
+    if (fin <= inicio) fin.setDate(fin.getDate() + 1);
+    return fin.getTime() + 60 * 60 * 1000;
+  }
+  return inicio.getTime() + 12 * 3600 * 1000;
+};
 
 /** «LISTA» → «Lista»: los PDF ponen las tarifas en mayúsculas. */
 const suave = (s: string | null) =>
@@ -38,28 +63,50 @@ const horaCorta = (iso: string) => new Date(iso).toLocaleTimeString(undefined, {
  */
 const ExternalTickets = ({
   events,
-  addOpen,
+  addOpen = false,
   onAddOpenChange,
+  view = 'upcoming',
+  onPastCount,
 }: {
   events: Event[];
-  addOpen: boolean;
-  onAddOpenChange: (open: boolean) => void;
+  addOpen?: boolean;
+  onAddOpenChange?: (open: boolean) => void;
+  /** «Próximas» (con la hoja de añadir) o «Pasadas» (lista; al tocar, la entrada). */
+  view?: 'upcoming' | 'past';
+  onPastCount?: (count: number) => void;
 }) => {
   const { t } = useTranslation();
   const { toast } = useToast();
   const [tickets, setTickets] = useState<ExternalTicket[]>([]);
   const [verArchivadas, setVerArchivadas] = useState(false);
   const [abiertos, setAbiertos] = useState<Record<string, boolean>>({});
+  const [viendo, setViendo] = useState<ExternalTicket | null>(null);
 
   const load = useCallback(async () => setTickets(await externalTicketsService.getMine()), []);
   useEffect(() => {
     void load();
   }, [load]);
 
-  const vivas = useMemo(() => tickets.filter(vigente), [tickets]);
+  const fichas = useMemo(() => new Map(events.map((e) => [e.id, e])), [events]);
+  const { vivas, pasadas } = useMemo(() => {
+    const ahora = Date.now();
+    const esPasada = (x: ExternalTicket) => {
+      const fin = finDe(x, x.eventId ? fichas.get(x.eventId) : undefined);
+      return fin !== null && fin <= ahora;
+    };
+    return {
+      vivas: tickets.filter((x) => !esPasada(x)),
+      pasadas: tickets
+        .filter(esPasada)
+        .sort((a, b) => new Date(b.startsAt ?? 0).getTime() - new Date(a.startsAt ?? 0).getTime()),
+    };
+  }, [tickets, fichas]);
   const vigentes = vivas.filter((x) => !x.archived);
   const archivadas = vivas.filter((x) => x.archived);
-  const fichas = useMemo(() => new Map(events.map((e) => [e.id, e])), [events]);
+
+  useEffect(() => {
+    onPastCount?.(pasadas.length);
+  }, [pasadas.length, onPastCount]);
 
   const archivar = async (ticket: ExternalTicket, archived: boolean) => {
     setTickets((l) => l.map((x) => (x.id === ticket.id ? { ...x, archived } : x)));
@@ -83,7 +130,7 @@ const ExternalTickets = ({
     }
   };
 
-  const tarjeta = (ticket: ExternalTicket) => {
+  const tarjeta = (ticket: ExternalTicket, pasada = false) => {
     const ficha = ticket.eventId ? fichas.get(ticket.eventId) : undefined;
     const plataforma = NOMBRE_PLATAFORMA[ticket.source] ?? t('tickets.external.otherSource');
     const detallesAbiertos = abiertos[ticket.id];
@@ -122,6 +169,7 @@ const ExternalTickets = ({
               {t('tickets.external.from', { source: plataforma })}
             </p>
           </div>
+          {!pasada && (
           <button
             type="button"
             onClick={() => void archivar(ticket, !ticket.archived)}
@@ -131,9 +179,10 @@ const ExternalTickets = ({
             {ticket.archived ? <ArchiveRestore size={14} /> : <Archive size={14} />}
             {ticket.archived ? t('tickets.mine.restore') : t('tickets.mine.archive')}
           </button>
+          )}
         </div>
 
-        {!ticket.archived && (
+        {(!ticket.archived || pasada) && (
           <div className="flex flex-col items-center gap-2 border-t border-dashed border-black/15 p-4">
             <QRCodeSVG value={ticket.qrText} size={180} level="M" />
             {ticket.code && <p className="font-mono text-body-md font-bold tracking-[0.2em]">{ticket.code}</p>}
@@ -194,9 +243,54 @@ const ExternalTickets = ({
     );
   };
 
+  // «Pasadas»: una fila por entrada; al tocarla se vuelve a ver entera (con su QR).
+  if (view === 'past') {
+    if (pasadas.length === 0) return null;
+    return (
+      <>
+        <ul className="space-y-3">
+          {pasadas.map((ticket) => (
+            <li key={ticket.id}>
+              <button
+                type="button"
+                onClick={() => setViendo(ticket)}
+                className="press flex w-full items-center gap-3 rounded-2xl bg-card p-3 text-left"
+              >
+                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-surface-high text-party-primary">
+                  <Ticket size={20} />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate font-display text-title-card">{ticket.eventName ?? ticket.organizer ?? '—'}</span>
+                  <span className="block truncate text-caption text-party-gray">
+                    {[ticket.organizer !== ticket.eventName ? ticket.organizer : null, ticket.startsAt ? fechaLarga(ticket.startsAt) : null]
+                      .filter(Boolean)
+                      .join(' · ')}
+                  </span>
+                  {(ticket.ticketType ?? ticket.kind) && (
+                    <span className="block truncate text-caption font-bold">{suave(ticket.ticketType ?? ticket.kind)}</span>
+                  )}
+                </span>
+                <span className="shrink-0 rounded-full bg-surface-high px-2.5 py-1 text-caption">{t('tickets.mine.ended')}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+        <Sheet open={viendo !== null} onOpenChange={(o) => !o && setViendo(null)}>
+          <SheetContent side="bottom" className="max-h-[90vh] overflow-y-auto">
+            <SheetHeader className="text-left">
+              <SheetTitle>{t('tickets.external.pastTitle')}</SheetTitle>
+              <SheetDescription>{t('tickets.external.pastBody')}</SheetDescription>
+            </SheetHeader>
+            {viendo && <ul className="py-4">{tarjeta(viendo, true)}</ul>}
+          </SheetContent>
+        </Sheet>
+      </>
+    );
+  }
+
   return (
     <div className="space-y-3">
-      {vigentes.length > 0 && <ul className="space-y-3">{vigentes.map(tarjeta)}</ul>}
+      {vigentes.length > 0 && <ul className="space-y-3">{vigentes.map((x) => tarjeta(x))}</ul>}
 
       {archivadas.length > 0 && (
         <div className="space-y-3">
@@ -210,13 +304,13 @@ const ExternalTickets = ({
             {t('tickets.mine.archivedList', { count: archivadas.length })}
             <ChevronDown size={14} className={cn('transition-transform', verArchivadas && 'rotate-180')} />
           </button>
-          {verArchivadas && <ul className="space-y-3">{archivadas.map(tarjeta)}</ul>}
+          {verArchivadas && <ul className="space-y-3">{archivadas.map((x) => tarjeta(x))}</ul>}
         </div>
       )}
 
       <AddTicketSheet
         open={addOpen}
-        onOpenChange={onAddOpenChange}
+        onOpenChange={(o) => onAddOpenChange?.(o)}
         events={events}
         onSaved={(nueva) => setTickets((l) => [...l.filter((x) => x.id !== nueva.id), nueva])}
       />
@@ -248,24 +342,58 @@ const AddTicketSheet = ({
   const [leida, setLeida] = useState<ImportedTicket | null>(null);
   const [enlazar, setEnlazar] = useState(true);
 
-  const ficha = useMemo(() => (leida ? matchEvent(leida, events) : null), [leida, events]);
+  // La fiesta de Fiestea de la entrada (la que se encontró al leerla).
+  const [ficha, setFicha] = useState<Event | null>(null);
 
   const reiniciar = () => {
     setLeida(null);
+    setFicha(null);
     setError(null);
     setEnlazar(true);
     if (input.current) input.current.value = '';
   };
 
+  const guardar = async (entrada: ImportedTicket | null = leida, fiesta: Event | null = ficha) => {
+    if (!entrada || !(entrada.eventName?.trim() && entrada.startsLocal)) return;
+    setGuardando(true);
+    try {
+      const { ticket, actualizada } = await externalTicketsService.add(entrada, enlazar && fiesta ? fiesta.id : null);
+      onSaved(ticket);
+      toast({
+        title: actualizada ? t('tickets.external.updated') : t('tickets.external.saved'),
+        description: [ticket.eventName, ticket.startsAt ? fechaLarga(ticket.startsAt) : null].filter(Boolean).join(' · '),
+      });
+      onOpenChange(false);
+      reiniciar();
+    } catch {
+      toast({ title: t('common.error'), description: t('errors.generic'), variant: 'destructive' });
+    } finally {
+      setGuardando(false);
+    }
+  };
+
+  /**
+   * Se lee el archivo, se busca su fiesta en Fiestea y, si con eso están el
+   * nombre y la fecha, se guarda sin pedir nada. Si no, se avisa de que faltan
+   * datos y se dejan los campos para completarlos.
+   */
   const leer = async (file: File | undefined) => {
     if (!file) return;
     setError(null);
     setLeida(null);
+    setFicha(null);
     setLeyendo(true);
     try {
       const r = await readTicketFile(file);
-      if (!r.qrText) setError(t('tickets.external.noQr'));
-      else setLeida(r);
+      if (!r.qrText) {
+        setError(t('tickets.external.noQr'));
+        return;
+      }
+      const fiesta = asociarFiesta(r, events);
+      const completa = fiesta ? completarConFiesta(r, fiesta) : r;
+      setFicha(fiesta);
+      setLeida(completa);
+      if (completa.eventName?.trim() && completa.startsLocal) await guardar(completa, fiesta);
     } catch (e) {
       setError(
         e instanceof TicketReadError && e.code === 'UNSUPPORTED' ? t('tickets.external.unsupported') : t('tickets.external.unreadable'),
@@ -276,25 +404,6 @@ const AddTicketSheet = ({
   };
 
   const completa = Boolean(leida?.eventName?.trim() && leida?.startsLocal);
-
-  const guardar = async () => {
-    if (!leida || !completa) return;
-    setGuardando(true);
-    try {
-      const nueva = await externalTicketsService.add(leida, enlazar && ficha ? ficha.id : null);
-      onSaved(nueva);
-      toast({ title: t('tickets.external.saved') });
-      onOpenChange(false);
-      reiniciar();
-    } catch (e) {
-      toast({
-        title: e instanceof Error && e.message === 'DUPLICATE' ? t('tickets.external.duplicate') : t('common.error'),
-        variant: e instanceof Error && e.message === 'DUPLICATE' ? 'default' : 'destructive',
-      });
-    } finally {
-      setGuardando(false);
-    }
-  };
 
   const cambia = (campo: keyof ImportedTicket, valor: string) =>
     setLeida((l) => (l ? { ...l, [campo]: valor || null } : l));
@@ -338,6 +447,10 @@ const AddTicketSheet = ({
 
           {leida && (
             <>
+              {/* Sin nombre o fecha (y sin fiesta de Fiestea que los dé): se dice y se completan a mano. */}
+              {!completa && (
+                <p className="rounded-xl bg-party-primary/15 p-3 text-body-sm text-foreground">{t('tickets.external.incomplete')}</p>
+              )}
               <div className="flex gap-4 rounded-2xl bg-white p-4 text-ink">
                 <QRCodeSVG value={leida.qrText} size={96} level="M" className="shrink-0" />
                 <div className="min-w-0 text-body-sm">
@@ -372,8 +485,6 @@ const AddTicketSheet = ({
                   <Switch checked={enlazar} onCheckedChange={setEnlazar} aria-label={t('tickets.external.linkToggle')} />
                 </div>
               )}
-
-              {!completa && <p className="text-caption text-party-gray">{t('tickets.external.needFields')}</p>}
 
               <PartyButton className="w-full" size="lg" disabled={!completa || guardando} onClick={() => void guardar()}>
                 {guardando && <Loader2 size={16} className="mr-2 animate-spin" />}

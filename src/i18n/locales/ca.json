@@ -2209,7 +2209,10 @@
             "renews": "Es renova el {{date}}",
             "ends": "Caduca el {{date}} (no es renova)",
             "endsCancelled": "Cancel·lada: caduca el {{date}}",
-            "trialEnds": "Prova gratis fins al {{date}}"
+            "trialEnds": "Prova gratis fins al {{date}}",
+            "expiresSoon_zero": "Caduca avui",
+            "expiresSoon_one": "Caduca demà",
+            "expiresSoon_other": "Caduca d’aquí a {{count}} dies"
         },
         "funout": {
             "synced_one": "{{count}} esdeveniment al dia",
@@ -2490,7 +2493,7 @@
             "add": "Afegir entrada",
             "addHint": "Vas comprar l’entrada a Fourvenues o a una altra web? Afegeix-la i tingues-la aquí amb la resta.",
             "addTitle": "Afegir una entrada",
-            "addBody": "Puja el PDF de la teva entrada o una captura amb el QR. Es llegeix al teu mòbil: el fitxer no es puja enlloc.",
+            "addBody": "Puja el PDF de la teva entrada o una captura: llegim la festa, la data i el QR al teu mòbil i l’afegim sola. L’arxiu no es puja enlloc.",
             "choose": "Triar PDF o captura",
             "reading": "Llegint l’entrada…",
             "noQr": "No hem trobat cap QR. Prova amb el PDF original o amb una captura més nítida.",
@@ -2515,7 +2518,11 @@
             "removed": "Entrada treta",
             "free": "Gratis",
             "untilClose": "fins al tancament",
-            "another": "Triar un altre fitxer"
+            "another": "Triar un altre fitxer",
+            "updated": "Ja tenies aquesta entrada: l’he actualitzada",
+            "incomplete": "La imatge no mostra les dades completes de la festa. Completa el nom i la data.",
+            "pastTitle": "La teva entrada",
+            "pastBody": "D’una festa que ja ha acabat."
         },
         "title": "Les meves entrades",
         "subtitle": "Llestes per a la porta i la barra",

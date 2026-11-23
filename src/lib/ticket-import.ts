@@ -45,6 +45,8 @@ export interface ImportedTicket {
   startsLocal: string | null;
   /** «Cierre» o la hora de fin («06:00»). */
   endsLabel: string | null;
+  /** Todo el texto leído (PDF o captura), para buscar la fiesta de Fiestea. No se guarda. */
+  ocrText?: string;
 }
 
 const MESES: Record<string, number> = {
@@ -203,6 +205,143 @@ export const parseTicket = (
   // Titular: la primera línea de la derecha que no es «Campo: valor».
   const titular = der.find((l) => !/:/.test(l.text));
   resultado.holderName = titular?.text ?? null;
+
+  return resultado;
+};
+
+// ---------------------------------------------------------------------------
+// Capturas (texto reconocido en el móvil con Tesseract)
+// ---------------------------------------------------------------------------
+
+/** Una línea reconocida en una captura: sus palabras con su posición. */
+export interface OcrLine {
+  text: string;
+  /** Arriba de la línea, en píxeles desde arriba. */
+  y: number;
+  h: number;
+  /** Confianza del reconocimiento, de 0 a 100. */
+  conf: number;
+  words: { text: string; x: number }[];
+}
+
+const DIA_SEMANA = /\b(lun|mar|mi[eé]|jue|vie|s[áa]b|dom|mon|tue|wed|thu|fri|sat|sun)[a-z]*\.?/i;
+
+/**
+ * Interpreta la captura de una entrada (la web de Fourvenues u otra parecida):
+ * la franja con la fecha, el nombre justo debajo, «Válido para N», la tarifa a
+ * la izquierda y el titular a la derecha, y la dirección tras «UBICACIÓN».
+ * Lo que no se lea lo completa la fiesta de Fiestea que se le asocie
+ * (`matchEventText`).
+ */
+export const parseTicketOcr = (lines: OcrLine[], width: number, qrText: string): ImportedTicket => {
+  // Las líneas con poca confianza son el QR, iconos o la barra del navegador.
+  const fiables = lines.filter((l) => l.conf >= 50 && l.text.trim());
+  const texto = fiables.map((l) => l.text).join('\n');
+  const resultado: ImportedTicket = {
+    source: /fourvenues/i.test(texto) ? 'fourvenues' : 'other',
+    qrText,
+    code: CODIGO.test(qrText.trim()) ? qrText.trim() : null,
+    eventName: null,
+    organizer: null,
+    kind: null,
+    ticketType: null,
+    details: null,
+    priceCents: null,
+    people: null,
+    holderName: null,
+    address: null,
+    startsLocal: null,
+    endsLabel: null,
+  };
+
+  // Franja: «ENTRADA SÁB. 21 DE NOV. DE 2026 | 6:00 PM - 11:45 PM».
+  const franja = fiables.find((l) => fechaIso(l.text) && /\d{1,2}:\d{2}/.test(l.text));
+  if (franja) {
+    const [antes, despues = ''] = franja.text.includes('|')
+      ? franja.text.split('|')
+      : [franja.text, franja.text.slice(franja.text.search(/\d{1,2}:\d{2}/))];
+    const fecha = fechaIso(antes);
+    const inicioFecha = antes.search(DIA_SEMANA);
+    const tipo = inicioFecha > 0 ? limpia(antes.slice(0, inicioFecha)) : '';
+    if (tipo && /^[a-záéíóúñ ]{3,20}$/i.test(tipo)) resultado.kind = tipo.toLowerCase().replace(/^\w/, (c) => c.toUpperCase());
+    const horas = despues.match(/\d{1,2}:\d{2}\s*(?:[AP]\.?\s?M\.?)?/gi) ?? [];
+    const ini = horas[0] ? hora24(horas[0]) : null;
+    if (fecha) resultado.startsLocal = `${fecha}T${ini ?? '00:00'}`;
+    if (horas[1]) resultado.endsLabel = hora24(horas[1]);
+    else if (/cierre|close/i.test(despues)) resultado.endsLabel = 'Cierre';
+  }
+
+  // Organizador: lo que va antes de «powered by» en la cabecera de Fourvenues. El
+  // reconocimiento a veces se come «powered» («Y AMOK by 4 fourvenues»): vale
+  // cualquier línea con «by … fourvenues», y se quita el logo leído como letras.
+  const cabecera = fiables.find((l) => /powered\s+b|\bby\b.*fourvenues/i.test(l.text));
+  if (cabecera) {
+    const antes = cabecera.text.split(/\bpowered\b|\bby\b|\|/i)[0];
+    const org = limpia(
+      antes
+        .split(/\s+/)
+        .map((p) => p.replace(/^[^A-Za-zÁÉÍÓÚÑáéíóúñ0-9]+|[^A-Za-zÁÉÍÓÚÑáéíóúñ0-9]+$/g, ''))
+        .filter((p, i, todas) => p && !(p.length <= 2 && i < todas.length - 1))
+        .join(' '),
+    );
+    if (org.length >= 2) resultado.organizer = org;
+  }
+
+  // Nombre: la primera línea clara bajo la franja (o, si la franja no se leyó,
+  // bajo la cabecera) que no es un código ni «Válido para».
+  const desdeY = franja?.y ?? cabecera?.y;
+  if (desdeY !== undefined) {
+    const nombre = fiables.find(
+      (l) =>
+        l.y > desdeY &&
+        l.conf >= (franja ? 70 : 85) &&
+        /[a-záéíóúñ]{3}/i.test(l.text) &&
+        !CODIGO.test(l.text.trim()) &&
+        !/fourvenues|powered/i.test(l.text),
+    );
+    if (nombre && !/v[áa]lido para/i.test(nombre.text)) resultado.eventName = limpia(nombre.text);
+  }
+
+  if (!resultado.code) {
+    const cod = fiables.find((l) => CODIGO.test(l.text.trim()));
+    if (cod) resultado.code = cod.text.trim();
+  }
+
+  const valido = fiables.find((l) => /v[áa]lido para/i.test(l.text));
+  const n = valido?.text.match(/(\d+)\s*persona/i);
+  if (n) resultado.people = Number(n[1]);
+
+  const ubic = fiables.find((l) => /^ubicaci[óo]n\b/i.test(l.text.trim()));
+  if (ubic) {
+    const dir = fiables.find((l) => l.y > ubic.y);
+    if (dir) resultado.address = limpia(dir.text);
+  }
+
+  // Bajo «Válido para»: tarifa y precio a la izquierda, titular a la derecha.
+  if (valido) {
+    const mitad = width / 2;
+    const bloque = fiables.filter((l) => l.y > valido.y && (!ubic || l.y < ubic.y));
+    const izq = (l: OcrLine) => limpia(l.words.filter((w) => w.x < mitad).map((w) => w.text).join(' '));
+    const der = (l: OcrLine) => limpia(l.words.filter((w) => w.x >= mitad).map((w) => w.text).join(' '));
+    if (bloque[0]) {
+      resultado.ticketType = izq(bloque[0]) || null;
+      const titular = der(bloque[0]);
+      if (titular && !/:/.test(titular)) resultado.holderName = titular;
+    }
+    const detalles: string[] = [];
+    for (const l of bloque.slice(1)) {
+      const t = izq(l);
+      const precio = t.match(/precio:?\s*([\d.,]+)\s*€?/i);
+      if (precio) {
+        const valor = Number(precio[1].replace(/\./g, '').replace(',', '.'));
+        if (Number.isFinite(valor)) resultado.priceCents = Math.round(valor * 100);
+        continue;
+      }
+      if (!t || /^tasas e impuestos/i.test(t) || /^email|^tel[ée]fono/i.test(t)) continue;
+      detalles.push(t.replace(/^contenido:\s*/i, ''));
+    }
+    resultado.details = detalles.length ? limpia(detalles.join(' ')) : null;
+  }
 
   return resultado;
 };

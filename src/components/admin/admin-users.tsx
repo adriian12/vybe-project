@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/components/ui/use-toast';
 import { adminService, AdminUser } from '@/services/admin';
 import { cn } from '@/lib/utils';
+import { diasParaCaducar } from '@/lib/caducidad';
 import AdminNotices from '@/components/admin/admin-notices';
 
 const PAGINA = 50;
@@ -187,6 +188,16 @@ const AdminUsers = () => {
                           )}
                         </SelectContent>
                       </Select>
+
+                      {/* Caduca pronto sin renovación: etiqueta roja, para verlo de un vistazo. */}
+                      {user.subscription !== 'none' &&
+                        diasParaCaducar(user.subscriptionExpiresAt, user.subscriptionRenews) !== null && (
+                          <span className="rounded-full bg-red-600 px-2 py-0.5 text-[10px] font-bold uppercase text-white">
+                            {t('admin.subs.expiresSoon', {
+                              count: diasParaCaducar(user.subscriptionExpiresAt, user.subscriptionRenews) ?? 0,
+                            })}
+                          </span>
+                        )}
 
                       {user.subscriptionExpiresAt && user.subscription !== 'none' && (
                         <span

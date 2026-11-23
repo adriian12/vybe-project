@@ -208,7 +208,24 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
     y tamaño del texto (organizador, franja con fecha, nombre en letra grande,
     «Válido para N», tarifa a la izquierda, titular a la derecha, UBICACIÓN).
     Tests con dos PDF reales anonimizados en `src/lib/__fixtures__/`.
-  - De otros PDF sólo se fía del QR; nombre y fecha los completa la persona.
+  - **Capturas** (22-11-2026): el texto se reconoce en el móvil con Tesseract.js
+    (`leerTextoImagen`): la imagen en gris, al doble y en negativo, porque la
+    franja de la fecha de Fourvenues es texto blanco sobre color y sin invertir no
+    se leía. `parseTicketOcr` la interpreta (test con la lectura real, anonimizada,
+    en `__fixtures__/captura-fourvenues-ocr.json`). Los datos del idioma se
+    descargan la primera vez (jsDelivr y tessdata); la imagen no sale del móvil.
+  - **Se asocia sola a la fiesta** (`asociarFiesta`): busca el nombre de cada fiesta
+    de esa noche (o, sin fecha, de las que no han terminado) en todo el texto
+    leído, y la sala ayuda. Con fiesta, `completarConFiesta` pone nombre, sala,
+    hora y dirección, y la entrada se guarda sin pedir nada. Sin nombre o fecha,
+    aviso «La imagen no muestra los datos completos…» y los campos a mano.
+  - **Mismo QR otra vez**: ya no da «Ya tenías esta entrada»; se actualiza con lo
+    leído y se desarchiva (`add` devuelve `actualizada`). Pasó con una de Amok
+    guardada a mano con fecha equivocada: desapareció esa noche y no se podía
+    volver a añadir.
+  - **Próximas hasta que acaba la fiesta** (`finDe`): la hora de fin de la ficha
+    enlazada, o la de la entrada (+1 h), o 12 h tras el inicio. Después pasan a
+    «Pasadas», donde al tocarlas se ven enteras con su QR (también las compradas).
   - `external_tickets` guarda el contenido exacto del QR y lo que se enseña,
     nunca correo ni teléfono. RLS: cada persona sólo las suyas. Entra en
     `export_my_data`.

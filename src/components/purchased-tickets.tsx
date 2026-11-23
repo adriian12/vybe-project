@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { QRCodeSVG } from 'qrcode.react';
 import { Archive, ArchiveRestore, Armchair, CheckCircle2, ChevronDown, Crown, Loader2, Ticket } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { formatHourRange } from '@/components/event-bits';
 import TicketDownloadButtons from '@/components/ticket-download-buttons';
 import { euros, MyTicket, ticketsService } from '@/services/tickets';
@@ -37,6 +38,8 @@ const PurchasedTickets = ({
   const [tickets, setTickets] = useState<MyTicket[]>([]);
   const [esperando, setEsperando] = useState(false);
   const [verArchivadas, setVerArchivadas] = useState(false);
+  // En «Pasadas», la entrada que se está mirando (al tocarla se vuelve a ver entera).
+  const [viendo, setViendo] = useState<MyTicket | null>(null);
 
   const load = useCallback(async () => {
     const lista = await ticketsService.getMine();
@@ -123,9 +126,90 @@ const PurchasedTickets = ({
   const fecha = (ticket: MyTicket) =>
     `${ticket.venueName} · ${new Date(ticket.startDate).toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' })} · ${formatHourRange(ticket.startDate, ticket.endDate)}`;
 
+  const tarjeta = (ticket: MyTicket, pasada = false) => {
+    const Icono = ticket.kind === 'table' ? Armchair : ticket.kind === 'vip' ? Crown : Ticket;
+    return (
+      <li key={ticket.id} className="overflow-hidden rounded-2xl bg-white text-ink">
+        <div className="flex items-start gap-3 p-4">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-party-primary">
+            <Icono size={18} />
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="truncate font-display text-title-card">{ticket.eventName}</p>
+            <p className="truncate text-caption text-ink/60">{fecha(ticket)}</p>
+            {ticket.holderName && <p className="mt-1 truncate text-caption font-bold text-ink/80">{ticket.holderName}</p>}
+          </div>
+          {!pasada && (
+          <button
+            type="button"
+            onClick={() => void archivar(ticket, !ticket.archived)}
+            aria-label={ticket.archived ? t('tickets.mine.restore') : t('tickets.mine.archive')}
+            title={ticket.archived ? t('tickets.mine.restore') : t('tickets.mine.archive')}
+            className="press flex h-9 shrink-0 items-center gap-1 rounded-full border border-black/15 px-3 text-caption font-bold"
+          >
+            {ticket.archived ? <ArchiveRestore size={14} /> : <Archive size={14} />}
+            {ticket.archived ? t('tickets.mine.restore') : t('tickets.mine.archive')}
+          </button>
+          )}
+        </div>
+        {/* El tipo, a lo ancho: al lado del botón de archivar se partía en dos líneas. */}
+        <div className="-mt-2 px-4 pb-4">
+          <p className="text-body-sm font-bold">
+            {ticket.typeName}
+            {ticket.kind === 'table' && ticket.guests ? ` · ${t('tickets.buy.guests', { count: ticket.guests })}` : ''}
+          </p>
+          {ticket.kind === 'table' && (
+            <p className="text-caption text-ink/60">
+              {t('tickets.mine.depositPaid', { amount: euros(ticket.unitCents) })}
+              {ticket.minSpendCents ? ` · ${t('tickets.buy.minSpend', { amount: euros(ticket.minSpendCents) })}` : ''}
+            </p>
+          )}
+        </div>
+        {ticket.archived && !pasada ? null : (
+          <div className="flex flex-col items-center gap-2 border-t border-dashed border-black/15 p-4">
+            <QRCodeSVG value={ticket.code} size={168} level="M" />
+            <p className="font-mono text-body-md font-bold tracking-[0.2em]">{ticket.code}</p>
+            <p className="text-caption text-ink/60">
+              {pasada && ticket.status === 'used'
+                ? t('tickets.mine.usedShort', {
+                    time: ticket.usedAt ? new Date(ticket.usedAt).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }) : '',
+                  })
+                : pasada
+                  ? t('tickets.mine.ended')
+                  : t('tickets.mine.showAtDoor')}
+            </p>
+            {pasada && (
+              <Link to={`/event/${ticket.eventId}`} className="text-caption font-bold underline underline-offset-2">
+                {t('tickets.external.seeEvent')}
+              </Link>
+            )}
+            {ticket.downloadToken && (
+              <TicketDownloadButtons
+                token={ticket.downloadToken}
+                code={ticket.code}
+                tone="light"
+                className="w-full pt-1"
+              />
+            )}
+          </div>
+        )}
+      </li>
+    );
+  };
+
   if (view === 'past') {
     if (pasadas.length === 0) return null;
     return (
+      <>
+      <Sheet open={viendo !== null} onOpenChange={(o) => !o && setViendo(null)}>
+        <SheetContent side="bottom" className="max-h-[90vh] overflow-y-auto">
+          <SheetHeader className="text-left">
+            <SheetTitle>{t('tickets.external.pastTitle')}</SheetTitle>
+            <SheetDescription>{t('tickets.external.pastBody')}</SheetDescription>
+          </SheetHeader>
+          {viendo && <ul className="py-4">{tarjeta(viendo, true)}</ul>}
+        </SheetContent>
+      </Sheet>
       <ul className="space-y-3">
         {pasadas.map((ticket) => {
           const Icono = ticket.kind === 'table' ? Armchair : ticket.kind === 'vip' ? Crown : Ticket;
@@ -133,7 +217,7 @@ const PurchasedTickets = ({
             <li key={ticket.id}>
               <button
                 type="button"
-                onClick={() => navigate(`/event/${ticket.eventId}`)}
+                onClick={() => setViendo(ticket)}
                 className="press flex w-full items-center gap-3 rounded-2xl bg-card p-3 text-left"
               >
                 <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-surface-high text-party-primary">
@@ -162,66 +246,11 @@ const PurchasedTickets = ({
           );
         })}
       </ul>
+      </>
     );
   }
 
   if (vivas.length === 0 && !esperando) return null;
-
-  const tarjeta = (ticket: MyTicket) => {
-    const Icono = ticket.kind === 'table' ? Armchair : ticket.kind === 'vip' ? Crown : Ticket;
-    return (
-      <li key={ticket.id} className="overflow-hidden rounded-2xl bg-white text-ink">
-        <div className="flex items-start gap-3 p-4">
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-party-primary">
-            <Icono size={18} />
-          </span>
-          <div className="min-w-0 flex-1">
-            <p className="truncate font-display text-title-card">{ticket.eventName}</p>
-            <p className="truncate text-caption text-ink/60">{fecha(ticket)}</p>
-            {ticket.holderName && <p className="mt-1 truncate text-caption font-bold text-ink/80">{ticket.holderName}</p>}
-          </div>
-          <button
-            type="button"
-            onClick={() => void archivar(ticket, !ticket.archived)}
-            aria-label={ticket.archived ? t('tickets.mine.restore') : t('tickets.mine.archive')}
-            title={ticket.archived ? t('tickets.mine.restore') : t('tickets.mine.archive')}
-            className="press flex h-9 shrink-0 items-center gap-1 rounded-full border border-black/15 px-3 text-caption font-bold"
-          >
-            {ticket.archived ? <ArchiveRestore size={14} /> : <Archive size={14} />}
-            {ticket.archived ? t('tickets.mine.restore') : t('tickets.mine.archive')}
-          </button>
-        </div>
-        {/* El tipo, a lo ancho: al lado del botón de archivar se partía en dos líneas. */}
-        <div className="-mt-2 px-4 pb-4">
-          <p className="text-body-sm font-bold">
-            {ticket.typeName}
-            {ticket.kind === 'table' && ticket.guests ? ` · ${t('tickets.buy.guests', { count: ticket.guests })}` : ''}
-          </p>
-          {ticket.kind === 'table' && (
-            <p className="text-caption text-ink/60">
-              {t('tickets.mine.depositPaid', { amount: euros(ticket.unitCents) })}
-              {ticket.minSpendCents ? ` · ${t('tickets.buy.minSpend', { amount: euros(ticket.minSpendCents) })}` : ''}
-            </p>
-          )}
-        </div>
-        {ticket.archived ? null : (
-          <div className="flex flex-col items-center gap-2 border-t border-dashed border-black/15 p-4">
-            <QRCodeSVG value={ticket.code} size={168} level="M" />
-            <p className="font-mono text-body-md font-bold tracking-[0.2em]">{ticket.code}</p>
-            <p className="text-caption text-ink/60">{t('tickets.mine.showAtDoor')}</p>
-            {ticket.downloadToken && (
-              <TicketDownloadButtons
-                token={ticket.downloadToken}
-                code={ticket.code}
-                tone="light"
-                className="w-full pt-1"
-              />
-            )}
-          </div>
-        )}
-      </li>
-    );
-  };
 
   return (
     <div className="space-y-3">
@@ -231,7 +260,7 @@ const PurchasedTickets = ({
           {t('tickets.mine.waiting')}
         </p>
       )}
-      {vigentes.length > 0 && <ul className="space-y-3">{vigentes.map(tarjeta)}</ul>}
+      {vigentes.length > 0 && <ul className="space-y-3">{vigentes.map((x) => tarjeta(x))}</ul>}
       {vigentes.length === 0 && archivadas.length > 0 && (
         <p className="rounded-2xl bg-card p-4 text-body-sm text-party-gray">{t('tickets.mine.allArchived')}</p>
       )}
@@ -247,7 +276,7 @@ const PurchasedTickets = ({
             {t('tickets.mine.archivedList', { count: archivadas.length })}
             <ChevronDown size={14} className={cn('transition-transform', verArchivadas && 'rotate-180')} />
           </button>
-          {verArchivadas && <ul className="space-y-3">{archivadas.map(tarjeta)}</ul>}
+          {verArchivadas && <ul className="space-y-3">{archivadas.map((x) => tarjeta(x))}</ul>}
         </div>
       )}
     </div>

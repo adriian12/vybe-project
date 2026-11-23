@@ -2209,7 +2209,10 @@
             "renews": "Verlängert sich am {{date}}",
             "ends": "Läuft am {{date}} ab (keine Verlängerung)",
             "endsCancelled": "Gekündigt: läuft am {{date}} ab",
-            "trialEnds": "Gratis-Test bis {{date}}"
+            "trialEnds": "Gratis-Test bis {{date}}",
+            "expiresSoon_zero": "Läuft heute ab",
+            "expiresSoon_one": "Läuft morgen ab",
+            "expiresSoon_other": "Läuft in {{count}} Tagen ab"
         },
         "funout": {
             "synced_one": "{{count}} Event aktuell",
@@ -2490,7 +2493,7 @@
             "add": "Ticket hinzufügen",
             "addHint": "Ticket bei Fourvenues oder einer anderen Website gekauft? Füge es hinzu und hab es hier bei den anderen.",
             "addTitle": "Ticket hinzufügen",
-            "addBody": "Lade das PDF deines Tickets oder einen Screenshot mit dem QR-Code hoch. Es wird auf deinem Handy gelesen: Die Datei wird nirgendwohin hochgeladen.",
+            "addBody": "Lade das PDF deines Tickets oder einen Screenshot hoch: Wir lesen Party, Datum und QR auf deinem Handy und fügen es automatisch hinzu. Die Datei wird nirgendwo hochgeladen.",
             "choose": "PDF oder Screenshot wählen",
             "reading": "Ticket wird gelesen…",
             "noQr": "Wir haben keinen QR-Code gefunden. Versuch es mit dem Original-PDF oder einem schärferen Screenshot.",
@@ -2515,7 +2518,11 @@
             "removed": "Ticket entfernt",
             "free": "Gratis",
             "untilClose": "bis Schluss",
-            "another": "Andere Datei wählen"
+            "another": "Andere Datei wählen",
+            "updated": "Du hattest dieses Ticket schon: Es wurde aktualisiert",
+            "incomplete": "Das Bild zeigt nicht alle Daten der Party. Ergänze Namen und Datum.",
+            "pastTitle": "Dein Ticket",
+            "pastBody": "Von einer Party, die schon vorbei ist."
         },
         "title": "Meine Tickets",
         "subtitle": "Bereit für Tür und Bar",

@@ -2209,7 +2209,10 @@
             "renews": "Se renueva el {{date}}",
             "ends": "Caduca el {{date}} (no se renueva)",
             "endsCancelled": "Cancelada: caduca el {{date}}",
-            "trialEnds": "Prueba gratis hasta el {{date}}"
+            "trialEnds": "Prueba gratis hasta el {{date}}",
+            "expiresSoon_zero": "Caduca hoy",
+            "expiresSoon_one": "Caduca mañana",
+            "expiresSoon_other": "Caduca en {{count}} días"
         },
         "funout": {
             "synced_one": "{{count}} evento al día",
@@ -2490,7 +2493,7 @@
             "add": "Añadir entrada",
             "addHint": "¿Compraste la entrada en Fourvenues u otra web? Añádela y tenla aquí con el resto.",
             "addTitle": "Añadir una entrada",
-            "addBody": "Sube el PDF de tu entrada o una captura con el QR. Se lee en tu móvil: el archivo no se sube a ningún sitio.",
+            "addBody": "Sube el PDF de tu entrada o una captura: leemos la fiesta, la fecha y el QR en tu móvil y la añadimos sola. El archivo no se sube a ningún sitio.",
             "choose": "Elegir PDF o captura",
             "reading": "Leyendo la entrada…",
             "noQr": "No hemos encontrado ningún QR. Prueba con el PDF original o con una captura más nítida.",
@@ -2515,7 +2518,11 @@
             "removed": "Entrada quitada",
             "free": "Gratis",
             "untilClose": "hasta el cierre",
-            "another": "Elegir otro archivo"
+            "another": "Elegir otro archivo",
+            "updated": "Ya tenías esta entrada: la he actualizado",
+            "incomplete": "La imagen no muestra los datos completos de la fiesta. Completa el nombre y la fecha.",
+            "pastTitle": "Tu entrada",
+            "pastBody": "De una fiesta que ya terminó."
         },
         "title": "Mis entradas",
         "subtitle": "Listas para la puerta y la barra",

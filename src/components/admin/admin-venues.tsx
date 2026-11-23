@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/components/ui/use-toast';
 import { adminService, AdminVenue, AdminVenueEvent } from '@/services/admin';
 import { cn } from '@/lib/utils';
+import { diasParaCaducar } from '@/lib/caducidad';
 import AdminNotices from '@/components/admin/admin-notices';
 
 /**
@@ -132,6 +133,12 @@ const AdminVenues = () => {
                       {/* La prueba gratis de Pro de los negocios nuevos: que no parezca de pago. */}
                       {venue.planStatus === 'trialing' ? ` · ${t('admin.venues.trial')}` : ''}
                     </span>
+                    {/* Caduca pronto sin renovación: en rojo, para verlo sin abrir la ficha. */}
+                    {venue.plan !== 'free' && diasParaCaducar(venue.planExpiresAt, venue.planRenews) !== null && (
+                      <span className="rounded-full bg-red-600 px-1.5 py-0.5 text-[10px] font-bold uppercase text-white">
+                        {t('admin.subs.expiresSoon', { count: diasParaCaducar(venue.planExpiresAt, venue.planRenews) ?? 0 })}
+                      </span>
+                    )}
                     <span className="flex items-center gap-0.5 rounded-full bg-black/[0.06] px-1.5 py-0.5 text-[10px] font-bold text-ink/60">
                       <CalendarDays size={10} />
                       {venue.eventsTotal}
