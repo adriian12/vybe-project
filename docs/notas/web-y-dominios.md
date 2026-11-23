@@ -54,3 +54,7 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
   extremo, biometría) que no existen. Se quitaron: en una web de captación eso
   es publicidad engañosa. Las cifras del panel de ejemplo van marcadas como
   «Vista de ejemplo».
+
+## Versión nueva con la página abierta
+
+Tras publicar, quien tenía la web abierta pide trozos (`lazy()`) que ya no existen y caía en «Algo ha ido mal». `src/lib/stale-build.ts` recarga la página sola (evento `vite:preloadError` y `ErrorBoundary`), como mucho una vez por minuto.

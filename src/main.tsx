@@ -9,11 +9,14 @@ import './index.css';
 import { i18nReady } from './i18n';
 import { initObservability } from '@/lib/observability';
 import ErrorBoundary from '@/components/error-boundary';
+import { setupStaleBuildReload } from '@/lib/stale-build';
 import { setupAuthRefreshOnResume, setupNativeShell } from '@/services/native';
 
 // Los datos de prueba se cargan con las migraciones SQL 004/005, no desde el
 // cliente: crear usuarios con signUp() en el arranque agotaba el rate limit.
 initObservability();
+// Tras publicar una versión nueva, la página abierta de antes recarga sola.
+setupStaleBuildReload();
 
 // Dentro de la aplicación instalada hay que quitar el splash y ajustar la barra
 // de estado. En el navegador no hace nada.

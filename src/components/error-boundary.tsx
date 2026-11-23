@@ -1,5 +1,6 @@
 import { Component, ErrorInfo, ReactNode } from 'react';
 import * as Sentry from '@sentry/react';
+import { isStaleBuildError, reloadForNewBuild } from '@/lib/stale-build';
 
 interface Props {
   children: ReactNode;
@@ -23,6 +24,8 @@ class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, info: ErrorInfo) {
+    // Página abierta de una versión anterior: recargar es lo único que lo arregla.
+    if (isStaleBuildError(error) && reloadForNewBuild()) return;
     console.error('Error no controlado:', error, info.componentStack);
     Sentry.withScope((scope) => {
       scope.setTag('area', this.props.area ?? 'app');
