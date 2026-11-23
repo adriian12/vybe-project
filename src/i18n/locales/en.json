@@ -2132,7 +2132,8 @@
                 "taxId": "Tax ID",
                 "type": "Type",
                 "created": "Joined"
-            }
+            },
+            "bookingFee": "No commission: Fiestea charges the buyer a 10% booking fee per ticket (max €5)"
         },
         "create": {
             "title": "Create an account",
@@ -2573,7 +2574,8 @@
             "free": "Free",
             "getFree": "Buy ticket",
             "salesFrom": "On sale {{date}}",
-            "salesUntil": "On sale until {{date}}"
+            "salesUntil": "On sale until {{date}}",
+            "plusFee": "+ {{amount}} booking fee"
         },
         "mine": {
             "title": "Your tickets",
@@ -2636,7 +2638,8 @@
                 "review": "Check the fields marked in red."
             },
             "seller": "Sold by: {{venue}}. Fiestea is the sales platform.",
-            "legalNote": "Final price including taxes. Tickets for a specific date have no right of withdrawal. If you enter other people’s details, you confirm they have agreed and that you will tell them about the privacy policy."
+            "legalNote": "Final price including taxes. Tickets for a specific date have no right of withdrawal. If you enter other people’s details, you confirm they have agreed and that you will tell them about the privacy policy.",
+            "bookingFee": "Booking fee"
         },
         "order": {
             "waiting": "Confirming payment…",
@@ -3480,7 +3483,7 @@
             "vipPlaceholder": "VIP ticket",
             "includes": "Includes",
             "includesPlaceholder": "One drink, VIP area access, cloakroom…",
-            "priceHelp": "€0 for a free ticket. Otherwise, from €0.50.",
+            "priceHelp": "€0 for a free ticket. Otherwise, from €0.50. The buyer also pays a 10% booking fee (max €5 per ticket); you get the full price.",
             "minAge": "Minimum age",
             "dressCode": "Dress code",
             "fromEvent": "The party's",
@@ -3596,7 +3599,7 @@
                 "orders_one": "{{count}} order",
                 "orders_other": "{{count}} orders",
                 "net": "For the business",
-                "netHint": "After the Fiestea fee",
+                "netHint": "No commission: the booking fee is paid by the buyer",
                 "sold": "Tickets",
                 "withComps_one": "Includes {{count}} guest ticket",
                 "withComps_other": "Includes {{count}} guest tickets",

@@ -13,6 +13,7 @@ import { ApiError } from '@/services/api';
 import { isNative, openExternal } from '@/services/native';
 import { siteMode } from '@/lib/hosts';
 import { euros, TicketCheckoutInfo, TicketHolder, ticketsService } from '@/services/tickets';
+import { gastosGestionCents } from '@/lib/booking-fee';
 import { track } from '@/lib/observability';
 import { cn } from '@/lib/utils';
 
@@ -151,7 +152,11 @@ const TicketCheckoutPage = () => {
   }
 
   const gratis = info.priceCents === 0;
-  const total = info.priceCents * unidades;
+  // Precio de las entradas (lo cobra el negocio) + gastos de gestión (los paga
+  // quien compra; 10 % por entrada, máximo 5 €, 0 si es gratis: lib/booking-fee).
+  const subtotal = info.priceCents * unidades;
+  const gastos = gastosGestionCents(info.priceCents) * unidades;
+  const total = subtotal + gastos;
   const agotada = info.remaining !== null && info.remaining <= 0;
   const hayCondiciones = Boolean(info.venueTerms?.trim());
   const datosOk = errores.every((e) => Object.keys(e).length === 0);
@@ -447,8 +452,14 @@ const TicketCheckoutPage = () => {
                   <dt className="text-party-gray">
                     {unidades} × {info.name}
                   </dt>
-                  <dd className="tabular">{gratis ? t('tickets.buy.free') : euros(total)}</dd>
+                  <dd className="tabular">{gratis ? t('tickets.buy.free') : euros(subtotal)}</dd>
                 </div>
+                {gastos > 0 && (
+                  <div className="flex justify-between gap-3">
+                    <dt className="text-party-gray">{t('tickets.checkout.bookingFee')}</dt>
+                    <dd className="tabular">{euros(gastos)}</dd>
+                  </div>
+                )}
                 <div className="flex justify-between gap-3 border-t border-white/10 pt-2 font-bold">
                   <dt>{t('tickets.checkout.total')}</dt>
                   <dd className="tabular">{gratis ? t('tickets.buy.free') : euros(total)}</dd>

@@ -101,10 +101,23 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
     (Stripe sólo acepta https).
   - **Planes de local:** Pro ya no exporta ni tiene curva de aforo; Business lo
     tiene todo, también exportar PDF (`exportSummaryPdf`, ventana de imprimir).
-- **Comisión de la plataforma por local:** `venues.platform_fee_percent`, de
-  0 a 50 y 0 por defecto. La fija administración en Locales, al abrir un
-  local (`admin_set_venue_fee`), y está protegida en `protect_venue_fields()`.
-  `stripe-checkout` la aplica como `application_fee` sólo a las entradas.
+- **Gastos de gestión de las entradas** (migración 142, 23-11-2026; sustituyen a la
+  antigua comisión por local `venues.platform_fee_percent`, que se puso a 0 y ya no
+  se usa ni se enseña en administración):
+  - Los paga quien compra, aparte del precio: 10 % de cada entrada, redondeado al
+    céntimo, con un tope de 5 € por entrada; 0 en las gratuitas. Sólo en las
+    entradas vendidas en Fiestea (las de enlace externo no pasan por aquí).
+  - La regla está en tres sitios iguales: `src/lib/booking-fee.ts` (con test),
+    `supabase/functions/_shared/booking-fee.ts` y `ticket_booking_fee_cents()`.
+  - `stripe-checkout` añade una segunda línea «Gastos de gestión» y la cobra como
+    `application_fee_amount`: va a la cuenta de Stripe de Fiestea. Se guarda en
+    `ticket_orders.booking_fee_cents`; `application_fee_cents` (comisión al
+    negocio) queda en 0, así que lo neto del negocio es el precio entero.
+  - El negocio paga la tarifa de Stripe de todo el cobro (cargo directo), también
+    de la parte de los gastos. Una devolución desde Ventas devuelve todo (precio y
+    gastos: `refund_application_fee`).
+  - Se enseñan en la ficha («+ X € gastos de gestión» y el botón con el total), en
+    el resumen de compra y en el del pedido (`get_my_ticket_order` los devuelve).
 - **Avisos de suscripción** (Edge Function `admin-notify`). Son los botones
   encima del buscador de usuarios y de locales:
   - **«Caduca pronto»:** avisa sólo a quien no renueva solo (cancelado, en

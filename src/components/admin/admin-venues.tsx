@@ -56,19 +56,6 @@ const AdminVenues = () => {
     }
   };
 
-  const cambiarComision = async (venue: AdminVenue, valor: string) => {
-    const pct = Number(valor);
-    setOcupado(venue.venueId);
-    try {
-      await adminService.setVenueFee(venue.venueId, pct);
-      setLocales((prev) => prev.map((v) => (v.venueId === venue.venueId ? { ...v, platformFeePercent: pct } : v)));
-      toast({ title: t('admin.venuesAll.feeSaved', { percent: pct }) });
-    } catch {
-      toast({ title: t('common.error'), variant: 'destructive' });
-    } finally {
-      setOcupado(null);
-    }
-  };
 
   const cambiarPlan = async (venue: AdminVenue, plan: string) => {
     setOcupado(venue.venueId);
@@ -190,34 +177,17 @@ const AdminVenues = () => {
                       </p>
                     )}
 
-                    {/* Cobros y comisión de la plataforma sobre las entradas */}
-                    <div className="flex flex-wrap items-center gap-2 rounded-xl bg-[#F5F5F7] p-2.5">
-                      <span className="min-w-0 flex-1 text-caption">
-                        <strong className="block">{t('admin.venuesAll.fee')}</strong>
-                        <span className="text-ink/60">
-                          {venue.stripeChargesEnabled
-                            ? t('admin.venuesAll.stripeActive')
-                            : venue.stripeConnected
-                              ? t('admin.venuesAll.stripePending')
-                              : t('admin.venuesAll.stripeNone')}
-                        </span>
+                    {/* Cobros: ya no hay comisión por local; Fiestea cobra los
+                        gastos de gestión al comprador (migración 142). */}
+                    <div className="rounded-xl bg-[#F5F5F7] p-2.5 text-caption">
+                      <strong className="block">{t('admin.venuesAll.bookingFee')}</strong>
+                      <span className="text-ink/60">
+                        {venue.stripeChargesEnabled
+                          ? t('admin.venuesAll.stripeActive')
+                          : venue.stripeConnected
+                            ? t('admin.venuesAll.stripePending')
+                            : t('admin.venuesAll.stripeNone')}
                       </span>
-                      <Select
-                        value={String(venue.platformFeePercent)}
-                        disabled={ocupado === venue.venueId}
-                        onValueChange={(v) => void cambiarComision(venue, v)}
-                      >
-                        <SelectTrigger className="h-9 w-[6.5rem] rounded-full border-black/10 bg-white text-ink" aria-label={t('admin.venuesAll.fee')}>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 20, 25, 30].map((n) => (
-                            <SelectItem key={n} value={String(n)}>
-                              {n} %
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
                     </div>
 
                     <div className="flex flex-wrap items-center gap-2">

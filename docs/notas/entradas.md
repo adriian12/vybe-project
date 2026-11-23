@@ -47,8 +47,9 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
       webhook de Connect también lo actualiza.
     - **Cobro:** cargo directo (la sesión de Checkout se crea con la cabecera
       `Stripe-Account` del negocio). La plataforma sólo se queda
-      `application_fee_amount` (su % y su fijo); la tarifa de Stripe la paga
-      el negocio.
+      `application_fee_amount`, que desde la migración 142 son los gastos de
+      gestión que paga el comprador (10 % por entrada, máx. 5 €; ver pagos.md);
+      la tarifa de Stripe la paga el negocio.
     - **Sin cobros activos sólo se dan entradas de 0 €** (migración 080): las
       de pago no salen y `create_ticket_order` devuelve
       `PAYMENTS_NOT_ENABLED`.

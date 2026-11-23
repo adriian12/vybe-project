@@ -4,6 +4,7 @@ import { json, preflight } from '../_shared/cors.ts';
 import { adminClient, getUser, getProfileId } from '../_shared/supabase.ts';
 import { sendTicketEmail } from '../_shared/ticket-mail.ts';
 import { stripeSecretKey, stripeVar } from '../_shared/stripe-env.ts';
+import { gastosGestionCents } from '../_shared/booking-fee.ts';
 
 /**
  * Abre una sesión de pago de Stripe (y cancela la suscripción mensual).
@@ -61,28 +62,9 @@ const VENUE_PRICE_CENTS: Record<VenuePlan, number> = { venue_business: 6999 };
 const BOOST_PRICE_CENTS = 1999;
 const BOOST_BUSINESS_PRICE_CENTS = 999;
 
-/**
- * Lo que se queda la plataforma de cada venta de entradas (Connect).
- *
- *   · El % lo fija administración para cada local
- *     (`venues.platform_fee_percent`, por defecto 0).
- *   · CONNECT_FEE_FIXED_CENTS: céntimos fijos por entrada (por defecto 0).
- *   · CONNECT_PASS_STRIPE_FEES: con cargos a destino la tarifa de Stripe la
- *     paga la plataforma; con «true» (por defecto) se le repercute al local
- *     como 1,5 % + 0,25 € por pago, la tarifa de las tarjetas europeas.
- *
- * Se cambian con `secrets set`, sin desplegar.
- */
-/**
- * Lo que se queda la plataforma de una venta de entradas: el % pactado con el
- * negocio y, si se configura, un fijo por entrada. Con cargos directos la
- * tarifa de Stripe la paga la cuenta del negocio, así que ya no se repercute.
- */
-const comisionPlataforma = (totalCents: number, unidades: number, pct: number): number => {
-  const fijo = Number(Deno.env.get('CONNECT_FEE_FIXED_CENTS') ?? '0') || 0;
-  const total = Math.round((totalCents * pct) / 100) + fijo * unidades;
-  return Math.max(0, Math.min(total, totalCents - 1));
-};
+// Lo que se queda Fiestea de cada venta de entradas son los gastos de gestión
+// que paga quien compra (`_shared/booking-fee.ts`, migración 142). La antigua
+// comisión por local (`venues.platform_fee_percent`) ya no se aplica.
 
 const esPlanDeLocal = (plan: Plan): plan is VenuePlan => plan.startsWith('venue_');
 
@@ -291,14 +273,17 @@ serve(async (req: Request): Promise<Response> => {
       // El cobro va a la cuenta de Stripe del local (Connect, migración 069).
       const { data: orden } = await supabase
         .from('ticket_orders')
-        .select('stripe_account_id, amount_cents, venues(platform_fee_percent)')
+        .select('stripe_account_id')
         .eq('id', pedido.order_id)
         .single();
       const destino = orden?.stripe_account_id as string | undefined;
       if (!destino) return json({ error: 'PAYMENTS_NOT_ENABLED' }, 409);
-      const total = Number(orden?.amount_cents ?? pedido.unit_cents * unidades);
-      const porcentaje = Number((orden?.venues as { platform_fee_percent?: number } | null)?.platform_fee_percent ?? 0);
-      const comision = comisionPlataforma(total, unidades, porcentaje);
+
+      // Gastos de gestión (migración 142): los paga quien compra, encima del
+      // precio, y son lo único que se queda Fiestea (`application_fee_amount`).
+      // El negocio cobra el precio entero: ya no hay comisión por local.
+      const gastoUnidad = gastosGestionCents(pedido.unit_cents);
+      const gastos = gastoUnidad * unidades;
 
       const entradas = new URLSearchParams({
         mode: 'payment',
@@ -318,7 +303,13 @@ serve(async (req: Request): Promise<Response> => {
         entradas.set('client_reference_id', profileId);
         entradas.set('metadata[profile_id]', profileId);
       }
-      if (comision > 0) entradas.set('payment_intent_data[application_fee_amount]', String(comision));
+      if (gastos > 0) {
+        entradas.set('line_items[1][quantity]', String(unidades));
+        entradas.set('line_items[1][price_data][currency]', 'eur');
+        entradas.set('line_items[1][price_data][unit_amount]', String(gastoUnidad));
+        entradas.set('line_items[1][price_data][product_data][name]', 'Gastos de gestión');
+        entradas.set('payment_intent_data[application_fee_amount]', String(gastos));
+      }
       const correoComprador = (buyerEmail ?? user?.email ?? '').trim().toLowerCase();
       if (correoComprador) entradas.set('customer_email', correoComprador);
 
@@ -343,7 +334,7 @@ serve(async (req: Request): Promise<Response> => {
       const sesion = (await respuesta.json()) as { id: string; url?: string };
       await supabase
         .from('ticket_orders')
-        .update({ stripe_session_id: sesion.id, application_fee_cents: comision })
+        .update({ stripe_session_id: sesion.id, application_fee_cents: 0, booking_fee_cents: gastos })
         .eq('id', pedido.order_id);
       return json({ url: sesion.url, orderId: pedido.order_id });
     }

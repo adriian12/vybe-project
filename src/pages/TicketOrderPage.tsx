@@ -130,6 +130,19 @@ const TicketOrderPage = () => {
             </span>
             <span className="tabular">{pedido.amountCents ? euros(pedido.amountCents) : t('tickets.buy.free')}</span>
           </p>
+          {/* Gastos de gestión (migración 142): aparte, y el total pagado. */}
+          {pedido.bookingFeeCents > 0 && (
+            <>
+              <p className="mt-1 flex justify-between text-body-sm">
+                <span>{t('tickets.checkout.bookingFee')}</span>
+                <span className="tabular">{euros(pedido.bookingFeeCents)}</span>
+              </p>
+              <p className="mt-1 flex justify-between border-t border-black/10 pt-2 text-body-sm font-bold">
+                <span>{t('tickets.checkout.total')}</span>
+                <span className="tabular">{euros(pedido.amountCents + pedido.bookingFeeCents)}</span>
+              </p>
+            </>
+          )}
         </section>
 
         {pedido.downloadToken && (

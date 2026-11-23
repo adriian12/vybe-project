@@ -2132,7 +2132,8 @@
                 "taxId": "Steuernummer",
                 "type": "Typ",
                 "created": "Seit"
-            }
+            },
+            "bookingFee": "Keine Provision: Fiestea berechnet dem Käufer 10 % Servicegebühr pro Ticket (max. 5 €)"
         },
         "create": {
             "title": "Konto anlegen",
@@ -2573,7 +2574,8 @@
             "free": "Gratis",
             "getFree": "Ticket kaufen",
             "salesFrom": "Im Verkauf ab {{date}}",
-            "salesUntil": "Verkauf bis {{date}}"
+            "salesUntil": "Verkauf bis {{date}}",
+            "plusFee": "+ {{amount}} Servicegebühr"
         },
         "mine": {
             "title": "Deine Tickets",
@@ -2636,7 +2638,8 @@
                 "review": "Prüfe die rot markierten Felder."
             },
             "seller": "Verkäufer: {{venue}}. Fiestea ist die Verkaufsplattform.",
-            "legalNote": "Endpreis inklusive Steuern. Für Tickets zu einem bestimmten Datum besteht kein Widerrufsrecht. Wenn du Daten anderer Personen angibst, bestätigst du, dass sie einverstanden sind und dass du sie über die Datenschutzerklärung informierst."
+            "legalNote": "Endpreis inklusive Steuern. Für Tickets zu einem bestimmten Datum besteht kein Widerrufsrecht. Wenn du Daten anderer Personen angibst, bestätigst du, dass sie einverstanden sind und dass du sie über die Datenschutzerklärung informierst.",
+            "bookingFee": "Servicegebühr"
         },
         "order": {
             "waiting": "Zahlung wird bestätigt…",
@@ -3480,7 +3483,7 @@
             "vipPlaceholder": "VIP-Ticket",
             "includes": "Enthält",
             "includesPlaceholder": "Ein Getränk, Zugang zum VIP-Bereich, Garderobe…",
-            "priceHelp": "0 € für ein Gratis-Ticket. Sonst ab 0,50 €.",
+            "priceHelp": "0 € für ein kostenloses Ticket. Sonst ab 0,50 €. Der Käufer zahlt zusätzlich 10 % Servicegebühr (max. 5 € pro Ticket); du erhältst den vollen Preis.",
             "minAge": "Mindestalter",
             "dressCode": "Dresscode",
             "fromEvent": "Wie die Party",
@@ -3596,7 +3599,7 @@
                 "orders_one": "{{count}} Bestellung",
                 "orders_other": "{{count}} Bestellungen",
                 "net": "Für das Lokal",
-                "netHint": "Nach der Fiestea-Gebühr",
+                "netHint": "Keine Provision: die Servicegebühr zahlt der Käufer",
                 "sold": "Tickets",
                 "withComps_one": "Inkl. {{count}} Freikarte",
                 "withComps_other": "Inkl. {{count}} Freikarten",

@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Armchair, Crown, Minus, Plus, Ticket } from 'lucide-react';
 import { euros, ticketsService, TicketType } from '@/services/tickets';
+import { gastosGestionCents } from '@/lib/booking-fee';
 import { cn } from '@/lib/utils';
 
 /**
@@ -121,6 +122,12 @@ const EventTickets = ({ eventId, kinds, onCount, bare = false, guest = false }: 
                     {tipo.priceCents ? euros(tipo.priceCents) : t('tickets.buy.free')}
                   </p>
                   {esMesa && tipo.priceCents > 0 && <p className="text-caption text-ink/60">{t('tickets.buy.deposit')}</p>}
+                  {/* Gastos de gestión (lib/booking-fee): se ven antes de pagar. */}
+                  {tipo.priceCents > 0 && (
+                    <p className="text-caption text-ink/60">
+                      {t('tickets.buy.plusFee', { amount: euros(gastosGestionCents(tipo.priceCents)) })}
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -165,8 +172,10 @@ const EventTickets = ({ eventId, kinds, onCount, bare = false, guest = false }: 
                     {tipo.priceCents === 0
                       ? t('tickets.buy.getFree')
                       : esMesa
-                        ? t('tickets.buy.reserve', { amount: euros(tipo.priceCents) })
-                        : t('tickets.buy.buy', { amount: euros(tipo.priceCents * cantidad) })}
+                        ? t('tickets.buy.reserve', { amount: euros(tipo.priceCents + gastosGestionCents(tipo.priceCents)) })
+                        : t('tickets.buy.buy', {
+                            amount: euros((tipo.priceCents + gastosGestionCents(tipo.priceCents)) * cantidad),
+                          })}
                   </button>
                 </div>
               )}

@@ -2132,7 +2132,8 @@
                 "taxId": "NIF/CIF",
                 "type": "Tipo",
                 "created": "Alta"
-            }
+            },
+            "bookingFee": "Sin comisión: Fiestea cobra al comprador unos gastos de gestión del 10 % por entrada (máx. 5 €)"
         },
         "create": {
             "title": "Dar de alta una cuenta",
@@ -2573,7 +2574,8 @@
             "free": "Gratis",
             "getFree": "Comprar entrada",
             "salesFrom": "A la venta el {{date}}",
-            "salesUntil": "Venta hasta el {{date}}"
+            "salesUntil": "Venta hasta el {{date}}",
+            "plusFee": "+ {{amount}} gastos de gestión"
         },
         "mine": {
             "title": "Tus entradas",
@@ -2636,7 +2638,8 @@
                 "review": "Revisa los campos marcados en rojo."
             },
             "seller": "Vende: {{venue}}. Fiestea es la plataforma de venta.",
-            "legalNote": "Precio final con impuestos incluidos. Las entradas para una fecha concreta no tienen derecho de desistimiento. Si das los datos de otras personas, confirmas que te han dado permiso y que les avisarás de la política de privacidad."
+            "legalNote": "Precio final con impuestos incluidos. Las entradas para una fecha concreta no tienen derecho de desistimiento. Si das los datos de otras personas, confirmas que te han dado permiso y que les avisarás de la política de privacidad.",
+            "bookingFee": "Gastos de gestión"
         },
         "order": {
             "waiting": "Confirmando el pago…",
@@ -3480,7 +3483,7 @@
             "vipPlaceholder": "Entrada VIP",
             "includes": "Incluye",
             "includesPlaceholder": "Una consumición, acceso a zona VIP, guardarropa…",
-            "priceHelp": "0 € para una entrada gratuita. Si no, desde 0,50 €.",
+            "priceHelp": "0 € para una entrada gratuita. Si no, desde 0,50 €. Quien compra paga además unos gastos de gestión del 10 % (máximo 5 € por entrada); tú cobras el precio entero.",
             "minAge": "Edad mínima",
             "dressCode": "Dress code",
             "fromEvent": "La de la fiesta",
@@ -3596,7 +3599,7 @@
                 "orders_one": "{{count}} pedido",
                 "orders_other": "{{count}} pedidos",
                 "net": "Para el negocio",
-                "netHint": "Tras la comisión de Fiestea",
+                "netHint": "Sin comisiones: los gastos de gestión los paga quien compra",
                 "sold": "Entradas",
                 "withComps_one": "Incluye {{count}} invitación",
                 "withComps_other": "Incluye {{count}} invitaciones",

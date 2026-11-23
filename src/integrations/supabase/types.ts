@@ -4867,6 +4867,7 @@ export type Database = {
           start_date: string
           status: string
           tickets: Json
+          booking_fee_cents: number
           type_name: string
           venue_name: string
         }[]

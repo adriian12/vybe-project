@@ -2132,7 +2132,8 @@
                 "taxId": "NIF/CIF",
                 "type": "Tipus",
                 "created": "Alta"
-            }
+            },
+            "bookingFee": "Sense comissió: Fiestea cobra al comprador unes despeses de gestió del 10 % per entrada (màx. 5 €)"
         },
         "create": {
             "title": "Donar d'alta un compte",
@@ -2573,7 +2574,8 @@
             "free": "Gratis",
             "getFree": "Comprar entrada",
             "salesFrom": "A la venda el {{date}}",
-            "salesUntil": "Venda fins al {{date}}"
+            "salesUntil": "Venda fins al {{date}}",
+            "plusFee": "+ {{amount}} despeses de gestió"
         },
         "mine": {
             "title": "Les teves entrades",
@@ -2636,7 +2638,8 @@
                 "review": "Revisa els camps marcats en vermell."
             },
             "seller": "Ven: {{venue}}. Fiestea és la plataforma de venda.",
-            "legalNote": "Preu final amb imposts inclosos. Les entrades per a una data concreta no tenen dret de desistiment. Si dones les dades d’altres persones, confirmes que t’han donat permís i que els avisaràs de la política de privadesa."
+            "legalNote": "Preu final amb imposts inclosos. Les entrades per a una data concreta no tenen dret de desistiment. Si dones les dades d’altres persones, confirmes que t’han donat permís i que els avisaràs de la política de privadesa.",
+            "bookingFee": "Despeses de gestió"
         },
         "order": {
             "waiting": "Confirmant el pagament…",
@@ -3480,7 +3483,7 @@
             "vipPlaceholder": "Entrada VIP",
             "includes": "Inclou",
             "includesPlaceholder": "Una consumició, accés a zona VIP, guarda-roba…",
-            "priceHelp": "0 € per a una entrada gratuïta. Si no, des de 0,50 €.",
+            "priceHelp": "0 € per a una entrada gratuïta. Si no, des de 0,50 €. Qui compra paga a més unes despeses de gestió del 10 % (màxim 5 € per entrada); tu cobres el preu sencer.",
             "minAge": "Edat mínima",
             "dressCode": "Dress code",
             "fromEvent": "La de la festa",
@@ -3596,7 +3599,7 @@
                 "orders_one": "{{count}} comanda",
                 "orders_other": "{{count}} comandes",
                 "net": "Per al negoci",
-                "netHint": "Després de la comissió de Fiestea",
+                "netHint": "Sense comissions: les despeses de gestió les paga qui compra",
                 "sold": "Entrades",
                 "withComps_one": "Inclou {{count}} invitació",
                 "withComps_other": "Inclou {{count}} invitacions",

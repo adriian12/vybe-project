@@ -143,6 +143,8 @@ export interface TicketOrderResult {
   kind: TicketKind;
   quantity: number;
   amountCents: number;
+  /** Gastos de gestión que pagó quien compra (migración 142), aparte del precio. */
+  bookingFeeCents: number;
   addToAccount: boolean;
   tickets: { id: string; code: string; holderName: string | null; holderEmail: string | null }[];
 }
@@ -484,6 +486,7 @@ export const ticketsService = {
       kind: row.kind as TicketKind,
       quantity: row.quantity,
       amountCents: row.amount_cents,
+      bookingFeeCents: Number(row.booking_fee_cents ?? 0),
       addToAccount: row.add_to_account,
       tickets: (row.tickets as unknown as TicketOrderResult['tickets']) ?? [],
     };
