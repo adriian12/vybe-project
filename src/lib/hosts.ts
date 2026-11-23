@@ -46,12 +46,14 @@ export const APP_URL = enProduccion
  * Enlaces a las tiendas (publicadas las dos el 23-11-2026). Las variables de
  * entorno sólo hacen falta para cambiarlos; vacías, la landing ya no decía
  * «Próximamente» sino que se quedaba sin enlace, así que van por defecto aquí.
- * El de Apple sin país (`/app/id…`): abre la ficha de la tienda de cada uno.
+ * El de Apple, con la tienda de España (`/es/app/…`): sin país, Apple
+ * mandaba a la ficha de EE. UU. En un iPhone se abre igual en la tienda de
+ * cada uno.
  */
 export const PLAY_STORE_URL =
   (import.meta.env.VITE_PLAY_STORE_URL as string | undefined) || 'https://play.google.com/store/apps/details?id=es.fiestea.app';
 export const APP_STORE_URL =
-  (import.meta.env.VITE_APP_STORE_URL as string | undefined) || 'https://apps.apple.com/app/id6824473615';
+  (import.meta.env.VITE_APP_STORE_URL as string | undefined) || 'https://apps.apple.com/es/app/fiestea/id6824473615';
 
 export type SiteMode = 'landing' | 'app' | 'all';
 
