@@ -3896,6 +3896,30 @@ export type Database = {
         Returns: undefined
       }
       active_event_of: { Args: { p_profile_id: string }; Returns: string }
+      // 144: campaña de Instagram en el panel.
+      admin_get_instagram_posts: {
+        Args: never
+        Returns: {
+          id: string
+          dia: number
+          scheduled_at: string
+          tipo: string
+          lado: string | null
+          titulo: string
+          detalle: string | null
+          manual: boolean
+          estado: string
+          media_id: string | null
+          permalink: string | null
+          preview_url: string | null
+          done_at: string | null
+          synced_at: string
+        }[]
+      }
+      admin_mark_instagram_done: {
+        Args: { p_done?: boolean; p_id: string }
+        Returns: string | null
+      }
       adjust_event_headcount: {
         Args: { p_delta: number; p_event_id: string }
         Returns: number

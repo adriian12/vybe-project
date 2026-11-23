@@ -17,6 +17,7 @@ import {
   LayoutGrid,
   Loader2,
   LogOut,
+  Megaphone,
   Mail,
   MapPin,
   Menu,
@@ -62,6 +63,7 @@ import { eventPath, publicLink } from '@/lib/share';
 import AdminFunout from '@/components/admin/admin-funout';
 import AdminScanner from '@/components/admin/admin-scanner';
 import AdminVenues from '@/components/admin/admin-venues';
+import AdminInstagram from '@/components/admin/admin-instagram';
 import TestLabCard from '@/components/admin/test-lab-card';
 import { VybeMark } from '@/components/brand/vybe-logo';
 import { api, BugReport, PlaceClaim } from '@/services/api';
@@ -92,9 +94,10 @@ const SECCIONES = [
   { id: 'reports' as const, icon: Flag },
   { id: 'sos' as const, icon: Siren },
   { id: 'metrics' as const, icon: BarChart3 },
+  { id: 'instagram' as const, icon: Megaphone },
 ];
 
-const ORDEN_MOVIL = ['overview', 'sos', 'reports', 'photos', 'users', 'venuesAll', 'venues', 'leads', 'events', 'metrics'] as const;
+const ORDEN_MOVIL = ['overview', 'sos', 'reports', 'photos', 'users', 'venuesAll', 'venues', 'leads', 'events', 'metrics', 'instagram'] as const;
 
 type Seccion = (typeof SECCIONES)[number]['id'];
 
@@ -280,6 +283,7 @@ const AdminDashboardPage = () => {
     sos: alerts.length,
     events: 0,
     metrics: 0,
+    instagram: 0,
   };
 
   const fotosVisibles = useMemo(
@@ -1477,6 +1481,13 @@ const AdminDashboardPage = () => {
           )}
 
           {seccion === 'metrics' && <AdminMetrics />}
+
+          {seccion === 'instagram' && (
+            <>
+              <CabeceraSeccion title={t('admin.instagram.title')} subtitle={t('admin.instagram.subtitle')} />
+              <AdminInstagram />
+            </>
+          )}
         </main>
 
       {/* ------------------------------------------- añadir, siempre a mano */}

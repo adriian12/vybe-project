@@ -1913,7 +1913,8 @@
             "overview": "Resumen",
             "leads": "Solicitudes",
             "users": "Usuarios",
-            "venuesAll": "Negocios"
+            "venuesAll": "Negocios",
+            "instagram": "Instagram"
         },
         "venues": {
             "title": "Negocios pendientes",
@@ -2304,6 +2305,44 @@
                 "resolved": "Marcado como arreglado",
                 "dismissed": "Error descartado",
                 "pending": "Error abierto de nuevo"
+            }
+        },
+        "instagram": {
+            "title": "Instagram",
+            "subtitle": "La campaña: lo que se publica solo, lo que ya está publicado y lo que te toca subir a mano.",
+            "published": "Publicado",
+            "manualDue": "Te toca subir",
+            "synced": "Actualizado",
+            "day": "Día {{n}}",
+            "filters": {
+                "upcoming": "Hoy y próximos",
+                "manual": "A mano pendientes",
+                "all": "Todo"
+            },
+            "empty": "Todavía no ha llegado la agenda desde la NAS.",
+            "emptyFilter": "Nada por aquí.",
+            "types": {
+                "reel": "Reel",
+                "carrusel": "Carrusel",
+                "historia": "Historia",
+                "fijar": "Fijar"
+            },
+            "sides": {
+                "fiesteros": "Fiester@s",
+                "negocios": "Negocios"
+            },
+            "manual": "A mano",
+            "open": "Ver en Instagram",
+            "markDone": "Ya lo he subido",
+            "undo": "Deshacer",
+            "status": {
+                "published": "Publicado",
+                "done": "Subido",
+                "sent": "Enviado por Telegram",
+                "failed": "Falló: súbelo tú",
+                "expired": "No se publicó",
+                "scheduled": "Programado",
+                "manualScheduled": "Te llegará por Telegram"
             }
         }
     },

@@ -1913,7 +1913,8 @@
             "overview": "Resum",
             "leads": "Sol·licituds",
             "users": "Usuaris",
-            "venuesAll": "Negocis"
+            "venuesAll": "Negocis",
+            "instagram": "Instagram"
         },
         "venues": {
             "title": "Negocis pendents",
@@ -2304,6 +2305,44 @@
                 "resolved": "Marcat com a arreglat",
                 "dismissed": "Error descartat",
                 "pending": "Error obert de nou"
+            }
+        },
+        "instagram": {
+            "title": "Instagram",
+            "subtitle": "La campanya: el que es publica sol, el que ja està publicat i el que has de pujar a mà.",
+            "published": "Publicat",
+            "manualDue": "Has de pujar",
+            "synced": "Actualitzat",
+            "day": "Dia {{n}}",
+            "filters": {
+                "upcoming": "Avui i propers",
+                "manual": "A mà pendents",
+                "all": "Tot"
+            },
+            "empty": "Encara no ha arribat l'agenda des de la NAS.",
+            "emptyFilter": "Res per aquí.",
+            "types": {
+                "reel": "Reel",
+                "carrusel": "Carrusel",
+                "historia": "Història",
+                "fijar": "Fixar"
+            },
+            "sides": {
+                "fiesteros": "Fester@s",
+                "negocios": "Negocis"
+            },
+            "manual": "A mà",
+            "open": "Veure a Instagram",
+            "markDone": "Ja l'he pujat",
+            "undo": "Desfer",
+            "status": {
+                "published": "Publicat",
+                "done": "Pujat",
+                "sent": "Enviat per Telegram",
+                "failed": "Ha fallat: puja-ho tu",
+                "expired": "No s'ha publicat",
+                "scheduled": "Programat",
+                "manualScheduled": "T'arribarà per Telegram"
             }
         }
     },

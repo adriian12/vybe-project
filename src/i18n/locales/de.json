@@ -1913,7 +1913,8 @@
             "overview": "Übersicht",
             "leads": "Anfragen",
             "users": "Nutzer",
-            "venuesAll": "Locations"
+            "venuesAll": "Locations",
+            "instagram": "Instagram"
         },
         "venues": {
             "title": "Ausstehende Lokale",
@@ -2304,6 +2305,44 @@
                 "resolved": "Als behoben markiert",
                 "dismissed": "Fehler verworfen",
                 "pending": "Fehler wieder geöffnet"
+            }
+        },
+        "instagram": {
+            "title": "Instagram",
+            "subtitle": "Die Kampagne: was sich selbst veröffentlicht, was schon online ist und was du von Hand hochladen musst.",
+            "published": "Veröffentlicht",
+            "manualDue": "Von dir hochzuladen",
+            "synced": "Aktualisiert",
+            "day": "Tag {{n}}",
+            "filters": {
+                "upcoming": "Heute und demnächst",
+                "manual": "Von Hand, offen",
+                "all": "Alles"
+            },
+            "empty": "Der Plan ist noch nicht vom NAS angekommen.",
+            "emptyFilter": "Hier ist nichts.",
+            "types": {
+                "reel": "Reel",
+                "carrusel": "Karussell",
+                "historia": "Story",
+                "fijar": "Anheften"
+            },
+            "sides": {
+                "fiesteros": "Partygäste",
+                "negocios": "Locations"
+            },
+            "manual": "Von Hand",
+            "open": "In Instagram öffnen",
+            "markDone": "Habe ich hochgeladen",
+            "undo": "Rückgängig",
+            "status": {
+                "published": "Veröffentlicht",
+                "done": "Hochgeladen",
+                "sent": "Per Telegram gesendet",
+                "failed": "Fehlgeschlagen: selbst hochladen",
+                "expired": "Nicht veröffentlicht",
+                "scheduled": "Geplant",
+                "manualScheduled": "Kommt per Telegram"
             }
         }
     },

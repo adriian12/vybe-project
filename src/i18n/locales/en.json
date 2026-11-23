@@ -1913,7 +1913,8 @@
             "overview": "Overview",
             "leads": "Requests",
             "users": "Users",
-            "venuesAll": "Venues"
+            "venuesAll": "Venues",
+            "instagram": "Instagram"
         },
         "venues": {
             "title": "Pending venues",
@@ -2304,6 +2305,44 @@
                 "resolved": "Marked as fixed",
                 "dismissed": "Bug dismissed",
                 "pending": "Bug reopened"
+            }
+        },
+        "instagram": {
+            "title": "Instagram",
+            "subtitle": "The campaign: what posts itself, what is already live and what you have to upload by hand.",
+            "published": "Published",
+            "manualDue": "For you to upload",
+            "synced": "Updated",
+            "day": "Day {{n}}",
+            "filters": {
+                "upcoming": "Today and upcoming",
+                "manual": "Manual, pending",
+                "all": "All"
+            },
+            "empty": "The schedule has not arrived from the NAS yet.",
+            "emptyFilter": "Nothing here.",
+            "types": {
+                "reel": "Reel",
+                "carrusel": "Carousel",
+                "historia": "Story",
+                "fijar": "Pin"
+            },
+            "sides": {
+                "fiesteros": "Partygoers",
+                "negocios": "Venues"
+            },
+            "manual": "By hand",
+            "open": "Open in Instagram",
+            "markDone": "I have posted it",
+            "undo": "Undo",
+            "status": {
+                "published": "Published",
+                "done": "Posted",
+                "sent": "Sent via Telegram",
+                "failed": "Failed: post it yourself",
+                "expired": "Not published",
+                "scheduled": "Scheduled",
+                "manualScheduled": "Will arrive via Telegram"
             }
         }
     },
