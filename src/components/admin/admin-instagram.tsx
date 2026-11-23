@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  AlertTriangle, Check, CircleDashed, Clapperboard, Clock, ExternalLink, Hand, Images, Loader2, Pin, Send, Smartphone,
+  AlertTriangle, Check, CircleDashed, Clapperboard, Clock, ExternalLink, Hand, Images, Loader2, Maximize2, Pin, Send, Smartphone,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
@@ -174,7 +174,7 @@ const AdminInstagram = () => {
                     type="button"
                     onClick={() => setAbierto(p)}
                     aria-label={t('admin.instagram.viewer.open')}
-                    className="press relative h-24 w-[3.4rem] shrink-0 overflow-hidden rounded-lg bg-black/[0.06] ring-party-primary hover:ring-2"
+                    className="press relative h-24 w-[3.4rem] shrink-0 cursor-zoom-in overflow-hidden rounded-lg bg-black/[0.06] ring-party-primary hover:ring-2"
                   >
                     {p.preview_url ? (
                       <img src={p.preview_url} alt="" loading="lazy" className="h-full w-full object-cover" />
@@ -222,6 +222,14 @@ const AdminInstagram = () => {
 
                     <div className="mt-2 flex flex-wrap items-center gap-2 text-caption font-bold">
                       <Estado post={p} />
+                      <button
+                        type="button"
+                        onClick={() => setAbierto(p)}
+                        className="press inline-flex items-center gap-1 text-ink underline underline-offset-2"
+                      >
+                        <Maximize2 size={12} />
+                        {t('admin.instagram.viewer.open')}
+                      </button>
                       {p.permalink && (
                         <button
                           type="button"
