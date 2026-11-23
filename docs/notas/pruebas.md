@@ -1,5 +1,16 @@
 # Cuentas y salas de pruebas
 
+> **Sala de revisión de las tiendas (migración 140, 23-11-2026).** Tras borrar los datos de
+> prueba, Apple y Google revisan con «Review Night» (código `583920`, sin ubicación, hasta
+> 2030) en «Fiestea Review Room», de revision.negocio@ con plan Business. La sala está SIN
+> verificar (`verification_status = rejected`): las reglas de siempre la esconden al público
+> (lista, mapa, buscador, ficha, perfil) y no sale en altas pendientes. Sólo la ven las dos
+> cuentas de revisión (`is_store_reviewer()` y dos políticas) y administración. Dentro hay
+> 12 perfiles demo `review-N@seed.vybe.test` (fotos de pravatar), sólo en esa fiesta, y
+> revision.apple@ con 5 matches con mensajes. No verificarla nunca: saldría al público.
+> Las notas para Apple de la 1.1 ya lo explican (en el panel sale «pendiente de verificar»
+> y no hay QR rotativo de puerta).
+
 > **Borrado programado (19-11-2026).** Cuando la versión de producción salga en Google Play,
 > la tarea de Windows «Fiestea - borrar datos de prueba» (`tools/limpiar-pruebas.mjs` de `D:/Webs/Fiestea`,
 > fuera de git) borra Aurora Sessions, Fiestea Test Night, Sala Aurora, las «Parapapaia», la fiesta
