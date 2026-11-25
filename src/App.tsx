@@ -1,5 +1,5 @@
 import { Suspense, lazy, useEffect } from 'react';
-import { Loader2 } from 'lucide-react';
+import { FullScreenLoader } from '@/components/glass-loader';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Navigate, Routes, Route, useNavigate } from 'react-router-dom';
 import { Toaster } from '@/components/ui/toaster';
@@ -104,12 +104,8 @@ const GoToApp = () => {
   return <PantallaCargando />;
 };
 
-/** Lo que se ve mientras llega una pantalla. */
-const PantallaCargando = () => (
-  <div className="min-h-screen flex items-center justify-center">
-    <Loader2 className="w-8 h-8 animate-spin text-party-primary" />
-  </div>
-);
+/** Lo que se ve mientras llega una pantalla: la copa que se llena. */
+const PantallaCargando = FullScreenLoader;
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1, staleTime: 30_000 } },

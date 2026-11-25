@@ -72,9 +72,26 @@
         ]
       }
     </script>
+    <!-- Loader de la copa (src/components/glass-loader.tsx usa estas clases). -->
+    <style>
+      html { background: #111114; }
+      .fl { display: inline-flex; }
+      .fl-boot { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; }
+      .fl-glass { fill: none; stroke: #f8d000; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+      .fl-liquid { fill: #f8d000; transform: translateY(23px); animation: fl-fill 1.8s cubic-bezier(.45,0,.25,1) infinite; }
+      @keyframes fl-fill {
+        0% { transform: translateY(23px); opacity: 1; }
+        70% { transform: translateY(0); opacity: 1; }
+        88% { transform: translateY(0); opacity: 0; }
+        100% { transform: translateY(23px); opacity: 0; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .fl-liquid { animation: none; transform: translateY(9px); }
+      }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root"><div class="fl fl-boot" role="status" aria-label="Cargando"><svg width="48" height="56" viewBox="0 0 48 56" aria-hidden="true"><defs><clipPath id="fl-bowl-boot"><path d="M6 6H42L24 28Z"/></clipPath></defs><g clip-path="url(#fl-bowl-boot)"><rect class="fl-liquid" x="0" y="6" width="48" height="23"/></g><path class="fl-glass" d="M6 6H42L24 28ZM24 28V49M15 50H33"/></svg></div></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

@@ -1,7 +1,7 @@
 import { ReactNode, useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Trans, useTranslation } from 'react-i18next';
-import { Loader2 } from 'lucide-react';
+import { FullScreenLoader } from '@/components/glass-loader';
 import { PartyButton } from '@/components/ui-custom/party-button';
 import { useToast } from '@/components/ui/use-toast';
 import { useAppContext } from '@/context/app-context';
@@ -95,11 +95,7 @@ const ConsentGate = ({ children }: { children: ReactNode }) => {
   // a quién dar consentimiento porque el consentimiento se le da a ella.
   if (isLoading || checked === null || !isLoggedIn || userType === 'venue' || userType === 'admin') {
     if (isLoading || checked === null) {
-      return (
-        <div className="min-h-screen flex items-center justify-center">
-          <Loader2 className="w-8 h-8 animate-spin text-party-primary" />
-        </div>
-      );
+      return <FullScreenLoader />;
     }
     return <>{children}</>;
   }

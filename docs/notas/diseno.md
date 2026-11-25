@@ -42,3 +42,11 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
   misma pantalla con dos pestañas.
 - El formulario de evento ya escribe `recurrence` (`weekly`/`biweekly`) y el
   aforo; la base de datos crea las siguientes ediciones.
+
+## Loader de la copa
+
+La carga (arranque, pantallas `lazy()` y espera del consentimiento) es una copa
+amarilla que se llena: `src/components/glass-loader.tsx`. Sus estilos (`.fl-*`)
+están en `index.html`, porque la misma copa va dentro de `#root` y se ve antes
+de que cargue el JavaScript; si cambias el dibujo, cámbialo en los dos sitios.
+Con «reducir movimiento» la copa se queda medio llena, sin animación.
