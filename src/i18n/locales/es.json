@@ -4292,5 +4292,19 @@
         "sent": "Error enviado",
         "sentBody": "Gracias. Lo revisaremos lo antes posible.",
         "tooMany": "Has enviado muchos reportes seguidos. Inténtalo dentro de un rato."
+    },
+    "signals": {
+        "views": "{{count}} visitas esta semana",
+        "clicks_one": "{{count}} persona ha mirado entradas hoy",
+        "clicks_other": "{{count}} personas han mirado entradas hoy",
+        "followers": "{{count}} siguen a {{venue}}",
+        "new": "Recién añadida",
+        "beFirst": "Sé de los primeros en apuntarte",
+        "tags": {
+            "lastTickets": "Últimas entradas",
+            "fillsUp": "Se suele llenar",
+            "popular": "Popular en {{city}}",
+            "featured": "Destacada"
+        }
     }
 }

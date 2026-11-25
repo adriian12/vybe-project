@@ -4684,6 +4684,21 @@ export type Database = {
           sales_start_at: string
         }[]
       }
+      get_events_signals: {
+        Args: { p_event_ids: string[] }
+        Returns: {
+          event_id: string
+          views_week: number
+          ticket_clicks_day: number
+          followers: number
+          venue_name: string | null
+          is_new: boolean
+          popular_city: string | null
+          fills_up: boolean
+          last_tickets: boolean
+          featured: boolean
+        }[]
+      }
       get_events_activity: {
         Args: { p_event_ids: string[] }
         Returns: {

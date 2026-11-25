@@ -210,3 +210,13 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
   entra lo hereda sin enseñarlo. No sale en `/auth`, `/legal`, enlaces del
   equipo ni en la compra. Se vuelve a ver desde Perfil → «Ver la introducción».
   Si cambia algo que cuenta (Flechazo, entradas, Premium), cambia su paso.
+
+- **Señales y etiquetas de las fiestas** (migración 146, 25-11-2026): con
+  menos de 10 «voy a ir» (`GOING_MIN`, `src/lib/event-signals.ts`) no se
+  enseña la cifra; sale el dato real más fuerte (visitas a la ficha en 7 días,
+  gente que miró entradas en 24 h, seguidores del local) o «Recién añadida» /
+  «Sé de los primeros en apuntarte». Nunca se inventan cifras. Etiquetas:
+  «Últimas entradas» (<15 % de las que vende la app), «Se suele llenar» y
+  «Popular en …» (salas de `popular_places`: se aplican solas a las fiestas
+  nuevas; para añadir una sala, una fila con su expresión regular) y
+  «Destacada». Todo sale de `get_events_signals` (también sin sesión).

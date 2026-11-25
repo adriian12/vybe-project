@@ -72,6 +72,32 @@ export interface EventActivity {
   swipeEnabled: boolean;
   /** Vende entradas en la app: la tarjeta enseña «Entradas» y no «Voy a ir». */
   hasTickets: boolean;
+  /** Datos reales que se enseñan mientras «van a ir» es bajo (migración 146). */
+  signals?: EventSignals;
+}
+
+/**
+ * Lo que sí es verdad de una fiesta cuando todavía hay poca gente con la app:
+ * nunca se inventa una cifra (ver `event-signals.ts`).
+ */
+export interface EventSignals {
+  /** Visitas a la ficha en los últimos 7 días (analítica anónima). */
+  viewsWeek: number;
+  /** Personas que han mirado entradas en las últimas 24 h. */
+  ticketClicksDay: number;
+  /** Seguidores del local (0 en el local de la casa). */
+  followers: number;
+  venueName: string | null;
+  /** Añadida en los últimos 7 días. */
+  isNew: boolean;
+  /** «Popular en …»: la sala está en la lista de salas conocidas. */
+  popularCity: string | null;
+  /** «Se suele llenar». */
+  fillsUp: boolean;
+  /** Quedan menos del 15 % de las entradas que vende la app. */
+  lastTickets: boolean;
+  /** Destacada ahora mismo. */
+  featured: boolean;
 }
 
 export const EMPTY_ACTIVITY: EventActivity = {
@@ -369,11 +395,33 @@ export const socialService = {
   getEventsActivity: async (eventIds: string[]): Promise<Record<string, EventActivity>> => {
     if (eventIds.length === 0) return {};
 
-    const { data, error } = await supabase.rpc('get_events_activity', {
-      p_event_ids: eventIds,
-    });
+    // Las señales también llegan sin cuenta; la actividad, sólo con sesión.
+    const [{ data, error }, { data: senales }] = await Promise.all([
+      supabase.rpc('get_events_activity', { p_event_ids: eventIds }),
+      supabase.rpc('get_events_signals', { p_event_ids: eventIds }),
+    ]);
 
-    if (error || !data) return {};
+    const porEvento = new Map(
+      (senales ?? []).map((row) => [
+        row.event_id,
+        {
+          viewsWeek: Number(row.views_week ?? 0),
+          ticketClicksDay: Number(row.ticket_clicks_day ?? 0),
+          followers: Number(row.followers ?? 0),
+          venueName: row.venue_name ?? null,
+          isNew: Boolean(row.is_new),
+          popularCity: row.popular_city ?? null,
+          fillsUp: Boolean(row.fills_up),
+          lastTickets: Boolean(row.last_tickets),
+          featured: Boolean(row.featured),
+        } satisfies EventSignals,
+      ]),
+    );
+
+    const base: Record<string, EventActivity> = {};
+    for (const [id, signals] of porEvento) base[id] = { ...EMPTY_ACTIVITY, signals };
+
+    if (error || !data) return base;
 
     return data.reduce<Record<string, EventActivity>>((acc, row) => {
       acc[row.event_id] = {
@@ -393,9 +441,10 @@ export const socialService = {
         headcount: row.headcount ?? null,
         swipeEnabled: row.swipe_enabled !== false,
         hasTickets: Boolean(row.has_tickets),
+        signals: porEvento.get(row.event_id),
       };
       return acc;
-    }, {});
+    }, base);
   },
 
   setIntent: async (eventId: string, going: boolean): Promise<void> => {

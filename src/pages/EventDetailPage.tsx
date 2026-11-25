@@ -30,7 +30,8 @@ import Header from '@/components/header';
 import Footer from '@/components/footer';
 import WhoIsGoing from '@/components/who-is-going';
 import MapThumb from '@/components/map-thumb';
-import { LivePill, formatHourRange } from '@/components/event-bits';
+import { LivePill, SignalTags, SignalText, formatHourRange } from '@/components/event-bits';
+import { GOING_MIN } from '@/lib/event-signals';
 import LiveThermometer from '@/components/live-thermometer';
 import EventTickets from '@/components/event-tickets';
 import GuestListJoin from '@/components/guest-list-join';
@@ -468,6 +469,14 @@ const EventDetailPage = () => {
             </p>
           )}
           <WhoIsGoing eventId={event.id} going={cifras.going} />
+          {/* Lo que es verdad de la fiesta y, mientras van pocos, el dato real
+              más fuerte en vez de la cifra (migración 146). */}
+          {!terminado && !live && (
+            <div className="flex flex-wrap items-center gap-2">
+              <SignalTags signals={cifras.signals} featured />
+              {cifras.going < GOING_MIN && <SignalText signals={cifras.signals} tone="dark" />}
+            </div>
+          )}
 
           {/* ---------------------------- Entradas · Listas · Reservados VIP */}
           {!terminado && (

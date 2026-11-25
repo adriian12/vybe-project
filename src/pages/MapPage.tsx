@@ -8,6 +8,7 @@ import Header from '@/components/header';
 import Footer from '@/components/footer';
 import { addBaseMap } from '@/lib/base-map';
 import { dayAndMonth } from '@/components/event-bits';
+import { GOING_MIN } from '@/lib/event-signals';
 import { vibeKey } from '@/lib/vibe';
 import {
   DropdownMenu,
@@ -709,8 +710,12 @@ const MapPage = () => {
                           <span className="font-bold">· {t(vibeKey(cifras.vibeLevel))}</span>
                         ) : cifras?.inside ? (
                           <span className="font-bold">· {t('home.inside', { count: cifras.inside })}</span>
-                        ) : cifras?.going ? (
+                        ) : cifras && cifras.going >= GOING_MIN ? (
                           <span>· {t('map.going', { count: cifras.going })}</span>
+                        ) : cifras?.signals?.popularCity ? (
+                          <span>· {t('signals.tags.popular', { city: cifras.signals.popularCity })}</span>
+                        ) : cifras?.signals?.isNew ? (
+                          <span>· {t('signals.new')}</span>
                         ) : null}
                       </div>
                     </div>

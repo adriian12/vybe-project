@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Loader2, Lock } from 'lucide-react';
 import { usePremium } from '@/context/premium-context';
 import { premiumNight, Attendee, isPremiumRequired } from '@/services/premium-night';
+import { GOING_MIN } from '@/lib/event-signals';
 
 interface WhoIsGoingProps {
   eventId: string;
@@ -52,7 +53,8 @@ const WhoIsGoing: React.FC<WhoIsGoingProps> = ({ eventId, going }) => {
   }, [isPremium, cargar]);
 
   // Sin nadie apuntado no hay nada que enseñar ni que vender.
-  if (going === 0) return null;
+  // Con poca gente no se enseña la cifra (ver `event-signals.ts`).
+  if (going < GOING_MIN) return null;
 
   const visibles = isPremium ? (gente ?? []).slice(0, CARAS) : [];
   const huecos = isPremium ? 0 : Math.min(going, CARAS);

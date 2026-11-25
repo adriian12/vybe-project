@@ -4292,5 +4292,19 @@
         "sent": "Fehler gesendet",
         "sentBody": "Danke. Wir schauen es uns so schnell wie möglich an.",
         "tooMany": "Du hast viele Meldungen hintereinander gesendet. Versuch es später noch einmal."
+    },
+    "signals": {
+        "views": "{{count}} Aufrufe diese Woche",
+        "clicks_one": "{{count}} Person hat heute Tickets angesehen",
+        "clicks_other": "{{count}} Personen haben heute Tickets angesehen",
+        "followers": "{{count}} folgen {{venue}}",
+        "new": "Neu hinzugefügt",
+        "beFirst": "Sei einer der Ersten",
+        "tags": {
+            "lastTickets": "Letzte Tickets",
+            "fillsUp": "Meist ausverkauft",
+            "popular": "Beliebt in {{city}}",
+            "featured": "Hervorgehoben"
+        }
     }
 }

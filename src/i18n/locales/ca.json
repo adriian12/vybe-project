@@ -4292,5 +4292,19 @@
         "sent": "Error enviat",
         "sentBody": "Gràcies. Ho revisarem al més aviat possible.",
         "tooMany": "Has enviat molts informes seguits. Torna-ho a provar d’aquí a una estona."
+    },
+    "signals": {
+        "views": "{{count}} visites aquesta setmana",
+        "clicks_one": "{{count}} persona ha mirat entrades avui",
+        "clicks_other": "{{count}} persones han mirat entrades avui",
+        "followers": "{{count}} segueixen {{venue}}",
+        "new": "Acabada d’afegir",
+        "beFirst": "Sigues dels primers a apuntar-t’hi",
+        "tags": {
+            "lastTickets": "Últimes entrades",
+            "fillsUp": "Se sol omplir",
+            "popular": "Popular a {{city}}",
+            "featured": "Destacada"
+        }
     }
 }

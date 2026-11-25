@@ -1,6 +1,8 @@
 import { useTranslation } from 'react-i18next';
+import { Eye, Flame, Heart, Sparkles, Ticket, TrendingUp, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { EMPTY_ACTIVITY, EventActivity } from '@/services/social';
+import { EMPTY_ACTIVITY, EventActivity, EventSignals } from '@/services/social';
+import { GOING_MIN, SignalLine, signalLine, signalTags } from '@/lib/event-signals';
 import { VIBE_LEVELS, VibeLevel, vibeFill, vibeKey } from '@/lib/vibe';
 
 /**
@@ -128,14 +130,12 @@ export const AttendeeStack: React.FC<{
   const { t } = useTranslation();
   const ring = tone === 'light' ? 'ring-white' : 'ring-card';
   const text = tone === 'light' ? 'text-ink' : 'text-foreground';
-  const { going, inside, vibeLevel, trend } = activity ?? EMPTY_ACTIVITY;
+  const { going, inside, vibeLevel, trend, signals } = activity ?? EMPTY_ACTIVITY;
 
-  if (going === 0 && inside === 0 && !vibeLevel) {
-    return (
-      <span className={cn('text-caption', tone === 'light' ? 'text-ink/50' : 'text-party-gray', className)}>
-        {t('home.beFirst')}
-      </span>
-    );
+  // Con poca gente no se dice cuántos van: sale el dato real más fuerte
+  // (visitas, gente mirando entradas, seguidores) o «Recién añadida».
+  if (going < GOING_MIN && inside === 0 && !vibeLevel) {
+    return <SignalText signals={signals} tone={tone} className={className} />;
   }
 
   const texto = vibeLevel
@@ -198,5 +198,88 @@ export const VibeMeter: React.FC<{ level: VibeLevel; at: string | null; classNam
         ))}
       </div>
     </div>
+  );
+};
+
+const SIGNAL_ICON: Record<SignalLine['key'], React.ElementType> = {
+  views: Eye,
+  clicks: Ticket,
+  followers: Heart,
+  new: Sparkles,
+  beFirst: Sparkles,
+};
+
+/** El texto de un dato real, para cuando todavía van pocos (`event-signals.ts`). */
+// eslint-disable-next-line react-refresh/only-export-components
+export const useSignalText = () => {
+  const { t } = useTranslation();
+  return (line: SignalLine): string =>
+    line.key === 'followers'
+      ? t('signals.followers', { count: line.count, venue: line.venue })
+      : line.key === 'views' || line.key === 'clicks'
+        ? t(`signals.${line.key}`, { count: line.count })
+        : t(`signals.${line.key}`);
+};
+
+export const SignalText: React.FC<{
+  signals?: EventSignals;
+  tone?: 'light' | 'dark';
+  className?: string;
+}> = ({ signals, tone = 'light', className }) => {
+  const texto = useSignalText();
+  const line = signalLine(signals);
+  const Icono = SIGNAL_ICON[line.key];
+  const fuerte = line.key !== 'beFirst';
+  return (
+    <span
+      className={cn(
+        'flex min-w-0 items-center gap-1.5 text-[11px]',
+        fuerte ? 'font-bold' : '',
+        tone === 'light' ? (fuerte ? 'text-ink' : 'text-ink/50') : fuerte ? 'text-foreground' : 'text-party-gray',
+        className,
+      )}
+    >
+      <Icono size={13} className={cn('shrink-0', fuerte && 'text-party-primary')} aria-hidden />
+      <span className="truncate">{texto(line)}</span>
+    </span>
+  );
+};
+
+const TAG_ICON = { lastTickets: Ticket, fillsUp: Users, popular: TrendingUp, featured: Flame } as const;
+
+/**
+ * «Últimas entradas», «Se suele llenar», «Popular en Palma», «Destacada»:
+ * sólo lo que es verdad de la fiesta (migración 146).
+ */
+export const SignalTags: React.FC<{
+  signals?: EventSignals;
+  featured?: boolean;
+  small?: boolean;
+  max?: number;
+  className?: string;
+}> = ({ signals, featured, small, max, className }) => {
+  const { t } = useTranslation();
+  const tags = signalTags(signals, { featured }).slice(0, max);
+  if (tags.length === 0) return null;
+  return (
+    <>
+      {tags.map((tag) => {
+        const Icono = TAG_ICON[tag.key];
+        return (
+          <span
+            key={tag.key}
+            className={cn(
+              'flex items-center gap-1 whitespace-nowrap rounded-full font-bold',
+              tag.key === 'lastTickets' ? 'bg-destructive/10 text-destructive' : 'bg-party-primary/15 text-foreground',
+              small ? 'px-2 py-[3px] text-[10px] leading-[14px]' : 'px-2.5 py-1 text-[11px]',
+              className,
+            )}
+          >
+            <Icono size={small ? 10 : 12} aria-hidden />
+            {tag.key === 'popular' ? t('signals.tags.popular', { city: tag.city }) : t(`signals.tags.${tag.key}`)}
+          </span>
+        );
+      })}
+    </>
   );
 };

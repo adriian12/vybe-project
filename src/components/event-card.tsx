@@ -7,6 +7,7 @@ import { franjaDe } from '@/lib/party-filters';
 import { cn } from '@/lib/utils';
 import {
   AttendeeStack,
+  SignalTags,
   DateBadge,
   LivePill,
   TimePill,
@@ -353,6 +354,7 @@ const EventCard: React.FC<EventCardProps> = ({
               {precio}
             </span>
           )}
+          <SignalTags signals={activity?.signals} small={grid} max={grid ? 1 : 2} />
           {franja && <Tag small={grid}>{t(`filters.franjas.${franja}`)}</Tag>}
           {event.theme && <Tag small={grid}>{event.theme}</Tag>}
           {event.minAge !== undefined && <Tag small={grid}>{event.minAge}+</Tag>}
