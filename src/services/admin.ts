@@ -502,6 +502,23 @@ export const adminService = {
     if (error) fallo(error.message);
   },
 
+  /**
+   * Borra un negocio (con o sin la cuenta de su dueño) o una cuenta (Edge
+   * Function `admin-delete`). Los motivos de rechazo llegan como código:
+   * VENUE_HAS_SALES, HOUSE_VENUE, PROTECTED_ACCOUNT, APPLE_SUBSCRIPTION_ACTIVE.
+   */
+  deleteEntity: async (type: 'venue' | 'user', id: string, withOwner = false): Promise<void> => {
+    const { data, error } = await supabase.functions.invoke('admin-delete', { body: { type, id, withOwner } });
+    if (!error && (data as { deleted?: boolean } | null)?.deleted) return;
+    let codigo = (data as { error?: string } | null)?.error ?? '';
+    // Con una respuesta 4xx/5xx el cuerpo viene en `error.context`.
+    const respuesta = (error as { context?: Response } | null)?.context;
+    if (!codigo && respuesta && typeof respuesta.json === 'function') {
+      codigo = ((await respuesta.json().catch(() => null)) as { error?: string } | null)?.error ?? '';
+    }
+    throw new ApiError(codigo || 'ADMIN_FAILED', codigo || 'errors.generic');
+  },
+
   /** Avisos de administración (Edge Function `admin-notify`). */
   notify: async <T,>(body: Record<string, unknown>): Promise<T> => {
     const { data, error } = await supabase.functions.invoke('admin-notify', { body });

@@ -8,6 +8,7 @@ import { adminService, AdminUser } from '@/services/admin';
 import { cn } from '@/lib/utils';
 import { diasParaCaducar } from '@/lib/caducidad';
 import AdminNotices from '@/components/admin/admin-notices';
+import AdminDeleteButton from '@/components/admin/admin-delete-button';
 
 const PAGINA = 50;
 
@@ -242,6 +243,20 @@ const AdminUsers = () => {
                         </button>
                       </span>
                     </div>
+
+                    {user.role !== 'admin' && (
+                      <div className="flex justify-end">
+                        <AdminDeleteButton
+                          type="user"
+                          id={user.profileId}
+                          name={user.name}
+                          onDeleted={() => {
+                            setAbierto(null);
+                            setUsuarios((prev) => prev.filter((u) => u.profileId !== user.profileId));
+                          }}
+                        />
+                      </div>
+                    )}
                   </div>
                 )}
               </li>

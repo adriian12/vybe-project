@@ -87,6 +87,9 @@ verify_jwt = false
 [functions.delete-account]
 verify_jwt = true
 
+[functions.admin-delete]
+verify_jwt = true
+
 [functions.venue-add-member]
 verify_jwt = true
 

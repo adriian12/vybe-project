@@ -2356,6 +2356,34 @@
                 "noCaption": "Storys werden ohne Text veröffentlicht.",
                 "noMedia": "Diese Aufgabe hat kein Bild."
             }
+        },
+        "delete": {
+            "button": {
+                "venue": "Unternehmen löschen",
+                "user": "Konto löschen"
+            },
+            "title": {
+                "venue": "„{{name}}“ löschen?",
+                "user": "Konto von {{name}} löschen?"
+            },
+            "body": {
+                "venue": "Gelöscht werden das Unternehmen, seine Partys, Logo, Follower, Bewertungen und Statistiken. Das kann nicht rückgängig gemacht werden.",
+                "user": "Gelöscht werden das Konto, Fotos, Nachrichten, Matches und, falls vorhanden, auch die Unternehmen mit ihren Partys. Premium über Stripe oder Google Play wird gekündigt. Das kann nicht rückgängig gemacht werden."
+            },
+            "withOwner": "Auch das Konto löschen, mit dem es angelegt wurde (und seine anderen Unternehmen, falls vorhanden).",
+            "typeName": "Zum Bestätigen „{{name}}“ eingeben",
+            "confirm": "Endgültig löschen",
+            "done": {
+                "venue": "Unternehmen gelöscht",
+                "user": "Konto gelöscht"
+            },
+            "failed": "Löschen nicht möglich",
+            "errors": {
+                "VENUE_HAS_SALES": "Es gibt bezahlte Ticketverkäufe: Bestellungen sind Buchhaltung und können nicht gelöscht werden. Setze es auf keinen Tarif oder bitte den Inhaber, das Unternehmen zu schließen.",
+                "HOUSE_VENUE": "Das ist das eigene Unternehmen von Fiestea: Es kann nicht gelöscht werden.",
+                "PROTECTED_ACCOUNT": "Dieses Konto kann nicht gelöscht werden (Verwaltung, System oder Store-Prüfung).",
+                "APPLE_SUBSCRIPTION_ACTIVE": "Es gibt ein Apple-Premium, das sich noch verlängert: Nur die Person kann es auf ihrem iPhone kündigen."
+            }
         }
     },
     "pwa": {

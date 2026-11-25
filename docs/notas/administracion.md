@@ -154,3 +154,12 @@ ciudad. Sólo para administración y cuentas con negocio.
 En Usuarios y en Negocios, una etiqueta roja «Caduca en N días» para el Premium o
 el plan que acaba en 7 días o menos sin renovación automática (`lib/caducidad.ts`,
 con test). En negocios va en la cabecera de la tarjeta, sin tener que abrirla.
+
+- **Borrar negocios y cuentas** (Edge Function `admin-delete`, 25-11-2026):
+  botón en la ficha de Negocios y de Usuarios; se confirma escribiendo el
+  nombre. Un negocio se borra solo o con la cuenta de su dueño (marcado por
+  defecto). La cuenta se borra con la misma lógica que `delete-account`
+  (`_shared/borrar-cuenta.ts`). No deja borrar negocios con entradas cobradas
+  (`VENUE_HAS_SALES`: los pedidos son contabilidad y caerían en cascada), el
+  local de la casa, administración, la propia cuenta, `sistema@` ni las de
+  revisión, ni cuentas con Premium de Apple que se sigue renovando.

@@ -2356,6 +2356,34 @@
                 "noCaption": "Les històries es publiquen sense text.",
                 "noMedia": "Aquesta tasca no té imatge."
             }
+        },
+        "delete": {
+            "button": {
+                "venue": "Esborrar negoci",
+                "user": "Esborrar compte"
+            },
+            "title": {
+                "venue": "Vols esborrar «{{name}}»?",
+                "user": "Vols esborrar el compte de {{name}}?"
+            },
+            "body": {
+                "venue": "S’esborren el negoci, les seves festes, el logo, els seguidors, les valoracions i les estadístiques. No es pot desfer.",
+                "user": "S’esborren el compte, les fotos, els missatges, els matches i, si té negocis, també aquests negocis amb les seves festes. El Premium de Stripe o Google Play es cancel·la. No es pot desfer."
+            },
+            "withOwner": "Esborrar també el compte amb què es va donar d’alta (i els seus altres negocis, si en té).",
+            "typeName": "Per confirmar, escriu «{{name}}»",
+            "confirm": "Esborrar per sempre",
+            "done": {
+                "venue": "Negoci esborrat",
+                "user": "Compte esborrat"
+            },
+            "failed": "No s’ha pogut esborrar",
+            "errors": {
+                "VENUE_HAS_SALES": "Té entrades cobrades: les comandes són comptabilitat i no es poden esborrar. Deixa’l sense pla o demana a la persona que tanqui el negoci.",
+                "HOUSE_VENUE": "És el negoci de Fiestea: no es pot esborrar.",
+                "PROTECTED_ACCOUNT": "Aquest compte no es pot esborrar (administració, sistema o revisió de les botigues).",
+                "APPLE_SUBSCRIPTION_ACTIVE": "Té un Premium d’Apple que es continua renovant: només la persona el pot cancel·lar al seu iPhone."
+            }
         }
     },
     "pwa": {

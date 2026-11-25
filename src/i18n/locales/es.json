@@ -2356,6 +2356,34 @@
                 "noCaption": "Las historias se publican sin texto.",
                 "noMedia": "Esta tarea no tiene imagen."
             }
+        },
+        "delete": {
+            "button": {
+                "venue": "Borrar negocio",
+                "user": "Borrar cuenta"
+            },
+            "title": {
+                "venue": "¿Borrar «{{name}}»?",
+                "user": "¿Borrar la cuenta de {{name}}?"
+            },
+            "body": {
+                "venue": "Se borran el negocio, sus fiestas, su logo, seguidores, valoraciones y estadísticas. No se puede deshacer.",
+                "user": "Se borran la cuenta, sus fotos, mensajes, matches y, si tiene negocios, también esos negocios con sus fiestas. Su Premium de Stripe o Google Play se cancela. No se puede deshacer."
+            },
+            "withOwner": "Borrar también la cuenta con la que se dio de alta (y sus otros negocios, si tiene).",
+            "typeName": "Para confirmar, escribe «{{name}}»",
+            "confirm": "Borrar para siempre",
+            "done": {
+                "venue": "Negocio borrado",
+                "user": "Cuenta borrada"
+            },
+            "failed": "No se ha podido borrar",
+            "errors": {
+                "VENUE_HAS_SALES": "Tiene entradas cobradas: los pedidos son contabilidad y no se pueden borrar. Déjalo sin plan o pide a la persona que cierre el negocio.",
+                "HOUSE_VENUE": "Es el negocio de Fiestea: no se puede borrar.",
+                "PROTECTED_ACCOUNT": "Esta cuenta no se puede borrar (administración, sistema o revisión de las tiendas).",
+                "APPLE_SUBSCRIPTION_ACTIVE": "Tiene Premium de Apple que se sigue renovando: sólo la persona puede cancelarlo en su iPhone."
+            }
         }
     },
     "pwa": {

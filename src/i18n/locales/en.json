@@ -2356,6 +2356,34 @@
                 "noCaption": "Stories are posted without a caption.",
                 "noMedia": "This task has no image."
             }
+        },
+        "delete": {
+            "button": {
+                "venue": "Delete business",
+                "user": "Delete account"
+            },
+            "title": {
+                "venue": "Delete “{{name}}”?",
+                "user": "Delete {{name}}’s account?"
+            },
+            "body": {
+                "venue": "This deletes the business, its parties, logo, followers, ratings and stats. It can’t be undone.",
+                "user": "This deletes the account, its photos, messages, matches and, if it owns businesses, those businesses and their parties too. Stripe or Google Play Premium is cancelled. It can’t be undone."
+            },
+            "withOwner": "Also delete the account it signed up with (and its other businesses, if any).",
+            "typeName": "To confirm, type “{{name}}”",
+            "confirm": "Delete forever",
+            "done": {
+                "venue": "Business deleted",
+                "user": "Account deleted"
+            },
+            "failed": "Couldn’t delete it",
+            "errors": {
+                "VENUE_HAS_SALES": "It has paid ticket sales: orders are accounting records and can’t be deleted. Set it to no plan or ask the owner to close the business.",
+                "HOUSE_VENUE": "This is Fiestea’s own business: it can’t be deleted.",
+                "PROTECTED_ACCOUNT": "This account can’t be deleted (admin, system or store review).",
+                "APPLE_SUBSCRIPTION_ACTIVE": "It has an Apple Premium that still renews: only the person can cancel it on their iPhone."
+            }
         }
     },
     "pwa": {

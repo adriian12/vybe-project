@@ -8,6 +8,7 @@ import { adminService, AdminVenue, AdminVenueEvent } from '@/services/admin';
 import { cn } from '@/lib/utils';
 import { diasParaCaducar } from '@/lib/caducidad';
 import AdminNotices from '@/components/admin/admin-notices';
+import AdminDeleteButton from '@/components/admin/admin-delete-button';
 
 /**
  * Todos los locales: su plan, cuánta gente les sigue y los eventos que han
@@ -212,6 +213,15 @@ const AdminVenues = () => {
                           <SelectItem value="business">{t('venue.plan.names.business')}</SelectItem>
                         </SelectContent>
                       </Select>
+                      <AdminDeleteButton
+                        type="venue"
+                        id={venue.venueId}
+                        name={venue.name}
+                        onDeleted={() => {
+                          setAbierto(null);
+                          setLocales((prev) => prev.filter((v) => v.venueId !== venue.venueId));
+                        }}
+                      />
                     </div>
 
                     <div className="space-y-1.5">
