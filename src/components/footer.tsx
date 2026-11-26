@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Compass, Martini, Ticket, User, Zap } from 'lucide-react';
+import { Compass, Lock, LogIn, Martini, Ticket, User, Zap } from 'lucide-react';
 import { useAppContext } from '@/context/app-context';
 
 const items = [
@@ -25,7 +25,7 @@ const items = [
 const Footer = () => {
   const { t } = useTranslation();
   const { pathname } = useLocation();
-  const { messages, currentUser } = useAppContext();
+  const { messages, currentUser, isExplorer } = useAppContext();
 
   // Un punto en «Vybes» cuando hay mensajes sin leer: es la única pestaña que
   // cambia sin que tú hagas nada.
@@ -45,12 +45,19 @@ const Footer = () => {
             existe para ella. */}
         {items
           .filter(({ to }) => to !== '/matches' || currentUser?.accountType !== 'guest')
-          .map(({ to, icon: Icon, key, also }) => {
-          const activo = also.test(pathname);
+          .map((item) => {
+          // Sin cuenta: «Perfil» es «Entrar» (al registro) y las pestañas que
+          // necesitan cuenta llevan un candado; al tocarlas sale el aviso.
+          const entrar = isExplorer && item.to === '/profile';
+          const to = entrar ? '/auth?type=user&mode=register' : item.to;
+          const Icon = entrar ? LogIn : item.icon;
+          const key = entrar ? 'nav.login' : item.key;
+          const bloqueada = isExplorer && (item.to === '/tickets' || item.to === '/matches');
+          const activo = !entrar && item.also.test(pathname);
 
           return (
             <NavLink
-              key={to}
+              key={item.to}
               to={to}
               aria-current={activo ? 'page' : undefined}
               className="press flex min-h-[44px] w-16 flex-col items-center justify-center"
@@ -61,6 +68,11 @@ const Footer = () => {
                 }`}
               >
                 <Icon size={19} strokeWidth={activo ? 2.4 : 2} />
+                {bloqueada && (
+                  <span className="absolute -right-1 -top-0.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-surface-container text-party-gray">
+                    <Lock size={9} strokeWidth={2.6} />
+                  </span>
+                )}
                 {to === '/matches' && pendientes > 0 && !activo && (
                   <span className="absolute right-0.5 top-0.5 h-2 w-2 rounded-full bg-party-primary ring-2 ring-surface-container" />
                 )}

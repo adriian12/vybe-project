@@ -2490,7 +2490,8 @@
         "chat": "Chat",
         "access": "Acceso",
         "live": "En pista",
-        "event": "Evento"
+        "event": "Evento",
+        "login": "Entrar"
     },
     "activity": {
         "title": "Avisos",
@@ -4348,6 +4349,7 @@
         "body": "Tardas 10 segundos con Apple o Google. Puedes seguir mirando fiestas sin cuenta.",
         "create": "Crear cuenta",
         "login": "Ya tengo cuenta",
-        "keepBrowsing": "Seguir mirando"
+        "keepBrowsing": "Seguir mirando",
+        "banner": "Estás viendo Fiestea sin cuenta"
     }
 }

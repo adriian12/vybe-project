@@ -2490,7 +2490,8 @@
         "chat": "Xat",
         "access": "Accés",
         "live": "A la pista",
-        "event": "Esdeveniment"
+        "event": "Esdeveniment",
+        "login": "Entrar"
     },
     "activity": {
         "title": "Avisos",
@@ -4348,6 +4349,7 @@
         "body": "Tardes 10 segons amb Apple o Google. Pots continuar mirant festes sense compte.",
         "create": "Crear compte",
         "login": "Ja tinc compte",
-        "keepBrowsing": "Continuar mirant"
+        "keepBrowsing": "Continuar mirant",
+        "banner": "Estàs veient Fiestea sense compte"
     }
 }

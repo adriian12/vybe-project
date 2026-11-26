@@ -2490,7 +2490,8 @@
         "chat": "Chat",
         "access": "Entry",
         "live": "On the floor",
-        "event": "Event"
+        "event": "Event",
+        "login": "Sign in"
     },
     "activity": {
         "title": "Updates",
@@ -4348,6 +4349,7 @@
         "body": "It takes 10 seconds with Apple or Google. You can keep browsing parties without an account.",
         "create": "Create account",
         "login": "I already have an account",
-        "keepBrowsing": "Keep browsing"
+        "keepBrowsing": "Keep browsing",
+        "banner": "You're browsing Fiestea without an account"
     }
 }

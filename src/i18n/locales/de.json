@@ -2490,7 +2490,8 @@
         "chat": "Chat",
         "access": "Einlass",
         "live": "Auf der Party",
-        "event": "Event"
+        "event": "Event",
+        "login": "Anmelden"
     },
     "activity": {
         "title": "Hinweise",
@@ -4348,6 +4349,7 @@
         "body": "Mit Apple oder Google dauert es 10 Sekunden. Partys kannst du auch ohne Konto ansehen.",
         "create": "Konto erstellen",
         "login": "Ich habe schon ein Konto",
-        "keepBrowsing": "Weiter ansehen"
+        "keepBrowsing": "Weiter ansehen",
+        "banner": "Du siehst Fiestea ohne Konto"
     }
 }

@@ -59,7 +59,7 @@ const Seccion: React.FC<{ titulo: React.ReactNode; extra?: React.ReactNode }> = 
 const RADIO_ZONA_M = 80_000;
 
 const HomePage = () => {
-  const { activeEvent, currentUser } = useAppContext();
+  const { activeEvent, currentUser, isExplorer } = useAppContext();
   const navigate = useNavigate();
   const { t } = useTranslation();
 
@@ -209,6 +209,22 @@ const HomePage = () => {
             )}
           </button>
         </section>
+
+        {/* Sin cuenta: una franja discreta, siempre a mano, sin ventanas. */}
+        {isExplorer && (
+          <section className="px-margin">
+            <Link
+              to="/auth?type=user&mode=register"
+              className="press flex items-center gap-3 rounded-xl bg-surface-low px-4 py-3"
+            >
+              <span className="min-w-0 flex-1 text-body-sm text-party-gray">{t('explorer.banner')}</span>
+              <span className="flex shrink-0 items-center gap-0.5 text-body-sm font-bold text-party-primary">
+                {t('explorer.create')}
+                <ChevronRight size={16} />
+              </span>
+            </Link>
+          </section>
+        )}
 
         {/* --------------------------------------------- evento en el que estás */}
         {activeEvent && (
