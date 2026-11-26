@@ -5696,7 +5696,7 @@ export type Database = {
         }[]
       }
       record_app_install: {
-        Args: { p_app_version?: string; p_device_model?: string; p_platform: string }
+        Args: { p_app_version?: string; p_device_model?: string; p_platform: string; p_source?: string }
         Returns: undefined
       }
       reinstate_profile: { Args: { p_profile_id: string }; Returns: undefined }

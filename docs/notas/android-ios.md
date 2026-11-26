@@ -57,3 +57,5 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
 - **Sólo iPhone** (`TARGETED_DEVICE_FAMILY = 1`): así el App Store no pide
   capturas de iPad, y una vez publicada en iPad ya no se podría quitar. En un
   iPad se instala igual, en modo iPhone.
+
+- **Origen de la instalación** (migración 149). Plugin `FiesteaInstall` (`FiesteaInstallPlugin.java`; en iOS dentro de `MainViewController.swift` para no tocar el proyecto de Xcode): Android `test` si `firebase.test.lab` (robots del informe previo al lanzamiento), `store` si la instaló `com.android.vending`, si no `sideload`; iOS `testflight` con recibo `sandboxReceipt` (TestFlight y revisión de Apple), `store` si no. `get_downloads_report` (Telegram) sólo cuenta `store` y las filas sin origen de versiones viejas, y no cuenta los avisos de cuentas de prueba. Las aperturas anteriores de versiones no publicadas se marcaron a mano el 26-11-2026.

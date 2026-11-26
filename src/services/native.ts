@@ -103,7 +103,22 @@ const recordInstallOnce = async (): Promise<void> => {
       // Sin versión se cuenta igual.
     }
 
-    const { error } = await supabase.rpc('record_app_install', { p_platform: plat, p_app_version: version });
+    // De dónde viene (migración 149): robots de Google, TestFlight y la
+    // revisión de Apple no cuentan como descargas.
+    let source: string | undefined;
+    try {
+      const { registerPlugin } = await import('@capacitor/core');
+      const FiesteaInstall = registerPlugin<{ getSource: () => Promise<{ source: string }> }>('FiesteaInstall');
+      source = (await FiesteaInstall.getSource()).source;
+    } catch {
+      // Una versión sin el plugin: se cuenta sin origen.
+    }
+
+    const { error } = await supabase.rpc('record_app_install', {
+      p_platform: plat,
+      p_app_version: version,
+      p_source: source,
+    });
     if (!error) window.localStorage.setItem(INSTALL_KEY, new Date().toISOString());
   } catch {
     // Sin almacenamiento sólo se pierde registrar la apertura.

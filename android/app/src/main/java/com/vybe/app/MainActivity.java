@@ -23,6 +23,8 @@ public class MainActivity extends BridgeActivity implements ModifiedMainActivity
         registerPlugin(FiesteaLocationPlugin.class);
         // Plugin propio: «Al calendario» sin pasar por el navegador.
         registerPlugin(FiesteaCalendarPlugin.class);
+        // Plugin propio: de dónde viene la instalación (migración 149).
+        registerPlugin(FiesteaInstallPlugin.class);
         super.onCreate(savedInstanceState);
     }
 
