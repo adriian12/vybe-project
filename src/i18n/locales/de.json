@@ -2110,7 +2110,29 @@
                 "monthly": "Premium monatlich",
                 "lifetime": "Premium auf Lebenszeit",
                 "event": "Premium für eine Party"
-            }
+            },
+            "kinds": {
+                "fiester": "Fiester",
+                "guest": "Gast",
+                "incomplete": "Anmeldung offen",
+                "test": "Test"
+            },
+            "counts": {
+                "real_one": "{{count}} echt",
+                "real_other": "{{count}} echt",
+                "fiesteros_one": "{{count}} Fiester",
+                "fiesteros_other": "{{count}} Fiester",
+                "guests_one": "{{count}} Gast",
+                "guests_other": "{{count}} Gäste",
+                "incomplete_one": "{{count}} unvollständig",
+                "incomplete_other": "{{count}} unvollständig"
+            },
+            "showTests": "Testkonten anzeigen ({{count}})",
+            "hideTests": "Testkonten ausblenden",
+            "markTest": "Als Test markieren",
+            "markReal": "Echtes Konto",
+            "markedTest": "Als Test markiert: erscheint nicht mehr bei den echten Konten",
+            "markedReal": "Zählt wieder als echtes Konto"
         },
         "venuesAll": {
             "search": "Location nach Name, E-Mail oder Stadt suchen",

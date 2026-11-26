@@ -36,6 +36,18 @@ export interface AdminUser {
   subscriptionCancelAtPeriodEnd: boolean;
   /** Se renueva sola en Stripe en `subscriptionExpiresAt`. */
   subscriptionRenews: boolean;
+  /** Revisión de tiendas, administración o marcada a mano (migración 147). */
+  isTest: boolean;
+  /** Fiester@ con el alta terminada; el invitado siempre cuenta como terminado. */
+  profileCompleted: boolean;
+}
+
+export interface AdminUserCounts {
+  real: number;
+  fiesteros: number;
+  guests: number;
+  incomplete: number;
+  tests: number;
 }
 
 export interface AdminVenue {
@@ -409,11 +421,12 @@ export const adminService = {
     if (error) fallo(error.message);
   },
 
-  listUsers: async (search = '', limit = 50, offset = 0): Promise<AdminUser[]> => {
+  listUsers: async (search = '', limit = 50, offset = 0, onlyReal = true): Promise<AdminUser[]> => {
     const { data, error } = await supabase.rpc('admin_list_users', {
       p_search: search || null,
       p_limit: limit,
       p_offset: offset,
+      p_only_real: onlyReal,
     });
     if (error) fallo(error.message);
     return (data ?? []).map((row) => ({
@@ -435,7 +448,29 @@ export const adminService = {
       total: Number(row.total_count ?? 0),
       subscriptionCancelAtPeriodEnd: Boolean(row.subscription_cancel_at_period_end),
       subscriptionRenews: Boolean(row.subscription_renews),
+      isTest: Boolean(row.is_test),
+      profileCompleted: Boolean(row.profile_completed),
     }));
+  },
+
+  /** Reales, fiester@s, invitados, altas sin terminar y cuentas de prueba. */
+  userCounts: async (): Promise<AdminUserCounts> => {
+    const { data, error } = await supabase.rpc('admin_user_counts');
+    if (error) fallo(error.message);
+    const row = data?.[0];
+    return {
+      real: Number(row?.real_users ?? 0),
+      fiesteros: Number(row?.fiesteros ?? 0),
+      guests: Number(row?.guests ?? 0),
+      incomplete: Number(row?.incomplete ?? 0),
+      tests: Number(row?.test_accounts ?? 0),
+    };
+  },
+
+  /** Marca o desmarca una cuenta como de prueba: deja de salir entre las reales. */
+  setTestAccount: async (profileId: string, test: boolean): Promise<void> => {
+    const { error } = await supabase.rpc('admin_set_test_account', { p_profile_id: profileId, p_test: test });
+    if (error) fallo(error.message);
   },
 
   setSubscription: async (profileId: string, type: 'none' | 'monthly' | 'lifetime', days = 30): Promise<void> => {

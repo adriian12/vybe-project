@@ -4,7 +4,7 @@ import { Loader2, Minus, Plus, Search, ShieldCheck, Star } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/components/ui/use-toast';
-import { adminService, AdminUser } from '@/services/admin';
+import { adminService, AdminUser, AdminUserCounts } from '@/services/admin';
 import { cn } from '@/lib/utils';
 import { diasParaCaducar } from '@/lib/caducidad';
 import AdminNotices from '@/components/admin/admin-notices';
@@ -31,12 +31,15 @@ const AdminUsers = () => {
   const [ocupado, setOcupado] = useState<string | null>(null);
   // Tocar una tarjeta la abre; sólo una a la vez.
   const [abierto, setAbierto] = useState<string | null>(null);
+  // Por defecto sólo personas reales: sin revisión de tiendas, seed ni cuentas propias.
+  const [conPruebas, setConPruebas] = useState(false);
+  const [cuentas, setCuentas] = useState<AdminUserCounts | null>(null);
 
   const cargar = useCallback(
-    async (texto: string, page: number) => {
+    async (texto: string, page: number, pruebas: boolean) => {
       setCargando(true);
       try {
-        setUsuarios(await adminService.listUsers(texto, PAGINA, page * PAGINA));
+        setUsuarios(await adminService.listUsers(texto, PAGINA, page * PAGINA, !pruebas));
       } catch {
         toast({ title: t('common.error'), variant: 'destructive' });
       } finally {
@@ -46,11 +49,36 @@ const AdminUsers = () => {
     [toast, t],
   );
 
+  const cargarCuentas = useCallback(() => {
+    adminService.userCounts().then(setCuentas).catch(() => setCuentas(null));
+  }, []);
+
+  useEffect(() => cargarCuentas(), [cargarCuentas]);
+
   // Se espera medio segundo a que se deje de escribir.
   useEffect(() => {
-    const id = window.setTimeout(() => void cargar(busqueda, pagina), 400);
+    const id = window.setTimeout(() => void cargar(busqueda, pagina, conPruebas), 400);
     return () => window.clearTimeout(id);
-  }, [busqueda, pagina, cargar]);
+  }, [busqueda, pagina, conPruebas, cargar]);
+
+  const marcarPrueba = async (user: AdminUser, prueba: boolean) => {
+    setOcupado(user.profileId);
+    try {
+      await adminService.setTestAccount(user.profileId, prueba);
+      setUsuarios((prev) =>
+        prueba && !conPruebas
+          ? prev.filter((u) => u.profileId !== user.profileId)
+          : prev.map((u) => (u.profileId === user.profileId ? { ...u, isTest: prueba } : u)),
+      );
+      if (prueba && !conPruebas) setAbierto(null);
+      cargarCuentas();
+      toast({ title: t(prueba ? 'admin.users.markedTest' : 'admin.users.markedReal') });
+    } catch {
+      toast({ title: t('common.error'), variant: 'destructive' });
+    } finally {
+      setOcupado(null);
+    }
+  };
 
   const total = usuarios[0]?.total ?? 0;
 
@@ -110,6 +138,35 @@ const AdminUsers = () => {
         />
       </label>
 
+      {cuentas && (
+        <div className="flex flex-wrap items-center gap-2">
+          {[
+            { key: 'real', value: cuentas.real, className: 'bg-white text-ink' },
+            { key: 'fiesteros', value: cuentas.fiesteros, className: 'bg-party-primary text-ink' },
+            { key: 'guests', value: cuentas.guests, className: 'bg-[#3A3A3C] text-white' },
+            { key: 'incomplete', value: cuentas.incomplete, className: 'bg-[#FF6B00] text-white' },
+          ].map((c) => (
+            <span key={c.key} className={cn('rounded-full px-3 py-1 text-caption font-bold', c.className)}>
+              {t(`admin.users.counts.${c.key}`, { count: c.value })}
+            </span>
+          ))}
+          <button
+            type="button"
+            onClick={() => {
+              setPagina(0);
+              setConPruebas((v) => !v);
+            }}
+            aria-pressed={conPruebas}
+            className={cn(
+              'press ml-auto rounded-full px-3 py-1 text-caption font-bold',
+              conPruebas ? 'bg-white text-ink' : 'bg-white/[0.06] text-[#C8C6C5]',
+            )}
+          >
+            {t(conPruebas ? 'admin.users.hideTests' : 'admin.users.showTests', { count: cuentas.tests })}
+          </button>
+        </div>
+      )}
+
       {cargando ? (
         <div className="flex justify-center py-10">
           <Loader2 className="h-6 w-6 animate-spin text-party-primary" />
@@ -140,6 +197,12 @@ const AdminUsers = () => {
                   </p>
                   <p className="truncate text-caption text-ink/60">{user.email ?? '—'}</p>
                   <p className="mt-1 flex flex-wrap items-center gap-1">
+                    <ModeBadge user={user} />
+                    {user.isTest && (
+                      <span className="rounded-full border border-dashed border-ink/40 px-1.5 py-0.5 text-[10px] font-bold uppercase text-ink/60">
+                        {t('admin.users.kinds.test')}
+                      </span>
+                    )}
                     <span
                       className={cn(
                         'rounded-full px-1.5 py-0.5 text-[10px] font-bold',
@@ -245,7 +308,15 @@ const AdminUsers = () => {
                     </div>
 
                     {user.role !== 'admin' && (
-                      <div className="flex justify-end">
+                      <div className="flex flex-wrap items-center justify-end gap-2">
+                        <button
+                          type="button"
+                          onClick={() => void marcarPrueba(user, !user.isTest)}
+                          disabled={ocupado === user.profileId}
+                          className="press h-9 rounded-full border border-black/10 px-3 text-caption font-bold text-ink disabled:opacity-40"
+                        >
+                          {t(user.isTest ? 'admin.users.markReal' : 'admin.users.markTest')}
+                        </button>
                         <AdminDeleteButton
                           type="user"
                           id={user.profileId}
@@ -289,6 +360,27 @@ const AdminUsers = () => {
         </div>
       )}
     </div>
+  );
+};
+
+/**
+ * Modo de la cuenta a simple vista: fiester@ (ámbar), invitado (gris oscuro)
+ * o fiester@ que entró con Google, Apple o correo y no terminó el alta (naranja).
+ */
+const ModeBadge = ({ user }: { user: AdminUser }) => {
+  const { t } = useTranslation();
+  const tipo = user.accountType === 'guest' ? 'guest' : user.profileCompleted ? 'fiester' : 'incomplete';
+  return (
+    <span
+      className={cn(
+        'rounded-full px-1.5 py-0.5 text-[10px] font-extrabold uppercase',
+        tipo === 'fiester' && 'bg-party-primary text-ink',
+        tipo === 'guest' && 'bg-[#3A3A3C] text-white',
+        tipo === 'incomplete' && 'bg-[#FF6B00] text-white',
+      )}
+    >
+      {t(`admin.users.kinds.${tipo}`)}
+    </span>
   );
 };
 

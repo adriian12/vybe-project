@@ -4019,15 +4019,17 @@ export type Database = {
         }[]
       }
       admin_list_users: {
-        Args: { p_limit?: number; p_offset?: number; p_search?: string }
+        Args: { p_limit?: number; p_offset?: number; p_search?: string; p_only_real?: boolean }
         Returns: {
           account_type: string
           age: number
           check_ins: number
           created_at: string
           email: string
+          is_test: boolean
           is_verified: boolean
           name: string
+          profile_completed: boolean
           profile_id: string
           role: string
           staff_only: boolean
@@ -4039,6 +4041,20 @@ export type Database = {
           subscription_type: string
           supercrush: number
           total_count: number
+        }[]
+      }
+      admin_set_test_account: {
+        Args: { p_profile_id: string; p_test: boolean }
+        Returns: boolean
+      }
+      admin_user_counts: {
+        Args: never
+        Returns: {
+          fiesteros: number
+          guests: number
+          incomplete: number
+          real_users: number
+          test_accounts: number
         }[]
       }
       admin_list_venues: {

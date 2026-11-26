@@ -163,3 +163,5 @@ con test). En negocios va en la cabecera de la tarjeta, sin tener que abrirla.
   (`VENUE_HAS_SALES`: los pedidos son contabilidad y caerían en cascada), el
   local de la casa, administración, la propia cuenta, `sistema@` ni las de
   revisión, ni cuentas con Premium de Apple que se sigue renovando.
+
+- **Usuarios reales** (migración 147). La sección Usuarios oculta por defecto las cuentas de prueba: administración, correos de `@seed.vybe.test`, `@vybe-test.local`, `@test.com`, `@example.com` y `@fiestea.es`, y las marcadas a mano en `admin_test_accounts` (botón «Marcar como prueba»). Los revisores de Apple entran con «Iniciar sesión con Apple» y un correo `privaterelay` nuevo en cada revisión: hay que marcarlos a mano. Etiquetas: Fiester@, Invitado y «Alta sin terminar» (fiester@ sin `profile_completed_at`, se quedó en el diálogo de completar perfil). Al invitado no se le pide nada más, así que nunca sale «sin terminar».

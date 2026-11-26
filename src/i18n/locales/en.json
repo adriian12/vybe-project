@@ -2110,7 +2110,29 @@
                 "monthly": "Monthly Premium",
                 "lifetime": "Lifetime Premium",
                 "event": "Party Premium"
-            }
+            },
+            "kinds": {
+                "fiester": "Fiester",
+                "guest": "Guest",
+                "incomplete": "Sign-up not finished",
+                "test": "Test"
+            },
+            "counts": {
+                "real_one": "{{count}} real",
+                "real_other": "{{count}} real",
+                "fiesteros_one": "{{count}} fiester",
+                "fiesteros_other": "{{count}} fiesters",
+                "guests_one": "{{count}} guest",
+                "guests_other": "{{count}} guests",
+                "incomplete_one": "{{count}} unfinished",
+                "incomplete_other": "{{count}} unfinished"
+            },
+            "showTests": "Show test accounts ({{count}})",
+            "hideTests": "Hide test accounts",
+            "markTest": "Mark as test",
+            "markReal": "It is a real account",
+            "markedTest": "Marked as test: no longer listed with real accounts",
+            "markedReal": "Counts as a real account again"
         },
         "venuesAll": {
             "search": "Search venue by name, email or city",

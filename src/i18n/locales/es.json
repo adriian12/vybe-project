@@ -2110,7 +2110,29 @@
                 "monthly": "Premium mensual",
                 "lifetime": "Premium de por vida",
                 "event": "Premium de una fiesta"
-            }
+            },
+            "kinds": {
+                "fiester": "Fiester@",
+                "guest": "Invitado",
+                "incomplete": "Alta sin terminar",
+                "test": "Prueba"
+            },
+            "counts": {
+                "real_one": "{{count}} real",
+                "real_other": "{{count}} reales",
+                "fiesteros_one": "{{count}} fiester@",
+                "fiesteros_other": "{{count}} fiester@s",
+                "guests_one": "{{count}} invitado",
+                "guests_other": "{{count}} invitados",
+                "incomplete_one": "{{count}} sin terminar",
+                "incomplete_other": "{{count}} sin terminar"
+            },
+            "showTests": "Ver cuentas de prueba ({{count}})",
+            "hideTests": "Ocultar cuentas de prueba",
+            "markTest": "Marcar como prueba",
+            "markReal": "Es una cuenta real",
+            "markedTest": "Marcada como prueba: ya no sale entre las reales",
+            "markedReal": "Vuelve a contar como cuenta real"
         },
         "venuesAll": {
             "search": "Buscar negocio por nombre, correo o ciudad",

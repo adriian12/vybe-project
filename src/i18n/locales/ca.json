@@ -2110,7 +2110,29 @@
                 "monthly": "Premium mensual",
                 "lifetime": "Premium per sempre",
                 "event": "Premium d'una festa"
-            }
+            },
+            "kinds": {
+                "fiester": "Fiester@",
+                "guest": "Convidat",
+                "incomplete": "Alta sense acabar",
+                "test": "Prova"
+            },
+            "counts": {
+                "real_one": "{{count}} real",
+                "real_other": "{{count}} reals",
+                "fiesteros_one": "{{count}} fiester@",
+                "fiesteros_other": "{{count}} fiester@s",
+                "guests_one": "{{count}} convidat",
+                "guests_other": "{{count}} convidats",
+                "incomplete_one": "{{count}} sense acabar",
+                "incomplete_other": "{{count}} sense acabar"
+            },
+            "showTests": "Veure comptes de prova ({{count}})",
+            "hideTests": "Amagar comptes de prova",
+            "markTest": "Marcar com a prova",
+            "markReal": "És un compte real",
+            "markedTest": "Marcat com a prova: ja no surt entre els reals",
+            "markedReal": "Torna a comptar com a compte real"
         },
         "venuesAll": {
             "search": "Cerca negoci per nom, correu o ciutat",
