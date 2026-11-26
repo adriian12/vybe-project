@@ -78,15 +78,15 @@
       .fl { display: inline-flex; }
       .fl-boot { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; }
       .fl-glass { fill: none; stroke: #f8d000; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
-      .fl-liquid { fill: #f8d000; transform: translateY(23px); animation: fl-fill 1.8s cubic-bezier(.45,0,.25,1) infinite; }
+      /* Empieza vacía, se llena y se vacía sin parar hasta que la app está lista. */
+      .fl-liquid { fill: #f8d000; transform: translateY(23px); animation: fl-fill 2.2s ease-in-out infinite; }
       @keyframes fl-fill {
-        0% { transform: translateY(23px); opacity: 1; }
-        70% { transform: translateY(0); opacity: 1; }
-        88% { transform: translateY(0); opacity: 0; }
-        100% { transform: translateY(23px); opacity: 0; }
+        0% { transform: translateY(23px); }
+        45%, 55% { transform: translateY(0); }
+        100% { transform: translateY(23px); }
       }
       @media (prefers-reduced-motion: reduce) {
-        .fl-liquid { animation: none; transform: translateY(9px); }
+        .fl-liquid { animation-duration: 4s; }
       }
     </style>
   </head>

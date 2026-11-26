@@ -1,31 +1,9 @@
 import { useEffect, useState } from 'react';
+import { GlassLoader } from '@/components/glass-loader';
 import { useNavigate } from 'react-router-dom';
 import { useEventIdParam } from '@/hooks/use-event-id-param';
 import { useTranslation } from 'react-i18next';
-import {
-  AlertTriangle,
-  ArrowLeft,
-  AtSign,
-  Bookmark,
-  BookmarkCheck,
-  CheckCircle2,
-  Heart,
-  ChevronDown,
-  ClipboardList,
-  Crown,
-  Loader2,
-  Martini,
-  Music,
-  Navigation,
-  QrCode,
-  Shirt,
-  MapPin as MapPinIcon,
-  Share2,
-  Ticket,
-  Undo2,
-  X,
-  Zap,
-} from 'lucide-react';
+import { AlertTriangle, ArrowLeft, AtSign, Bookmark, BookmarkCheck, CheckCircle2, Heart, ChevronDown, ClipboardList, Crown, Martini, Music, Navigation, QrCode, Shirt, MapPin as MapPinIcon, Share2, Ticket, Undo2, X, Zap } from 'lucide-react';
 import Header from '@/components/header';
 import Footer from '@/components/footer';
 import WhoIsGoing from '@/components/who-is-going';
@@ -169,7 +147,7 @@ const EventDetailPage = () => {
   if (estado === 'loading') {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-party-primary" />
+        <GlassLoader />
       </div>
     );
   }

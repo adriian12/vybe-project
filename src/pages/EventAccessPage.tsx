@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { GlassLoader } from '@/components/glass-loader';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AlertTriangle, BadgeCheck, Loader2, LocateFixed, Navigation, RotateCw } from 'lucide-react';
@@ -188,7 +189,7 @@ const EventAccessPage = () => {
   if (cargando) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-party-primary" />
+        <GlassLoader />
       </div>
     );
   }

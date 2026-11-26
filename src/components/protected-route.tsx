@@ -1,6 +1,7 @@
 import { ReactNode } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAppContext, UserType } from '@/context/app-context';
+import { FullScreenLoader } from '@/components/glass-loader';
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -10,12 +11,6 @@ interface ProtectedRouteProps {
   requireEvent?: boolean;
 }
 
-const FullScreenLoader = () => (
-  <div className="min-h-screen flex flex-col items-center justify-center gap-4">
-    <div className="w-10 h-10 border-4 border-party-primary border-t-transparent rounded-full animate-spin" />
-    <p className="text-party-gray text-sm">Cargando…</p>
-  </div>
-);
 
 /**
  * Guarda de rutas.

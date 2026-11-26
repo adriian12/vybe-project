@@ -270,7 +270,9 @@ export const SignalTags: React.FC<{
             key={tag.key}
             className={cn(
               'flex items-center gap-1 whitespace-nowrap rounded-full font-bold',
-              tag.key === 'lastTickets' ? 'bg-destructive/10 text-destructive' : 'bg-party-primary/15 text-foreground',
+              // Colores fijos: las tarjetas son blancas también en el tema oscuro,
+              // así que `text-foreground` (claro) dejaba el texto casi invisible.
+              tag.key === 'lastTickets' ? 'bg-destructive text-white' : 'bg-party-primary text-ink',
               small ? 'px-2 py-[3px] text-[10px] leading-[14px]' : 'px-2.5 py-1 text-[11px]',
               className,
             )}

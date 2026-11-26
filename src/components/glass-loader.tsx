@@ -9,6 +9,9 @@ import { cn } from '@/lib/utils';
  * misma copa se pinta allí antes de que cargue el JavaScript; así el arranque y
  * las cargas siguientes son idénticos y no hay salto entre uno y otras.
  */
+/** Lo que dura un llenado y vaciado (`fl-fill` en `index.html`). */
+const FILL_MS = 2200;
+
 export const GlassLoader = ({ className, size = 48 }: { className?: string; size?: number }) => {
   const { t } = useTranslation();
   const clip = `fl-bowl-${useId().replace(/:/g, '')}`;
@@ -21,7 +24,17 @@ export const GlassLoader = ({ className, size = 48 }: { className?: string; size
           </clipPath>
         </defs>
         <g clipPath={`url(#${clip})`}>
-          <rect className="fl-liquid" x="0" y="6" width="48" height="23" />
+          {/* Desfase según el tiempo desde que abrió la página: todas las copas van
+              al mismo compás que la del arranque y al cambiar de pantalla de carga
+              el líquido no salta. */}
+          <rect
+            className="fl-liquid"
+            x="0"
+            y="6"
+            width="48"
+            height="23"
+            style={{ animationDelay: `-${Math.round(performance.now() % FILL_MS)}ms` }}
+          />
         </g>
         <path className="fl-glass" d="M6 6H42L24 28ZM24 28V49M15 50H33" />
       </svg>

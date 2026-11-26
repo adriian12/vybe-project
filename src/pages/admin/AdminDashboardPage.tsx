@@ -1,41 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { GlassLoader } from '@/components/glass-loader';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import {
-  Ban,
-  BarChart3,
-  Building,
-  CalendarDays,
-  Check,
-  ChevronRight,
-  Clock,
-  FileText,
-  Flag,
-  Home,
-  Image as ImageIcon,
-  Inbox,
-  LayoutGrid,
-  Loader2,
-  LogOut,
-  Megaphone,
-  Mail,
-  MapPin,
-  Menu,
-  Paperclip,
-  Pencil,
-  Printer,
-  Ticket,
-  Phone,
-  RefreshCw,
-  Search,
-  Plus,
-  Siren,
-  SlidersHorizontal,
-  Store,
-  UsersRound,
-  X,
-  UserMinus,
-} from 'lucide-react';
+import { Ban, BarChart3, Building, CalendarDays, Check, ChevronRight, Clock, FileText, Flag, Home, Image as ImageIcon, Inbox, LayoutGrid, LogOut, Megaphone, Mail, MapPin, Menu, Paperclip, Pencil, Printer, Ticket, Phone, RefreshCw, Search, Plus, Siren, SlidersHorizontal, Store, UsersRound, X, UserMinus } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -406,7 +373,7 @@ const AdminDashboardPage = () => {
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-party-primary" />
+        <GlassLoader />
       </div>
     );
   }

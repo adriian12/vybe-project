@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
+import { GlassLoader } from '@/components/glass-loader';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, CalendarDays, List, Loader2, MapPin, Martini, Navigation } from 'lucide-react';
+import { ArrowLeft, CalendarDays, List, MapPin, Martini, Navigation } from 'lucide-react';
 import Header from '@/components/header';
 import Footer from '@/components/footer';
 import MapThumb from '@/components/map-thumb';
@@ -92,7 +93,7 @@ const PlacePage = () => {
   if (cargando) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-party-primary" />
+        <GlassLoader />
       </div>
     );
   }

@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
+import { GlassLoader } from '@/components/glass-loader';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Bell, ChevronRight, Flame, LayoutGrid, List, Loader2, PartyPopper, RectangleVertical, User } from 'lucide-react';
+import { Bell, ChevronRight, Flame, LayoutGrid, List, PartyPopper, RectangleVertical, User } from 'lucide-react';
 import GoHomeButton from '@/components/go-home/go-home-button';
 import { useAppContext } from '@/context/app-context';
 import Header from '@/components/header';
@@ -363,7 +364,7 @@ const HomePage = () => {
 
           {isLoading ? (
             <div className="flex flex-col items-center justify-center gap-3 py-16">
-              <Loader2 className="h-8 w-8 animate-spin text-party-primary" />
+              <GlassLoader />
               <p className="text-sm text-party-gray">{t('common.loading')}</p>
             </div>
           ) : visible.length === 0 && cercaDeLaFecha.length === 0 ? (

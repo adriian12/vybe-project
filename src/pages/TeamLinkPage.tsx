@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { GlassLoader } from '@/components/glass-loader';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Loader2, LinkIcon, RefreshCw } from 'lucide-react';
+import { LinkIcon, RefreshCw } from 'lucide-react';
 import LanguageSwitcher from '@/components/language-switcher';
 import { VybeMark } from '@/components/brand/vybe-logo';
 import TeamSecurity from '@/components/team/team-security';
@@ -84,7 +85,7 @@ const TeamLinkPage = () => {
           </div>
         ) : !state ? (
           <div className="flex flex-1 items-center justify-center">
-            <Loader2 className="h-8 w-8 animate-spin text-party-primary" />
+            <GlassLoader />
           </div>
         ) : state.role === 'security' ? (
           <TeamSecurity client={client} state={state} onInvalid={caducado} />

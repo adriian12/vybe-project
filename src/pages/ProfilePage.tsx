@@ -1,4 +1,5 @@
 import { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react';
+import { GlassLoader } from '@/components/glass-loader';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -451,7 +452,7 @@ const ProfilePage = () => {
   if (!currentUser) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-party-primary" />
+        <GlassLoader />
       </div>
     );
   }

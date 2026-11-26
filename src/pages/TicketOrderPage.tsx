@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
+import { GlassLoader } from '@/components/glass-loader';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, CheckCircle2, Loader2, Mail, XCircle } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Mail, XCircle } from 'lucide-react';
 import Header from '@/components/header';
 import TicketDownloadButtons from '@/components/ticket-download-buttons';
 import { onAppResume } from '@/services/native';
@@ -69,7 +70,7 @@ const TicketOrderPage = () => {
     if (pedido === undefined || (pedido?.status === 'pending' && !agotado)) {
       return (
         <section className="flex flex-col items-center gap-3 rounded-3xl bg-surface-low p-8 text-center">
-          <Loader2 className="h-8 w-8 animate-spin text-party-primary" />
+          <GlassLoader />
           <p className="font-display text-headline-md">{t('tickets.order.waiting')}</p>
           <p className="text-body-sm text-party-gray">{t('tickets.order.waitingBody')}</p>
         </section>

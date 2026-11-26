@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
+import { GlassLoader } from '@/components/glass-loader';
 import { useEventIdParam } from '@/hooks/use-event-id-param';
 import { useTranslation } from 'react-i18next';
-import { CalendarDays, CalendarPlus, Clock, ExternalLink, Loader2, MapPin, Music, Navigation, Smartphone } from 'lucide-react';
+import { CalendarDays, CalendarPlus, Clock, ExternalLink, MapPin, Music, Navigation, Smartphone } from 'lucide-react';
 import LanguageSwitcher from '@/components/language-switcher';
 import { VybeMark } from '@/components/brand/vybe-logo';
 import EventTickets from '@/components/event-tickets';
@@ -48,7 +49,7 @@ const PublicEventPage = () => {
   if (evento === undefined) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
-        <Loader2 className="h-8 w-8 animate-spin text-party-primary" />
+        <GlassLoader />
       </div>
     );
   }

@@ -1,21 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { GlassLoader } from '@/components/glass-loader';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import {
-  ArrowLeft,
-  Camera,
-  Heart,
-  Loader2,
-  LogOut,
-  Radar,
-  RefreshCw,
-  Rocket,
-  RotateCcw,
-  ShieldAlert,
-  Star,
-  Users,
-  X,
-} from 'lucide-react';
+import { ArrowLeft, Camera, Heart, LogOut, Radar, RefreshCw, Rocket, RotateCcw, ShieldAlert, Star, Users, X } from 'lucide-react';
 import Header from '@/components/header';
 import Footer from '@/components/footer';
 import { PartyButton } from '@/components/ui-custom/party-button';
@@ -311,7 +298,7 @@ const EventSwipingPage = () => {
   if (!activeEvent) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-party-primary" />
+        <GlassLoader />
       </div>
     );
   }
