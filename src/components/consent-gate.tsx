@@ -18,7 +18,7 @@ import { supabase } from '@/integrations/supabase/client';
 const ConsentGate = ({ children }: { children: ReactNode }) => {
   const { t } = useTranslation();
   const { toast } = useToast();
-  const { isLoggedIn, userType, isLoading } = useAppContext();
+  const { isLoggedIn, userType, isLoading, isExplorer } = useAppContext();
 
   const [checked, setChecked] = useState<boolean | null>(null);
   const [terms, setTerms] = useState(false);
@@ -34,7 +34,9 @@ const ConsentGate = ({ children }: { children: ReactNode }) => {
     // aparecía esta pantalla encima. Parecía que volvía a pedir permiso.
     setChecked(null);
 
-    if (!isLoggedIn) {
+    // Quien mira sin cuenta no entrega datos: acepta al pie de la bienvenida
+    // y, si se registra, aquí mismo con su cuenta.
+    if (!isLoggedIn || isExplorer) {
       setChecked(true);
       return;
     }
@@ -67,7 +69,7 @@ const ConsentGate = ({ children }: { children: ReactNode }) => {
     }
 
     setChecked(false);
-  }, [isLoggedIn]);
+  }, [isLoggedIn, isExplorer]);
 
   useEffect(() => {
     if (!isLoading) void verify();
@@ -93,7 +95,7 @@ const ConsentGate = ({ children }: { children: ReactNode }) => {
   // Los locales tienen su propio flujo contractual, fuera de esta pantalla, y
   // la cuenta de administración es la del responsable del tratamiento: no tiene
   // a quién dar consentimiento porque el consentimiento se le da a ella.
-  if (isLoading || checked === null || !isLoggedIn || userType === 'venue' || userType === 'admin') {
+  if (isLoading || checked === null || !isLoggedIn || isExplorer || userType === 'venue' || userType === 'admin') {
     if (isLoading || checked === null) {
       return <FullScreenLoader />;
     }

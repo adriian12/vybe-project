@@ -40,7 +40,8 @@
         "asUser": "Als Nutzer fortfahren",
         "asVenue": "Als Location fortfahren",
         "or": "oder",
-        "legal": "Mit dem Fortfahren akzeptierst du unsere <terms>Nutzungsbedingungen</terms> und die <privacy>Datenschutzerklärung</privacy>"
+        "legal": "Mit dem Fortfahren akzeptierst du unsere <terms>Nutzungsbedingungen</terms> und die <privacy>Datenschutzerklärung</privacy>",
+        "explore": "Partys ohne Konto ansehen"
     },
     "auth": {
         "userAccess": "Anmeldung für Gäste",
@@ -4328,5 +4329,25 @@
             "popular": "Beliebt in {{city}}",
             "featured": "Hervorgehoben"
         }
+    },
+    "explorer": {
+        "reasons": {
+            "follow": "Erstelle ein Konto, um diesem Club zu folgen",
+            "tickets": "Erstelle ein Konto für deine Tickets",
+            "enter": "Erstelle ein Konto, um zur Party zu gehen",
+            "crushes": "Erstelle ein Konto, um deine Crushes zu sehen",
+            "chat": "Erstelle ein Konto zum Chatten",
+            "profile": "Erstelle ein Konto für dein Profil",
+            "notifications": "Erstelle ein Konto für Benachrichtigungen",
+            "raffle": "Erstelle ein Konto für Gewinnspiele",
+            "generic": "Erstelle ein Konto, um das zu tun",
+            "save": "Erstelle ein Konto, um deine Partys zu speichern",
+            "offer": "Erstelle ein Konto für dieses Angebot",
+            "list": "Erstelle ein Konto für die Gästeliste"
+        },
+        "body": "Mit Apple oder Google dauert es 10 Sekunden. Partys kannst du auch ohne Konto ansehen.",
+        "create": "Konto erstellen",
+        "login": "Ich habe schon ein Konto",
+        "keepBrowsing": "Weiter ansehen"
     }
 }

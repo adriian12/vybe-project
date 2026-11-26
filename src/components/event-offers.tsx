@@ -23,6 +23,7 @@ import NightRaffles from '@/components/night/night-raffles';
 import NightStamps from '@/components/night/night-stamps';
 import NightSongs from '@/components/night/night-songs';
 import TicketCode from '@/components/night/ticket-code';
+import { needsAccount } from '@/lib/explorer';
 
 interface EventOffersProps {
   eventId: string;
@@ -94,6 +95,7 @@ const EventOffers = ({ eventId }: EventOffersProps) => {
   }, [open, load]);
 
   const claim = async (offerId: string) => {
+    if (needsAccount('offer')) return;
     setBusyId(offerId);
     try {
       const { ticketCode, title } = await socialService.claimOffer(offerId);

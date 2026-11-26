@@ -212,7 +212,7 @@ export const legalDocs = (app: string, web: string, panel: string, miembro: stri
         },
         {
           title: 'Qué usamos',
-          body: `Sólo almacenamiento técnico, necesario para que ${app} funcione: la sesión iniciada (para no pedirte la contraseña cada vez), el idioma que eliges, la sección abierta del panel de negocios y los ficheros de la web guardados por el navegador para que cargue rápido. En la app instalada, la sesión se guarda en el almacenamiento seguro del teléfono.`,
+          body: `Sólo almacenamiento técnico, necesario para que ${app} funcione: la sesión iniciada (para no pedirte la contraseña cada vez), la sesión anónima si ves las fiestas sin cuenta (no lleva ningún dato tuyo y se borra a los 30 días), el idioma que eliges, la sección abierta del panel de negocios y los ficheros de la web guardados por el navegador para que cargue rápido. En la app instalada, la sesión se guarda en el almacenamiento seguro del teléfono.`,
         },
         {
           title: 'Qué no usamos',

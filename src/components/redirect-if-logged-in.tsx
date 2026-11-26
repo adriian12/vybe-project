@@ -20,8 +20,8 @@ export const homeFor = (userType: UserType): string =>
  * sabe, por ejemplo, echar a una cuenta que no es de local del acceso de
  * locales) y esto no se mete en medio.
  */
-const RedirectIfLoggedIn = ({ children }: { children: ReactNode }) => {
-  const { isLoading, isLoggedIn, userType } = useAppContext();
+const RedirectIfLoggedIn = ({ children, allowExplorer = false }: { children: ReactNode; allowExplorer?: boolean }) => {
+  const { isLoading, isLoggedIn, userType, isExplorer } = useAppContext();
   const yaHabiaSesion = useRef<boolean | null>(null);
 
   if (yaHabiaSesion.current === null && !isLoading) {
@@ -36,7 +36,8 @@ const RedirectIfLoggedIn = ({ children }: { children: ReactNode }) => {
     );
   }
 
-  if (yaHabiaSesion.current && isLoggedIn && userType) {
+  // Quien mira sin cuenta sí puede abrir el registro y el acceso.
+  if (yaHabiaSesion.current && isLoggedIn && userType && !(allowExplorer && isExplorer)) {
     return <Navigate to={homeFor(userType)} replace />;
   }
 

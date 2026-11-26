@@ -9,6 +9,7 @@ import { calculateDistance, Coordinates, FAST_POSITION, getCurrentPosition } fro
 import { EMPTY_ACTIVITY, EventActivity, socialService } from '@/services/social';
 import { track } from '@/lib/observability';
 import { Event } from '@/types/venue';
+import { needsAccount } from '@/lib/explorer';
 
 export type Activity = Record<string, EventActivity>;
 
@@ -139,6 +140,7 @@ export const useEventsFeed = () => {
 
   const toggleIntent = useCallback(
     async (eventId: string) => {
+      if (needsAccount('save')) return;
       const going = !intents.includes(eventId);
       setBusyIntent(eventId);
 

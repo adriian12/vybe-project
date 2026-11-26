@@ -40,7 +40,8 @@
         "asUser": "Continuar com a usuari",
         "asVenue": "Continuar com a negoci",
         "or": "o",
-        "legal": "En continuar, acceptes els <terms>Termes del servei</terms> i la <privacy>Política de privacitat</privacy>"
+        "legal": "En continuar, acceptes els <terms>Termes del servei</terms> i la <privacy>Política de privacitat</privacy>",
+        "explore": "Veure festes sense compte"
     },
     "auth": {
         "userAccess": "Accés d'usuari",
@@ -4328,5 +4329,25 @@
             "popular": "Popular a {{city}}",
             "featured": "Destacada"
         }
+    },
+    "explorer": {
+        "reasons": {
+            "follow": "Crea el teu compte per seguir aquest local",
+            "tickets": "Crea el teu compte per tenir les teves entrades",
+            "enter": "Crea el teu compte per entrar a la festa",
+            "crushes": "Crea el teu compte per veure els teus crushes",
+            "chat": "Crea el teu compte per xatejar",
+            "profile": "Crea el teu compte per tenir el teu perfil",
+            "notifications": "Crea el teu compte per rebre avisos",
+            "raffle": "Crea el teu compte per participar en sortejos",
+            "generic": "Crea el teu compte per fer això",
+            "save": "Crea el teu compte per guardar les teves festes",
+            "offer": "Crea el teu compte per aconseguir aquesta oferta",
+            "list": "Crea el teu compte per apuntar-te a la llista"
+        },
+        "body": "Tardes 10 segons amb Apple o Google. Pots continuar mirant festes sense compte.",
+        "create": "Crear compte",
+        "login": "Ja tinc compte",
+        "keepBrowsing": "Continuar mirant"
     }
 }

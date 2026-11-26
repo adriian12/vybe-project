@@ -5,6 +5,7 @@ import { Check, ChevronRight, Plus } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { nightService, VenueProfile } from '@/services/night';
 import { cn } from '@/lib/utils';
+import { needsAccount } from '@/lib/explorer';
 
 /**
  * «Organiza»: el negocio de la fiesta, con su logo, para ir a su ficha y
@@ -34,6 +35,7 @@ const VenueOrganizerCard = ({ venueId }: { venueId: string }) => {
   if (!venue) return null;
 
   const seguir = async () => {
+    if (needsAccount('follow')) return;
     setCambiando(true);
     try {
       const ahora = await nightService.toggleFollow(venue.id);

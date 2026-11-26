@@ -19,6 +19,7 @@ import { isNearDate, matchesDate, nightOf, useDateSelection } from '@/lib/date-f
 import RatePartyPrompt from '@/components/rate-party';
 import { aplicarFiltros, conFlechazo, Franja } from '@/lib/party-filters';
 import { MUSICAS, musicaDe } from '@/lib/music';
+import { needsAccount } from '@/lib/explorer';
 
 /** Cuántas tarjetas caben en el carrusel de destacados. */
 const DESTACADOS = 5;
@@ -198,7 +199,7 @@ const HomePage = () => {
 
           <button
             type="button"
-            onClick={() => setAvisosAbiertos(true)}
+            onClick={() => !needsAccount('notifications') && setAvisosAbiertos(true)}
             aria-label={t('activity.title')}
             className="press relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-surface-low text-foreground"
           >

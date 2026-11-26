@@ -31,6 +31,7 @@ import { rutaHasta } from '@/lib/maps';
 import { nightService, OpeningDay, VenueEventSummary, VenueProfile } from '@/services/night';
 import { SOCIAL_NAME, socialUrl, SocialNetwork } from '@/lib/socials';
 import { cn } from '@/lib/utils';
+import { needsAccount } from '@/lib/explorer';
 
 /** Lunes = 0 … domingo = 6, como se guarda el horario. */
 const diaHoy = () => (new Date().getDay() + 6) % 7;
@@ -92,7 +93,7 @@ const VenuePage = () => {
   }, [load]);
 
   const seguir = async () => {
-    if (!venue) return;
+    if (!venue || needsAccount('follow')) return;
     setBusy(true);
     try {
       const ahora = await nightService.toggleFollow(venue.id);

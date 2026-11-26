@@ -1,7 +1,9 @@
 import { Suspense, lazy, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Trans, useTranslation } from 'react-i18next';
-import { Building, User } from 'lucide-react';
+import { Building, ChevronRight, Compass, Loader2, User } from 'lucide-react';
+import { useToast } from '@/components/ui/use-toast';
+import { startExploring } from '@/lib/explorer';
 import LanguageSwitcher from '@/components/language-switcher';
 import { VybeMark } from '@/components/brand/vybe-logo';
 import { deviceSeenAt, markDeviceSeen } from '@/lib/welcome-tour';
@@ -18,8 +20,21 @@ const WelcomeTour = lazy(() => import('@/components/welcome-tour/welcome-tour'))
 const Index = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { toast } = useToast();
   // La primera vez que se abre la app, antes de elegir cómo entrar.
   const [tour, setTour] = useState(() => deviceSeenAt() === null);
+  const [entrando, setEntrando] = useState(false);
+
+  const explorar = async () => {
+    setEntrando(true);
+    try {
+      await startExploring();
+      navigate('/home', { replace: true });
+    } catch {
+      toast({ title: t('common.error'), variant: 'destructive' });
+      setEntrando(false);
+    }
+  };
 
   return (
     <div className="pt-safe pb-safe relative flex min-h-[100dvh] flex-col overflow-hidden">
@@ -61,6 +76,20 @@ const Index = () => {
         >
           <Building size={19} />
           {t('index.asVenue')}
+        </button>
+
+        {/* Sin cuenta: ver fiestas, mapa y locales; la cuenta se pide al
+            tocar algo que la necesita (`require-account.tsx`). */}
+        <button
+          type="button"
+          style={{ '--i': 3 } as React.CSSProperties}
+          onClick={() => void explorar()}
+          disabled={entrando}
+          className="press flex h-11 w-full items-center justify-center gap-1.5 text-body-md font-bold text-party-primary disabled:opacity-50"
+        >
+          {entrando ? <Loader2 size={17} className="animate-spin" /> : <Compass size={17} />}
+          {t('index.explore')}
+          <ChevronRight size={17} />
         </button>
 
         <p className="pt-3 text-center text-caption font-normal text-party-gray">

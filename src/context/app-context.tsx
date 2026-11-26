@@ -22,6 +22,7 @@ import { siteMode } from '@/lib/hosts';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { clearSignedPhotoCache } from '@/services/storage-urls';
+import { isAnonymousUser, setExplorerMode } from '@/lib/explorer';
 
 export type UserType = 'user' | 'venue' | 'admin';
 
@@ -58,6 +59,8 @@ interface AppContextType {
    * para el equipo, que en `app.vybes.es` entra al panel con su propia cuenta.
    */
   venueRole: VenueRole | null;
+  /** Ve fiestas sin cuenta (sesión anónima): `userType` es 'user' y `currentUser` null. */
+  isExplorer: boolean;
 
   activeEvent: EventAccess | null;
   isEventVerified: boolean;
@@ -106,6 +109,9 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
+// Sesión anónima de «Ver fiestas sin cuenta» (`lib/explorer.ts`).
+const salirDeExplorar = () => setExplorerMode(false);
+
 // eslint-disable-next-line react-refresh/only-export-components
 export const useAppContext = () => {
   const context = useContext(AppContext);
@@ -124,6 +130,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [currentVenue, setCurrentVenue] = useState<Venue | null>(null);
   const [venueRole, setVenueRole] = useState<VenueRole | null>(null);
+  const [isExplorer, setIsExplorer] = useState(false);
 
   const [activeEvent, setActiveEvent] = useState<EventAccess | null>(readStoredEvent);
 
@@ -165,6 +172,20 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     } = await supabase.auth.getSession();
 
     usuarioCargado.current = session?.user?.id ?? null;
+    setIsExplorer(isAnonymousUser(session?.user));
+    setExplorerMode(isAnonymousUser(session?.user));
+
+    // «Ver fiestas sin cuenta» (migración 148): sesión anónima, sin perfil.
+    // Entra como fiester@ para las pantallas abiertas; lo demás pide la cuenta.
+    if (session?.user && isAnonymousUser(session.user)) {
+      setCurrentUser(null);
+      setCurrentVenue(null);
+      setVenueRole(null);
+      setActiveEvent(null);
+      setUserType('user');
+      setIsLoading(false);
+      return;
+    }
 
     if (!session?.user) {
       setUserType(null);
@@ -258,6 +279,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       if (event === 'SIGNED_OUT') {
         identifyUser(null);
         setUserType(null);
+        setIsExplorer(false);
+        salirDeExplorar();
         setCurrentUser(null);
         setCurrentVenue(null);
         setNearbyProfiles([]);
@@ -480,6 +503,11 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   useEffect(() => {
+    // Sin cuenta: sólo las fiestas; no hay conexiones ni mensajes.
+    if (isExplorer) {
+      void refreshEvents();
+      return;
+    }
     if ((userType === 'user' || userType === 'admin') && !currentUser?.staffOnly) {
       void loadConnections();
       void loadMessages();
@@ -487,13 +515,13 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     } else if (userType === 'venue') {
       void refreshEvents();
     }
-  }, [userType, currentUser?.staffOnly, loadConnections, loadMessages, refreshEvents]);
+  }, [isExplorer, userType, currentUser?.staffOnly, loadConnections, loadMessages, refreshEvents]);
 
   useEffect(() => {
-    if (activeEvent && (userType === 'user' || userType === 'admin') && !currentUser?.staffOnly) {
+    if (activeEvent && !isExplorer && (userType === 'user' || userType === 'admin') && !currentUser?.staffOnly) {
       void loadProfiles();
     }
-  }, [activeEvent, userType, currentUser?.staffOnly, loadProfiles]);
+  }, [activeEvent, isExplorer, userType, currentUser?.staffOnly, loadProfiles]);
 
   // ==========================================================================
   // REALTIME
@@ -795,6 +823,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     clearSignedPhotoCache();
     localStorage.removeItem(ACTIVE_EVENT_KEY);
     setUserType(null);
+    setIsExplorer(false);
+    salirDeExplorar();
     setCurrentUser(null);
     setCurrentVenue(null);
     setVenueRole(null);
@@ -813,6 +843,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     currentUser,
     currentVenue,
     venueRole,
+    isExplorer,
     activeEvent,
     isEventVerified: activeEvent !== null,
     nearbyProfiles,

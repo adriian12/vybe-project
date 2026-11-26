@@ -40,7 +40,8 @@
         "asUser": "Continue as a user",
         "asVenue": "Continue as a venue",
         "or": "or",
-        "legal": "By continuing you accept our <terms>Terms of Service</terms> and <privacy>Privacy Policy</privacy>"
+        "legal": "By continuing you accept our <terms>Terms of Service</terms> and <privacy>Privacy Policy</privacy>",
+        "explore": "Browse parties without an account"
     },
     "auth": {
         "userAccess": "Guest sign in",
@@ -4328,5 +4329,25 @@
             "popular": "Popular in {{city}}",
             "featured": "Featured"
         }
+    },
+    "explorer": {
+        "reasons": {
+            "follow": "Create your account to follow this venue",
+            "tickets": "Create your account to keep your tickets",
+            "enter": "Create your account to join the party",
+            "crushes": "Create your account to see your crushes",
+            "chat": "Create your account to chat",
+            "profile": "Create your account to have a profile",
+            "notifications": "Create your account to get alerts",
+            "raffle": "Create your account to enter giveaways",
+            "generic": "Create your account to do this",
+            "save": "Create your account to save your parties",
+            "offer": "Create your account to get this offer",
+            "list": "Create your account to join the guest list"
+        },
+        "body": "It takes 10 seconds with Apple or Google. You can keep browsing parties without an account.",
+        "create": "Create account",
+        "login": "I already have an account",
+        "keepBrowsing": "Keep browsing"
     }
 }

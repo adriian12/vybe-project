@@ -8,6 +8,7 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { AppProvider, useAppContext } from '@/context/app-context';
 import { PremiumProvider } from '@/context/premium-context';
 import ProtectedRoute from '@/components/protected-route';
+import { RequireAccountSheet } from '@/components/require-account';
 import PremiumFeatures from '@/components/premium-features';
 import SupercrushDialog from '@/components/supercrush-dialog';
 import PwaPrompt from '@/components/pwa-prompt';
@@ -114,9 +115,9 @@ const queryClient = new QueryClient({
 /** Envuelve una ruta protegida en su propio límite de error. */
 const guarded = (
   element: React.ReactNode,
-  options: { allow?: ('user' | 'venue' | 'admin')[]; requireEvent?: boolean } = {},
+  options: { allow?: ('user' | 'venue' | 'admin')[]; requireEvent?: boolean; explorer?: boolean } = {},
 ) => (
-  <ProtectedRoute allow={options.allow} requireEvent={options.requireEvent}>
+  <ProtectedRoute allow={options.allow} requireEvent={options.requireEvent} explorer={options.explorer}>
     <ErrorBoundary area="route">{element}</ErrorBoundary>
   </ProtectedRoute>
 );
@@ -125,7 +126,7 @@ const guarded = (
  * Pantalla de clubber. En `app.vybes.es` no se abre: la web es para locales y
  * administración, y quien sale de fiesta usa la app del móvil.
  */
-const clubber = (element: React.ReactNode, options: { requireEvent?: boolean } = {}) =>
+const clubber = (element: React.ReactNode, options: { requireEvent?: boolean; explorer?: boolean } = {}) =>
   MODE === 'app' ? <MobileOnlyPage /> : guarded(element, { allow: ['user', 'admin'], ...options });
 
 /**
@@ -184,6 +185,7 @@ const App = () => (
             <NativePushBridge />
             <StaffOnlyWeb />
             <WhereNextPrompt />
+            <RequireAccountSheet />
 
             <Suspense fallback={<PantallaCargando />}>
               <ConsentGate>
@@ -216,7 +218,7 @@ const App = () => (
                     <Route
                       path="/auth"
                       element={
-                        <RedirectIfLoggedIn>
+                        <RedirectIfLoggedIn allowExplorer>
                           <AuthPage />
                         </RedirectIfLoggedIn>
                       }
@@ -242,9 +244,9 @@ const App = () => (
                     <Route path="/equipo/:token" element={<TeamLinkPage />} />
 
                     {/* Clubbers */}
-                    <Route path="/home" element={clubber(<HomePage />)} />
-                    <Route path="/location" element={clubber(<LocationPage />)} />
-                    <Route path="/map" element={clubber(<MapPage />)} />
+                    <Route path="/home" element={clubber(<HomePage />, { explorer: true })} />
+                    <Route path="/location" element={clubber(<LocationPage />, { explorer: true })} />
+                    <Route path="/map" element={clubber(<MapPage />, { explorer: true })} />
                     <Route path="/tickets" element={clubber(<TicketsPage />)} />
                     <Route
                       path="/tickets/buy/:typeId"
@@ -255,20 +257,20 @@ const App = () => (
                     <Route path="/matches" element={clubber(<MatchesPage />)} />
                     <Route path="/likes" element={clubber(<LikesPage />)} />
                     <Route path="/u/:userId" element={clubber(<UserProfilePage />)} />
-                    <Route path="/local/:venueId" element={clubber(<VenuePage />)} />
-                    <Route path="/local/:venueId/dia/:day" element={clubber(<VenueDayPage />)} />
-                    <Route path="/sala/:nombre" element={clubber(<PlacePage />)} />
+                    <Route path="/local/:venueId" element={clubber(<VenuePage />, { explorer: true })} />
+                    <Route path="/local/:venueId/dia/:day" element={clubber(<VenueDayPage />, { explorer: true })} />
+                    <Route path="/sala/:nombre" element={clubber(<PlacePage />, { explorer: true })} />
                     <Route path="/chat/:userId" element={clubber(<ChatPage />)} />
                     <Route path="/profile" element={clubber(<ProfilePage />)} />
                     <Route
                       path="/event/:eventId"
-                      element={<SinCuenta conCuenta={clubber(<EventDetailPage />)} sinCuenta={<PublicEventPage />} />}
+                      element={<SinCuenta conCuenta={clubber(<EventDetailPage />, { explorer: true })} sinCuenta={<PublicEventPage />} />}
                     />
                     {/* URL legible (migración 133). Las rutas fijas de abajo
                         ganan a esta: ningún slug puede ser «access» ni «live». */}
                     <Route
                       path="/event/:placeSlug/:eventSlug"
-                      element={<SinCuenta conCuenta={clubber(<EventDetailPage />)} sinCuenta={<PublicEventPage />} />}
+                      element={<SinCuenta conCuenta={clubber(<EventDetailPage />, { explorer: true })} sinCuenta={<PublicEventPage />} />}
                     />
                     <Route path="/event/:eventId/access" element={clubber(<EventAccessPage />)} />
                     <Route path="/event/:eventId/live" element={clubber(<EventSwipingPage />, { requireEvent: true })} />

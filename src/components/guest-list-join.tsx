@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
 import { ApiError } from '@/services/api';
 import { guestListService, GuestListInfo } from '@/services/guest-lists';
+import { needsAccount } from '@/lib/explorer';
 
 interface GuestListJoinProps {
   eventId: string;
@@ -65,6 +66,7 @@ const GuestListJoin = ({ eventId, ask, defaultName = '', onAvailable }: GuestLis
   }, [ask, cargar]);
 
   const abrirFormulario = () => {
+    if (needsAccount('list')) return;
     setNombre(info?.mine?.name ?? defaultName);
     setAcompanantes(info?.mine?.companions ?? 0);
     setPaso('form');

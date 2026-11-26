@@ -33,6 +33,7 @@ import { cn } from '@/lib/utils';
 import { Event } from '@/types/venue';
 import { artistInitials, instagramUrl } from '@/lib/lineup';
 import VenueOrganizerCard from '@/components/venue-organizer-card';
+import { needsAccount } from '@/lib/explorer';
 
 /**
  * Desplegable amarillo de la ficha (Entradas, Listas, Reservados VIP), como en
@@ -169,6 +170,7 @@ const EventDetailPage = () => {
 
   // Al marcar «voy a ir» se pregunta por la lista de invitados, si la hay.
   const alternarAviso = async () => {
+    if (needsAccount('notifications')) return;
     setCambiandoAviso(true);
     try {
       const ahora = await eventWatchService.toggle(event.id);

@@ -40,7 +40,8 @@
         "asUser": "Continuar como usuario",
         "asVenue": "Continuar como negocio",
         "or": "o",
-        "legal": "Al continuar, aceptas nuestros <terms>Términos de servicio</terms> y la <privacy>Política de privacidad</privacy>"
+        "legal": "Al continuar, aceptas nuestros <terms>Términos de servicio</terms> y la <privacy>Política de privacidad</privacy>",
+        "explore": "Ver fiestas sin cuenta"
     },
     "auth": {
         "userAccess": "Acceso de usuario",
@@ -4328,5 +4329,25 @@
             "popular": "Popular en {{city}}",
             "featured": "Destacada"
         }
+    },
+    "explorer": {
+        "reasons": {
+            "follow": "Crea tu cuenta para seguir a este local",
+            "tickets": "Crea tu cuenta para tener tus entradas",
+            "enter": "Crea tu cuenta para entrar en la fiesta",
+            "crushes": "Crea tu cuenta para ver tus crushes",
+            "chat": "Crea tu cuenta para chatear",
+            "profile": "Crea tu cuenta para tener tu perfil",
+            "notifications": "Crea tu cuenta para recibir avisos",
+            "raffle": "Crea tu cuenta para participar en sorteos",
+            "generic": "Crea tu cuenta para hacer esto",
+            "save": "Crea tu cuenta para guardar tus fiestas",
+            "offer": "Crea tu cuenta para conseguir esta oferta",
+            "list": "Crea tu cuenta para apuntarte a la lista"
+        },
+        "body": "Tardas 10 segundos con Apple o Google. Puedes seguir mirando fiestas sin cuenta.",
+        "create": "Crear cuenta",
+        "login": "Ya tengo cuenta",
+        "keepBrowsing": "Seguir mirando"
     }
 }
