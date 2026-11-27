@@ -24,7 +24,11 @@ import { cn } from '@/lib/utils';
  * Premium) para que nadie entre y salga sólo para mirar, y hace falta rellenar
  * lo que el registro de invitado no pide.
  */
-const AccountTypeCard = () => {
+/**
+ * `invite`: dentro de una fiesta con Flechazo, al invitado se le enseña en
+ * grande, en amarillo y con el botón «Hacerme fiester@» (el mismo formulario).
+ */
+const AccountTypeCard = ({ invite = false }: { invite?: boolean }) => {
   const { t } = useTranslation();
   const { toast } = useToast();
   const { currentUser, refreshProfile } = useAppContext();
@@ -87,9 +91,32 @@ const AccountTypeCard = () => {
   };
 
   const Icono = actual === 'guest' ? Ticket : Heart;
+  const invitar = invite && actual === 'guest';
 
   return (
-    <section className="space-y-3 rounded-2xl bg-card p-4">
+    <section className={cn('space-y-3 rounded-2xl p-4', invitar ? 'bg-party-primary text-ink' : 'bg-card')}>
+      {invitar ? (
+        <>
+          <div className="flex items-start gap-3">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-ink text-party-primary">
+              <Heart size={20} className="fill-current" />
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="font-display text-title-card">{t('accountKind.invite.title')}</p>
+              <p className="text-body-sm text-ink/75">{t('accountKind.invite.body')}</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setAbierto(true)}
+            className="press flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-ink font-display text-title-card text-party-primary"
+          >
+            <Heart size={17} />
+            {t('accountKind.invite.cta')}
+          </button>
+        </>
+      ) : (
+        <>
       <div className="flex items-start gap-3">
         <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-party-primary text-ink">
           <Icono size={20} />
@@ -119,9 +146,11 @@ const AccountTypeCard = () => {
         <Repeat2 size={16} />
         {t('accountKind.switchTo', { kind: t(`accountKind.${otro}.tab`) })}
       </button>
+        </>
+      )}
 
       {otro === 'vyber' && (
-        <p className="text-caption text-party-gray">
+        <p className={cn('text-caption', invitar ? 'text-ink/60' : 'text-party-gray')}>
           {bloqueado && fecha
             ? t('accountKind.limitReached', { date: fecha })
             : t('accountKind.changesLeft', { count: Math.max(estado.maxChanges - estado.changesUsed, 0) })}

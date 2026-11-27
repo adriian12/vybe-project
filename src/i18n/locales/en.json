@@ -3485,6 +3485,11 @@
                 "board": "Flechazo: board, match and chat",
                 "premium": "Premium"
             }
+        },
+        "invite": {
+            "title": "This party has Flechazo",
+            "body": "Become a fiester@ to see who's inside and match. We'll only ask for your date of birth and gender.",
+            "cta": "Become a fiester@"
         }
     },
     "supercrush": {

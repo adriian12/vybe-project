@@ -3485,6 +3485,11 @@
                 "board": "Flechazo: tauler, match i xat",
                 "premium": "Premium"
             }
+        },
+        "invite": {
+            "title": "Aquesta festa té Flechazo",
+            "body": "Fes-te fiester@ per veure qui hi ha dins i fer match. Només et demanarem la data de naixement i el gènere.",
+            "cta": "Fer-me fiester@"
         }
     },
     "supercrush": {

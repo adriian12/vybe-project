@@ -324,7 +324,7 @@ const HomePage = () => {
             nights={noches}
             calendarEvents={paraCalendario}
             flechazo={soloFlechazo}
-            onFlechazo={currentUser?.accountType === 'guest' ? undefined : setSoloFlechazo}
+            onFlechazo={setSoloFlechazo}
           />
         )}
 

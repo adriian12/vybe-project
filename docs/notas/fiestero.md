@@ -50,6 +50,7 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
   - **vyber**: foto del momento, tablón, swipe y match.
   - **guest** («invitado»): fiestas, mapa, ofertas, sorteos, avisos y seguir
     locales. Ni ve tablones ni sale en ellos, y no tiene pestaña «Crushes».
+  - **Google y Apple dan de alta como invitado** (migración 151, `handle_new_user`): no traen fecha de nacimiento ni género y la ventana obligatoria dejaba altas a medias. La fecha y el género se piden al pasar a fiester@ (`AccountTypeCard`, en el perfil y dentro de la fiesta). No cuenta como cambio de tipo. «Alta sin terminar» en administración ya sólo sale a quien se registró con correo como fiester@ y no rellenó la ficha.
   - Se elige en el registro (dos pestañas con su modal de información,
     `account-kind-info.tsx`), y el formulario de invitado no pide género ni «a
     quién quiere ver»: se piden al pasarse a vyber.
@@ -276,7 +277,10 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
 - **Filtro «Con Flechazo»** (`conFlechazo` en `lib/party-filters.ts`): fiestas
   que no han terminado (no sólo las que están en directo: de día salía vacío)
   con entrada y Flechazo encendidos y, si se entra por ubicación, con
-  coordenadas. En inicio y en el mapa; no sale a los invitados.
+  coordenadas. En inicio y en el mapa, también para los invitados (151):
+  dentro de una fiesta con Flechazo, el invitado ve arriba la tarjeta amarilla
+  «Esta fiesta tiene Flechazo» (`AccountTypeCard invite`) con «Hacerme
+  fiester@».
 - **Invitados:** sin «Sin verificar», sin «Completa tu verificación» y sin
   Premium (`premium-context` da `isPremium` falso). La suscripción no se
   pausa: los días como invitado se consumen y al volver a fiester@ sigue.

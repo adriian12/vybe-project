@@ -217,6 +217,10 @@ export const FiesterForm = ({
  *     comprar entradas no hace falta nada más.
  *   · Fiester@: la ficha de siempre (edad, género, a quién quiere ver, plan).
  * Quien se registra con correo ya lo eligió en el alta y va directo a la ficha.
+ *
+ * Desde la migración 151 Google y Apple dan de alta como invitado, así que el
+ * paso «tipo» casi nunca sale: queda por si alguna cuenta social sigue como
+ * fiester@ sin terminar. La ficha se pide al pasar a fiester@ (`AccountTypeCard`).
  * No se puede cerrar sin terminar: sin esos datos el tablón no funciona.
  */
 const CompleteProfileDialog = () => {

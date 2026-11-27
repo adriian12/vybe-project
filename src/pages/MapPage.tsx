@@ -17,7 +17,6 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useAppContext } from '@/context/app-context';
 import { EventWithDistance, isEventLive, isEventTonight, useEventsFeed } from '@/hooks/use-events-feed';
 import { DateFilter } from '@/components/party-filters';
 import { matchesDate, nightOf, useDateSelection } from '@/lib/date-filter';
@@ -130,9 +129,6 @@ const TIPOS: PlaceType[] = ['discoteca', 'terraza', 'aire_libre'];
 const MapPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { currentUser } = useAppContext();
-  // Los invitados no usan el Flechazo: no se les ofrece ese filtro.
-  const esInvitado = currentUser?.accountType === 'guest';
   const { withDistance, position, activity, relocate } = useEventsFeed();
   const { toast } = useToast();
 
@@ -558,7 +554,7 @@ const MapPage = () => {
           free={soloGratis}
           onFree={setSoloGratis}
           flechazo={soloFlechazo}
-          onFlechazo={esInvitado ? undefined : setSoloFlechazo}
+          onFlechazo={setSoloFlechazo}
           results={visibles.length}
           onReset={() => {
             setTipo(null);

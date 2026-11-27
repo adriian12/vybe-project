@@ -3485,6 +3485,11 @@
                 "board": "Flechazo: tablón, match y chat",
                 "premium": "Premium"
             }
+        },
+        "invite": {
+            "title": "Esta fiesta tiene Flechazo",
+            "body": "Hazte fiester@ para ver quién hay dentro y hacer match. Sólo te pediremos tu fecha de nacimiento y tu género.",
+            "cta": "Hacerme fiester@"
         }
     },
     "supercrush": {

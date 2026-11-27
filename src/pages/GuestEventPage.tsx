@@ -78,6 +78,10 @@ const GuestEventPage = ({ swipeOff = false }: { swipeOff?: boolean }) => {
           </p>
         </section>
 
+        {/* Esta fiesta tiene Flechazo: al invitado se le invita a hacerse fiester@
+            aquí mismo (fecha de nacimiento y género, y entra al tablón). */}
+        {currentUser?.accountType === 'guest' && !swipeOff && <AccountTypeCard invite />}
+
         <div className="no-scrollbar flex gap-2 overflow-x-auto py-1">
           <EventOffers eventId={activeEvent.eventId} />
           {/* Un vyber que entró como invitado puede volver a su modo. */}
@@ -105,9 +109,6 @@ const GuestEventPage = ({ swipeOff = false }: { swipeOff?: boolean }) => {
           </ul>
         </section>
 
-        {/* La cuenta de invitado puede hacerse Vyber desde aquí mismo, con
-            las mismas reglas que en el perfil. */}
-        {currentUser?.accountType === 'guest' && !swipeOff && <AccountTypeCard />}
 
         {activeEvent.venueId && (
           <FollowVenuePrompt
