@@ -28,7 +28,6 @@ import {
   Plus,
   Shield,
   ShieldAlert,
-  Sparkles,
   Star,
   Users,
   X,
@@ -586,7 +585,8 @@ const ProfilePage = () => {
             </button>
           </div>
           {/* Supercrush que le quedan: valen en cualquier evento. Tocar abre
-              la compra. */}
+              la compra. El invitado no entra al tablón, así que no le sirven. */}
+          {!esInvitado && (
           <button
             type="button"
             onClick={() => setShowSupercrushDialog(true)}
@@ -595,6 +595,7 @@ const ProfilePage = () => {
             <Star size={15} className="fill-party-primary" />
             {t('supercrush.available', { count: supercrushBalance })}
           </button>
+          )}
           {miembroDesde && (
             <p className="mt-1 text-center text-body-sm text-[#C8C6C5]">
               {t('profile.memberSince', { date: miembroDesde })}
@@ -602,13 +603,9 @@ const ProfilePage = () => {
           )}
 
           <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
-            {reputation && (
-              <span className="flex items-center gap-1.5 rounded-full bg-surface-high px-3 py-1 text-caption">
-                <Sparkles size={14} className="text-party-primary" />
-                {t('profile.eventsAttended', { count: reputation.eventsAttended })} ·{' '}
-                {t('profile.connectionsMade', { count: reputation.connectionsMade })}
-              </span>
-            )}
+            {/* «N eventos · N conexiones» ya no sale: con la app recién
+                lanzada casi siempre era «0 · 0». Las fiestas a las que has ido
+                siguen en «Historial». */}
             {/* Un invitado no necesita verificarse: sólo ve fiestas y compra entradas. */}
             {!esInvitado && (
             <span
