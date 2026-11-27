@@ -1139,6 +1139,7 @@ export type Database = {
           start_date: string
           slug: string | null
           entry_enabled: boolean
+          entry_method: string
           swipe_enabled: boolean
           test_lab: boolean
           theme: string | null
@@ -1194,6 +1195,7 @@ export type Database = {
           start_date: string
           slug?: string | null
           entry_enabled?: boolean
+          entry_method?: string
           swipe_enabled?: boolean
           test_lab?: boolean
           theme?: string | null
@@ -1249,6 +1251,7 @@ export type Database = {
           start_date?: string
           slug?: string | null
           entry_enabled?: boolean
+          entry_method?: string
           swipe_enabled?: boolean
           test_lab?: boolean
           theme?: string | null
@@ -5832,6 +5835,7 @@ export type Database = {
         Args: {
           p_event_id: string
           p_entry?: boolean
+          p_entry_method?: string
           p_gender: boolean
           p_headcount: boolean
           p_swipe: boolean

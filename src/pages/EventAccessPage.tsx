@@ -295,7 +295,7 @@ const EventAccessPage = () => {
           </p>
         )}
 
-        {event.byPlatform ? (
+        {event.entryByLocation ? (
           <div className="space-y-3">
             {tarjeta}
             <p className="text-body-sm text-party-gray">{t('eventAccess.platformHelp', { app: t('common.appName') })}</p>

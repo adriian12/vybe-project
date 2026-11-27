@@ -139,7 +139,8 @@ const AdminEventForm = ({
         if (id) {
           await adminService.updateEvent(id, datos);
           // Siempre: las de Fiestea nacen con entrada y swipe según la ubicación.
-          await eventSettingsService.save(id, ajustes).catch(() =>
+          // Las de Fiestea se entran siempre por ubicación (150).
+          await eventSettingsService.save(id, deLaCasa ? { ...ajustes, entryMethod: 'location' } : ajustes).catch(() =>
             toast({ title: t('venue.liveSettings.afterCreateFailed'), variant: 'destructive' }),
           );
         }
@@ -348,9 +349,9 @@ const AdminEventForm = ({
       <div className="space-y-2">
         {deLaCasa && <p className="text-caption text-ink/60">{t('admin.eventForm.platformSwipeHelp')}</p>}
         {editando && event ? (
-          <EventLiveSettings eventId={event.id} className="border border-black/10" />
+          <EventLiveSettings eventId={event.id} platform={deLaCasa} className="border border-black/10" />
         ) : (
-          <EventLiveSettings value={ajustes} onChange={setAjustes} className="border border-black/10" />
+          <EventLiveSettings value={ajustes} onChange={setAjustes} platform={deLaCasa} className="border border-black/10" />
         )}
       </div>
 

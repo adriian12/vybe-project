@@ -300,7 +300,7 @@
         "noLocationTitle": "Wir sehen deinen Standort nicht",
         "locationReady": "Standort bereit",
         "notStarted": "Beginnt um {{time}}. Der Code funktioniert nur während der Party.",
-        "platformHelp": "Das ist eine {{app}}-Party: Kein Code nötig, du musst nur dort sein.",
+        "platformHelp": "Für diese Party brauchst du weder QR noch Code: Du musst nur dort sein.",
         "enterHere": "Ich bin da, rein"
     },
     "scanner": {
@@ -439,7 +439,8 @@
         "keepAlonePremium": "Mit Premium sicherst du sie allein und sie läuft nicht mehr ab.",
         "yesterday": "Gestern",
         "ended": "Beendet",
-        "read": "Gelesen"
+        "read": "Gelesen",
+        "flechazoEvents": "Events mit Flechazo"
     },
     "chat": {
         "noConversation": "Unterhaltung nicht gefunden",
@@ -1823,7 +1824,7 @@
             "hint": "Was du erlaubst und was das Publikum auf dieser Party sieht. Wird beim Tippen gespeichert.",
             "entry": {
                 "title": "Zur Party",
-                "body": "Man kommt mit QR-Code, Code oder vor Ort rein. Aus: Die Seite zeigt nur „Ich gehe hin“ (und Tickets, falls es welche gibt), und Swipe ist aus."
+                "body": "An: Die Leute kommen mit der App in die Party. Aus: Die Seite zeigt nur „Ich komme“ (und Tickets, falls vorhanden) und das Swipen ist aus."
             },
             "swipe": {
                 "title": "Leute kennenlernen (Swipe)",
@@ -1843,7 +1844,14 @@
                 "body": "Die Seite zeigt über den Tickets ein Formular zum Eintragen mit Name und Begleitung.",
                 "messagePlaceholder": "Nachricht (z. B. Gratis vor 00:30)"
             },
-            "afterCreateFailed": "Die Party wurde erstellt, aber ihre Einstellungen wurden nicht gespeichert. Prüfe sie beim Bearbeiten."
+            "afterCreateFailed": "Die Party wurde erstellt, aber ihre Einstellungen wurden nicht gespeichert. Prüfe sie beim Bearbeiten.",
+            "entryMethod": {
+                "code": "QR oder Code",
+                "location": "Nur Standort",
+                "codeHelp": "Man kommt rein, indem man den QR der Location scannt oder ihren Code eingibt.",
+                "locationHelp": "Man kommt rein, wenn man vor Ort ist und auf „Zur Party“ tippt: ohne QR. Das GPS wird geprüft.",
+                "needsLocation": "Für den Einlass per Standort braucht die Party ihre Adresse auf der Karte."
+            }
         },
         "promoters": {
             "teamsTitle": "Promoter-Teams",

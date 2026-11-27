@@ -48,31 +48,34 @@ describe('conFlechazo', () => {
     startDate: '2026-10-05T22:00:00Z',
     endDate: '2026-10-06T05:00:00Z',
     swipeEnabled: true,
-    byPlatform: false,
+    entryByLocation: false,
     location: undefined,
   };
-  it('en directo y con Flechazo', () => {
+  it('en directo o más tarde, con Flechazo', () => {
     expect(conFlechazo(base, ahora)).toBe(true);
+    // Empieza dentro de unas horas: también sale (antes el filtro se quedaba vacío de día).
+    expect(conFlechazo({ ...base, startDate: '2026-10-06T01:00:00Z' }, ahora)).toBe(true);
   });
-  it('sin Flechazo, o fuera de hora, no', () => {
+  it('sin Flechazo, sin entrada o ya terminada, no', () => {
     expect(conFlechazo({ ...base, swipeEnabled: false }, ahora)).toBe(false);
-    expect(conFlechazo({ ...base, startDate: '2026-10-06T01:00:00Z' }, ahora)).toBe(false);
+    expect(conFlechazo({ ...base, entryEnabled: false }, ahora)).toBe(false);
+    expect(conFlechazo({ ...base, endDate: '2026-10-05T23:00:00Z' }, ahora)).toBe(false);
   });
   it('las de Fiestea, sólo con ubicación', () => {
-    expect(conFlechazo({ ...base, byPlatform: true }, ahora)).toBe(false);
-    expect(conFlechazo({ ...base, byPlatform: true, location: { latitude: 39.5, longitude: 2.6 } }, ahora)).toBe(true);
+    expect(conFlechazo({ ...base, entryByLocation: true }, ahora)).toBe(false);
+    expect(conFlechazo({ ...base, entryByLocation: true, location: { latitude: 39.5, longitude: 2.6 } }, ahora)).toBe(true);
   });
 });
 
 describe('sePuedeEntrar', () => {
   it('con la entrada encendida, sí; apagada, sólo «Voy a ir»', () => {
-    expect(sePuedeEntrar({ entryEnabled: true, byPlatform: false })).toBe(true);
-    expect(sePuedeEntrar({ byPlatform: false })).toBe(true);
-    expect(sePuedeEntrar({ entryEnabled: false, byPlatform: false })).toBe(false);
+    expect(sePuedeEntrar({ entryEnabled: true, entryByLocation: false })).toBe(true);
+    expect(sePuedeEntrar({ entryByLocation: false })).toBe(true);
+    expect(sePuedeEntrar({ entryEnabled: false, entryByLocation: false })).toBe(false);
   });
   it('las de Fiestea, sólo con ubicación', () => {
     const location = { latitude: 39.57, longitude: 2.65 } as Parameters<typeof sePuedeEntrar>[0]['location'];
-    expect(sePuedeEntrar({ entryEnabled: true, byPlatform: true })).toBe(false);
-    expect(sePuedeEntrar({ entryEnabled: true, byPlatform: true, location })).toBe(true);
+    expect(sePuedeEntrar({ entryEnabled: true, entryByLocation: true })).toBe(false);
+    expect(sePuedeEntrar({ entryEnabled: true, entryByLocation: true, location })).toBe(true);
   });
 });

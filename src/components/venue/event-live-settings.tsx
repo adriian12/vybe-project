@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ClipboardList, DoorOpen, Heart, Loader2, Percent, Settings2, Users } from 'lucide-react';
+import { ClipboardList, DoorOpen, Heart, Loader2, MapPin, Percent, QrCode, Settings2, Users } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/components/ui/use-toast';
@@ -17,12 +17,16 @@ import { cn } from '@/lib/utils';
  * quien crea la fiesta lo guarda después.
  *
  * Sin entrada no hay swipe: al apagarla se apaga y no se puede encender.
+ *
+ * Con la entrada encendida, el negocio elige cómo se entra (150): con su QR o
+ * código, o sólo estando en el sitio. Las de Fiestea (`platform`) se entran
+ * siempre por ubicación y no lo ven.
  */
 type Props =
-  | { eventId: string; value?: never; onChange?: never; className?: string }
-  | { eventId?: never; value: Ajustes; onChange: (value: Ajustes) => void; className?: string };
+  | { eventId: string; value?: never; onChange?: never; className?: string; platform?: boolean }
+  | { eventId?: never; value: Ajustes; onChange: (value: Ajustes) => void; className?: string; platform?: boolean };
 
-const EventLiveSettings = ({ eventId, value, onChange, className }: Props) => {
+const EventLiveSettings = ({ eventId, value, onChange, className, platform = false }: Props) => {
   const { t } = useTranslation();
   const { toast } = useToast();
   const [guardados, setAjustes] = useState<Ajustes | null>(null);
@@ -114,6 +118,42 @@ const EventLiveSettings = ({ eventId, value, onChange, className }: Props) => {
                 />
               )}
             </label>
+            {campo === 'entry' && ajustes.entry && !platform && (
+              <div className="mt-2 pl-11">
+                <div className="grid grid-cols-2 gap-1 rounded-xl bg-black/[0.05] p-1" role="radiogroup">
+                  {([
+                    ['code', QrCode],
+                    ['location', MapPin],
+                  ] as const).map(([metodo, Icono]) => (
+                    <button
+                      key={metodo}
+                      type="button"
+                      role="radio"
+                      aria-checked={ajustes.entryMethod === metodo}
+                      disabled={guardando !== null}
+                      onClick={() =>
+                        ajustes.entryMethod !== metodo &&
+                        void guardar('entryMethod', { ...ajustes, entryMethod: metodo, guestListMessage: mensaje || null })
+                      }
+                      className={cn(
+                        'press flex h-9 items-center justify-center gap-1.5 rounded-lg text-caption font-bold disabled:opacity-60',
+                        ajustes.entryMethod === metodo ? 'bg-party-primary text-ink' : 'text-ink/60',
+                      )}
+                    >
+                      {guardando === 'entryMethod' && ajustes.entryMethod === metodo ? (
+                        <Loader2 size={14} className="animate-spin" />
+                      ) : (
+                        <Icono size={14} />
+                      )}
+                      {t(`venue.liveSettings.entryMethod.${metodo}`)}
+                    </button>
+                  ))}
+                </div>
+                <p className="mt-1.5 text-caption text-party-gray">
+                  {t(`venue.liveSettings.entryMethod.${ajustes.entryMethod}Help`)}
+                </p>
+              </div>
+            )}
             {campo === 'guestList' && ajustes.guestList && (
               <div className="mt-2 pl-11">
                 <Input

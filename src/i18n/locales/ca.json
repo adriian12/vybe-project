@@ -300,7 +300,7 @@
         "noLocationTitle": "No veiem la teva ubicació",
         "locationReady": "Ubicació llesta",
         "notStarted": "Comença a les {{time}}. El codi només funciona mentre dura la festa.",
-        "platformHelp": "És una festa de {{app}}: no cal codi, només ser-hi.",
+        "platformHelp": "En aquesta festa no cal QR ni codi: només ser-hi.",
         "enterHere": "Soc aquí, entra"
     },
     "scanner": {
@@ -439,7 +439,8 @@
         "keepAlonePremium": "Amb Premium la deses tu sol i deixa de caducar.",
         "yesterday": "Ahir",
         "ended": "Finalitzat",
-        "read": "Llegit"
+        "read": "Llegit",
+        "flechazoEvents": "Esdeveniments amb Flechazo"
     },
     "chat": {
         "noConversation": "No s'ha trobat la conversa",
@@ -1823,7 +1824,7 @@
             "hint": "El que permets i el que veu el públic en aquesta festa. Es desa en tocar-ho.",
             "entry": {
                 "title": "Entrar a l'esdeveniment",
-                "body": "La gent entra amb el QR, el codi o sent-hi. Apagat, la fitxa només mostra «Hi aniré» (i les entrades, si n'hi ha) i el swipe s'apaga."
+                "body": "Encès, la gent entra a la festa amb l'app. Apagat, la fitxa només mostra «Hi vaig» (i les entrades, si n'hi ha) i el swipe s'apaga."
             },
             "swipe": {
                 "title": "Conèixer gent (swipe)",
@@ -1843,7 +1844,14 @@
                 "body": "La fitxa mostra, damunt de les entrades, un formulari per apuntar-se amb nom i acompanyants.",
                 "messagePlaceholder": "Missatge (ex.: Gratis abans de les 00:30)"
             },
-            "afterCreateFailed": "La festa s'ha creat, però els seus ajustos no s'han desat. Revisa'ls quan l'editis."
+            "afterCreateFailed": "La festa s'ha creat, però els seus ajustos no s'han desat. Revisa'ls quan l'editis.",
+            "entryMethod": {
+                "code": "QR o codi",
+                "location": "Només ubicació",
+                "codeHelp": "S'entra escanejant el QR del local o escrivint-ne el codi.",
+                "locationHelp": "S'entra essent-hi i prement «Entrar a l'esdeveniment»: sense QR. Es comprova el GPS.",
+                "needsLocation": "Per entrar per ubicació, la festa necessita l'adreça al mapa."
+            }
         },
         "promoters": {
             "teamsTitle": "Equips de RRPP",

@@ -311,7 +311,9 @@ const VybesPage = () => {
                 <Zap size={40} className="mb-3 text-party-primary" />
                 <h2 className="font-display text-headline-md">{t('matches.empty')}</h2>
                 <p className="mb-5 mt-1 max-w-xs text-body-sm text-party-gray">{t('matches.emptyBody')}</p>
-                <PartyButton onClick={() => navigate('/home')}>{t('tickets.explore')}</PartyButton>
+                <PartyButton onClick={() => navigate('/home', { state: { flechazo: true } })}>
+                  {t('matches.flechazoEvents')}
+                </PartyButton>
               </div>
             ) : (
               conversaciones.length > 0 && (
@@ -506,13 +508,18 @@ const VybesPage = () => {
         )}
       </main>
 
-      {/* Volver a buscar gente: a la fiesta si estás dentro, a la lista si no. */}
+      {/* Volver a buscar gente: a la fiesta si estás dentro y, si no, a las
+          fiestas con Flechazo, que son las únicas donde se puede ligar. */}
       <button
         type="button"
-        onClick={() => navigate(activeEvent ? `/event/${activeEvent.eventId}/live` : '/home')}
+        onClick={() =>
+          activeEvent
+            ? navigate(`/event/${activeEvent.eventId}/live`)
+            : navigate('/home', { state: { flechazo: true } })
+        }
         className="press fixed bottom-[calc(var(--nav-h)+1rem)] right-margin z-20 flex h-14 items-center gap-2 rounded-full bg-party-primary px-6 font-display text-title-card text-ink shadow-[0_8px_24px_rgba(0,0,0,0.5)]"
       >
-        {t('vybes.backToExplore')}
+        {activeEvent ? t('vybes.backToExplore') : t('matches.flechazoEvents')}
       </button>
 
       <AlertDialog open={borrar !== null} onOpenChange={(open) => !open && !borrando && setBorrar(null)}>

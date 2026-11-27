@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { GlassLoader } from '@/components/glass-loader';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Bell, ChevronRight, Flame, LayoutGrid, List, PartyPopper, RectangleVertical, User } from 'lucide-react';
 import GoHomeButton from '@/components/go-home/go-home-button';
@@ -92,7 +92,11 @@ const HomePage = () => {
 
   const [theme, setTheme] = useState<string | null>(null);
   const [franja, setFranja] = useState<Franja | null>(null);
-  const [soloFlechazo, setSoloFlechazo] = useState(false);
+  // Desde Crushes («Eventos con Flechazo») se llega con el filtro ya puesto.
+  const location = useLocation();
+  const [soloFlechazo, setSoloFlechazo] = useState(
+    () => (location.state as { flechazo?: boolean } | null)?.flechazo === true,
+  );
   const [avisosAbiertos, setAvisosAbiertos] = useState(false);
   const avisos = useActivity(intents);
 

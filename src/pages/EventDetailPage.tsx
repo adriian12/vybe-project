@@ -646,8 +646,8 @@ const EventDetailPage = () => {
               onClick={() => navigate(`/event/${event.id}/access`)}
               className="press flex h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-party-primary font-display text-title-card font-extrabold uppercase tracking-wide text-ink shadow-lg"
             >
-              {event.byPlatform ? <MapPinIcon size={20} /> : <QrCode size={20} />}
-              {event.byPlatform ? t('eventDetail.imHere') : t('eventDetail.enterNow')}
+              {event.entryByLocation ? <MapPinIcon size={20} /> : <QrCode size={20} />}
+              {event.entryByLocation ? t('eventDetail.imHere') : t('eventDetail.enterNow')}
             </button>
           ) : (
             <button

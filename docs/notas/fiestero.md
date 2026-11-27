@@ -273,9 +273,10 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
     gusta sin crush, resuelve la denuncia, avisa (`EXPELLED`) e impide volver
     (`EXPELLED`). Está en Puerta, en el enlace de Seguridad y en
     administración → Denuncias.
-- **Filtro «Con Flechazo»** (`conFlechazo` en `lib/party-filters.ts`): en
-  directo y con el tablón encendido. En inicio y en el mapa; no sale a los
-  invitados.
+- **Filtro «Con Flechazo»** (`conFlechazo` en `lib/party-filters.ts`): fiestas
+  que no han terminado (no sólo las que están en directo: de día salía vacío)
+  con entrada y Flechazo encendidos y, si se entra por ubicación, con
+  coordenadas. En inicio y en el mapa; no sale a los invitados.
 - **Invitados:** sin «Sin verificar», sin «Completa tu verificación» y sin
   Premium (`premium-context` da `isPremium` falso). La suscripción no se
   pausa: los días como invitado se consumen y al volver a fiester@ sigue.
@@ -299,3 +300,12 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
 ## Perfil del invitado
 
 En modo invitado el perfil no enseña «Mis fotos de fiesta», «Sobre mí» ni «Quiero ver»: son de la cuenta de fiester@. No se borra nada (`set_account_type` sólo quita la foto y los likes sin match de la fiesta en curso), así que al volver a fiester@ sale todo como estaba. El lápiz del nombre abre «Sobre mí» sólo con nombre y fecha de nacimiento.
+
+## Cómo se entra: QR/código o sólo ubicación (migración 150)
+
+- `events.entry_method`: `code` (QR o código, por defecto) o `location`. Las de Fiestea, siempre `location` (lo fuerzan `platform_events_swipe_off` al crear y `platform_events_location_changed` cuando cambian las coordenadas: con ubicación, entrada y Flechazo encendidos; sin ella, apagados).
+- El negocio lo elige en «Ajustes de la fiesta», bajo «Entrar al evento» (`set_event_live_settings`, `p_entry_method`); `location` sin coordenadas devuelve `EVENT_WITHOUT_LOCATION`.
+- `enter_platform_event` acepta las de Fiestea y las `location`, y por ubicación **siempre** mira la distancia (aunque `requires_location` sea falso). Con el código se sigue entrando también.
+- En la app, `event.entryByLocation` (Fiestea o `location`) decide el botón «Entrar al evento» y los filtros `sePuedeEntrar` y `conFlechazo`.
+- A 27-11-2026: 724 de las 876 fiestas próximas de Fiestea tienen Flechazo; las otras 152 no tienen coordenadas (casi todas «TBA», ubicación secreta).
+- Desde Crushes, «Eventos con Flechazo» abre inicio con el filtro puesto (`navigate('/home', { state: { flechazo: true } })`).

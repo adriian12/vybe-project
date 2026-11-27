@@ -121,7 +121,7 @@ const VENUE_PUBLICO =
 const EVENTO_LISTA =
   'id, name, venue_id, place_name, place_type, external_source, city, region, start_date, end_date, ' +
   'min_age, max_age, theme, dress_code, price, booking_url, poster_url, max_capacity, featured_until, ' +
-  'place_slug, slug, requires_location, entry_enabled, swipe_enabled, show_headcount, show_gender_split, ' +
+  'place_slug, slug, requires_location, entry_enabled, entry_method, swipe_enabled, show_headcount, show_gender_split, ' +
   'recurrence, latitude, longitude, address';
 
 /**
@@ -220,6 +220,9 @@ const dbEventToEvent = (dbEvent: EventRow, venue?: Partial<VenueRow>): Event => 
   slug: dbEvent.slug ?? undefined,
   requiresLocation: dbEvent.requires_location ?? true,
   entryEnabled: dbEvent.entry_enabled ?? true,
+  // Se entra estando allí y pulsando «Entrar», sin QR: las de Fiestea siempre y
+  // las de un negocio que lo elige (150).
+  entryByLocation: (venue?.is_platform ?? false) || dbEvent.entry_method === 'location',
   swipeEnabled: dbEvent.swipe_enabled ?? true,
   showHeadcount: dbEvent.show_headcount ?? false,
   showGenderSplit: dbEvent.show_gender_split ?? false,

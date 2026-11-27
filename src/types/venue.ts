@@ -103,6 +103,8 @@ export interface Event {
   requiresLocation?: boolean;
   /** Si se puede entrar (QR, código o ubicación); apagado, sólo «Voy a ir» (111). */
   entryEnabled?: boolean;
+  /** Se entra por ubicación pulsando «Entrar», sin QR ni código (150). */
+  entryByLocation?: boolean;
   /** El negocio deja conocer gente dentro (tablón y swipe). Por defecto, sí. */
   swipeEnabled?: boolean;
   /** El público ve cuánta gente hay dentro, en directo. */

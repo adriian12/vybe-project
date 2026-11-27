@@ -300,7 +300,7 @@
         "noLocationTitle": "No vemos tu ubicación",
         "locationReady": "Ubicación lista",
         "notStarted": "Empieza a las {{time}}. El código sólo funciona mientras dura la fiesta.",
-        "platformHelp": "Es una fiesta de {{app}}: no hace falta código, sólo estar allí.",
+        "platformHelp": "En esta fiesta no hace falta QR ni código: sólo estar allí.",
         "enterHere": "Estoy aquí, entrar"
     },
     "scanner": {
@@ -439,7 +439,8 @@
         "keepAlonePremium": "Con Premium la guardas tú solo y deja de caducar.",
         "yesterday": "Ayer",
         "ended": "Finalizado",
-        "read": "Leído"
+        "read": "Leído",
+        "flechazoEvents": "Eventos con Flechazo"
     },
     "chat": {
         "noConversation": "No se encontró la conversación",
@@ -1823,7 +1824,7 @@
             "hint": "Lo que permites y lo que ve el público en esta fiesta. Se guarda al tocarlo.",
             "entry": {
                 "title": "Entrar al evento",
-                "body": "La gente entra con el QR, el código o estando en el sitio. Apagado, la ficha sólo enseña «Voy a ir» (y las entradas, si hay) y el swipe se apaga."
+                "body": "Encendido, la gente entra a la fiesta con la app. Apagado, la ficha sólo enseña «Voy a ir» (y las entradas, si hay) y el swipe se apaga."
             },
             "swipe": {
                 "title": "Conocer gente (swipe)",
@@ -1843,7 +1844,14 @@
                 "body": "La ficha enseña, encima de las entradas, un formulario para apuntarse con nombre y acompañantes.",
                 "messagePlaceholder": "Mensaje (ej.: Gratis antes de las 00:30)"
             },
-            "afterCreateFailed": "La fiesta se ha creado, pero sus ajustes no se han guardado. Revísalos al editarla."
+            "afterCreateFailed": "La fiesta se ha creado, pero sus ajustes no se han guardado. Revísalos al editarla.",
+            "entryMethod": {
+                "code": "QR o código",
+                "location": "Sólo ubicación",
+                "codeHelp": "Se entra escaneando el QR del local o escribiendo su código.",
+                "locationHelp": "Se entra estando en el sitio y pulsando «Entrar al evento»: sin QR. Se comprueba el GPS.",
+                "needsLocation": "Para entrar por ubicación, la fiesta necesita su dirección en el mapa."
+            }
         },
         "promoters": {
             "teamsTitle": "Equipos de RRPP",

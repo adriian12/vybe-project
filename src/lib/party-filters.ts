@@ -42,18 +42,21 @@ export const aplicarFiltros = <T extends { event: Pick<Event, 'startDate' | 'the
  * negocio o administración (111), sólo «Voy a ir». Las de Fiestea, además,
  * con ubicación: no tienen QR ni código, se entra estando en el sitio.
  */
-export const sePuedeEntrar = (event: Pick<Event, 'entryEnabled' | 'byPlatform' | 'location'>): boolean =>
-  event.entryEnabled !== false && (!event.byPlatform || Boolean(event.location));
+export const sePuedeEntrar = (event: Pick<Event, 'entryEnabled' | 'entryByLocation' | 'location'>): boolean =>
+  event.entryEnabled !== false && (!event.entryByLocation || Boolean(event.location));
 
 /**
- * «Con Flechazo»: en directo ahora y con el Flechazo (tablón) encendido. En
- * las fiestas de Fiestea, además, con ubicación: es como se entra en ellas.
+ * «Con Flechazo»: fiestas que aún no han terminado y en las que se podrá entrar
+ * al tablón (entrada y Flechazo encendidos). Antes sólo valían las que estaban
+ * en directo y, de día, el filtro casi siempre salía vacío. Las que se entran
+ * por ubicación, además, con coordenadas.
  */
 export const conFlechazo = (
-  event: Pick<Event, 'startDate' | 'endDate' | 'swipeEnabled' | 'byPlatform' | 'location'>,
+  event: Pick<Event, 'endDate' | 'entryEnabled' | 'swipeEnabled' | 'entryByLocation' | 'location'> &
+    Partial<Pick<Event, 'startDate'>>,
   ahora: number = Date.now(),
 ): boolean =>
-  new Date(event.startDate).getTime() <= ahora &&
   new Date(event.endDate).getTime() > ahora &&
+  event.entryEnabled !== false &&
   event.swipeEnabled !== false &&
-  (!event.byPlatform || Boolean(event.location));
+  (!event.entryByLocation || Boolean(event.location));
