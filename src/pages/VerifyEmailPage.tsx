@@ -8,6 +8,7 @@ import { Mail, CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import { api } from '@/services/api';
 import { DOWNLOAD_PATH, DownloadReason, siteMode } from '@/lib/hosts';
 import { authEmailService, authEmailMessage } from '@/services/auth-email';
+import { Input } from '@/components/ui/input';
 
 type Status = 'verifying' | 'success' | 'error' | 'pending';
 
@@ -16,7 +17,16 @@ interface LocationState {
   type?: 'user' | 'venue';
   /** La cuenta se creó pero el correo no salió: hay que decirlo. */
   emailFailed?: boolean;
+  /** Viene de intentar entrar sin haber confirmado: puede pedir otro ya. */
+  fromLogin?: boolean;
 }
+
+/**
+ * Segundos antes de poder pedir otro correo. Cada enlace nuevo anula el
+ * anterior: si se pide otro mientras llega el primero, el primero ya no vale
+ * (pasó el 27-11-2026). El servidor tampoco crea otro antes de 90 s (153).
+ */
+const ESPERA_REENVIO = 60;
 
 const errorMessage = (error: unknown, fallback: string): string =>
   error instanceof Error ? error.message : fallback;
@@ -33,6 +43,18 @@ const VerifyEmailPage = () => {
   const [status, setStatus] = useState<Status>('verifying');
   const [email, setEmail] = useState(state.email ?? searchParams.get('email') ?? '');
   const [resending, setResending] = useState(false);
+  // Recién mandado desde el alta: se espera antes de dejar pedir otro.
+  const [espera, setEspera] = useState(() =>
+    location.pathname.includes('verify-email-pending') && !state.fromLogin && !state.emailFailed ? ESPERA_REENVIO : 0,
+  );
+  // El enlace llegó, pero Supabase lo rechazó (usado o sustituido por otro).
+  const [enlaceCaducado, setEnlaceCaducado] = useState(false);
+
+  useEffect(() => {
+    if (espera <= 0) return;
+    const id = window.setTimeout(() => setEspera((s) => s - 1), 1000);
+    return () => window.clearTimeout(id);
+  }, [espera]);
 
   // La verificación sólo debe ejecutarse una vez por carga.
   const hasRun = useRef(false);
@@ -84,6 +106,16 @@ const VerifyEmailPage = () => {
       const token = searchParams.get('token_hash') ?? searchParams.get('token');
       const type = searchParams.get('type');
       const hasHashToken = window.location.hash.includes('access_token=');
+      // GoTrue devuelve aquí `#error_code=otp_expired` cuando el enlace ya
+      // se usó o se pidió otro después.
+      const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+      const codigoError = hashParams.get('error_code') ?? searchParams.get('error_code');
+      if (codigoError) {
+        window.history.replaceState({}, document.title, window.location.pathname);
+        setEnlaceCaducado(true);
+        setStatus('error');
+        return;
+      }
 
       try {
         // Enlaces nuevos de Supabase: token en query, hay que canjearlo.
@@ -129,10 +161,16 @@ const VerifyEmailPage = () => {
         setStatus(email ? 'pending' : 'error');
       } catch (error) {
         console.error('Error verifying email:', error);
+        const mensaje = errorMessage(error, '');
+        if (/expired|invalid|not found/i.test(mensaje)) {
+          setEnlaceCaducado(true);
+          setStatus('error');
+          return;
+        }
         setStatus('error');
         toast({
           title: t('auth.verify.errorTitle'),
-          description: errorMessage(error, t('errors.generic')),
+          description: mensaje || t('errors.generic'),
           variant: 'destructive',
         });
       }
@@ -149,15 +187,20 @@ const VerifyEmailPage = () => {
    * peor que un error. Va por la misma función que el alta.
    */
   const resendEmail = async () => {
-    if (!email) {
+    if (!email.trim()) {
       toast({ title: t('auth.errors.invalidEmail'), variant: 'destructive' });
       return;
     }
 
     setResending(true);
     try {
-      await authEmailService.resendConfirmation(email);
-      toast({ title: t('auth.verify.resent') });
+      const { recent } = await authEmailService.resendConfirmation(email.trim());
+      toast(
+        recent
+          ? { title: t('auth.verify.recentlySentTitle'), description: t('auth.verify.recentlySent') }
+          : { title: t('auth.verify.resent'), description: t('auth.verify.resentLatest') },
+      );
+      setEspera(ESPERA_REENVIO);
     } catch (error) {
       toast({
         title: t('common.error'),
@@ -213,9 +256,13 @@ const VerifyEmailPage = () => {
                 variant="outline"
                 className="w-full"
                 onClick={() => void resendEmail()}
-                disabled={resending}
+                disabled={resending || espera > 0}
               >
-                {resending ? t('auth.verify.resending') : t('auth.verify.resend')}
+                {resending
+                  ? t('auth.verify.resending')
+                  : espera > 0
+                    ? t('auth.verify.resendIn', { s: espera })
+                    : t('auth.verify.resend')}
               </PartyButton>
               <Link to="/auth" className="block text-sm text-party-primary hover:underline">
                 {t('auth.verify.backToLogin')}
@@ -228,14 +275,27 @@ const VerifyEmailPage = () => {
           <>
             <XCircle size={56} className="mx-auto mb-6 text-destructive" />
             <h1 className="text-2xl font-bold mb-2">{t('auth.verify.errorTitle')}</h1>
-            <p className="text-party-gray mb-8">{t('auth.verify.errorBody')}</p>
+            <p className="text-party-gray mb-6">
+              {t(enlaceCaducado ? 'auth.verify.linkInvalidBody' : 'auth.verify.errorBody')}
+            </p>
 
             <div className="space-y-3">
+              {/* El enlace no trae el correo: sin él no se puede pedir otro. */}
+              <Input
+                type="email"
+                inputMode="email"
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder={t('auth.verify.emailPlaceholder')}
+                aria-label={t('auth.verify.emailPlaceholder')}
+                className="h-12 text-center"
+              />
               <PartyButton
                 variant="gradient"
                 className="w-full"
                 onClick={() => void resendEmail()}
-                disabled={resending}
+                disabled={resending || espera > 0}
               >
                 {resending ? t('auth.verify.resending') : t('auth.verify.resend')}
               </PartyButton>

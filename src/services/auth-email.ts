@@ -48,6 +48,8 @@ interface AuthEmailResponse {
   uploads?: SignedUpload[];
   error?: AuthEmailError;
   created?: boolean;
+  /** Reenvío: el último correo salió hace nada y no se ha mandado otro. */
+  recent?: boolean;
 }
 
 const call = async (payload: Record<string, unknown>): Promise<AuthEmailResponse> => {
@@ -152,8 +154,9 @@ export const authEmailService = {
   },
 
   /** Vuelve a mandar el correo de verificación. */
-  resendConfirmation: async (email: string): Promise<void> => {
-    await call({ action: 'resend', email });
+  resendConfirmation: async (email: string): Promise<{ recent: boolean }> => {
+    const response = await call({ action: 'resend', email });
+    return { recent: Boolean(response.recent) };
   },
 
   /** Manda el enlace para cambiar la contraseña. */

@@ -40,6 +40,8 @@ export interface AdminUser {
   isTest: boolean;
   /** Fiester@ con el alta terminada; el invitado siempre cuenta como terminado. */
   profileCompleted: boolean;
+  /** Confirmó el correo (o entró con Google/Apple). Sin confirmar no cuenta como real. */
+  emailConfirmed: boolean;
 }
 
 export interface AdminUserCounts {
@@ -48,6 +50,8 @@ export interface AdminUserCounts {
   guests: number;
   incomplete: number;
   tests: number;
+  /** Altas que nunca confirmaron el correo (mal escrito o enlace sin abrir). */
+  unconfirmed: number;
 }
 
 export interface AdminVenue {
@@ -450,6 +454,7 @@ export const adminService = {
       subscriptionRenews: Boolean(row.subscription_renews),
       isTest: Boolean(row.is_test),
       profileCompleted: Boolean(row.profile_completed),
+      emailConfirmed: Boolean(row.email_confirmed),
     }));
   },
 
@@ -464,6 +469,7 @@ export const adminService = {
       guests: Number(row?.guests ?? 0),
       incomplete: Number(row?.incomplete ?? 0),
       tests: Number(row?.test_accounts ?? 0),
+      unconfirmed: Number(row?.unconfirmed ?? 0),
     };
   },
 

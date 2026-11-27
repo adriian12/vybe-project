@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/compone
 import Footer from '@/components/footer';
 import { VybeMark } from '@/components/brand/vybe-logo';
 import { AccountReason, onAccountRequested } from '@/lib/explorer';
+import { track } from '@/lib/observability';
 
 const ICONOS: Record<AccountReason, LucideIcon> = {
   follow: Heart,
@@ -37,7 +38,12 @@ const Contenido = ({ reason, onGo, dialog = false }: { reason: AccountReason; on
   const { t } = useTranslation();
   const navigate = useNavigate();
   const Icono = ICONOS[reason];
+  // Cuántas veces sale el aviso y qué responde la gente (admin › Métricas).
+  useEffect(() => {
+    track('account_prompt', { reason, wall: !dialog });
+  }, [reason, dialog]);
   const ir = (destino: string) => {
+    track('account_prompt_cta', { reason, choice: destino.includes('mode=register') ? 'create' : 'login' });
     onGo();
     navigate(destino);
   };

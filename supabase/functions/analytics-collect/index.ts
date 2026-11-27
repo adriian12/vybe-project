@@ -1,7 +1,7 @@
 import { serve } from 'https://deno.land/std@0.193.0/http/server.ts';
 import { overLimit, tooManyRequests } from '../_shared/rate-limit.ts';
 import { json, preflight } from '../_shared/cors.ts';
-import { adminClient, getUser, getProfileId } from '../_shared/supabase.ts';
+import { adminClient } from '../_shared/supabase.ts';
 
 /**
  * Recoge los lotes de eventos de producto que envía el cliente.
@@ -35,7 +35,59 @@ const ALLOWED = new Set([
   'tickets_checkout',
   'event_rated',
   'page_view',
+  // Migración 152: salir de la app, «Ver fiestas sin cuenta» y el aviso de crear cuenta.
+  'app_background',
+  'explore_started',
+  'account_prompt',
+  'account_prompt_cta',
 ]);
+
+const PLATFORMS = new Set(['ios', 'android', 'web']);
+const SOURCES = new Set(['store', 'test', 'testflight', 'sideload']);
+const corto = (v: unknown, max: number): string | null =>
+  typeof v === 'string' && v.length > 0 ? v.slice(0, max) : null;
+
+type Supa = ReturnType<typeof adminClient>;
+
+/**
+ * Quién manda el lote (migración 152): fiester@, invitado, alta sin terminar,
+ * sin cuenta (sesión anónima), negocio, admin o visitante sin sesión.
+ */
+const quienEs = async (
+  req: Request,
+  supabase: Supa,
+): Promise<{ userId: string | null; profileId: string | null; segment: string }> => {
+  const header = req.headers.get('Authorization');
+  const token = header?.startsWith('Bearer ') ? header.slice(7) : null;
+  if (!token) return { userId: null, profileId: null, segment: 'visitor' };
+  const { data, error } = await supabase.auth.getUser(token);
+  const user = data?.user;
+  if (error || !user) return { userId: null, profileId: null, segment: 'visitor' };
+  if (user.is_anonymous) return { userId: user.id, profileId: null, segment: 'explorer' };
+
+  const { data: perfil } = await supabase
+    .from('profiles')
+    .select('id, role, account_type, profile_completed_at')
+    .eq('user_id', user.id)
+    .maybeSingle();
+  if (perfil) {
+    const segment =
+      perfil.role === 'admin'
+        ? 'admin'
+        : perfil.account_type === 'guest'
+          ? 'guest'
+          : perfil.profile_completed_at
+            ? 'fiester'
+            : 'incomplete';
+    return { userId: user.id, profileId: perfil.id, segment };
+  }
+
+  const [{ data: local }, { data: equipo }] = await Promise.all([
+    supabase.from('venues').select('venue_id').eq('venue_id', user.id).limit(1).maybeSingle(),
+    supabase.from('venue_members').select('user_id').eq('user_id', user.id).limit(1).maybeSingle(),
+  ]);
+  return { userId: user.id, profileId: null, segment: local || equipo ? 'venue' : 'visitor' };
+};
 
 interface IncomingEvent {
   name: string;
@@ -57,18 +109,29 @@ serve(async (req: Request): Promise<Response> => {
     if (!Array.isArray(events) || events.length === 0) return json({ stored: 0 });
 
     // La analítica es opcional: si no hay sesión, se registra sin perfil.
-    const user = await getUser(req, supabase);
-    const profileId = user ? await getProfileId(supabase, user.id) : null;
+    const { userId, profileId, segment } = await quienEs(req, supabase);
 
     const rows = events
       .filter((event) => ALLOWED.has(event.name))
       .slice(0, MAX_BATCH)
-      .map((event) => ({
-        profile_id: profileId,
-        name: event.name,
-        props: event.props ?? {},
-        created_at: event.at ?? new Date().toISOString(),
-      }));
+      .map((event) => {
+        // El contexto de la sesión va en columnas propias, no en `props`.
+        const { sid, plat, v, src, ...props } = event.props ?? {};
+        const platform = corto(plat, 10);
+        const source = corto(src, 12);
+        return {
+          profile_id: profileId,
+          user_id: userId,
+          segment,
+          session_id: corto(sid, 64),
+          platform: platform && PLATFORMS.has(platform) ? platform : null,
+          app_version: corto(v, 32),
+          install_source: source && SOURCES.has(source) ? source : null,
+          name: event.name,
+          props,
+          created_at: event.at ?? new Date().toISOString(),
+        };
+      });
 
     if (rows.length === 0) return json({ stored: 0 });
 

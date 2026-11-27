@@ -19,6 +19,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { useAppContext } from '@/context/app-context';
 import LanguageSwitcher from '@/components/language-switcher';
 import AdminMetrics from '@/components/admin/admin-metrics';
+import AdminAnalytics from '@/components/admin/admin-analytics';
 import AdminBulkFeatures from '@/components/admin/admin-bulk-features';
 import { Checkbox } from '@/components/ui/checkbox';
 import AdminUsers from '@/components/admin/admin-users';
@@ -1447,7 +1448,12 @@ const AdminDashboardPage = () => {
             <AdminVenues key={`locales-${altas}`} />
           )}
 
-          {seccion === 'metrics' && <AdminMetrics />}
+          {seccion === 'metrics' && (
+            <div className="space-y-6">
+              <AdminAnalytics />
+              <AdminMetrics />
+            </div>
+          )}
 
           {seccion === 'instagram' && (
             <>

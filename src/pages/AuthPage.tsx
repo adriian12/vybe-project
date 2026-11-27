@@ -306,6 +306,13 @@ const UserLoginForm = () => {
         password: values.password,
       });
 
+      // Sin confirmar: a la pantalla de «revisa tu correo», que deja pedir otro.
+      // Antes sólo salía un aviso rojo y no había forma de recibir el enlace.
+      if (error?.message.includes('Email not confirmed')) {
+        navigate('/auth/verify-email-pending', { state: { email: values.email.trim(), fromLogin: true } });
+        return;
+      }
+
       if (error) {
         toast({
           title: t('common.error'),
@@ -317,7 +324,7 @@ const UserLoginForm = () => {
 
       if (!data.user.email_confirmed_at) {
         await supabase.auth.signOut();
-        navigate('/auth/verify-email-pending', { state: { email: values.email } });
+        navigate('/auth/verify-email-pending', { state: { email: values.email, fromLogin: true } });
         return;
       }
 

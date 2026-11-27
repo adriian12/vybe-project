@@ -165,3 +165,31 @@ con test). En negocios va en la cabecera de la tarjeta, sin tener que abrirla.
   revisión, ni cuentas con Premium de Apple que se sigue renovando.
 
 - **Usuarios reales** (migración 147). La sección Usuarios oculta por defecto las cuentas de prueba: administración, correos de `@seed.vybe.test`, `@vybe-test.local`, `@test.com`, `@example.com` y `@fiestea.es`, y las marcadas a mano en `admin_test_accounts` (botón «Marcar como prueba»). Los revisores de Apple entran con «Iniciar sesión con Apple» y un correo `privaterelay` nuevo en cada revisión: hay que marcarlos a mano. Etiquetas: Fiester@, Invitado y «Alta sin terminar» (fiester@ sin `profile_completed_at`, se quedó en el diálogo de completar perfil). Al invitado no se le pide nada más, así que nunca sale «sin terminar».
+
+## Analítica de uso y descargas (migración 152)
+
+- Admin › Métricas: arriba `admin-analytics.tsx` (descargas + uso por tipo de
+  persona), debajo el embudo de siempre.
+- `analytics-collect` decide el tipo con la sesión que manda el cliente
+  (`observability.ts` ya envía el token de la persona, antes mandaba la clave
+  anónima y `profile_id` salía siempre vacío): `fiester`, `guest`,
+  `incomplete`, `explorer` (sesión anónima), `venue`, `admin`, `visitor`.
+- Sesión = `sid` en memoria por apertura; nueva tras 30 min en segundo plano.
+  `app_background` marca el cierre (duración y pantalla de salida).
+- Plataforma, versión y origen de instalación los pone `services/native.ts`
+  con `setAnalyticsContext`; `test`/`testflight`, admin y cuentas de prueba
+  no cuentan en `admin_analytics_report`.
+- Las rutas se agrupan en SQL con `analytics_route()`; el nombre de cada
+  pantalla está en `PANTALLAS` del componente y en `admin.analytics.screens`.
+- Los datos por tipo empiezan a llenarse cuando la web y las apps llevan este
+  código (las filas anteriores no tienen `session_id` y no salen).
+- Se borran a los 13 meses (cron `fiestea-purgar-analitica`).
+
+## Cuentas con el correo sin confirmar (migración 154)
+
+- El alta por correo crea el perfil antes de confirmar: un correo mal escrito
+  dejaba un «usuario» que nunca podrá entrar. En Admin › Usuarios salen con la
+  etiqueta roja «Correo sin confirmar» y el botón «Reenviar correo de
+  confirmación» (usa `auth-email`, con la espera de 90 s de la migración 153).
+- No cuentan entre los reales (`admin_user_counts.unconfirmed`, chip rojo) ni
+  en las altas del informe de descargas.

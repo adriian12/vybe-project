@@ -98,6 +98,12 @@ export type Database = {
           name: string
           profile_id: string | null
           props: Json
+          app_version: string | null
+          install_source: string | null
+          platform: string | null
+          segment: string | null
+          session_id: string | null
+          user_id: string | null
         }
         Insert: {
           created_at?: string
@@ -105,6 +111,12 @@ export type Database = {
           name: string
           profile_id?: string | null
           props?: Json
+          app_version?: string | null
+          install_source?: string | null
+          platform?: string | null
+          segment?: string | null
+          session_id?: string | null
+          user_id?: string | null
         }
         Update: {
           created_at?: string
@@ -112,6 +124,12 @@ export type Database = {
           name?: string
           profile_id?: string | null
           props?: Json
+          app_version?: string | null
+          install_source?: string | null
+          platform?: string | null
+          segment?: string | null
+          session_id?: string | null
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -4029,6 +4047,7 @@ export type Database = {
           check_ins: number
           created_at: string
           email: string
+          email_confirmed: boolean
           is_test: boolean
           is_verified: boolean
           name: string
@@ -4050,6 +4069,14 @@ export type Database = {
         Args: { p_profile_id: string; p_test: boolean }
         Returns: boolean
       }
+      admin_analytics_report: {
+        Args: { p_days?: number; p_segment?: string }
+        Returns: Json
+      }
+      admin_downloads_report: {
+        Args: { p_days?: number }
+        Returns: Json
+      }
       admin_user_counts: {
         Args: never
         Returns: {
@@ -4058,6 +4085,7 @@ export type Database = {
           incomplete: number
           real_users: number
           test_accounts: number
+          unconfirmed: number
         }[]
       }
       admin_list_venues: {

@@ -1,5 +1,6 @@
 import type { User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { track } from '@/lib/observability';
 
 /**
  * «Ver fiestas sin cuenta» (migración 148).
@@ -15,6 +16,7 @@ import { supabase } from '@/integrations/supabase/client';
 export const startExploring = async (): Promise<void> => {
   const { error } = await supabase.auth.signInAnonymously();
   if (error) throw error;
+  track('explore_started');
 };
 
 export const isAnonymousUser = (user: User | null | undefined): boolean => Boolean(user?.is_anonymous);

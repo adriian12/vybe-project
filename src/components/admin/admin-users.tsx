@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/components/ui/use-toast';
 import { adminService, AdminUser, AdminUserCounts } from '@/services/admin';
+import { authEmailService, authEmailMessage } from '@/services/auth-email';
 import { cn } from '@/lib/utils';
 import { diasParaCaducar } from '@/lib/caducidad';
 import AdminNotices from '@/components/admin/admin-notices';
@@ -60,6 +61,23 @@ const AdminUsers = () => {
     const id = window.setTimeout(() => void cargar(busqueda, pagina, conPruebas), 400);
     return () => window.clearTimeout(id);
   }, [busqueda, pagina, conPruebas, cargar]);
+
+  /**
+   * Reenvía el correo de confirmación por `auth-email` (Resend), igual que el
+   * botón de «Revisa tu correo». Crea un enlace nuevo que anula el anterior.
+   */
+  const reenviarConfirmacion = async (user: AdminUser) => {
+    if (!user.email) return;
+    setOcupado(user.profileId);
+    try {
+      const { recent } = await authEmailService.resendConfirmation(user.email);
+      toast({ title: t(recent ? 'admin.users.resendRecent' : 'admin.users.resendDone', { email: user.email }) });
+    } catch (error) {
+      toast({ title: t('common.error'), description: t(authEmailMessage(error)), variant: 'destructive' });
+    } finally {
+      setOcupado(null);
+    }
+  };
 
   const marcarPrueba = async (user: AdminUser, prueba: boolean) => {
     setOcupado(user.profileId);
@@ -145,6 +163,8 @@ const AdminUsers = () => {
             { key: 'fiesteros', value: cuentas.fiesteros, className: 'bg-party-primary text-ink' },
             { key: 'guests', value: cuentas.guests, className: 'bg-[#3A3A3C] text-white' },
             { key: 'incomplete', value: cuentas.incomplete, className: 'bg-[#FF6B00] text-white' },
+            // Salen en la lista (en rojo) pero no cuentan entre los reales.
+            { key: 'unconfirmed', value: cuentas.unconfirmed, className: 'bg-destructive text-white' },
           ].map((c) => (
             <span key={c.key} className={cn('rounded-full px-3 py-1 text-caption font-bold', c.className)}>
               {t(`admin.users.counts.${c.key}`, { count: c.value })}
@@ -198,6 +218,11 @@ const AdminUsers = () => {
                   <p className="truncate text-caption text-ink/60">{user.email ?? '—'}</p>
                   <p className="mt-1 flex flex-wrap items-center gap-1">
                     <ModeBadge user={user} />
+                    {!user.emailConfirmed && (
+                      <span className="rounded-full bg-destructive px-1.5 py-0.5 text-[10px] font-bold uppercase text-white">
+                        {t('admin.users.kinds.unconfirmed')}
+                      </span>
+                    )}
                     {user.isTest && (
                       <span className="rounded-full border border-dashed border-ink/40 px-1.5 py-0.5 text-[10px] font-bold uppercase text-ink/60">
                         {t('admin.users.kinds.test')}
@@ -309,6 +334,16 @@ const AdminUsers = () => {
 
                     {user.role !== 'admin' && (
                       <div className="flex flex-wrap items-center justify-end gap-2">
+                        {!user.emailConfirmed && user.email && (
+                          <button
+                            type="button"
+                            onClick={() => void reenviarConfirmacion(user)}
+                            disabled={ocupado === user.profileId}
+                            className="press h-9 rounded-full bg-destructive px-3 text-caption font-bold text-white disabled:opacity-40"
+                          >
+                            {t('admin.users.resendConfirmation')}
+                          </button>
+                        )}
                         <button
                           type="button"
                           onClick={() => void marcarPrueba(user, !user.isTest)}

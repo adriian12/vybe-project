@@ -156,7 +156,13 @@ export type AnalyticsEvent =
   | 'account_deleted'
   | 'tickets_checkout'
   | 'event_rated'
-  | 'page_view';
+  | 'page_view'
+  // Migración 152: la app pasa a segundo plano (cierra la última pantalla),
+  // «Ver fiestas sin cuenta» y el aviso de crear cuenta con su respuesta.
+  | 'app_background'
+  | 'explore_started'
+  | 'account_prompt'
+  | 'account_prompt_cta';
 
 interface QueuedEvent {
   name: AnalyticsEvent;
@@ -165,13 +171,53 @@ interface QueuedEvent {
 }
 
 const queue: QueuedEvent[] = [];
+
+// ---------------------------------------------------------------- sesión
+// Una sesión por apertura de la app; tras 30 minutos en segundo plano empieza
+// otra. Vive sólo en memoria: no se guarda nada en el dispositivo.
+const NUEVA_SESION_MS = 30 * 60 * 1000;
+const nuevoId = (): string =>
+  typeof crypto !== 'undefined' && 'randomUUID' in crypto
+    ? crypto.randomUUID()
+    : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 12)}`;
+let sessionId = nuevoId();
+let ocultaDesde: number | null = null;
+
+/** Plataforma, versión y origen de la instalación (lo pone `services/native`). */
+const contexto: { plat: string; v?: string; src?: string } = { plat: 'web' };
+export const setAnalyticsContext = (valores: { plat?: string; v?: string; src?: string }) => {
+  Object.assign(contexto, valores);
+};
+
+// El servidor necesita la sesión de la persona para saber si es fiester@,
+// invitado o explora sin cuenta (`analytics-collect`). Se lee del cliente de
+// Supabase la primera vez que hace falta y se sigue cada cambio.
+let token: string | null = null;
+let tokenListo: Promise<void> | null = null;
+const prepararToken = (): Promise<void> => {
+  tokenListo ??= import('@/integrations/supabase/client')
+    .then(async ({ supabase }) => {
+      const { data } = await supabase.auth.getSession();
+      token = data.session?.access_token ?? null;
+      supabase.auth.onAuthStateChange((_evento, sesion) => {
+        token = sesion?.access_token ?? null;
+      });
+    })
+    .catch(() => undefined);
+  return tokenListo;
+};
 let flushTimer: ReturnType<typeof setTimeout> | null = null;
 
 const flush = async () => {
   flushTimer = null;
   if (!ANALYTICS_ENDPOINT || queue.length === 0) return;
 
+  await prepararToken();
   const batch = queue.splice(0, queue.length);
+  const bearer = token ?? ANON_KEY;
+  // La plataforma y la versión se añaden al enviar: al abrir la app todavía
+  // no se saben cuando llega la primera pantalla.
+  const lote = batch.map((e) => ({ ...e, props: { ...contexto, ...e.props } }));
 
   try {
     // `keepalive` permite que el último lote salga aunque se cierre la pestaña.
@@ -179,9 +225,10 @@ const flush = async () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        ...(ANON_KEY ? { apikey: ANON_KEY, Authorization: `Bearer ${ANON_KEY}` } : {}),
+        ...(ANON_KEY ? { apikey: ANON_KEY } : {}),
+        ...(bearer ? { Authorization: `Bearer ${bearer}` } : {}),
       },
-      body: JSON.stringify({ events: batch }),
+      body: JSON.stringify({ events: lote }),
       keepalive: true,
     });
   } catch {
@@ -208,7 +255,7 @@ export const track = (name: AnalyticsEvent, props: Record<string, unknown> = {})
 
   if (!ANALYTICS_ENDPOINT) return;
 
-  queue.push({ name, props, at: new Date().toISOString() });
+  queue.push({ name, props: { ...props, sid: sessionId }, at: new Date().toISOString() });
 
   // Agrupamos para no hacer una petición por clic.
   if (!flushTimer) flushTimer = setTimeout(() => void flush(), 3000);
@@ -216,6 +263,18 @@ export const track = (name: AnalyticsEvent, props: Record<string, unknown> = {})
 
 if (typeof document !== 'undefined') {
   document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'hidden') void flush();
+    if (document.visibilityState === 'hidden') {
+      ocultaDesde = Date.now();
+      // Marca el final de la última pantalla: así se sabe cuánto duró y que
+      // la persona se fue desde ahí.
+      track('app_background', { path: window.location.pathname });
+      void flush();
+      return;
+    }
+    if (ocultaDesde && Date.now() - ocultaDesde > NUEVA_SESION_MS) {
+      sessionId = nuevoId();
+      track('page_view', { path: window.location.pathname, host: window.location.hostname });
+    }
+    ocultaDesde = null;
   });
 }

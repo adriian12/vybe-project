@@ -75,3 +75,17 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
 - **Correos propios de Supabase Auth** (aviso de contraseña cambiada y confirmación de cambio de correo): salen por el SMTP de Resend (`smtp.resend.com:465`, usuario `resend`, la `RESEND_API_KEY`) desde `no-reply@fiestea.es` con remitente «Fiestea». Hasta el 23-11-2026 salían por el Gmail `vybe.party@gmail.com` como «Vybe». Plantillas en español con la marca; se cambian por la Management API (`/config/auth`).
 
 - **Ver fiestas sin cuenta** (migración 148, 26-11-2026). Botón en la bienvenida (`Index.tsx`): `signInAnonymously()` (activado en Auth, límite 30 por IP y hora). La sesión anónima no tiene perfil (`handle_new_user` la salta) y entra como `userType = user` con `isExplorer`. Las rutas con `explorer: true` en `App.tsx` (inicio, mapa, ubicación, ficha de fiesta, local, sala) se abren; las demás muestran `AccountWall`. Las acciones que necesitan cuenta empiezan con `needsAccount(motivo)` (`lib/explorer.ts`), que abre `RequireAccountSheet`. Sin pantalla de consentimiento (acepta al pie de la bienvenida). Políticas RESTRICTIVE: sin crear perfil ni negocio, sin códigos y sin subir ficheros. `purge_anonymous_users()` borra a las 3:45 las de más de 30 días. Si se añade un botón que escribe con perfil en una pantalla abierta, ponle `needsAccount`.
+
+### Enlace de verificación «no válido» (27-11-2026, migración 153)
+
+- Cada `generateLink()` nuevo **anula el enlace anterior**. Quien pulsaba
+  «Reenviar» mientras esperaba el primer correo recibía dos y, al abrir el
+  primero, GoTrue contestaba `One-time token not found` (pantalla «No hemos
+  podido verificar tu email»).
+- Ahora: «Reenviar» en «Revisa tu correo» espera 60 s tras el alta;
+  `auth-email` no crea otro si el último salió hace menos de 90 s
+  (`auth_confirmation_recent`) y responde `recent: true`.
+- Volver a abrir un enlace ya usado también da `otp_expired` aunque la cuenta
+  esté confirmada (le pasó a Neus el 25-11): la pantalla de error lo explica y
+  pide el correo para reenviar (el enlace no lo trae).
+- Entrar sin confirmar lleva a «Revisa tu correo» con el reenvío activo.

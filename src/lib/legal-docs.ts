@@ -128,7 +128,7 @@ export const legalDocs = (app: string, web: string, panel: string, miembro: stri
         },
         {
           title: 'Cuánto tiempo los conservamos',
-          body: 'La foto del momento, hasta que sales de la fiesta o termina. Los matches y sus conversaciones caducan una hora después del final de la fiesta, salvo que los guardes. Las fotos rechazadas por la moderación se borran al momento. Las listas de invitados y los datos de cada noche, lo que dura la fiesta y el tiempo necesario para las estadísticas del negocio. El resto, mientras la cuenta esté activa. Al eliminar la cuenta se borra todo, salvo los pedidos de entradas, que se quedan en las ventas del negocio sin tu nombre, y los justificantes de pago, que Stripe conserva el plazo que exige la ley (hasta seis años), bloqueados.',
+          body: 'La foto del momento, hasta que sales de la fiesta o termina. Los matches y sus conversaciones caducan una hora después del final de la fiesta, salvo que los guardes. Las fotos rechazadas por la moderación se borran al momento. Las listas de invitados y los datos de cada noche, lo que dura la fiesta y el tiempo necesario para las estadísticas del negocio. Las estadísticas de uso de la app (qué pantallas se abren y cuándo, ligadas a la cuenta o a la sesión sin cuenta), 13 meses. El resto, mientras la cuenta esté activa. Al eliminar la cuenta se borra todo, salvo los pedidos de entradas, que se quedan en las ventas del negocio sin tu nombre, y los justificantes de pago, que Stripe conserva el plazo que exige la ley (hasta seis años), bloqueados.',
         },
         {
           title: 'Tus derechos',

@@ -281,6 +281,15 @@ serve(async (req: Request): Promise<Response> => {
       if (phoneTaken) return json({ error: 'PHONE_TAKEN' }, 409);
     }
 
+    // Reenvío pedido justo después del alta (o de otro reenvío): cada enlace
+    // nuevo anula el anterior, y quien abría el primer correo se encontraba
+    // «el enlace no es válido» (migración 153). Si el último salió hace menos
+    // de 90 s no se crea otro: se le dice que espere.
+    if (action === 'resend') {
+      const { data: reciente } = await supabase.rpc('auth_confirmation_recent', { p_email: email, p_seconds: 90 });
+      if (reciente === true) return json({ ok: true, recent: true });
+    }
+
     // ------------------------------------------------------------------ enlace
     // `signup` crea la cuenta; `resend` la vuelve a enlazar sin duplicarla; y
     // `recover` sólo sirve para una cuenta que ya existe.

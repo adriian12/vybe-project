@@ -1,5 +1,6 @@
 import { Capacitor, registerPlugin } from '@capacitor/core';
 import { supabase } from '@/integrations/supabase/client';
+import { setAnalyticsContext } from '@/lib/observability';
 
 /**
  * Puente con el contenedor nativo.
@@ -79,7 +80,27 @@ export const setupNativeShell = async (): Promise<void> => {
 
   // La primera apertura de la app instalada cuenta como una descarga (141).
   void recordInstallOnce();
+  // Plataforma, versión y origen en la analítica de uso (migración 152).
+  void Promise.all([appVersion(), installSource()]).then(([v, src]) =>
+    setAnalyticsContext({ plat: platform(), v, src }),
+  );
 };
+
+let versionCache: Promise<string | undefined> | null = null;
+/** «1.2.1 (213)», o nada si no se puede leer. */
+const appVersion = (): Promise<string | undefined> =>
+  (versionCache ??= import('@capacitor/app')
+    .then(({ App }) => App.getInfo())
+    .then((info) => `${info.version} (${info.build})`)
+    .catch(() => undefined));
+
+let sourceCache: Promise<string | undefined> | null = null;
+/** De dónde viene la instalación (migración 149): store, test, testflight o sideload. */
+const installSource = (): Promise<string | undefined> =>
+  (sourceCache ??= registerPlugin<{ getSource: () => Promise<{ source: string }> }>('FiesteaInstall')
+    .getSource()
+    .then((r) => r.source)
+    .catch(() => undefined));
 
 const INSTALL_KEY = 'fiestea_install_recorded';
 
@@ -94,25 +115,12 @@ const recordInstallOnce = async (): Promise<void> => {
     if (plat !== 'android' && plat !== 'ios') return;
     if (window.localStorage.getItem(INSTALL_KEY)) return;
 
-    let version: string | undefined;
-    try {
-      const { App } = await import('@capacitor/app');
-      const info = await App.getInfo();
-      version = `${info.version} (${info.build})`;
-    } catch {
-      // Sin versión se cuenta igual.
-    }
+    // Sin versión u origen se cuenta igual.
+    const version = await appVersion();
 
     // De dónde viene (migración 149): robots de Google, TestFlight y la
     // revisión de Apple no cuentan como descargas.
-    let source: string | undefined;
-    try {
-      const { registerPlugin } = await import('@capacitor/core');
-      const FiesteaInstall = registerPlugin<{ getSource: () => Promise<{ source: string }> }>('FiesteaInstall');
-      source = (await FiesteaInstall.getSource()).source;
-    } catch {
-      // Una versión sin el plugin: se cuenta sin origen.
-    }
+    const source = await installSource();
 
     const { error } = await supabase.rpc('record_app_install', {
       p_platform: plat,
