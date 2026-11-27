@@ -723,6 +723,10 @@ const ProfilePage = () => {
             </section>
           )}
 
+          {/* Fotos y «Sobre mí» son de la cuenta de fiester@: el invitado no las
+              ve, pero no se borran y vuelven tal cual si cambia otra vez. */}
+          {!esInvitado && (
+          <>
           {/* -------------------------------------------------------- fotos */}
           <section className="rounded-2xl bg-white p-4 text-ink shadow-2xl">
             <div className="mb-3 flex items-center justify-between">
@@ -780,13 +784,18 @@ const ProfilePage = () => {
 
             <p className="mt-2 text-center text-body-sm text-ink/60">{t('profile.photosVisible')}</p>
           </section>
+          </>
+          )}
 
-          {/* ---------------------------------------------------- sobre mí */}
+          {/* ---------------------------------------------------- sobre mí
+              El invitado sólo la ve al pulsar el lápiz del nombre, y sin la
+              bio ni el plan de esta noche. */}
+          {(!esInvitado || isEditing) && (
           <section ref={sobreMi} className="rounded-2xl bg-white p-4 text-ink shadow-2xl">
             <div className="mb-2 flex items-center justify-between">
               <h2 className="flex items-center gap-2 font-display text-headline-md">
                 <IdCard size={20} />
-                {t('profile.aboutMe')}
+                {esInvitado ? t('profile.editName') : t('profile.aboutMe')}
               </h2>
               <button
                 type="button"
@@ -823,6 +832,8 @@ const ProfilePage = () => {
                     onChange={(e) => setNacimiento(e.target.value)}
                   />
                 </label>
+                {!esInvitado && (
+                <>
                 <label className="block space-y-1">
                   <span className="text-caption text-ink/60">{t('profile.bio')}</span>
                   <textarea
@@ -843,6 +854,8 @@ const ProfilePage = () => {
                     maxLength={80}
                   />
                 </label>
+                </>
+                )}
                 <button
                   type="button"
                   onClick={() => void saveDetails()}
@@ -867,6 +880,7 @@ const ProfilePage = () => {
               </>
             )}
           </section>
+          )}
 
           {/* Intereses de fiesta: ocultos. El alta no los pide y en los filtros
               del tablón tampoco están, así que aquí sólo eran ruido. El código
@@ -972,7 +986,9 @@ const ProfilePage = () => {
             />
 
             {/* A quién se quiere ver. El género no aparece aquí: se elige al
-                registrarse y la base de datos impide cambiarlo. */}
+                registrarse y la base de datos impide cambiarlo. El invitado no
+                liga, así que no lo ve (lo elegido se guarda). */}
+            {!esInvitado && (
             <div className="px-4 py-4">
               <p className="font-display text-title-card">{t('auth.wants')}</p>
               <p className="mb-3 text-body-sm text-party-gray">{t('profile.wantsHelp')}</p>
@@ -993,6 +1009,7 @@ const ProfilePage = () => {
                 ))}
               </div>
             </div>
+            )}
 
             {/* Sólo el idioma y la flecha abren el menú, y al soltar el dedo:
                 Radix lo abre al posarlo y, con la fila entera de botón, se

@@ -295,3 +295,7 @@ Notas de trabajo de Fiestea (antes en `CLAUDE.md`). Se leen cuando la tarea toca
   ve y la ve todo el mundo. «Ficha sin hacer» se mide por
   `profile_completed_at`, no por el género. Nunca vuelvas a hacerlo
   obligatorio en la app de iOS.
+
+## Perfil del invitado
+
+En modo invitado el perfil no enseña «Mis fotos de fiesta», «Sobre mí» ni «Quiero ver»: son de la cuenta de fiester@. No se borra nada (`set_account_type` sólo quita la foto y los likes sin match de la fiesta en curso), así que al volver a fiester@ sale todo como estaba. El lápiz del nombre abre «Sobre mí» sólo con nombre y fecha de nacimiento.
